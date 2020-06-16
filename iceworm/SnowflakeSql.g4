@@ -35,8 +35,8 @@ functionCall
     ;
 
 relation
-    : left=relation JOIN right=relation  #joinRelation
-    | identifier                         #tableRelation
+    : left=relation JOIN right=relation (ON condition=booleanExpression)?  #joinRelation
+    | identifier                                                           #tableRelation
     ;
 
 identifier
@@ -52,6 +52,7 @@ AS: 'as';
 FROM: 'from';
 JOIN: 'join';
 NOT: 'not';
+ON: 'on';
 OR: 'or';
 SELECT: 'select';
 

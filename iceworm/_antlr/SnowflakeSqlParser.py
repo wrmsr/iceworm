@@ -12,39 +12,40 @@ else:
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\20")
-        buf.write("h\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\21")
+        buf.write("l\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b")
         buf.write("\t\b\4\t\t\t\4\n\t\n\4\13\t\13\3\2\3\2\3\2\3\2\3\3\3\3")
         buf.write("\3\3\3\3\7\3\37\n\3\f\3\16\3\"\13\3\3\3\3\3\3\3\3\3\7")
         buf.write("\3(\n\3\f\3\16\3+\13\3\5\3-\n\3\3\4\3\4\5\4\61\n\4\3\4")
         buf.write("\5\4\64\n\4\3\5\3\5\3\6\3\6\3\6\3\6\5\6<\n\6\3\6\3\6\3")
         buf.write("\6\7\6A\n\6\f\6\16\6D\13\6\3\7\3\7\3\7\5\7I\n\7\3\b\3")
         buf.write("\b\3\b\3\b\3\b\7\bP\n\b\f\b\16\bS\13\b\5\bU\n\b\3\b\3")
-        buf.write("\b\3\t\3\t\3\t\3\t\3\t\3\t\7\t_\n\t\f\t\16\tb\13\t\3\n")
-        buf.write("\3\n\3\13\3\13\3\13\2\4\n\20\f\2\4\6\b\n\f\16\20\22\24")
-        buf.write("\2\3\4\2\7\7\f\f\2i\2\26\3\2\2\2\4\32\3\2\2\2\6.\3\2\2")
-        buf.write("\2\b\65\3\2\2\2\n;\3\2\2\2\fH\3\2\2\2\16J\3\2\2\2\20X")
-        buf.write("\3\2\2\2\22c\3\2\2\2\24e\3\2\2\2\26\27\5\4\3\2\27\30\7")
-        buf.write("\3\2\2\30\31\7\2\2\3\31\3\3\2\2\2\32\33\7\r\2\2\33 \5")
-        buf.write("\6\4\2\34\35\7\4\2\2\35\37\5\6\4\2\36\34\3\2\2\2\37\"")
-        buf.write("\3\2\2\2 \36\3\2\2\2 !\3\2\2\2!,\3\2\2\2\" \3\2\2\2#$")
-        buf.write("\7\t\2\2$)\5\20\t\2%&\7\4\2\2&(\5\20\t\2\'%\3\2\2\2(+")
-        buf.write("\3\2\2\2)\'\3\2\2\2)*\3\2\2\2*-\3\2\2\2+)\3\2\2\2,#\3")
-        buf.write("\2\2\2,-\3\2\2\2-\5\3\2\2\2.\63\5\b\5\2/\61\7\b\2\2\60")
-        buf.write("/\3\2\2\2\60\61\3\2\2\2\61\62\3\2\2\2\62\64\5\22\n\2\63")
-        buf.write("\60\3\2\2\2\63\64\3\2\2\2\64\7\3\2\2\2\65\66\5\n\6\2\66")
-        buf.write("\t\3\2\2\2\678\b\6\1\28<\5\f\7\29:\7\13\2\2:<\5\n\6\4")
-        buf.write(";\67\3\2\2\2;9\3\2\2\2<B\3\2\2\2=>\f\3\2\2>?\t\2\2\2?")
-        buf.write("A\5\n\6\4@=\3\2\2\2AD\3\2\2\2B@\3\2\2\2BC\3\2\2\2C\13")
-        buf.write("\3\2\2\2DB\3\2\2\2EI\5\22\n\2FI\5\24\13\2GI\5\16\b\2H")
-        buf.write("E\3\2\2\2HF\3\2\2\2HG\3\2\2\2I\r\3\2\2\2JK\5\22\n\2KT")
-        buf.write("\7\5\2\2LM\5\b\5\2MQ\7\4\2\2NP\5\b\5\2ON\3\2\2\2PS\3\2")
-        buf.write("\2\2QO\3\2\2\2QR\3\2\2\2RU\3\2\2\2SQ\3\2\2\2TL\3\2\2\2")
-        buf.write("TU\3\2\2\2UV\3\2\2\2VW\7\6\2\2W\17\3\2\2\2XY\b\t\1\2Y")
-        buf.write("Z\5\22\n\2Z`\3\2\2\2[\\\f\4\2\2\\]\7\n\2\2]_\5\20\t\5")
-        buf.write("^[\3\2\2\2_b\3\2\2\2`^\3\2\2\2`a\3\2\2\2a\21\3\2\2\2b")
-        buf.write("`\3\2\2\2cd\7\17\2\2d\23\3\2\2\2ef\7\16\2\2f\25\3\2\2")
-        buf.write("\2\r ),\60\63;BHQT`")
+        buf.write("\b\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\5\ta\n\t\7\tc\n\t\f")
+        buf.write("\t\16\tf\13\t\3\n\3\n\3\13\3\13\3\13\2\4\n\20\f\2\4\6")
+        buf.write("\b\n\f\16\20\22\24\2\3\4\2\7\7\r\r\2n\2\26\3\2\2\2\4\32")
+        buf.write("\3\2\2\2\6.\3\2\2\2\b\65\3\2\2\2\n;\3\2\2\2\fH\3\2\2\2")
+        buf.write("\16J\3\2\2\2\20X\3\2\2\2\22g\3\2\2\2\24i\3\2\2\2\26\27")
+        buf.write("\5\4\3\2\27\30\7\3\2\2\30\31\7\2\2\3\31\3\3\2\2\2\32\33")
+        buf.write("\7\16\2\2\33 \5\6\4\2\34\35\7\4\2\2\35\37\5\6\4\2\36\34")
+        buf.write("\3\2\2\2\37\"\3\2\2\2 \36\3\2\2\2 !\3\2\2\2!,\3\2\2\2")
+        buf.write("\" \3\2\2\2#$\7\t\2\2$)\5\20\t\2%&\7\4\2\2&(\5\20\t\2")
+        buf.write("\'%\3\2\2\2(+\3\2\2\2)\'\3\2\2\2)*\3\2\2\2*-\3\2\2\2+")
+        buf.write(")\3\2\2\2,#\3\2\2\2,-\3\2\2\2-\5\3\2\2\2.\63\5\b\5\2/")
+        buf.write("\61\7\b\2\2\60/\3\2\2\2\60\61\3\2\2\2\61\62\3\2\2\2\62")
+        buf.write("\64\5\22\n\2\63\60\3\2\2\2\63\64\3\2\2\2\64\7\3\2\2\2")
+        buf.write("\65\66\5\n\6\2\66\t\3\2\2\2\678\b\6\1\28<\5\f\7\29:\7")
+        buf.write("\13\2\2:<\5\n\6\4;\67\3\2\2\2;9\3\2\2\2<B\3\2\2\2=>\f")
+        buf.write("\3\2\2>?\t\2\2\2?A\5\n\6\4@=\3\2\2\2AD\3\2\2\2B@\3\2\2")
+        buf.write("\2BC\3\2\2\2C\13\3\2\2\2DB\3\2\2\2EI\5\22\n\2FI\5\24\13")
+        buf.write("\2GI\5\16\b\2HE\3\2\2\2HF\3\2\2\2HG\3\2\2\2I\r\3\2\2\2")
+        buf.write("JK\5\22\n\2KT\7\5\2\2LM\5\b\5\2MQ\7\4\2\2NP\5\b\5\2ON")
+        buf.write("\3\2\2\2PS\3\2\2\2QO\3\2\2\2QR\3\2\2\2RU\3\2\2\2SQ\3\2")
+        buf.write("\2\2TL\3\2\2\2TU\3\2\2\2UV\3\2\2\2VW\7\6\2\2W\17\3\2\2")
+        buf.write("\2XY\b\t\1\2YZ\5\22\n\2Zd\3\2\2\2[\\\f\4\2\2\\]\7\n\2")
+        buf.write("\2]`\5\20\t\2^_\7\f\2\2_a\5\n\6\2`^\3\2\2\2`a\3\2\2\2")
+        buf.write("ac\3\2\2\2b[\3\2\2\2cf\3\2\2\2db\3\2\2\2de\3\2\2\2e\21")
+        buf.write("\3\2\2\2fd\3\2\2\2gh\7\20\2\2h\23\3\2\2\2ij\7\17\2\2j")
+        buf.write("\25\3\2\2\2\16 ),\60\63;BHQT`d")
         return buf.getvalue()
 
 
@@ -59,11 +60,11 @@ class SnowflakeSqlParser ( Parser ):
     sharedContextCache = PredictionContextCache()
 
     literalNames = [ "<INVALID>", "';'", "','", "'('", "')'", "'and'", "'as'", 
-                     "'from'", "'join'", "'not'", "'or'", "'select'" ]
+                     "'from'", "'join'", "'not'", "'on'", "'or'", "'select'" ]
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "AND", "AS", "FROM", "JOIN", "NOT", "OR", 
-                      "SELECT", "INTEGER_VALUE", "IDENTIFIER", "WS" ]
+                      "<INVALID>", "AND", "AS", "FROM", "JOIN", "NOT", "ON", 
+                      "OR", "SELECT", "INTEGER_VALUE", "IDENTIFIER", "WS" ]
 
     RULE_singleStatement = 0
     RULE_selectStatement = 1
@@ -90,11 +91,12 @@ class SnowflakeSqlParser ( Parser ):
     FROM=7
     JOIN=8
     NOT=9
-    OR=10
-    SELECT=11
-    INTEGER_VALUE=12
-    IDENTIFIER=13
-    WS=14
+    ON=10
+    OR=11
+    SELECT=12
+    INTEGER_VALUE=13
+    IDENTIFIER=14
+    WS=15
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -725,6 +727,7 @@ class SnowflakeSqlParser ( Parser ):
             super().__init__(parser)
             self.left = None # RelationContext
             self.right = None # RelationContext
+            self.condition = None # BooleanExpressionContext
             self.copyFrom(ctx)
 
         def JOIN(self):
@@ -734,6 +737,11 @@ class SnowflakeSqlParser ( Parser ):
                 return self.getTypedRuleContexts(SnowflakeSqlParser.RelationContext)
             else:
                 return self.getTypedRuleContext(SnowflakeSqlParser.RelationContext,i)
+
+        def ON(self):
+            return self.getToken(SnowflakeSqlParser.ON, 0)
+        def booleanExpression(self):
+            return self.getTypedRuleContext(SnowflakeSqlParser.BooleanExpressionContext,0)
 
 
         def enterRule(self, listener:ParseTreeListener):
@@ -793,9 +801,9 @@ class SnowflakeSqlParser ( Parser ):
             self.state = 87
             self.identifier()
             self._ctx.stop = self._input.LT(-1)
-            self.state = 94
+            self.state = 98
             self._errHandler.sync(self)
-            _alt = self._interp.adaptivePredict(self._input,10,self._ctx)
+            _alt = self._interp.adaptivePredict(self._input,11,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                 if _alt==1:
                     if self._parseListeners is not None:
@@ -811,10 +819,20 @@ class SnowflakeSqlParser ( Parser ):
                     self.state = 90
                     self.match(SnowflakeSqlParser.JOIN)
                     self.state = 91
-                    localctx.right = self.relation(3) 
-                self.state = 96
+                    localctx.right = self.relation(0)
+                    self.state = 94
+                    self._errHandler.sync(self)
+                    la_ = self._interp.adaptivePredict(self._input,10,self._ctx)
+                    if la_ == 1:
+                        self.state = 92
+                        self.match(SnowflakeSqlParser.ON)
+                        self.state = 93
+                        localctx.condition = self.booleanExpression(0)
+
+             
+                self.state = 100
                 self._errHandler.sync(self)
-                _alt = self._interp.adaptivePredict(self._input,10,self._ctx)
+                _alt = self._interp.adaptivePredict(self._input,11,self._ctx)
 
         except RecognitionException as re:
             localctx.exception = re
@@ -860,7 +878,7 @@ class SnowflakeSqlParser ( Parser ):
         self.enterRule(localctx, 16, self.RULE_identifier)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 97
+            self.state = 101
             self.match(SnowflakeSqlParser.IDENTIFIER)
         except RecognitionException as re:
             localctx.exception = re
@@ -877,26 +895,38 @@ class SnowflakeSqlParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def INTEGER_VALUE(self):
-            return self.getToken(SnowflakeSqlParser.INTEGER_VALUE, 0)
 
         def getRuleIndex(self):
             return SnowflakeSqlParser.RULE_number
 
+     
+        def copyFrom(self, ctx:ParserRuleContext):
+            super().copyFrom(ctx)
+
+
+
+    class IntegerNumberContext(NumberContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a SnowflakeSqlParser.NumberContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def INTEGER_VALUE(self):
+            return self.getToken(SnowflakeSqlParser.INTEGER_VALUE, 0)
+
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterNumber" ):
-                listener.enterNumber(self)
+            if hasattr( listener, "enterIntegerNumber" ):
+                listener.enterIntegerNumber(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitNumber" ):
-                listener.exitNumber(self)
+            if hasattr( listener, "exitIntegerNumber" ):
+                listener.exitIntegerNumber(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitNumber" ):
-                return visitor.visitNumber(self)
+            if hasattr( visitor, "visitIntegerNumber" ):
+                return visitor.visitIntegerNumber(self)
             else:
                 return visitor.visitChildren(self)
-
 
 
 
@@ -905,8 +935,9 @@ class SnowflakeSqlParser ( Parser ):
         localctx = SnowflakeSqlParser.NumberContext(self, self._ctx, self.state)
         self.enterRule(localctx, 18, self.RULE_number)
         try:
+            localctx = SnowflakeSqlParser.IntegerNumberContext(self, localctx)
             self.enterOuterAlt(localctx, 1)
-            self.state = 99
+            self.state = 103
             self.match(SnowflakeSqlParser.INTEGER_VALUE)
         except RecognitionException as re:
             localctx.exception = re

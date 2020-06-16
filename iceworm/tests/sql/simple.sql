@@ -7,3 +7,4 @@ select x as y from z;
 select x and y;
 select not z;
 select x from y join z;
+select x from y join z on 1;

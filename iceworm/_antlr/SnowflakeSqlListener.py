@@ -117,12 +117,12 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#number.
-    def enterNumber(self, ctx:SnowflakeSqlParser.NumberContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#integerNumber.
+    def enterIntegerNumber(self, ctx:SnowflakeSqlParser.IntegerNumberContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#number.
-    def exitNumber(self, ctx:SnowflakeSqlParser.NumberContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#integerNumber.
+    def exitIntegerNumber(self, ctx:SnowflakeSqlParser.IntegerNumberContext):
         pass
 
 

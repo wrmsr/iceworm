@@ -70,8 +70,8 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#number.
-    def visitNumber(self, ctx:SnowflakeSqlParser.NumberContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#integerNumber.
+    def visitIntegerNumber(self, ctx:SnowflakeSqlParser.IntegerNumberContext):
         return self.visitChildren(ctx)
 
 

@@ -22,7 +22,12 @@ class Renderer(dispatch.Class):
         return str(node.value)
 
     def render(self, node: no.Join) -> str:  # noqa
-        return self.render(node.left) + ' join ' + self.render(node.right)
+        return (
+                self.render(node.left) +
+                ' join ' +
+                self.render(node.right) +
+                ((' on ' + self.render(node.condition)) if node.condition is not None else '')
+        )
 
     def render(self, node: no.Select) -> str:  # noqa
         return (

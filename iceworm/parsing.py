@@ -32,13 +32,14 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitIdentifier(self, ctx: SnowflakeSqlParser.IdentifierContext):
         return no.Identifier(ctx.IDENTIFIER().getText())
 
+    def visitIntegerNumber(self, ctx: SnowflakeSqlParser.IntegerNumberContext):
+        return no.Integer(int(ctx.INTEGER_VALUE().getText()))
+
     def visitJoinRelation(self, ctx: SnowflakeSqlParser.JoinRelationContext):
         left = self.visit(ctx.left)
         right = self.visit(ctx.right)
-        return no.Join(left, right)
-
-    def visitIntegerNumber(self, ctx: SnowflakeSqlParser.IntegerNumberContext):
-        return no.Integer(int(ctx.INTEGER_VALUE().getText()))
+        condition = self.visit(ctx.condition) if ctx.condition is not None else None
+        return no.Join(left, right, condition)
 
     def visitSelectItem(self, ctx: SnowflakeSqlParser.SelectItemContext):
         expr = self.visit(ctx.expression())

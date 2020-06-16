@@ -57,6 +57,7 @@ class Relation(Node, abstract=True):
 class Join(Relation):
     left: Relation
     right: Relation
+    condition: ta.Optional[Expr] = None
 
 
 class Table(Relation):
