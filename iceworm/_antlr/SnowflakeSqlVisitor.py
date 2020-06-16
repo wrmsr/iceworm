@@ -30,6 +30,16 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#booleanExpression.
+    def visitBooleanExpression(self, ctx:SnowflakeSqlParser.BooleanExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#primaryExpression.
+    def visitPrimaryExpression(self, ctx:SnowflakeSqlParser.PrimaryExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#functionCall.
     def visitFunctionCall(self, ctx:SnowflakeSqlParser.FunctionCallContext):
         return self.visitChildren(ctx)

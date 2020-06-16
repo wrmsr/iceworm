@@ -1,6 +1,7 @@
 import typing as ta
 
 from omnibus import dataclasses as dc
+from omnibus import lang
 
 
 class Node(dc.Enum):
@@ -9,6 +10,26 @@ class Node(dc.Enum):
 
 class Expr(Node, abstract=True):
     pass
+
+
+class BinaryOp(lang.ValueEnum):
+    AND = 'and'
+    OR = 'or'
+
+
+class BinaryExpr(Expr):
+    left: Expr
+    op: BinaryOp
+    right: Expr
+
+
+class UnaryOp(lang.ValueEnum):
+    NOT = 'not'
+
+
+class UnaryExpr(Expr):
+    op: UnaryOp
+    value: Expr
 
 
 class Identifier(Expr):

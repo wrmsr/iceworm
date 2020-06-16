@@ -15,6 +15,16 @@ selectItem
     ;
 
 expression
+    : booleanExpression
+    ;
+
+booleanExpression
+    : primaryExpression
+    | NOT booleanExpression
+    | booleanExpression (AND | OR) booleanExpression
+    ;
+
+primaryExpression
     : identifier
     | number
     | functionCall
@@ -36,9 +46,12 @@ number
     : INTEGER_VALUE
     ;
 
+AND: 'and';
 AS: 'as';
-SELECT: 'select';
 FROM: 'from';
+NOT: 'not';
+OR: 'or';
+SELECT: 'select';
 
 INTEGER_VALUE
     : DIGIT+

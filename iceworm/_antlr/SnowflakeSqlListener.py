@@ -45,6 +45,24 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#booleanExpression.
+    def enterBooleanExpression(self, ctx:SnowflakeSqlParser.BooleanExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#booleanExpression.
+    def exitBooleanExpression(self, ctx:SnowflakeSqlParser.BooleanExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#primaryExpression.
+    def enterPrimaryExpression(self, ctx:SnowflakeSqlParser.PrimaryExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#primaryExpression.
+    def exitPrimaryExpression(self, ctx:SnowflakeSqlParser.PrimaryExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#functionCall.
     def enterFunctionCall(self, ctx:SnowflakeSqlParser.FunctionCallContext):
         pass
