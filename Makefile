@@ -170,7 +170,7 @@ antlr:
 			( \
 				BUF=$$(echo -e '# flake8: noqa' && cat "$$P") ; \
 				IMP=$$(echo "$$D" | tr -dc / | tr / .) ; \
-				BUF=$$(echo "$$BUF" | sed "s/^from antlr4/from $$IMP.._vendor.antlr4/") ; \
+				BUF=$$(echo "$$BUF" | sed "s/^from antlr4/from omnibus._vendor.antlr4/") ; \
 				echo "$$BUF" > "$$P" \
 			) ; \
 		done ; \
