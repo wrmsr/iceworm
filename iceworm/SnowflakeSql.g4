@@ -78,7 +78,7 @@ SELECT: 'select';
 WHERE: 'where';
 
 STRING
-    : '\'' ( ~'\'' | '\'\'' )* '\''
+    : '\'' (~'\'' | '\'\'')* '\''
     ;
 
 INTEGER_VALUE
@@ -90,7 +90,7 @@ IDENTIFIER
     ;
 
 QUOTED_IDENTIFIER
-    : '"' ( ~'"' | '""' )* '"'
+    : '"' (~'"' | '""')* '"'
     ;
 
 fragment DIGIT
