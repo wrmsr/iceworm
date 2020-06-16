@@ -29,6 +29,7 @@ booleanExpression
 primaryExpression
     : identifier
     | number
+    | string
     | functionCall
     | null
     ;
@@ -47,11 +48,16 @@ groupBy
     ;
 
 identifier
-    : IDENTIFIER
+    : IDENTIFIER         #unquotedIdentifier
+    | QUOTED_IDENTIFIER  #quotedIdentifier
     ;
 
 number
     : INTEGER_VALUE  #integerNumber
+    ;
+
+string
+    : STRING
     ;
 
 null
@@ -71,6 +77,10 @@ OR: 'or';
 SELECT: 'select';
 WHERE: 'where';
 
+STRING
+    : '\'' ( ~'\'' | '\'\'' )* '\''
+    ;
+
 INTEGER_VALUE
     : DIGIT+
     ;
@@ -79,12 +89,20 @@ IDENTIFIER
     : (LETTER | '_') (LETTER | DIGIT | '_' | '@' | ':')*
     ;
 
+QUOTED_IDENTIFIER
+    : '"' ( ~'"' | '""' )* '"'
+    ;
+
 fragment DIGIT
     : [0-9]
     ;
 
 fragment LETTER
     : [A-Za-z]
+    ;
+
+COMMENT
+    : '--' ~[\r\n]* '\r'? '\n'? -> channel(HIDDEN)
     ;
 
 WS

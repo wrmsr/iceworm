@@ -40,6 +40,10 @@ class Integer(Expr):
     value: int
 
 
+class String(Expr):
+    value: str
+
+
 class FunctionCall(Expr):
     name: Identifier
     args: ta.Sequence[Expr]

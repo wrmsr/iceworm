@@ -7,6 +7,7 @@ from . import nodes as no
 from ._antlr.SnowflakeSqlLexer import SnowflakeSqlLexer
 from ._antlr.SnowflakeSqlParser import SnowflakeSqlParser
 from ._antlr.SnowflakeSqlVisitor import SnowflakeSqlVisitor
+from .quoting import unquote
 
 
 class _ParseVisitor(SnowflakeSqlVisitor):
@@ -33,9 +34,6 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         exprs = [self.visit(e) for e in ctx.expression()]
         return no.GroupBy(exprs)
 
-    def visitIdentifier(self, ctx: SnowflakeSqlParser.IdentifierContext):
-        return no.Identifier(ctx.IDENTIFIER().getText())
-
     def visitIntegerNumber(self, ctx: SnowflakeSqlParser.IntegerNumberContext):
         return no.Integer(int(ctx.INTEGER_VALUE().getText()))
 
@@ -47,6 +45,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
         return no.Null()
+
+    def visitQuotedIdentifier(self, ctx: SnowflakeSqlParser.QuotedIdentifierContext):
+        name = unquote(ctx.QUOTED_IDENTIFIER().getText(), '"')
+        return no.Identifier(name)
 
     def visitSelectItem(self, ctx: SnowflakeSqlParser.SelectItemContext):
         expr = self.visit(ctx.expression())
@@ -60,6 +62,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         group_by = self.visit(ctx.groupBy()) if ctx.groupBy() else None
         return no.Select(items, relations, where, group_by)
 
+    def visitString(self, ctx: SnowflakeSqlParser.StringContext):
+        value = unquote(ctx.STRING().getText(), "'")
+        return no.String(value)
+
     def visitTableRelation(self, ctx: SnowflakeSqlParser.TableRelationContext):
         return no.Table(self.visit(ctx.identifier()))
 
@@ -67,6 +73,9 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         op = lang.parse_enum(ctx.op.text.upper(), no.UnaryOp)
         value = self.visit(ctx.booleanExpression())
         return no.UnaryExpr(op, value)
+
+    def visitUnquotedIdentifier(self, ctx: SnowflakeSqlParser.UnquotedIdentifierContext):
+        return no.Identifier(ctx.IDENTIFIER().getText())
 
 
 def parse_statement(buf: str) -> no.Node:

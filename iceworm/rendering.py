@@ -1,6 +1,7 @@
 from omnibus import dispatch
 
 from . import nodes as no
+from .quoting import quote
 
 
 class Renderer(dispatch.Class):
@@ -19,7 +20,7 @@ class Renderer(dispatch.Class):
         return ', '.join(self.render(e) for e in node.exprs)
 
     def render(self, node: no.Identifier) -> str:  # noqa
-        return node.name
+        return quote(node.name, '"')
 
     def render(self, node: no.Integer) -> str:  # noqa
         return str(node.value)
@@ -46,6 +47,9 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.SelectItem) -> str:  # noqa
         return self.render(node.expr) + ((' as ' + self.render(node.label)) if node.label is not None else '')
+
+    def render(self, node: no.String) -> str:  # noqa
+        return "'" + node.value.replace("'", "''") + "'"
 
     def render(self, node: no.Table) -> str:  # noqa
         return self.render(node.name)

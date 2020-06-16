@@ -70,13 +70,23 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#identifier.
-    def visitIdentifier(self, ctx:SnowflakeSqlParser.IdentifierContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#unquotedIdentifier.
+    def visitUnquotedIdentifier(self, ctx:SnowflakeSqlParser.UnquotedIdentifierContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#quotedIdentifier.
+    def visitQuotedIdentifier(self, ctx:SnowflakeSqlParser.QuotedIdentifierContext):
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by SnowflakeSqlParser#integerNumber.
     def visitIntegerNumber(self, ctx:SnowflakeSqlParser.IntegerNumberContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#string.
+    def visitString(self, ctx:SnowflakeSqlParser.StringContext):
         return self.visitChildren(ctx)
 
 

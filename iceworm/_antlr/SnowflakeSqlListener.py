@@ -117,12 +117,21 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#identifier.
-    def enterIdentifier(self, ctx:SnowflakeSqlParser.IdentifierContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#unquotedIdentifier.
+    def enterUnquotedIdentifier(self, ctx:SnowflakeSqlParser.UnquotedIdentifierContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#identifier.
-    def exitIdentifier(self, ctx:SnowflakeSqlParser.IdentifierContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#unquotedIdentifier.
+    def exitUnquotedIdentifier(self, ctx:SnowflakeSqlParser.UnquotedIdentifierContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#quotedIdentifier.
+    def enterQuotedIdentifier(self, ctx:SnowflakeSqlParser.QuotedIdentifierContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#quotedIdentifier.
+    def exitQuotedIdentifier(self, ctx:SnowflakeSqlParser.QuotedIdentifierContext):
         pass
 
 
@@ -132,6 +141,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#integerNumber.
     def exitIntegerNumber(self, ctx:SnowflakeSqlParser.IntegerNumberContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#string.
+    def enterString(self, ctx:SnowflakeSqlParser.StringContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#string.
+    def exitString(self, ctx:SnowflakeSqlParser.StringContext):
         pass
 
 
