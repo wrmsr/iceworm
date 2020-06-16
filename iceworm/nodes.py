@@ -54,6 +54,11 @@ class Relation(Node, abstract=True):
     pass
 
 
+class Join(Relation):
+    left: Relation
+    right: Relation
+
+
 class Table(Relation):
     name: Identifier
 

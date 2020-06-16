@@ -37,6 +37,9 @@ class Renderer(dispatch.Class):
     def render(self, node: no.UnaryExpr) -> str:  # noqa
         return node.op.name.lower() + ' ' + self.render(node.value)
 
+    def render(self, node: no.Join) -> str:  # noqa
+        return self.render(node.left) + ' join ' + self.render(node.right)
+
 
 def render(node: no.Node) -> str:
     return Renderer().render(node)

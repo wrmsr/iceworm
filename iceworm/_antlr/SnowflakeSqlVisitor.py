@@ -55,8 +55,13 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#relation.
-    def visitRelation(self, ctx:SnowflakeSqlParser.RelationContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#joinRelation.
+    def visitJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#tableRelation.
+    def visitTableRelation(self, ctx:SnowflakeSqlParser.TableRelationContext):
         return self.visitChildren(ctx)
 
 

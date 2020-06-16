@@ -29,8 +29,13 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
         return no.SelectItem(expr, label)
 
-    def visitRelation(self, ctx: SnowflakeSqlParser.RelationContext):
+    def visitTableRelation(self, ctx: SnowflakeSqlParser.TableRelationContext):
         return no.Table(self.visit(ctx.identifier()))
+
+    def visitJoinRelation(self, ctx: SnowflakeSqlParser.JoinRelationContext):
+        left = self.visit(ctx.left)
+        right = self.visit(ctx.right)
+        return no.Join(left, right)
 
     def visitFunctionCall(self, ctx: SnowflakeSqlParser.FunctionCallContext):
         name = self.visit(ctx.identifier())

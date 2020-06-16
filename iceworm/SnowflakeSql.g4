@@ -35,7 +35,8 @@ functionCall
     ;
 
 relation
-    : identifier
+    : left=relation JOIN right=relation  #joinRelation
+    | identifier                         #tableRelation
     ;
 
 identifier
@@ -49,6 +50,7 @@ number
 AND: 'and';
 AS: 'as';
 FROM: 'from';
+JOIN: 'join';
 NOT: 'not';
 OR: 'or';
 SELECT: 'select';

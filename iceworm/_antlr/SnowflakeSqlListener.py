@@ -90,12 +90,21 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#relation.
-    def enterRelation(self, ctx:SnowflakeSqlParser.RelationContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#joinRelation.
+    def enterJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#relation.
-    def exitRelation(self, ctx:SnowflakeSqlParser.RelationContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#joinRelation.
+    def exitJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#tableRelation.
+    def enterTableRelation(self, ctx:SnowflakeSqlParser.TableRelationContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#tableRelation.
+    def exitTableRelation(self, ctx:SnowflakeSqlParser.TableRelationContext):
         pass
 
 
