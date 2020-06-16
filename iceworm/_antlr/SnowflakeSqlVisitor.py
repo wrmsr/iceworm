@@ -30,6 +30,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#functionCall.
+    def visitFunctionCall(self, ctx:SnowflakeSqlParser.FunctionCallContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#relation.
     def visitRelation(self, ctx:SnowflakeSqlParser.RelationContext):
         return self.visitChildren(ctx)

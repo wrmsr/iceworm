@@ -17,6 +17,11 @@ selectItem
 expression
     : identifier
     | number
+    | functionCall
+    ;
+
+functionCall
+    : identifier '(' (expression (',' expression*))? ')'
     ;
 
 relation

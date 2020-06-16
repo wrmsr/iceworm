@@ -19,6 +19,11 @@ class Integer(Expr):
     value: int
 
 
+class FunctionCall(Expr):
+    name: Identifier
+    args: ta.Sequence[Expr]
+
+
 class SelectItem(Node):
     expr: Expr
 

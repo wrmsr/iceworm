@@ -45,6 +45,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#functionCall.
+    def enterFunctionCall(self, ctx:SnowflakeSqlParser.FunctionCallContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#functionCall.
+    def exitFunctionCall(self, ctx:SnowflakeSqlParser.FunctionCallContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#relation.
     def enterRelation(self, ctx:SnowflakeSqlParser.RelationContext):
         pass

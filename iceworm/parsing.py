@@ -27,7 +27,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         return no.SelectItem(self.visit(ctx.expression()))
 
     def visitRelation(self, ctx: SnowflakeSqlParser.RelationContext):
-        return no.Table(ctx.identifier())
+        return no.Table(self.visit(ctx.identifier()))
+
+    def visitFunctionCall(self, ctx: SnowflakeSqlParser.FunctionCallContext):
+        name = self.visit(ctx.identifier())
+        args = [self.visit(a) for a in ctx.expression()]
+        return no.FunctionCall(name, args)
 
     def visitIdentifier(self, ctx: SnowflakeSqlParser.IdentifierContext):
         return no.Identifier(ctx.IDENTIFIER().getText())
