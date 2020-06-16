@@ -1,5 +1,4 @@
 import fnmatch
-import glob
 import os
 import sys
 
@@ -21,8 +20,26 @@ def _read_about():
 _read_about()
 
 
-PACKAGE_DATA = [
+EXCLUDED_STATIC_FILE_PATHS = [
+    '*.py',
+    '*/__pycache__/*',
+    '*/tests/*',
 ]
+
+
+def _get_static_files(path):
+    return [
+        filepath
+        for (dirpath, dirnames, filenames) in os.walk(path, followlinks=True)
+        for filename in filenames
+        for filepath in [os.path.join(dirpath, filename)]
+        if not any(fnmatch.fnmatch(filepath, pat) for pat in EXCLUDED_STATIC_FILE_PATHS)
+    ]
+
+
+PACKAGE_DATA = [
+] + _get_static_files('iceworm')
+
 
 INSTALL_REQUIRES = [
 ]

@@ -1,5 +1,6 @@
 **/.DS_Store
 **/.idea/
+**/.revision
 *.dylib
 *.exe
 *.pstats
@@ -21,8 +22,8 @@
 /cython_debug/
 /dist/
 /gen/
-/MANIFEST
 /iceworm.egg-info/
+/MANIFEST
 /profiles/
 /target/
 antlr-*.jar

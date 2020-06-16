@@ -231,3 +231,45 @@ dep-tree: venv
 .PHONY: dep-updates
 dep-updates: venv
 	.venv/bin/pip list -o --format=columns
+
+
+### Dist
+
+define do-dist
+	rm -rf build
+	mkdir build
+	$(eval DIST_BUILD_PYTHON:=$(shell echo "$(shell pwd)/$(1)/bin/python"))
+
+	cp -rv \
+		LICENSE \
+		iceworm \
+		README.md \
+	\
+		build/
+	cp -rv \
+		LICENSE-* \
+	\
+		build/ || :
+
+	cp setup.py build/setup.py
+	cp MANIFEST.in build/MANIFEST.in
+
+	cd build && "$(DIST_BUILD_PYTHON)" setup.py clean
+
+	git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty > "build/iceworm/.revision"
+
+	if [ "$(1)" = ".venv" ] ; then \
+		cd build && "$(DIST_BUILD_PYTHON)" setup.py sdist --formats=zip ; \
+	fi
+
+	cd build && "$(DIST_BUILD_PYTHON)" setup.py bdist_wheel
+
+	if [ ! -d ./dist ] ; then \
+		mkdir dist ; \
+	fi
+	cp build/dist/* ./dist/
+endef
+
+.PHONY: dist
+dist: venv
+	$(call do-dist,.venv,0)
