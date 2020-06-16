@@ -29,6 +29,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         args = [self.visit(a) for a in ctx.expression()]
         return no.FunctionCall(name, args)
 
+    def visitGroupBy(self, ctx: SnowflakeSqlParser.GroupByContext):
+        exprs = [self.visit(e) for e in ctx.expression()]
+        return no.GroupBy(exprs)
+
     def visitIdentifier(self, ctx: SnowflakeSqlParser.IdentifierContext):
         return no.Identifier(ctx.IDENTIFIER().getText())
 
@@ -49,7 +53,9 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitSelectStatement(self, ctx: SnowflakeSqlParser.SelectStatementContext):
         items = [self.visit(i) for i in ctx.selectItem()]
         relations = [self.visit(r) for r in ctx.relation()]
-        return no.Select(items, relations)
+        where = self.visit(ctx.where) if ctx.where is not None else None
+        group_by = self.visit(ctx.groupBy()) if ctx.groupBy() else None
+        return no.Select(items, relations, where, group_by)
 
     def visitTableRelation(self, ctx: SnowflakeSqlParser.TableRelationContext):
         return no.Table(self.visit(ctx.identifier()))

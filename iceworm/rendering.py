@@ -15,6 +15,9 @@ class Renderer(dispatch.Class):
     def render(self, node: no.FunctionCall) -> str:  # noqa
         return self.render(node.name) + '(' + ', '.join(self.render(a) for a in node.args) + ')'
 
+    def render(self, node: no.GroupBy) -> str:  # noqa
+        return ', '.join(self.render(e) for e in node.exprs)
+
     def render(self, node: no.Identifier) -> str:  # noqa
         return node.name
 
@@ -33,7 +36,9 @@ class Renderer(dispatch.Class):
         return (
                 'select ' +
                 ', '.join(self.render(i) for i in node.items) +
-                ((' from ' + ', '.join(self.render(r) for r in node.relations)) if node.relations else '')
+                ((' from ' + ', '.join(self.render(r) for r in node.relations)) if node.relations else '') +
+                ((' where ' + self.render(node.where)) if node.where is not None else '') +
+                ((' group by ' + self.render(node.group_by)) if node.group_by is not None else '')
         )
 
     def render(self, node: no.SelectItem) -> str:  # noqa

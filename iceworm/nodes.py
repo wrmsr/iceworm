@@ -64,6 +64,12 @@ class Table(Relation):
     name: Identifier
 
 
+class GroupBy(Node):
+    exprs: ta.Sequence[Expr]
+
+
 class Select(Node):
     items: ta.Sequence[SelectItem]
     relations: ta.Sequence[Relation]
+    where: ta.Optional[Expr] = None
+    group_by: ta.Optional[GroupBy] = None

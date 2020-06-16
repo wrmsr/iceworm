@@ -108,6 +108,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#groupBy.
+    def enterGroupBy(self, ctx:SnowflakeSqlParser.GroupByContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#groupBy.
+    def exitGroupBy(self, ctx:SnowflakeSqlParser.GroupByContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#identifier.
     def enterIdentifier(self, ctx:SnowflakeSqlParser.IdentifierContext):
         pass

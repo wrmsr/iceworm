@@ -8,6 +8,8 @@ singleStatement
 selectStatement
     : SELECT selectItem (',' selectItem)*
       (FROM relation (',' relation)*)?
+      (WHERE where=booleanExpression)?
+      (GROUP BY groupBy)?
     ;
 
 selectItem
@@ -39,6 +41,10 @@ relation
     | identifier                                                           #tableRelation
     ;
 
+groupBy
+    : expression (',' expression)*
+    ;
+
 identifier
     : IDENTIFIER
     ;
@@ -49,12 +55,15 @@ number
 
 AND: 'and';
 AS: 'as';
+BY: 'by';
 FROM: 'from';
+GROUP: 'group';
 JOIN: 'join';
 NOT: 'not';
 ON: 'on';
 OR: 'or';
 SELECT: 'select';
+WHERE: 'where';
 
 INTEGER_VALUE
     : DIGIT+

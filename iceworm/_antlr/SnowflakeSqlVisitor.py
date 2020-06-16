@@ -65,6 +65,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#groupBy.
+    def visitGroupBy(self, ctx:SnowflakeSqlParser.GroupByContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#identifier.
     def visitIdentifier(self, ctx:SnowflakeSqlParser.IdentifierContext):
         return self.visitChildren(ctx)
