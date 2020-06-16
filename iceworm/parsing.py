@@ -50,4 +50,4 @@ def parse_statement(buf: str) -> no.Node:
 
     visitor = _ParseVisitor()
     node = visitor.visit(parser.singleStatement())
-    return node
+    return check.isinstance(node, no.Node)
