@@ -2,6 +2,7 @@ import glob
 import os.path
 
 from .. import parsing
+from .. import rendering
 
 
 def test_iceworm():
@@ -12,5 +13,11 @@ def test_iceworm():
 
         for line in lines.splitlines():
             print(line)
+
             node = parsing.parse_statement(line)
             print(node)
+
+            rendered = rendering.render(node)
+            print(rendered)
+
+            print()
