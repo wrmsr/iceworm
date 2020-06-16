@@ -18,12 +18,12 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#statement.
-    def enterStatement(self, ctx:SnowflakeSqlParser.StatementContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#selectStatement.
+    def enterSelectStatement(self, ctx:SnowflakeSqlParser.SelectStatementContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#statement.
-    def exitStatement(self, ctx:SnowflakeSqlParser.StatementContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#selectStatement.
+    def exitSelectStatement(self, ctx:SnowflakeSqlParser.SelectStatementContext):
         pass
 
 
@@ -33,6 +33,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#selectItem.
     def exitSelectItem(self, ctx:SnowflakeSqlParser.SelectItemContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#expression.
+    def enterExpression(self, ctx:SnowflakeSqlParser.ExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#expression.
+    def exitExpression(self, ctx:SnowflakeSqlParser.ExpressionContext):
         pass
 
 

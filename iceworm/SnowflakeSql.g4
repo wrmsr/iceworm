@@ -1,14 +1,18 @@
 grammar SnowflakeSql;
 
 singleStatement
-    : statement ';' EOF
+    : selectStatement ';' EOF
     ;
 
-statement
+selectStatement
     : SELECT selectItem (',' selectItem)* (FROM tableClause)?
     ;
 
 selectItem
+    : expression
+    ;
+
+expression
     : identifier
     | integer
     ;
