@@ -19,23 +19,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             check.none(aggregate)
             return nextResult
 
-    def visitSelectStatement(self, ctx: SnowflakeSqlParser.SelectStatementContext):
-        items = [self.visit(i) for i in ctx.selectItem()]
-        relations = [self.visit(r) for r in ctx.relation()]
-        return no.Select(items, relations)
-
-    def visitSelectItem(self, ctx: SnowflakeSqlParser.SelectItemContext):
-        expr = self.visit(ctx.expression())
-        label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
-        return no.SelectItem(expr, label)
-
-    def visitTableRelation(self, ctx: SnowflakeSqlParser.TableRelationContext):
-        return no.Table(self.visit(ctx.identifier()))
-
-    def visitJoinRelation(self, ctx: SnowflakeSqlParser.JoinRelationContext):
-        left = self.visit(ctx.left)
-        right = self.visit(ctx.right)
-        return no.Join(left, right)
+    def visitBinaryBooleanExpression(self, ctx: SnowflakeSqlParser.BinaryBooleanExpressionContext):
+        left, right = [self.visit(e) for e in ctx.booleanExpression()]
+        op = lang.parse_enum(ctx.op.text.upper(), no.BinaryOp)
+        return no.BinaryExpr(left, op, right)
 
     def visitFunctionCall(self, ctx: SnowflakeSqlParser.FunctionCallContext):
         name = self.visit(ctx.identifier())
@@ -45,13 +32,26 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitIdentifier(self, ctx: SnowflakeSqlParser.IdentifierContext):
         return no.Identifier(ctx.IDENTIFIER().getText())
 
-    def visitNumber(self, ctx: SnowflakeSqlParser.NumberContext):
+    def visitJoinRelation(self, ctx: SnowflakeSqlParser.JoinRelationContext):
+        left = self.visit(ctx.left)
+        right = self.visit(ctx.right)
+        return no.Join(left, right)
+
+    def visitIntegerNumber(self, ctx: SnowflakeSqlParser.IntegerNumberContext):
         return no.Integer(int(ctx.INTEGER_VALUE().getText()))
 
-    def visitBinaryBooleanExpression(self, ctx: SnowflakeSqlParser.BinaryBooleanExpressionContext):
-        left, right = [self.visit(e) for e in ctx.booleanExpression()]
-        op = lang.parse_enum(ctx.op.text.upper(), no.BinaryOp)
-        return no.BinaryExpr(left, op, right)
+    def visitSelectItem(self, ctx: SnowflakeSqlParser.SelectItemContext):
+        expr = self.visit(ctx.expression())
+        label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
+        return no.SelectItem(expr, label)
+
+    def visitSelectStatement(self, ctx: SnowflakeSqlParser.SelectStatementContext):
+        items = [self.visit(i) for i in ctx.selectItem()]
+        relations = [self.visit(r) for r in ctx.relation()]
+        return no.Select(items, relations)
+
+    def visitTableRelation(self, ctx: SnowflakeSqlParser.TableRelationContext):
+        return no.Table(self.visit(ctx.identifier()))
 
     def visitUnaryBooleanExpression(self, ctx: SnowflakeSqlParser.UnaryBooleanExpressionContext):
         op = lang.parse_enum(ctx.op.text.upper(), no.UnaryOp)

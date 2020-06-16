@@ -44,7 +44,7 @@ identifier
     ;
 
 number
-    : INTEGER_VALUE
+    : INTEGER_VALUE  #integerNumber
     ;
 
 AND: 'and';
