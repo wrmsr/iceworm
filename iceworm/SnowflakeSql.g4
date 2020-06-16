@@ -1,11 +1,13 @@
 grammar SnowflakeSql;
 
+
 singleStatement
     : selectStatement ';' EOF
     ;
 
 selectStatement
-    : SELECT selectItem (',' selectItem)* (FROM tableClause)?
+    : SELECT selectItem (',' selectItem)*
+      (FROM relation (',' relation)*)?
     ;
 
 selectItem
@@ -14,10 +16,10 @@ selectItem
 
 expression
     : identifier
-    | integer
+    | number
     ;
 
-tableClause
+relation
     : identifier
     ;
 
@@ -25,15 +27,29 @@ identifier
     : IDENTIFIER
     ;
 
-integer
-    : INTEGER
+number
+    : INTEGER_VALUE
     ;
 
 SELECT: 'select';
 FROM: 'from';
 
-IDENTIFIER: [A-Za-z_][A-Za-z_0-9]*;
+INTEGER_VALUE
+    : DIGIT+
+    ;
 
-INTEGER: [0-9]+;
+IDENTIFIER
+    : (LETTER | '_') (LETTER | DIGIT | '_' | '@' | ':')*
+    ;
 
-WS: [ \t\n\r]+ -> skip;
+fragment DIGIT
+    : [0-9]
+    ;
+
+fragment LETTER
+    : [A-Za-z]
+    ;
+
+WS
+    : [ \t\n\r]+ -> skip
+    ;

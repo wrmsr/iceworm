@@ -23,10 +23,14 @@ class SelectItem(Node):
     expr: Expr
 
 
-class Table(Node):
+class Relation(Node, abstract=True):
+    pass
+
+
+class Table(Relation):
     name: Identifier
 
 
 class Select(Node):
     items: ta.Sequence[SelectItem]
-    table: ta.Optional[Table]
+    relations: ta.Sequence[Relation]

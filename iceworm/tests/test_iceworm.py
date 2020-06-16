@@ -9,8 +9,8 @@ def test_iceworm():
         print(file_path)
         with open(file_path, 'r') as f:
             lines = f.read()
-        print(lines)
 
         for line in lines.splitlines():
+            print(line)
             node = parsing.parse_statement(line)
             print(node)

@@ -45,12 +45,12 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#tableClause.
-    def enterTableClause(self, ctx:SnowflakeSqlParser.TableClauseContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#relation.
+    def enterRelation(self, ctx:SnowflakeSqlParser.RelationContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#tableClause.
-    def exitTableClause(self, ctx:SnowflakeSqlParser.TableClauseContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#relation.
+    def exitRelation(self, ctx:SnowflakeSqlParser.RelationContext):
         pass
 
 
@@ -63,12 +63,12 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#integer.
-    def enterInteger(self, ctx:SnowflakeSqlParser.IntegerContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#number.
+    def enterNumber(self, ctx:SnowflakeSqlParser.NumberContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#integer.
-    def exitInteger(self, ctx:SnowflakeSqlParser.IntegerContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#number.
+    def exitNumber(self, ctx:SnowflakeSqlParser.NumberContext):
         pass
 
 

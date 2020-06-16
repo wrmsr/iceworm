@@ -30,8 +30,8 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#tableClause.
-    def visitTableClause(self, ctx:SnowflakeSqlParser.TableClauseContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#relation.
+    def visitRelation(self, ctx:SnowflakeSqlParser.RelationContext):
         return self.visitChildren(ctx)
 
 
@@ -40,8 +40,8 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#integer.
-    def visitInteger(self, ctx:SnowflakeSqlParser.IntegerContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#number.
+    def visitNumber(self, ctx:SnowflakeSqlParser.NumberContext):
         return self.visitChildren(ctx)
 
 

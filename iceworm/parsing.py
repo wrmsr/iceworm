@@ -20,20 +20,20 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitSelectStatement(self, ctx: SnowflakeSqlParser.SelectStatementContext):
         items = [self.visit(i) for i in ctx.selectItem()]
-        table = self.visit(ctx.tableClause()) if ctx.tableClause() is not None else None
-        return no.Select(items, table)
+        relations = [self.visit(r) for r in ctx.relation()]
+        return no.Select(items, relations)
 
     def visitSelectItem(self, ctx: SnowflakeSqlParser.SelectItemContext):
         return no.SelectItem(self.visit(ctx.expression()))
 
-    def visitTableClause(self, ctx: SnowflakeSqlParser.TableClauseContext):
+    def visitRelation(self, ctx: SnowflakeSqlParser.RelationContext):
         return no.Table(ctx.identifier())
 
     def visitIdentifier(self, ctx: SnowflakeSqlParser.IdentifierContext):
         return no.Identifier(ctx.IDENTIFIER().getText())
 
-    def visitInteger(self, ctx: SnowflakeSqlParser.IntegerContext):
-        return no.Integer(int(ctx.INTEGER().getText()))
+    def visitNumber(self, ctx: SnowflakeSqlParser.NumberContext):
+        return no.Integer(int(ctx.INTEGER_VALUE().getText()))
 
 
 def parse_statement(buf: str) -> no.Node:

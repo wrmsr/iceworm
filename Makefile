@@ -207,6 +207,10 @@ typecheck: venv
 
 .PHONY: test
 test: build
+	.venv/bin/pytest -v iceworm
+
+.PHONY: test-parallel
+test-parallel: build
 	.venv/bin/pytest -v -n auto iceworm
 
 .PHONY: test-verbose
