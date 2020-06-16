@@ -11,7 +11,7 @@ selectStatement
     ;
 
 selectItem
-    : expression
+    : expression (AS? identifier)?
     ;
 
 expression
@@ -36,6 +36,7 @@ number
     : INTEGER_VALUE
     ;
 
+AS: 'as';
 SELECT: 'select';
 FROM: 'from';
 

@@ -24,7 +24,9 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         return no.Select(items, relations)
 
     def visitSelectItem(self, ctx: SnowflakeSqlParser.SelectItemContext):
-        return no.SelectItem(self.visit(ctx.expression()))
+        expr = self.visit(ctx.expression())
+        label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
+        return no.SelectItem(expr, label)
 
     def visitRelation(self, ctx: SnowflakeSqlParser.RelationContext):
         return no.Table(self.visit(ctx.identifier()))

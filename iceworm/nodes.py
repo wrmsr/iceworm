@@ -26,6 +26,7 @@ class FunctionCall(Expr):
 
 class SelectItem(Node):
     expr: Expr
+    label: ta.Optional[Identifier] = None
 
 
 class Relation(Node, abstract=True):
