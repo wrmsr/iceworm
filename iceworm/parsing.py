@@ -1,5 +1,6 @@
 from omnibus import antlr
 from omnibus import check
+from omnibus import lang
 from omnibus._vendor import antlr4
 
 from . import nodes as no
@@ -41,6 +42,16 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitNumber(self, ctx: SnowflakeSqlParser.NumberContext):
         return no.Integer(int(ctx.INTEGER_VALUE().getText()))
+
+    def visitBinaryBooleanExpression(self, ctx: SnowflakeSqlParser.BinaryBooleanExpressionContext):
+        left, right = [self.visit(e) for e in ctx.booleanExpression()]
+        op = lang.parse_enum(ctx.op.text.upper(), no.BinaryOp)
+        return no.BinaryExpr(left, op, right)
+
+    def visitUnaryBooleanExpression(self, ctx: SnowflakeSqlParser.UnaryBooleanExpressionContext):
+        op = lang.parse_enum(ctx.op.text.upper(), no.UnaryOp)
+        value = self.visit(ctx.booleanExpression())
+        return no.UnaryExpr(op, value)
 
 
 def parse_statement(buf: str) -> no.Node:

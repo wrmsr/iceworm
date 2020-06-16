@@ -19,9 +19,9 @@ expression
     ;
 
 booleanExpression
-    : primaryExpression
-    | NOT booleanExpression
-    | booleanExpression (AND | OR) booleanExpression
+    : primaryExpression                                  #primaryBooleanExpression
+    | op=NOT booleanExpression                           #unaryBooleanExpression
+    | booleanExpression op=(AND | OR) booleanExpression  #binaryBooleanExpression
     ;
 
 primaryExpression

@@ -379,12 +379,46 @@ class SnowflakeSqlParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
+
+        def getRuleIndex(self):
+            return SnowflakeSqlParser.RULE_booleanExpression
+
+     
+        def copyFrom(self, ctx:ParserRuleContext):
+            super().copyFrom(ctx)
+
+
+    class PrimaryBooleanExpressionContext(BooleanExpressionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a SnowflakeSqlParser.BooleanExpressionContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
         def primaryExpression(self):
             return self.getTypedRuleContext(SnowflakeSqlParser.PrimaryExpressionContext,0)
 
 
-        def NOT(self):
-            return self.getToken(SnowflakeSqlParser.NOT, 0)
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterPrimaryBooleanExpression" ):
+                listener.enterPrimaryBooleanExpression(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitPrimaryBooleanExpression" ):
+                listener.exitPrimaryBooleanExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPrimaryBooleanExpression" ):
+                return visitor.visitPrimaryBooleanExpression(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class BinaryBooleanExpressionContext(BooleanExpressionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a SnowflakeSqlParser.BooleanExpressionContext
+            super().__init__(parser)
+            self.op = None # Token
+            self.copyFrom(ctx)
 
         def booleanExpression(self, i:int=None):
             if i is None:
@@ -392,27 +426,50 @@ class SnowflakeSqlParser ( Parser ):
             else:
                 return self.getTypedRuleContext(SnowflakeSqlParser.BooleanExpressionContext,i)
 
-
         def AND(self):
             return self.getToken(SnowflakeSqlParser.AND, 0)
-
         def OR(self):
             return self.getToken(SnowflakeSqlParser.OR, 0)
 
-        def getRuleIndex(self):
-            return SnowflakeSqlParser.RULE_booleanExpression
-
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterBooleanExpression" ):
-                listener.enterBooleanExpression(self)
+            if hasattr( listener, "enterBinaryBooleanExpression" ):
+                listener.enterBinaryBooleanExpression(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitBooleanExpression" ):
-                listener.exitBooleanExpression(self)
+            if hasattr( listener, "exitBinaryBooleanExpression" ):
+                listener.exitBinaryBooleanExpression(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitBooleanExpression" ):
-                return visitor.visitBooleanExpression(self)
+            if hasattr( visitor, "visitBinaryBooleanExpression" ):
+                return visitor.visitBinaryBooleanExpression(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class UnaryBooleanExpressionContext(BooleanExpressionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a SnowflakeSqlParser.BooleanExpressionContext
+            super().__init__(parser)
+            self.op = None # Token
+            self.copyFrom(ctx)
+
+        def booleanExpression(self):
+            return self.getTypedRuleContext(SnowflakeSqlParser.BooleanExpressionContext,0)
+
+        def NOT(self):
+            return self.getToken(SnowflakeSqlParser.NOT, 0)
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterUnaryBooleanExpression" ):
+                listener.enterUnaryBooleanExpression(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitUnaryBooleanExpression" ):
+                listener.exitUnaryBooleanExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitUnaryBooleanExpression" ):
+                return visitor.visitUnaryBooleanExpression(self)
             else:
                 return visitor.visitChildren(self)
 
@@ -432,12 +489,19 @@ class SnowflakeSqlParser ( Parser ):
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [SnowflakeSqlParser.INTEGER_VALUE, SnowflakeSqlParser.IDENTIFIER]:
+                localctx = SnowflakeSqlParser.PrimaryBooleanExpressionContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
+
                 self.state = 54
                 self.primaryExpression()
                 pass
             elif token in [SnowflakeSqlParser.NOT]:
+                localctx = SnowflakeSqlParser.UnaryBooleanExpressionContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
                 self.state = 55
-                self.match(SnowflakeSqlParser.NOT)
+                localctx.op = self.match(SnowflakeSqlParser.NOT)
                 self.state = 56
                 self.booleanExpression(2)
                 pass
@@ -453,16 +517,17 @@ class SnowflakeSqlParser ( Parser ):
                     if self._parseListeners is not None:
                         self.triggerExitRuleEvent()
                     _prevctx = localctx
-                    localctx = SnowflakeSqlParser.BooleanExpressionContext(self, _parentctx, _parentState)
+                    localctx = SnowflakeSqlParser.BinaryBooleanExpressionContext(self, SnowflakeSqlParser.BooleanExpressionContext(self, _parentctx, _parentState))
                     self.pushNewRecursionContext(localctx, _startState, self.RULE_booleanExpression)
                     self.state = 59
                     if not self.precpred(self._ctx, 1):
                         from antlr4.error.Errors import FailedPredicateException
                         raise FailedPredicateException(self, "self.precpred(self._ctx, 1)")
                     self.state = 60
+                    localctx.op = self._input.LT(1)
                     _la = self._input.LA(1)
                     if not(_la==SnowflakeSqlParser.AND or _la==SnowflakeSqlParser.OR):
-                        self._errHandler.recoverInline(self)
+                        localctx.op = self._errHandler.recoverInline(self)
                     else:
                         self._errHandler.reportMatch(self)
                         self.consume()

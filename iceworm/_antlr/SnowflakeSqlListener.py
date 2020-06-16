@@ -45,12 +45,30 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#booleanExpression.
-    def enterBooleanExpression(self, ctx:SnowflakeSqlParser.BooleanExpressionContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#primaryBooleanExpression.
+    def enterPrimaryBooleanExpression(self, ctx:SnowflakeSqlParser.PrimaryBooleanExpressionContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#booleanExpression.
-    def exitBooleanExpression(self, ctx:SnowflakeSqlParser.BooleanExpressionContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#primaryBooleanExpression.
+    def exitPrimaryBooleanExpression(self, ctx:SnowflakeSqlParser.PrimaryBooleanExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#binaryBooleanExpression.
+    def enterBinaryBooleanExpression(self, ctx:SnowflakeSqlParser.BinaryBooleanExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#binaryBooleanExpression.
+    def exitBinaryBooleanExpression(self, ctx:SnowflakeSqlParser.BinaryBooleanExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#unaryBooleanExpression.
+    def enterUnaryBooleanExpression(self, ctx:SnowflakeSqlParser.UnaryBooleanExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#unaryBooleanExpression.
+    def exitUnaryBooleanExpression(self, ctx:SnowflakeSqlParser.UnaryBooleanExpressionContext):
         pass
 
 

@@ -31,6 +31,12 @@ class Renderer(dispatch.Class):
                 ((' from ' + ', '.join(self.render(r) for r in node.relations)) if node.relations else '')
         )
 
+    def render(self, node: no.BinaryExpr) -> str:  # noqa
+        return self.render(node.left) + ' ' + node.op.name.lower() + ' ' + self.render(node.right)
+
+    def render(self, node: no.UnaryExpr) -> str:  # noqa
+        return node.op.name.lower() + ' ' + self.render(node.value)
+
 
 def render(node: no.Node) -> str:
     return Renderer().render(node)

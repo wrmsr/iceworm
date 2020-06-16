@@ -12,9 +12,9 @@ class Expr(Node, abstract=True):
     pass
 
 
-class BinaryOp(lang.ValueEnum):
-    AND = 'and'
-    OR = 'or'
+class BinaryOp(lang.AutoEnum):
+    AND = ...
+    OR = ...
 
 
 class BinaryExpr(Expr):
@@ -23,8 +23,8 @@ class BinaryExpr(Expr):
     right: Expr
 
 
-class UnaryOp(lang.ValueEnum):
-    NOT = 'not'
+class UnaryOp(lang.AutoEnum):
+    NOT = ...
 
 
 class UnaryExpr(Expr):

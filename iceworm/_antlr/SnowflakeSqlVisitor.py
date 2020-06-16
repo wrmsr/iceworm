@@ -30,8 +30,18 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#booleanExpression.
-    def visitBooleanExpression(self, ctx:SnowflakeSqlParser.BooleanExpressionContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#primaryBooleanExpression.
+    def visitPrimaryBooleanExpression(self, ctx:SnowflakeSqlParser.PrimaryBooleanExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#binaryBooleanExpression.
+    def visitBinaryBooleanExpression(self, ctx:SnowflakeSqlParser.BinaryBooleanExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#unaryBooleanExpression.
+    def visitUnaryBooleanExpression(self, ctx:SnowflakeSqlParser.UnaryBooleanExpressionContext):
         return self.visitChildren(ctx)
 
 
