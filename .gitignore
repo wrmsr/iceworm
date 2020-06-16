@@ -22,7 +22,7 @@
 /dist/
 /gen/
 /MANIFEST
-/omnibus.egg-info/
+/iceworm.egg-info/
 /profiles/
 /target/
 antlr-*.jar
