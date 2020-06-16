@@ -1,0 +1,12 @@
+include README.md
+include LICENSE
+include LICENSE-*
+
+global-exclude *.py[cod]
+global-exclude *.so
+global-exclude .DS_Store
+global-exclude .gitignore
+global-exclude __pycache__
+
+global-exclude **/tests/**
+exclude iceworm/conftest.py

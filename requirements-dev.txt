@@ -1,0 +1,27 @@
+-r requirements.txt
+
+
+## packaging deps
+
+twine==3.1.1
+wheel>=0.34.2
+
+
+## actual code deps
+
+pytest-benchmark==3.2.3
+pytest-randomly==3.4.0
+pytest-xdist==1.32.0
+pytest==5.4.3
+
+
+## useful tools
+
+flake8==3.8.3
+ipdb==0.13.2
+ipython==7.15.0
+mypy==0.780
+pipdeptree==0.13.2
+pyflakes==2.2.0
+sqlparse==0.3.1
+typed-ast==1.4.1

@@ -1,0 +1,5 @@
+grammar SnowflakeSql;
+
+parse
+    : EOF
+    ;

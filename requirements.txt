@@ -1,0 +1,5 @@
+setuptools>=38.0.0
+
+Cython==0.29.20
+
+git+https://github.com/wrmsr/omnibus@wrmsr_working
