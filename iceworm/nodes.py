@@ -45,6 +45,10 @@ class FunctionCall(Expr):
     args: ta.Sequence[Expr]
 
 
+class Null(Expr):
+    pass
+
+
 class SelectItem(Node):
     expr: Expr
     label: ta.Optional[Identifier] = None

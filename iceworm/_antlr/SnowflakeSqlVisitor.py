@@ -80,5 +80,10 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#null.
+    def visitNull(self, ctx:SnowflakeSqlParser.NullContext):
+        return self.visitChildren(ctx)
+
+
 
 del SnowflakeSqlParser

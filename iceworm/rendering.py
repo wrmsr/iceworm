@@ -32,6 +32,9 @@ class Renderer(dispatch.Class):
                 ((' on ' + self.render(node.condition)) if node.condition is not None else '')
         )
 
+    def render(self, node: no.Null) -> str:  # noqa
+        return 'null'
+
     def render(self, node: no.Select) -> str:  # noqa
         return (
                 'select ' +

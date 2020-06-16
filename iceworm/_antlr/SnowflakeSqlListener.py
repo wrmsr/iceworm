@@ -135,5 +135,14 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#null.
+    def enterNull(self, ctx:SnowflakeSqlParser.NullContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#null.
+    def exitNull(self, ctx:SnowflakeSqlParser.NullContext):
+        pass
+
+
 
 del SnowflakeSqlParser

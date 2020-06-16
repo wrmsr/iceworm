@@ -30,6 +30,7 @@ primaryExpression
     : identifier
     | number
     | functionCall
+    | null
     ;
 
 functionCall
@@ -53,6 +54,10 @@ number
     : INTEGER_VALUE  #integerNumber
     ;
 
+null
+    : NULL
+    ;
+
 AND: 'and';
 AS: 'as';
 BY: 'by';
@@ -60,6 +65,7 @@ FROM: 'from';
 GROUP: 'group';
 JOIN: 'join';
 NOT: 'not';
+NULL: 'null';
 ON: 'on';
 OR: 'or';
 SELECT: 'select';

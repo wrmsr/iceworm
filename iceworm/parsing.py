@@ -45,6 +45,9 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         condition = self.visit(ctx.condition) if ctx.condition is not None else None
         return no.Join(left, right, condition)
 
+    def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
+        return no.Null()
+
     def visitSelectItem(self, ctx: SnowflakeSqlParser.SelectItemContext):
         expr = self.visit(ctx.expression())
         label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
