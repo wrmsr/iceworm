@@ -121,7 +121,6 @@ venv:
 ### Gen
 
 .PHONY: gen
-gen: antlr stl
 gen: antlr
 	true
 
