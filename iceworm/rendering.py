@@ -4,6 +4,10 @@ from . import nodes as no
 from .quoting import quote
 
 
+def paren(s: str) -> str:
+    return '(' + s + ')'
+
+
 class Renderer(dispatch.Class):
     render = dispatch.property()
 
@@ -14,16 +18,16 @@ class Renderer(dispatch.Class):
         return '*'
 
     def render(self, node: no.BinaryExpr) -> str:  # noqa
-        return self.render(node.left) + ' ' + node.op.name.lower() + ' ' + self.render(node.right)
+        return paren(self.render(node.left)) + ' ' + node.op.name.lower() + ' ' + paren(self.render(node.right))
 
     def render(self, node: no.ExprSelectItem) -> str:  # noqa
-        return self.render(node.expr) + ((' as ' + self.render(node.label)) if node.label is not None else '')
+        return paren(self.render(node.expr)) + ((' as ' + self.render(node.label)) if node.label is not None else '')
 
     def render(self, node: no.FunctionCall) -> str:  # noqa
-        return self.render(node.name) + '(' + ', '.join(self.render(a) for a in node.args) + ')'
+        return self.render(node.name) + '(' + ', '.join(paren(self.render(a)) for a in node.args) + ')'
 
     def render(self, node: no.GroupBy) -> str:  # noqa
-        return ', '.join(self.render(e) for e in node.exprs)
+        return ', '.join(paren(self.render(e)) for e in node.exprs)
 
     def render(self, node: no.Identifier) -> str:  # noqa
         return quote(node.name, '"')
@@ -58,7 +62,7 @@ class Renderer(dispatch.Class):
         return self.render(node.name)
 
     def render(self, node: no.UnaryExpr) -> str:  # noqa
-        return node.op.name.lower() + ' ' + self.render(node.value)
+        return node.op.name.lower() + ' ' + paren(self.render(node.value))
 
 
 def render(node: no.Node) -> str:
