@@ -20,13 +20,23 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#selectItem.
-    def visitSelectItem(self, ctx:SnowflakeSqlParser.SelectItemContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#allSelectItem.
+    def visitAllSelectItem(self, ctx:SnowflakeSqlParser.AllSelectItemContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#expressionSelectItem.
+    def visitExpressionSelectItem(self, ctx:SnowflakeSqlParser.ExpressionSelectItemContext):
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by SnowflakeSqlParser#expression.
     def visitExpression(self, ctx:SnowflakeSqlParser.ExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#parenBooleanExpression.
+    def visitParenBooleanExpression(self, ctx:SnowflakeSqlParser.ParenBooleanExpressionContext):
         return self.visitChildren(ctx)
 
 
@@ -62,6 +72,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#tableRelation.
     def visitTableRelation(self, ctx:SnowflakeSqlParser.TableRelationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#parenRelation.
+    def visitParenRelation(self, ctx:SnowflakeSqlParser.ParenRelationContext):
         return self.visitChildren(ctx)
 
 

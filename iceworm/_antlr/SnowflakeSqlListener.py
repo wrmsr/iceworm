@@ -27,12 +27,21 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#selectItem.
-    def enterSelectItem(self, ctx:SnowflakeSqlParser.SelectItemContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#allSelectItem.
+    def enterAllSelectItem(self, ctx:SnowflakeSqlParser.AllSelectItemContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#selectItem.
-    def exitSelectItem(self, ctx:SnowflakeSqlParser.SelectItemContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#allSelectItem.
+    def exitAllSelectItem(self, ctx:SnowflakeSqlParser.AllSelectItemContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#expressionSelectItem.
+    def enterExpressionSelectItem(self, ctx:SnowflakeSqlParser.ExpressionSelectItemContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#expressionSelectItem.
+    def exitExpressionSelectItem(self, ctx:SnowflakeSqlParser.ExpressionSelectItemContext):
         pass
 
 
@@ -42,6 +51,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#expression.
     def exitExpression(self, ctx:SnowflakeSqlParser.ExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#parenBooleanExpression.
+    def enterParenBooleanExpression(self, ctx:SnowflakeSqlParser.ParenBooleanExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#parenBooleanExpression.
+    def exitParenBooleanExpression(self, ctx:SnowflakeSqlParser.ParenBooleanExpressionContext):
         pass
 
 
@@ -105,6 +123,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#tableRelation.
     def exitTableRelation(self, ctx:SnowflakeSqlParser.TableRelationContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#parenRelation.
+    def enterParenRelation(self, ctx:SnowflakeSqlParser.ParenRelationContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#parenRelation.
+    def exitParenRelation(self, ctx:SnowflakeSqlParser.ParenRelationContext):
         pass
 
 

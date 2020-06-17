@@ -13,3 +13,6 @@ select x from y join z on 1;
 select x from y where 2;
 select x from y group by 1;
 select null;
+select * from x;
+select * from (x);
+select (1) x;

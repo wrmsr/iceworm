@@ -10,8 +10,14 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Node) -> str:  # noqa
         raise TypeError(node)
 
+    def render(self, node: no.AllSelectItem) -> str:  # noqa
+        return '*'
+
     def render(self, node: no.BinaryExpr) -> str:  # noqa
         return self.render(node.left) + ' ' + node.op.name.lower() + ' ' + self.render(node.right)
+
+    def render(self, node: no.ExprSelectItem) -> str:  # noqa
+        return self.render(node.expr) + ((' as ' + self.render(node.label)) if node.label is not None else '')
 
     def render(self, node: no.FunctionCall) -> str:  # noqa
         return self.render(node.name) + '(' + ', '.join(self.render(a) for a in node.args) + ')'
@@ -45,11 +51,8 @@ class Renderer(dispatch.Class):
                 ((' group by ' + self.render(node.group_by)) if node.group_by is not None else '')
         )
 
-    def render(self, node: no.SelectItem) -> str:  # noqa
-        return self.render(node.expr) + ((' as ' + self.render(node.label)) if node.label is not None else '')
-
     def render(self, node: no.String) -> str:  # noqa
-        return "'" + node.value.replace("'", "''") + "'"
+        return quote(node.value, "'")
 
     def render(self, node: no.Table) -> str:  # noqa
         return self.render(node.name)

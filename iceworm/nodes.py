@@ -4,7 +4,7 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 
 
-class Node(dc.Enum):
+class Node(dc.Enum, sealed=True):
     pass
 
 
@@ -53,11 +53,6 @@ class Null(Expr):
     pass
 
 
-class SelectItem(Node):
-    expr: Expr
-    label: ta.Optional[Identifier] = None
-
-
 class Relation(Node, abstract=True):
     pass
 
@@ -74,6 +69,19 @@ class Table(Relation):
 
 class GroupBy(Node):
     exprs: ta.Sequence[Expr]
+
+
+class SelectItem(Node, abstract=True):
+    pass
+
+
+class AllSelectItem(SelectItem):
+    pass
+
+
+class ExprSelectItem(Node):
+    expr: Expr
+    label: ta.Optional[Identifier] = None
 
 
 class Select(Node):

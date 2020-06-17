@@ -13,7 +13,8 @@ selectStatement
     ;
 
 selectItem
-    : expression (AS? identifier)?
+    : '*'                           #allSelectItem
+    | expression (AS? identifier)?  #expressionSelectItem
     ;
 
 expression
@@ -21,7 +22,8 @@ expression
     ;
 
 booleanExpression
-    : primaryExpression                                  #primaryBooleanExpression
+    : '(' expression ')'                                 #parenBooleanExpression
+    | primaryExpression                                  #primaryBooleanExpression
     | op=NOT booleanExpression                           #unaryBooleanExpression
     | booleanExpression op=(AND | OR) booleanExpression  #binaryBooleanExpression
     ;
@@ -40,6 +42,7 @@ functionCall
 
 relation
     : left=relation JOIN right=relation (ON condition=booleanExpression)?  #joinRelation
+    | '(' relation ')'                                                     #parenRelation
     | identifier                                                           #tableRelation
     ;
 
