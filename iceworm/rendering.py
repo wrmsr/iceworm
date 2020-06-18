@@ -14,6 +14,9 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Node) -> str:  # noqa
         raise TypeError(node)
 
+    def render(self, node: no.AliasedRelation) -> str:  # noqa
+        return self.render(node.relation) + ((' as ' + self.render(node.alias)) if node.alias is not None else '')
+
     def render(self, node: no.AllSelectItem) -> str:  # noqa
         return '*'
 
@@ -38,7 +41,7 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Join) -> str:  # noqa
         return (
                 self.render(node.left) +
-                (node.type.value + ' ' if node.type != no.JoinType.DEFAULT else '') +
+                ((node.type.value + ' ') if node.type != no.JoinType.DEFAULT else '') +
                 ' join ' +
                 self.render(node.right) +
                 ((' on ' + self.render(node.condition)) if node.condition is not None else '')
@@ -47,9 +50,13 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Null) -> str:  # noqa
         return 'null'
 
+    def render(self, node: no.QualifiedName) -> str:  # noqa
+        return '.'.join(self.render(i) for i in node.parts)
+
     def render(self, node: no.Select) -> str:  # noqa
         return (
                 'select ' +
+                ((node.set_quantifier.value + ' ') if node.set_quantifier is not None else '') +
                 ', '.join(self.render(i) for i in node.items) +
                 ((' from ' + ', '.join(self.render(r) for r in node.relations)) if node.relations else '') +
                 ((' where ' + self.render(node.where)) if node.where is not None else '') +

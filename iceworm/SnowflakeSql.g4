@@ -6,7 +6,7 @@ singleStatement
     ;
 
 selectStatement
-    : SELECT selectItem (',' selectItem)*
+    : SELECT setQuantifier? selectItem (',' selectItem)*
       (FROM relation (',' relation)*)?
       (WHERE where=booleanExpression)?
       (GROUP BY groupBy)?
@@ -46,20 +46,25 @@ primaryExpression
 
 simpleExpression
     : '(' expression ')'
-    | identifier
+    | qualifiedName
     | number
     | string
     | null
     ;
 
 relation
-    : left=relation ty=joinType? JOIN right=relation (ON condition=booleanExpression)?  #joinRelation
+    : relation AS? identifier                                                           #aliasedRelation
+    | left=relation ty=joinType? JOIN right=relation (ON condition=booleanExpression)?  #joinRelation
     | '(' relation ')'                                                                  #parenRelation
-    | identifier                                                                        #tableRelation
+    | qualifiedName                                                                     #tableRelation
     ;
 
 groupBy
     : expression (',' expression)*
+    ;
+
+qualifiedName
+    : identifier ('.' identifier)*
     ;
 
 identifier
@@ -77,6 +82,11 @@ string
 
 null
     : NULL
+    ;
+
+setQuantifier
+    : DISTINCT
+    | ALL
     ;
 
 joinType
@@ -114,10 +124,12 @@ unaryOp
     | '-'
     ;
 
+ALL: 'all';
 AND: 'and';
 AS: 'as';
 BY: 'by';
 CROSS: 'cross';
+DISTINCT: 'distinct';
 FROM: 'from';
 FULL: 'full';
 GROUP: 'group';

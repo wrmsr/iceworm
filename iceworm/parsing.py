@@ -19,6 +19,11 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             check.none(aggregate)
             return nextResult
 
+    def visitAliasedRelation(self, ctx: SnowflakeSqlParser.AliasedRelationContext):
+        relation = self.visit(ctx.relation())
+        alias = self.visit(ctx.identifier())
+        return no.AliasedRelation(relation, alias)
+
     def visitAllSelectItem(self, ctx: SnowflakeSqlParser.AllSelectItemContext):
         return no.AllSelectItem()
 
@@ -63,6 +68,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitParenRelation(self, ctx: SnowflakeSqlParser.ParenRelationContext):
         return self.visit(ctx.relation())
 
+    def visitQualifiedName(self, ctx: SnowflakeSqlParser.QualifiedNameContext):
+        parts = [self.visit(i) for i in ctx.identifier()]
+        return no.QualifiedName(parts)
+
     def visitQuotedIdentifier(self, ctx: SnowflakeSqlParser.QuotedIdentifierContext):
         name = unquote(ctx.QUOTED_IDENTIFIER().getText(), '"')
         return no.Identifier(name)
@@ -70,16 +79,18 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitSelectStatement(self, ctx: SnowflakeSqlParser.SelectStatementContext):
         items = [self.visit(i) for i in ctx.selectItem()]
         relations = [self.visit(r) for r in ctx.relation()]
+        set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
+            if ctx.setQuantifier() is not None else None
         where = self.visit(ctx.where) if ctx.where is not None else None
         group_by = self.visit(ctx.groupBy()) if ctx.groupBy() else None
-        return no.Select(items, relations, where, group_by)
+        return no.Select(items, relations, where, set_quantifier, group_by)
 
     def visitString(self, ctx: SnowflakeSqlParser.StringContext):
         value = unquote(ctx.STRING().getText(), "'")
         return no.String(value)
 
     def visitTableRelation(self, ctx: SnowflakeSqlParser.TableRelationContext):
-        return no.Table(self.visit(ctx.identifier()))
+        return no.Table(self.visit(ctx.qualifiedName()))
 
     def visitUnaryValueExpression(self, ctx: SnowflakeSqlParser.UnaryValueExpressionContext):
         op = no.UNARY_OP_MAP[ctx.op.getText().lower()]

@@ -162,6 +162,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#aliasedRelation.
+    def enterAliasedRelation(self, ctx:SnowflakeSqlParser.AliasedRelationContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#aliasedRelation.
+    def exitAliasedRelation(self, ctx:SnowflakeSqlParser.AliasedRelationContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#joinRelation.
     def enterJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
         pass
@@ -195,6 +204,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#groupBy.
     def exitGroupBy(self, ctx:SnowflakeSqlParser.GroupByContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#qualifiedName.
+    def enterQualifiedName(self, ctx:SnowflakeSqlParser.QualifiedNameContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#qualifiedName.
+    def exitQualifiedName(self, ctx:SnowflakeSqlParser.QualifiedNameContext):
         pass
 
 
@@ -240,6 +258,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#null.
     def exitNull(self, ctx:SnowflakeSqlParser.NullContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#setQuantifier.
+    def enterSetQuantifier(self, ctx:SnowflakeSqlParser.SetQuantifierContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#setQuantifier.
+    def exitSetQuantifier(self, ctx:SnowflakeSqlParser.SetQuantifierContext):
         pass
 
 

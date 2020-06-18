@@ -85,6 +85,10 @@ class Identifier(Expr):
     name: str
 
 
+class QualifiedName(Expr):
+    parts: ta.Sequence[Identifier]
+
+
 class Integer(Expr):
     value: int
 
@@ -119,7 +123,7 @@ class JoinType(enum.Enum):
     NATURAL = 'natural'
 
 
-JOIN_TYPE_MAP: ta.Mapping[str, UnaryOp] = {v.value: v for v in JoinType.__members__.values()}
+JOIN_TYPE_MAP: ta.Mapping[str, JoinType] = {v.value: v for v in JoinType.__members__.values()}
 
 
 class Join(Relation):
@@ -130,7 +134,12 @@ class Join(Relation):
 
 
 class Table(Relation):
-    name: Identifier
+    name: QualifiedName
+
+
+class AliasedRelation(Relation):
+    relation: Relation
+    alias: Identifier
 
 
 class GroupBy(Node):
@@ -150,8 +159,17 @@ class ExprSelectItem(Node):
     label: ta.Optional[Identifier] = None
 
 
+class SetQuantifier(enum.Enum):
+    DISTINCT = 'distinct'
+    ALL = 'all'
+
+
+SET_QUANTIFIER_MAP: ta.Mapping[str, SetQuantifier] = {v.value: v for v in SetQuantifier.__members__.values()}
+
+
 class Select(Node):
     items: ta.Sequence[SelectItem]
     relations: ta.Sequence[Relation]
     where: ta.Optional[Expr] = None
+    set_quantifier: ta.Optional[SetQuantifier] = None
     group_by: ta.Optional[GroupBy] = None

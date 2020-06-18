@@ -95,6 +95,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#aliasedRelation.
+    def visitAliasedRelation(self, ctx:SnowflakeSqlParser.AliasedRelationContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#joinRelation.
     def visitJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
         return self.visitChildren(ctx)
@@ -112,6 +117,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#groupBy.
     def visitGroupBy(self, ctx:SnowflakeSqlParser.GroupByContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#qualifiedName.
+    def visitQualifiedName(self, ctx:SnowflakeSqlParser.QualifiedNameContext):
         return self.visitChildren(ctx)
 
 
@@ -137,6 +147,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#null.
     def visitNull(self, ctx:SnowflakeSqlParser.NullContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#setQuantifier.
+    def visitSetQuantifier(self, ctx:SnowflakeSqlParser.SetQuantifierContext):
         return self.visitChildren(ctx)
 
 
