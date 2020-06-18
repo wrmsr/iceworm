@@ -22,22 +22,34 @@ expression
     ;
 
 booleanExpression
-    : '(' expression ')'                                 #parenBooleanExpression
-    | primaryExpression                                  #primaryBooleanExpression
+    : valueExpression predicate[$valueExpression.ctx]?   #predicatedBooleanExpression
     | op=NOT booleanExpression                           #unaryBooleanExpression
     | booleanExpression op=(AND | OR) booleanExpression  #binaryBooleanExpression
     ;
 
-primaryExpression
-    : identifier
-    | number
-    | string
-    | functionCall
-    | null
+predicate[ParserRuleContext value]
+    : cmpOp right=valueExpression                   #cmpPredicate
+    | NOT? IN '(' expression (',' expression)* ')'  #inListPredicate
+    | IS NOT? NULL                                  #isNullPredicate
     ;
 
-functionCall
-    : identifier '(' (expression (',' expression*))? ')'
+valueExpression
+    : primaryExpression                                      #primaryValueExpression
+    | op=unaryOp valueExpression                             #unaryValueExpression
+    | left=valueExpression op=arithOp right=valueExpression  #arithValueExpression
+    ;
+
+primaryExpression
+    : identifier '(' (expression (',' expression*))? ')'  #functionCallPrimaryExpression
+    | simpleExpression                                    #simplePrimaryExpression
+    ;
+
+simpleExpression
+    : '(' expression ')'
+    | identifier
+    | number
+    | string
+    | null
     ;
 
 relation
@@ -67,11 +79,36 @@ null
     : NULL
     ;
 
+cmpOp
+    : '='
+    | '!='
+    | '<>'
+    | '<'
+    | '<='
+    | '>'
+    | '>='
+    ;
+
+arithOp
+    : '+'
+    | '-'
+    | '*'
+    | '/'
+    | '%'
+    ;
+
+unaryOp
+    : '+'
+    | '-'
+    ;
+
 AND: 'and';
 AS: 'as';
 BY: 'by';
 FROM: 'from';
 GROUP: 'group';
+IN: 'in';
+IS: 'is';
 JOIN: 'join';
 NOT: 'not';
 NULL: 'null';

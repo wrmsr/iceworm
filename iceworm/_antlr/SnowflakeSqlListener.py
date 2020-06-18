@@ -54,30 +54,21 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#parenBooleanExpression.
-    def enterParenBooleanExpression(self, ctx:SnowflakeSqlParser.ParenBooleanExpressionContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#parenBooleanExpression.
-    def exitParenBooleanExpression(self, ctx:SnowflakeSqlParser.ParenBooleanExpressionContext):
-        pass
-
-
-    # Enter a parse tree produced by SnowflakeSqlParser#primaryBooleanExpression.
-    def enterPrimaryBooleanExpression(self, ctx:SnowflakeSqlParser.PrimaryBooleanExpressionContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#primaryBooleanExpression.
-    def exitPrimaryBooleanExpression(self, ctx:SnowflakeSqlParser.PrimaryBooleanExpressionContext):
-        pass
-
-
     # Enter a parse tree produced by SnowflakeSqlParser#binaryBooleanExpression.
     def enterBinaryBooleanExpression(self, ctx:SnowflakeSqlParser.BinaryBooleanExpressionContext):
         pass
 
     # Exit a parse tree produced by SnowflakeSqlParser#binaryBooleanExpression.
     def exitBinaryBooleanExpression(self, ctx:SnowflakeSqlParser.BinaryBooleanExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#predicatedBooleanExpression.
+    def enterPredicatedBooleanExpression(self, ctx:SnowflakeSqlParser.PredicatedBooleanExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#predicatedBooleanExpression.
+    def exitPredicatedBooleanExpression(self, ctx:SnowflakeSqlParser.PredicatedBooleanExpressionContext):
         pass
 
 
@@ -90,21 +81,84 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#primaryExpression.
-    def enterPrimaryExpression(self, ctx:SnowflakeSqlParser.PrimaryExpressionContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#cmpPredicate.
+    def enterCmpPredicate(self, ctx:SnowflakeSqlParser.CmpPredicateContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#primaryExpression.
-    def exitPrimaryExpression(self, ctx:SnowflakeSqlParser.PrimaryExpressionContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#cmpPredicate.
+    def exitCmpPredicate(self, ctx:SnowflakeSqlParser.CmpPredicateContext):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#functionCall.
-    def enterFunctionCall(self, ctx:SnowflakeSqlParser.FunctionCallContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#inListPredicate.
+    def enterInListPredicate(self, ctx:SnowflakeSqlParser.InListPredicateContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#functionCall.
-    def exitFunctionCall(self, ctx:SnowflakeSqlParser.FunctionCallContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#inListPredicate.
+    def exitInListPredicate(self, ctx:SnowflakeSqlParser.InListPredicateContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#isNullPredicate.
+    def enterIsNullPredicate(self, ctx:SnowflakeSqlParser.IsNullPredicateContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#isNullPredicate.
+    def exitIsNullPredicate(self, ctx:SnowflakeSqlParser.IsNullPredicateContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#primaryValueExpression.
+    def enterPrimaryValueExpression(self, ctx:SnowflakeSqlParser.PrimaryValueExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#primaryValueExpression.
+    def exitPrimaryValueExpression(self, ctx:SnowflakeSqlParser.PrimaryValueExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#unaryValueExpression.
+    def enterUnaryValueExpression(self, ctx:SnowflakeSqlParser.UnaryValueExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#unaryValueExpression.
+    def exitUnaryValueExpression(self, ctx:SnowflakeSqlParser.UnaryValueExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#arithValueExpression.
+    def enterArithValueExpression(self, ctx:SnowflakeSqlParser.ArithValueExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#arithValueExpression.
+    def exitArithValueExpression(self, ctx:SnowflakeSqlParser.ArithValueExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#functionCallPrimaryExpression.
+    def enterFunctionCallPrimaryExpression(self, ctx:SnowflakeSqlParser.FunctionCallPrimaryExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#functionCallPrimaryExpression.
+    def exitFunctionCallPrimaryExpression(self, ctx:SnowflakeSqlParser.FunctionCallPrimaryExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#simplePrimaryExpression.
+    def enterSimplePrimaryExpression(self, ctx:SnowflakeSqlParser.SimplePrimaryExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#simplePrimaryExpression.
+    def exitSimplePrimaryExpression(self, ctx:SnowflakeSqlParser.SimplePrimaryExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#simpleExpression.
+    def enterSimpleExpression(self, ctx:SnowflakeSqlParser.SimpleExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#simpleExpression.
+    def exitSimpleExpression(self, ctx:SnowflakeSqlParser.SimpleExpressionContext):
         pass
 
 
@@ -186,6 +240,33 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#null.
     def exitNull(self, ctx:SnowflakeSqlParser.NullContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#cmpOp.
+    def enterCmpOp(self, ctx:SnowflakeSqlParser.CmpOpContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#cmpOp.
+    def exitCmpOp(self, ctx:SnowflakeSqlParser.CmpOpContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#arithOp.
+    def enterArithOp(self, ctx:SnowflakeSqlParser.ArithOpContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#arithOp.
+    def exitArithOp(self, ctx:SnowflakeSqlParser.ArithOpContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#unaryOp.
+    def enterUnaryOp(self, ctx:SnowflakeSqlParser.UnaryOpContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#unaryOp.
+    def exitUnaryOp(self, ctx:SnowflakeSqlParser.UnaryOpContext):
         pass
 
 

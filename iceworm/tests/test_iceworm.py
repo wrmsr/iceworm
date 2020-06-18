@@ -12,6 +12,10 @@ def test_iceworm():
             lines = f.read()
 
         for line in lines.splitlines():
+            line = line.strip()
+            if not line or line.startswith('--'):
+                continue
+
             print(line)
 
             node = parsing.parse_statement(line)

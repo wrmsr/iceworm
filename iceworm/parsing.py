@@ -1,6 +1,5 @@
 from omnibus import antlr
 from omnibus import check
-from omnibus import lang
 from omnibus._vendor import antlr4
 
 from . import nodes as no
@@ -23,9 +22,14 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitAllSelectItem(self, ctx: SnowflakeSqlParser.AllSelectItemContext):
         return no.AllSelectItem()
 
+    def visitArithValueExpression(self, ctx: SnowflakeSqlParser.ArithValueExpressionContext):
+        left, right = [self.visit(e) for e in ctx.valueExpression()]
+        op = no.BINARY_OP_MAP[ctx.op.getText().lower()]
+        return no.BinaryExpr(left, op, right)
+
     def visitBinaryBooleanExpression(self, ctx: SnowflakeSqlParser.BinaryBooleanExpressionContext):
         left, right = [self.visit(e) for e in ctx.booleanExpression()]
-        op = lang.parse_enum(ctx.op.text.upper(), no.BinaryOp)
+        op = no.BINARY_OP_MAP[ctx.op.text.lower()]
         return no.BinaryExpr(left, op, right)
 
     def visitExpressionSelectItem(self, ctx: SnowflakeSqlParser.ExpressionSelectItemContext):
@@ -33,7 +37,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
         return no.ExprSelectItem(expr, label)
 
-    def visitFunctionCall(self, ctx: SnowflakeSqlParser.FunctionCallContext):
+    def visitFunctionCallPrimaryExpression(self, ctx:SnowflakeSqlParser.FunctionCallPrimaryExpressionContext):
         name = self.visit(ctx.identifier())
         args = [self.visit(a) for a in ctx.expression()]
         return no.FunctionCall(name, args)
@@ -53,9 +57,6 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
         return no.Null()
-
-    def visitParenBooleanExpression(self, ctx: SnowflakeSqlParser.ParenBooleanExpressionContext):
-        return self.visit(ctx.expression())
 
     def visitParenRelation(self, ctx: SnowflakeSqlParser.ParenRelationContext):
         return self.visit(ctx.relation())
@@ -78,8 +79,13 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitTableRelation(self, ctx: SnowflakeSqlParser.TableRelationContext):
         return no.Table(self.visit(ctx.identifier()))
 
+    def visitUnaryValueExpression(self, ctx: SnowflakeSqlParser.UnaryValueExpressionContext):
+        op = no.UNARY_OP_MAP[ctx.op.getText().lower()]
+        value = self.visit(ctx.valueExpression())
+        return no.UnaryExpr(op, value)
+
     def visitUnaryBooleanExpression(self, ctx: SnowflakeSqlParser.UnaryBooleanExpressionContext):
-        op = lang.parse_enum(ctx.op.text.upper(), no.UnaryOp)
+        op = no.UNARY_OP_MAP[ctx.op.text.lower()]
         value = self.visit(ctx.booleanExpression())
         return no.UnaryExpr(op, value)
 

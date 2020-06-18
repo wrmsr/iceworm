@@ -1,7 +1,7 @@
+import enum
 import typing as ta
 
 from omnibus import dataclasses as dc
-from omnibus import lang
 
 
 class Node(dc.Enum, sealed=True):
@@ -12,9 +12,52 @@ class Expr(Node, abstract=True):
     pass
 
 
-class BinaryOp(lang.AutoEnum):
-    AND = ...
-    OR = ...
+class BinaryOp(enum.Enum):
+    AND = 'and'
+    OR = 'or'
+
+    EQ = '='
+    NE = '!='
+    NEX = '<>'
+    LT = '<'
+    LTE = '<='
+    GT = '>'
+    GTE = '>='
+
+    ADD = '+'
+    SUB = '-'
+    MUL = '*'
+    DIV = '/'
+    MOD = '%'
+
+
+BINARY_OP_MAP: ta.Mapping[str, BinaryOp] = {v.value: v for v in BinaryOp.__members__.values()}
+
+
+LOGIC_OPS: ta.AbstractSet[BinaryOp] = frozenset([
+    BinaryOp.AND,
+    BinaryOp.OR,
+])
+
+
+CMP_OPS: ta.AbstractSet[BinaryOp] = frozenset([
+    BinaryOp.EQ,
+    BinaryOp.NE,
+    BinaryOp.NEX,
+    BinaryOp.LT,
+    BinaryOp.LTE,
+    BinaryOp.GT,
+    BinaryOp.GTE,
+])
+
+
+ARITH_OPS: ta.AbstractSet[BinaryOp] = frozenset([
+    BinaryOp.ADD,
+    BinaryOp.SUB,
+    BinaryOp.MUL,
+    BinaryOp.DIV,
+    BinaryOp.MOD,
+])
 
 
 class BinaryExpr(Expr):
@@ -23,8 +66,14 @@ class BinaryExpr(Expr):
     right: Expr
 
 
-class UnaryOp(lang.AutoEnum):
-    NOT = ...
+class UnaryOp(enum.Enum):
+    NOT = 'not'
+
+    PLUS = '+'
+    MINUS = '-'
+
+
+UNARY_OP_MAP: ta.Mapping[str, UnaryOp] = {v.value: v for v in UnaryOp.__members__.values()}
 
 
 class UnaryExpr(Expr):

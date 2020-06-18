@@ -18,7 +18,7 @@ class Renderer(dispatch.Class):
         return '*'
 
     def render(self, node: no.BinaryExpr) -> str:  # noqa
-        return paren(self.render(node.left)) + ' ' + node.op.name.lower() + ' ' + paren(self.render(node.right))
+        return paren(self.render(node.left)) + ' ' + node.op.value + ' ' + paren(self.render(node.right))
 
     def render(self, node: no.ExprSelectItem) -> str:  # noqa
         return paren(self.render(node.expr)) + ((' as ' + self.render(node.label)) if node.label is not None else '')
@@ -62,7 +62,7 @@ class Renderer(dispatch.Class):
         return self.render(node.name)
 
     def render(self, node: no.UnaryExpr) -> str:  # noqa
-        return node.op.name.lower() + ' ' + paren(self.render(node.value))
+        return node.op.value + ' ' + paren(self.render(node.value))
 
 
 def render(node: no.Node) -> str:

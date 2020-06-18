@@ -35,18 +35,13 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#parenBooleanExpression.
-    def visitParenBooleanExpression(self, ctx:SnowflakeSqlParser.ParenBooleanExpressionContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by SnowflakeSqlParser#primaryBooleanExpression.
-    def visitPrimaryBooleanExpression(self, ctx:SnowflakeSqlParser.PrimaryBooleanExpressionContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by SnowflakeSqlParser#binaryBooleanExpression.
     def visitBinaryBooleanExpression(self, ctx:SnowflakeSqlParser.BinaryBooleanExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#predicatedBooleanExpression.
+    def visitPredicatedBooleanExpression(self, ctx:SnowflakeSqlParser.PredicatedBooleanExpressionContext):
         return self.visitChildren(ctx)
 
 
@@ -55,13 +50,48 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#primaryExpression.
-    def visitPrimaryExpression(self, ctx:SnowflakeSqlParser.PrimaryExpressionContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#cmpPredicate.
+    def visitCmpPredicate(self, ctx:SnowflakeSqlParser.CmpPredicateContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#functionCall.
-    def visitFunctionCall(self, ctx:SnowflakeSqlParser.FunctionCallContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#inListPredicate.
+    def visitInListPredicate(self, ctx:SnowflakeSqlParser.InListPredicateContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#isNullPredicate.
+    def visitIsNullPredicate(self, ctx:SnowflakeSqlParser.IsNullPredicateContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#primaryValueExpression.
+    def visitPrimaryValueExpression(self, ctx:SnowflakeSqlParser.PrimaryValueExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#unaryValueExpression.
+    def visitUnaryValueExpression(self, ctx:SnowflakeSqlParser.UnaryValueExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#arithValueExpression.
+    def visitArithValueExpression(self, ctx:SnowflakeSqlParser.ArithValueExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#functionCallPrimaryExpression.
+    def visitFunctionCallPrimaryExpression(self, ctx:SnowflakeSqlParser.FunctionCallPrimaryExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#simplePrimaryExpression.
+    def visitSimplePrimaryExpression(self, ctx:SnowflakeSqlParser.SimplePrimaryExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#simpleExpression.
+    def visitSimpleExpression(self, ctx:SnowflakeSqlParser.SimpleExpressionContext):
         return self.visitChildren(ctx)
 
 
@@ -107,6 +137,21 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#null.
     def visitNull(self, ctx:SnowflakeSqlParser.NullContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#cmpOp.
+    def visitCmpOp(self, ctx:SnowflakeSqlParser.CmpOpContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#arithOp.
+    def visitArithOp(self, ctx:SnowflakeSqlParser.ArithOpContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#unaryOp.
+    def visitUnaryOp(self, ctx:SnowflakeSqlParser.UnaryOpContext):
         return self.visitChildren(ctx)
 
 

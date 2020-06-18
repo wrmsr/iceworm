@@ -16,3 +16,5 @@ select null;
 select * from x;
 select * from (x);
 select (1) x;
+select 1 - 2;
+select -1;
