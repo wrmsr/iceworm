@@ -53,9 +53,9 @@ simpleExpression
     ;
 
 relation
-    : left=relation JOIN right=relation (ON condition=booleanExpression)?  #joinRelation
-    | '(' relation ')'                                                     #parenRelation
-    | identifier                                                           #tableRelation
+    : left=relation ty=joinType? JOIN right=relation (ON condition=booleanExpression)?  #joinRelation
+    | '(' relation ')'                                                                  #parenRelation
+    | identifier                                                                        #tableRelation
     ;
 
 groupBy
@@ -77,6 +77,18 @@ string
 
 null
     : NULL
+    ;
+
+joinType
+    : INNER
+    | LEFT
+    | LEFT OUTER
+    | RIGHT
+    | RIGHT OUTER
+    | FULL
+    | FULL OUTER
+    | CROSS
+    | NATURAL
     ;
 
 cmpOp
@@ -105,15 +117,22 @@ unaryOp
 AND: 'and';
 AS: 'as';
 BY: 'by';
+CROSS: 'cross';
 FROM: 'from';
+FULL: 'full';
 GROUP: 'group';
 IN: 'in';
+INNER: 'inner';
 IS: 'is';
 JOIN: 'join';
+LEFT: 'left';
+NATURAL: 'natural';
 NOT: 'not';
 NULL: 'null';
 ON: 'on';
 OR: 'or';
+OUTER: 'outer';
+RIGHT: 'right';
 SELECT: 'select';
 WHERE: 'where';
 

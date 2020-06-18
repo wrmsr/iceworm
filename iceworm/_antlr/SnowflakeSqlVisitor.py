@@ -140,6 +140,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#joinType.
+    def visitJoinType(self, ctx:SnowflakeSqlParser.JoinTypeContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#cmpOp.
     def visitCmpOp(self, ctx:SnowflakeSqlParser.CmpOpContext):
         return self.visitChildren(ctx)

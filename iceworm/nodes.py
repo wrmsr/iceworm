@@ -106,8 +106,25 @@ class Relation(Node, abstract=True):
     pass
 
 
+class JoinType(enum.Enum):
+    DEFAULT = ''
+    INNER = 'inner'
+    LEFT = 'left'
+    LEFT_OUTER = 'left outer'
+    RIGHT = 'right'
+    RIGHT_OUTER = 'right outer'
+    FULL = 'full'
+    FULL_OUTER = 'full outer'
+    CROSS = 'cross'
+    NATURAL = 'natural'
+
+
+JOIN_TYPE_MAP: ta.Mapping[str, UnaryOp] = {v.value: v for v in JoinType.__members__.values()}
+
+
 class Join(Relation):
     left: Relation
+    type: JoinType
     right: Relation
     condition: ta.Optional[Expr] = None
 

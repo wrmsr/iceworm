@@ -38,6 +38,7 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Join) -> str:  # noqa
         return (
                 self.render(node.left) +
+                (node.type.value + ' ' if node.type != no.JoinType.DEFAULT else '') +
                 ' join ' +
                 self.render(node.right) +
                 ((' on ' + self.render(node.condition)) if node.condition is not None else '')

@@ -51,9 +51,11 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitJoinRelation(self, ctx: SnowflakeSqlParser.JoinRelationContext):
         left = self.visit(ctx.left)
+        ty = no.JOIN_TYPE_MAP[' '.join(c.getText().lower() for c in ctx.joinType().children)] \
+            if ctx.joinType() is not None else no.JoinType.DEFAULT
         right = self.visit(ctx.right)
         condition = self.visit(ctx.condition) if ctx.condition is not None else None
-        return no.Join(left, right, condition)
+        return no.Join(left, ty, right, condition)
 
     def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
         return no.Null()

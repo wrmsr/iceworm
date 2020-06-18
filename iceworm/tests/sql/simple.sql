@@ -18,3 +18,5 @@ select * from (x);
 select (1) x;
 select 1 - 2;
 select -1;
+select * from a inner join b;
+select * from a left outer join b;

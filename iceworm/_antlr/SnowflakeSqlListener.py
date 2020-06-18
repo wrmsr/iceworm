@@ -243,6 +243,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#joinType.
+    def enterJoinType(self, ctx:SnowflakeSqlParser.JoinTypeContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#joinType.
+    def exitJoinType(self, ctx:SnowflakeSqlParser.JoinTypeContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#cmpOp.
     def enterCmpOp(self, ctx:SnowflakeSqlParser.CmpOpContext):
         pass

@@ -24,4 +24,7 @@ def test_iceworm():
             rendered = rendering.render(node)
             print(rendered)
 
+            reparsed = parsing.parse_statement(rendered + ';')
+            assert reparsed == node
+
             print()
