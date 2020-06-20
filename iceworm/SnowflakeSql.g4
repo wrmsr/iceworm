@@ -6,10 +6,15 @@ singleStatement
     ;
 
 selectStatement
-    : SELECT setQuantifier? selectItem (',' selectItem)*
+    : (WITH cte (',' cte)*)?
+      SELECT setQuantifier? selectItem (',' selectItem)*
       (FROM relation (',' relation)*)?
       (WHERE where=booleanExpression)?
       (GROUP BY groupBy)?
+    ;
+
+cte
+    : identifier AS '(' selectStatement ')'
     ;
 
 selectItem
@@ -147,6 +152,7 @@ OUTER: 'outer';
 RIGHT: 'right';
 SELECT: 'select';
 WHERE: 'where';
+WITH: 'with';
 
 STRING
     : '\'' (~'\'' | '\'\'')* '\''

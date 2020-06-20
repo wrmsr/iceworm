@@ -27,6 +27,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#cte.
+    def enterCte(self, ctx:SnowflakeSqlParser.CteContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#cte.
+    def exitCte(self, ctx:SnowflakeSqlParser.CteContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#allSelectItem.
     def enterAllSelectItem(self, ctx:SnowflakeSqlParser.AllSelectItemContext):
         pass

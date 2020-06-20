@@ -167,9 +167,15 @@ class SetQuantifier(enum.Enum):
 SET_QUANTIFIER_MAP: ta.Mapping[str, SetQuantifier] = {v.value: v for v in SetQuantifier.__members__.values()}
 
 
+class Cte(Node):
+    name: Identifier
+    select: 'Select'
+
+
 class Select(Node):
     items: ta.Sequence[SelectItem]
     relations: ta.Sequence[Relation]
     where: ta.Optional[Expr] = None
+    ctes: ta.Optional[ta.Sequence[Cte]] = None
     set_quantifier: ta.Optional[SetQuantifier] = None
     group_by: ta.Optional[GroupBy] = None

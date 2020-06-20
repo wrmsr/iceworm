@@ -43,6 +43,11 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         right = self.visit(ctx.valueExpression())
         return no.BinaryExpr(left, op, right)
 
+    def visitCte(self, ctx: SnowflakeSqlParser.CteContext):
+        name = self.visit(ctx.identifier())
+        select = self.visit(ctx.selectStatement())
+        return no.Cte(name, select)
+
     def visitExpressionSelectItem(self, ctx: SnowflakeSqlParser.ExpressionSelectItemContext):
         expr = self.visit(ctx.expression())
         label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
@@ -86,13 +91,21 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         return no.Identifier(name)
 
     def visitSelectStatement(self, ctx: SnowflakeSqlParser.SelectStatementContext):
+        ctes = [self.visit(c) for c in ctx.cte()]
         items = [self.visit(i) for i in ctx.selectItem()]
         relations = [self.visit(r) for r in ctx.relation()]
         set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
             if ctx.setQuantifier() is not None else None
         where = self.visit(ctx.where) if ctx.where is not None else None
         group_by = self.visit(ctx.groupBy()) if ctx.groupBy() else None
-        return no.Select(items, relations, where, set_quantifier, group_by)
+        return no.Select(
+            items,
+            relations,
+            where,
+            ctes=ctes,
+            set_quantifier=set_quantifier,
+            group_by=group_by,
+        )
 
     def visitString(self, ctx: SnowflakeSqlParser.StringContext):
         value = unquote(ctx.STRING().getText(), "'")
