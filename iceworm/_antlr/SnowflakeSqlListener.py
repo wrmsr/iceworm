@@ -153,6 +153,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#casePrimaryExpression.
+    def enterCasePrimaryExpression(self, ctx:SnowflakeSqlParser.CasePrimaryExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#casePrimaryExpression.
+    def exitCasePrimaryExpression(self, ctx:SnowflakeSqlParser.CasePrimaryExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#simplePrimaryExpression.
     def enterSimplePrimaryExpression(self, ctx:SnowflakeSqlParser.SimplePrimaryExpressionContext):
         pass
@@ -168,6 +177,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#simpleExpression.
     def exitSimpleExpression(self, ctx:SnowflakeSqlParser.SimpleExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#caseItem.
+    def enterCaseItem(self, ctx:SnowflakeSqlParser.CaseItemContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#caseItem.
+    def exitCaseItem(self, ctx:SnowflakeSqlParser.CaseItemContext):
         pass
 
 

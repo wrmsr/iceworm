@@ -23,6 +23,17 @@ class Renderer(dispatch.Class):
     def render(self, node: no.BinaryExpr) -> str:  # noqa
         return paren(self.render(node.left)) + ' ' + node.op.value + ' ' + paren(self.render(node.right))
 
+    def render(self, node: no.Case) -> str:  # noqa
+        return (
+                'case' +
+                ((' ' + ' '.join(self.render(i) for i in node.items)) if node.items else '') +
+                ((' else ' + self.render(node.default)) if node.items else '') +
+                ' end'
+        )
+
+    def render(self, node: no.CaseItem) -> str:  # noqa
+        return 'when ' + self.render(node.when) + ' then ' + self.render(node.then)
+
     def render(self, node: no.Cte) -> str:  # noqa
         return self.render(node.name) + ' as ' + paren(self.render(node.select))
 

@@ -37,6 +37,15 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         op = no.BINARY_OP_MAP[ctx.op.text.lower()]
         return no.BinaryExpr(left, op, right)
 
+    def visitCaseItem(self, ctx: SnowflakeSqlParser.CaseItemContext):
+        when, then = [self.visit(e) for e in ctx.expression()]
+        return no.CaseItem(when, then)
+
+    def visitCasePrimaryExpression(self, ctx: SnowflakeSqlParser.CasePrimaryExpressionContext):
+        items = [self.visit(i) for i in ctx.caseItem()]
+        default = self.visit(ctx.expression()) if ctx.expression() is not None else None
+        return no.Case(items, default)
+
     def visitCmpPredicate(self, ctx: SnowflakeSqlParser.CmpPredicateContext):
         left = self.visit(ctx.value)
         op = no.BINARY_OP_MAP[ctx.cmpOp().getText().lower()]

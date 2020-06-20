@@ -90,6 +90,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#casePrimaryExpression.
+    def visitCasePrimaryExpression(self, ctx:SnowflakeSqlParser.CasePrimaryExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#simplePrimaryExpression.
     def visitSimplePrimaryExpression(self, ctx:SnowflakeSqlParser.SimplePrimaryExpressionContext):
         return self.visitChildren(ctx)
@@ -97,6 +102,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#simpleExpression.
     def visitSimpleExpression(self, ctx:SnowflakeSqlParser.SimpleExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#caseItem.
+    def visitCaseItem(self, ctx:SnowflakeSqlParser.CaseItemContext):
         return self.visitChildren(ctx)
 
 

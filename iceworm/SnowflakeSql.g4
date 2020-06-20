@@ -46,6 +46,7 @@ valueExpression
 
 primaryExpression
     : identifier '(' (expression (',' expression)*)? ')'  #functionCallPrimaryExpression
+    | CASE caseItem* (ELSE expression)? END               #casePrimaryExpression
     | simpleExpression                                    #simplePrimaryExpression
     ;
 
@@ -55,6 +56,10 @@ simpleExpression
     | number
     | string
     | null
+    ;
+
+caseItem
+    : WHEN expression THEN expression
     ;
 
 relation
@@ -134,8 +139,11 @@ ALL: 'all';
 AND: 'and';
 AS: 'as';
 BY: 'by';
+CASE: 'case';
 CROSS: 'cross';
 DISTINCT: 'distinct';
+ELSE: 'else';
+END: 'end';
 FROM: 'from';
 FULL: 'full';
 GROUP: 'group';
@@ -152,6 +160,8 @@ OR: 'or';
 OUTER: 'outer';
 RIGHT: 'right';
 SELECT: 'select';
+THEN: 'then';
+WHEN: 'when';
 WHERE: 'where';
 WITH: 'with';
 

@@ -108,6 +108,16 @@ class Null(Expr):
     pass
 
 
+class CaseItem(Node):
+    when: Expr
+    then: Expr
+
+
+class Case(Expr):
+    items: ta.Sequence[CaseItem]
+    default: ta.Optional[Expr] = None
+
+
 class Relation(Node, abstract=True):
     pass
 
@@ -172,6 +182,7 @@ SET_QUANTIFIER_MAP: ta.Mapping[str, SetQuantifier] = {v.value: v for v in SetQua
 class Cte(Node):
     name: Identifier
     select: 'Select'
+
 
 
 class Select(Node):
