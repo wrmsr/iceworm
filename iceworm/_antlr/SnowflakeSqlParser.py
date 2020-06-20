@@ -1430,7 +1430,7 @@ class SnowflakeSqlParser ( Parser ):
             self.left = None # RelationContext
             self.ty = None # JoinTypeContext
             self.right = None # RelationContext
-            self.condition = None # BooleanExpressionContext
+            self.cond = None # BooleanExpressionContext
             self.copyFrom(ctx)
 
         def JOIN(self):
@@ -1609,7 +1609,7 @@ class SnowflakeSqlParser ( Parser ):
                             self.state = 194
                             self.match(SnowflakeSqlParser.ON)
                             self.state = 195
-                            localctx.condition = self.booleanExpression(0)
+                            localctx.cond = self.booleanExpression(0)
 
 
                         pass

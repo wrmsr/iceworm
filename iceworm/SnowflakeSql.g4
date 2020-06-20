@@ -53,10 +53,10 @@ simpleExpression
     ;
 
 relation
-    : relation AS? identifier                                                           #aliasedRelation
-    | left=relation ty=joinType? JOIN right=relation (ON condition=booleanExpression)?  #joinRelation
-    | '(' relation ')'                                                                  #parenRelation
-    | qualifiedName                                                                     #tableRelation
+    : relation AS? identifier                                                      #aliasedRelation
+    | left=relation ty=joinType? JOIN right=relation (ON cond=booleanExpression)?  #joinRelation
+    | '(' relation ')'                                                             #parenRelation
+    | qualifiedName                                                                #tableRelation
     ;
 
 groupBy

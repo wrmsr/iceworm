@@ -37,6 +37,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         op = no.BINARY_OP_MAP[ctx.op.text.lower()]
         return no.BinaryExpr(left, op, right)
 
+    def visitCmpPredicate(self, ctx: SnowflakeSqlParser.CmpPredicateContext):
+        left = self.visit(ctx.value)
+        op = no.BINARY_OP_MAP[ctx.cmpOp().getText().lower()]
+        right = self.visit(ctx.valueExpression())
+        return no.BinaryExpr(left, op, right)
+
     def visitExpressionSelectItem(self, ctx: SnowflakeSqlParser.ExpressionSelectItemContext):
         expr = self.visit(ctx.expression())
         label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
@@ -59,7 +65,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         ty = no.JOIN_TYPE_MAP[' '.join(c.getText().lower() for c in ctx.joinType().children)] \
             if ctx.joinType() is not None else no.JoinType.DEFAULT
         right = self.visit(ctx.right)
-        condition = self.visit(ctx.condition) if ctx.condition is not None else None
+        condition = self.visit(ctx.cond) if ctx.cond is not None else None
         return no.Join(left, ty, right, condition)
 
     def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
@@ -67,6 +73,9 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitParenRelation(self, ctx: SnowflakeSqlParser.ParenRelationContext):
         return self.visit(ctx.relation())
+
+    def visitPredicatedBooleanExpression(self, ctx: SnowflakeSqlParser.PredicatedBooleanExpressionContext):
+        return self.visit(ctx.predicate()) if ctx.predicate() is not None else self.visit(ctx.valueExpression())
 
     def visitQualifiedName(self, ctx: SnowflakeSqlParser.QualifiedNameContext):
         parts = [self.visit(i) for i in ctx.identifier()]
