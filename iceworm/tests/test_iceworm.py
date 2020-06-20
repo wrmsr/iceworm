@@ -11,14 +11,14 @@ def test_iceworm():
         with open(file_path, 'r') as f:
             lines = f.read()
 
-        for line in lines.splitlines():
+        for line in lines.split(';'):
             line = line.strip()
             if not line or line.startswith('--'):
                 continue
 
             print(line)
 
-            node = parsing.parse_statement(line)
+            node = parsing.parse_statement(line + ';')
             print(node)
 
             rendered = rendering.render(node)

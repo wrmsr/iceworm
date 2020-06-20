@@ -163,7 +163,7 @@ INTEGER_VALUE
     ;
 
 IDENTIFIER
-    : (LETTER | '_') (LETTER | DIGIT | '_' | '@' | ':')*
+    : (LETTER | '_') (LETTER | DIGIT | '_' | '@' | ':' | '$')*
     ;
 
 QUOTED_IDENTIFIER
