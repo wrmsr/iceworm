@@ -74,9 +74,9 @@ def serializedATN():
         buf.write("(\25\2\u008f\u0090\5\16\b\4\u0090\u0092\3\2\2\2\u0091")
         buf.write("\u008d\3\2\2\2\u0092\u0095\3\2\2\2\u0093\u0091\3\2\2\2")
         buf.write("\u0093\u0094\3\2\2\2\u0094\17\3\2\2\2\u0095\u0093\3\2")
-        buf.write("\2\2\u0096\u0097\5\32\16\2\u0097\u00a0\7\6\2\2\u0098\u0099")
-        buf.write("\5\b\5\2\u0099\u009d\7\4\2\2\u009a\u009c\5\b\5\2\u009b")
-        buf.write("\u009a\3\2\2\2\u009c\u009f\3\2\2\2\u009d\u009b\3\2\2\2")
+        buf.write("\2\2\u0096\u0097\5\32\16\2\u0097\u00a0\7\6\2\2\u0098\u009d")
+        buf.write("\5\b\5\2\u0099\u009a\7\4\2\2\u009a\u009c\5\b\5\2\u009b")
+        buf.write("\u0099\3\2\2\2\u009c\u009f\3\2\2\2\u009d\u009b\3\2\2\2")
         buf.write("\u009d\u009e\3\2\2\2\u009e\u00a1\3\2\2\2\u009f\u009d\3")
         buf.write("\2\2\2\u00a0\u0098\3\2\2\2\u00a0\u00a1\3\2\2\2\u00a1\u00a2")
         buf.write("\3\2\2\2\u00a2\u00a3\7\7\2\2\u00a3\u00a6\3\2\2\2\u00a4")
@@ -1247,13 +1247,12 @@ class SnowflakeSqlParser ( Parser ):
                 if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__3) | (1 << SnowflakeSqlParser.T__13) | (1 << SnowflakeSqlParser.T__14) | (1 << SnowflakeSqlParser.NOT) | (1 << SnowflakeSqlParser.NULL) | (1 << SnowflakeSqlParser.STRING) | (1 << SnowflakeSqlParser.INTEGER_VALUE) | (1 << SnowflakeSqlParser.IDENTIFIER) | (1 << SnowflakeSqlParser.QUOTED_IDENTIFIER))) != 0):
                     self.state = 150
                     self.expression()
-
-                    self.state = 151
-                    self.match(SnowflakeSqlParser.T__1)
                     self.state = 155
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    while (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__3) | (1 << SnowflakeSqlParser.T__13) | (1 << SnowflakeSqlParser.T__14) | (1 << SnowflakeSqlParser.NOT) | (1 << SnowflakeSqlParser.NULL) | (1 << SnowflakeSqlParser.STRING) | (1 << SnowflakeSqlParser.INTEGER_VALUE) | (1 << SnowflakeSqlParser.IDENTIFIER) | (1 << SnowflakeSqlParser.QUOTED_IDENTIFIER))) != 0):
+                    while _la==SnowflakeSqlParser.T__1:
+                        self.state = 151
+                        self.match(SnowflakeSqlParser.T__1)
                         self.state = 152
                         self.expression()
                         self.state = 157

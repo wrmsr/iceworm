@@ -40,7 +40,7 @@ valueExpression
     ;
 
 primaryExpression
-    : identifier '(' (expression (',' expression*))? ')'  #functionCallPrimaryExpression
+    : identifier '(' (expression (',' expression)*)? ')'  #functionCallPrimaryExpression
     | simpleExpression                                    #simplePrimaryExpression
     ;
 
