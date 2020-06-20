@@ -29,6 +29,7 @@ class BinaryOp(enum.Enum):
     MUL = '*'
     DIV = '/'
     MOD = '%'
+    CONCAT = '||'
 
 
 BINARY_OP_MAP: ta.Mapping[str, BinaryOp] = {v.value: v for v in BinaryOp.__members__.values()}
@@ -57,6 +58,7 @@ ARITH_OPS: ta.AbstractSet[BinaryOp] = frozenset([
     BinaryOp.MUL,
     BinaryOp.DIV,
     BinaryOp.MOD,
+    BinaryOp.CONCAT,
 ])
 
 

@@ -12,7 +12,7 @@ else:
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\61")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\62")
         buf.write("\u0111\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
         buf.write("\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4\f\t\f\4\r\t\r\4\16")
         buf.write("\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22\4\23\t\23")
@@ -39,43 +39,43 @@ def serializedATN():
         buf.write("\3\23\3\23\3\24\3\24\3\24\3\24\3\24\3\24\3\24\3\24\3\24")
         buf.write("\3\24\3\24\3\24\5\24\u0109\n\24\3\25\3\25\3\26\3\26\3")
         buf.write("\27\3\27\3\27\2\5\f\20\26\30\2\4\6\b\n\f\16\20\22\24\26")
-        buf.write("\30\32\34\36 \"$&(*,\2\7\4\2\25\25&&\4\2\24\24\31\31\3")
-        buf.write("\2\t\17\4\2\7\7\20\23\3\2\20\21\2\u0127\2.\3\2\2\2\4;")
-        buf.write("\3\2\2\2\6]\3\2\2\2\bk\3\2\2\2\nm\3\2\2\2\fv\3\2\2\2\16")
-        buf.write("\u0097\3\2\2\2\20\u009e\3\2\2\2\22\u00b8\3\2\2\2\24\u00c2")
-        buf.write("\3\2\2\2\26\u00ca\3\2\2\2\30\u00e0\3\2\2\2\32\u00e8\3")
-        buf.write("\2\2\2\34\u00f2\3\2\2\2\36\u00f4\3\2\2\2 \u00f6\3\2\2")
-        buf.write("\2\"\u00f8\3\2\2\2$\u00fa\3\2\2\2&\u0108\3\2\2\2(\u010a")
+        buf.write("\30\32\34\36 \"$&(*,\2\7\4\2\26\26\'\'\4\2\25\25\32\32")
+        buf.write("\3\2\t\17\4\2\7\7\20\24\3\2\20\21\2\u0127\2.\3\2\2\2\4")
+        buf.write(";\3\2\2\2\6]\3\2\2\2\bk\3\2\2\2\nm\3\2\2\2\fv\3\2\2\2")
+        buf.write("\16\u0097\3\2\2\2\20\u009e\3\2\2\2\22\u00b8\3\2\2\2\24")
+        buf.write("\u00c2\3\2\2\2\26\u00ca\3\2\2\2\30\u00e0\3\2\2\2\32\u00e8")
+        buf.write("\3\2\2\2\34\u00f2\3\2\2\2\36\u00f4\3\2\2\2 \u00f6\3\2")
+        buf.write("\2\2\"\u00f8\3\2\2\2$\u00fa\3\2\2\2&\u0108\3\2\2\2(\u010a")
         buf.write("\3\2\2\2*\u010c\3\2\2\2,\u010e\3\2\2\2./\5\4\3\2/\60\7")
-        buf.write("\3\2\2\60\61\7\2\2\3\61\3\3\2\2\2\62\63\7+\2\2\638\5\6")
+        buf.write("\3\2\2\60\61\7\2\2\3\61\3\3\2\2\2\62\63\7,\2\2\638\5\6")
         buf.write("\4\2\64\65\7\4\2\2\65\67\5\6\4\2\66\64\3\2\2\2\67:\3\2")
         buf.write("\2\28\66\3\2\2\289\3\2\2\29<\3\2\2\2:8\3\2\2\2;\62\3\2")
-        buf.write("\2\2;<\3\2\2\2<=\3\2\2\2=?\7)\2\2>@\5$\23\2?>\3\2\2\2")
+        buf.write("\2\2;<\3\2\2\2<=\3\2\2\2=?\7*\2\2>@\5$\23\2?>\3\2\2\2")
         buf.write("?@\3\2\2\2@A\3\2\2\2AF\5\b\5\2BC\7\4\2\2CE\5\b\5\2DB\3")
         buf.write("\2\2\2EH\3\2\2\2FD\3\2\2\2FG\3\2\2\2GR\3\2\2\2HF\3\2\2")
-        buf.write("\2IJ\7\32\2\2JO\5\26\f\2KL\7\4\2\2LN\5\26\f\2MK\3\2\2")
+        buf.write("\2IJ\7\33\2\2JO\5\26\f\2KL\7\4\2\2LN\5\26\f\2MK\3\2\2")
         buf.write("\2NQ\3\2\2\2OM\3\2\2\2OP\3\2\2\2PS\3\2\2\2QO\3\2\2\2R")
-        buf.write("I\3\2\2\2RS\3\2\2\2SV\3\2\2\2TU\7*\2\2UW\5\f\7\2VT\3\2")
-        buf.write("\2\2VW\3\2\2\2W[\3\2\2\2XY\7\34\2\2YZ\7\27\2\2Z\\\5\30")
+        buf.write("I\3\2\2\2RS\3\2\2\2SV\3\2\2\2TU\7+\2\2UW\5\f\7\2VT\3\2")
+        buf.write("\2\2VW\3\2\2\2W[\3\2\2\2XY\7\35\2\2YZ\7\30\2\2Z\\\5\30")
         buf.write("\r\2[X\3\2\2\2[\\\3\2\2\2\\\5\3\2\2\2]^\5\34\17\2^_\7")
-        buf.write("\26\2\2_`\7\5\2\2`a\5\4\3\2ab\7\6\2\2b\7\3\2\2\2cl\7\7")
-        buf.write("\2\2di\5\n\6\2eg\7\26\2\2fe\3\2\2\2fg\3\2\2\2gh\3\2\2")
+        buf.write("\27\2\2_`\7\5\2\2`a\5\4\3\2ab\7\6\2\2b\7\3\2\2\2cl\7\7")
+        buf.write("\2\2di\5\n\6\2eg\7\27\2\2fe\3\2\2\2fg\3\2\2\2gh\3\2\2")
         buf.write("\2hj\5\34\17\2if\3\2\2\2ij\3\2\2\2jl\3\2\2\2kc\3\2\2\2")
         buf.write("kd\3\2\2\2l\t\3\2\2\2mn\5\f\7\2n\13\3\2\2\2op\b\7\1\2")
         buf.write("pr\5\20\t\2qs\5\16\b\2rq\3\2\2\2rs\3\2\2\2sw\3\2\2\2t")
-        buf.write("u\7#\2\2uw\5\f\7\4vo\3\2\2\2vt\3\2\2\2w}\3\2\2\2xy\f\3")
+        buf.write("u\7$\2\2uw\5\f\7\4vo\3\2\2\2vt\3\2\2\2w}\3\2\2\2xy\f\3")
         buf.write("\2\2yz\t\2\2\2z|\5\f\7\4{x\3\2\2\2|\177\3\2\2\2}{\3\2")
         buf.write("\2\2}~\3\2\2\2~\r\3\2\2\2\177}\3\2\2\2\u0080\u0081\5(")
         buf.write("\25\2\u0081\u0082\5\20\t\2\u0082\u0098\3\2\2\2\u0083\u0085")
-        buf.write("\7#\2\2\u0084\u0083\3\2\2\2\u0084\u0085\3\2\2\2\u0085")
-        buf.write("\u0086\3\2\2\2\u0086\u0087\7\35\2\2\u0087\u0088\7\5\2")
+        buf.write("\7$\2\2\u0084\u0083\3\2\2\2\u0084\u0085\3\2\2\2\u0085")
+        buf.write("\u0086\3\2\2\2\u0086\u0087\7\36\2\2\u0087\u0088\7\5\2")
         buf.write("\2\u0088\u008d\5\n\6\2\u0089\u008a\7\4\2\2\u008a\u008c")
         buf.write("\5\n\6\2\u008b\u0089\3\2\2\2\u008c\u008f\3\2\2\2\u008d")
         buf.write("\u008b\3\2\2\2\u008d\u008e\3\2\2\2\u008e\u0090\3\2\2\2")
         buf.write("\u008f\u008d\3\2\2\2\u0090\u0091\7\6\2\2\u0091\u0098\3")
-        buf.write("\2\2\2\u0092\u0094\7\37\2\2\u0093\u0095\7#\2\2\u0094\u0093")
+        buf.write("\2\2\2\u0092\u0094\7 \2\2\u0093\u0095\7$\2\2\u0094\u0093")
         buf.write("\3\2\2\2\u0094\u0095\3\2\2\2\u0095\u0096\3\2\2\2\u0096")
-        buf.write("\u0098\7$\2\2\u0097\u0080\3\2\2\2\u0097\u0084\3\2\2\2")
+        buf.write("\u0098\7%\2\2\u0097\u0080\3\2\2\2\u0097\u0084\3\2\2\2")
         buf.write("\u0097\u0092\3\2\2\2\u0098\17\3\2\2\2\u0099\u009a\b\t")
         buf.write("\1\2\u009a\u009f\5\22\n\2\u009b\u009c\5,\27\2\u009c\u009d")
         buf.write("\5\20\t\4\u009d\u009f\3\2\2\2\u009e\u0099\3\2\2\2\u009e")
@@ -99,12 +99,12 @@ def serializedATN():
         buf.write("\1\2\u00c5\u00c6\7\5\2\2\u00c6\u00c7\5\26\f\2\u00c7\u00c8")
         buf.write("\7\6\2\2\u00c8\u00cb\3\2\2\2\u00c9\u00cb\5\32\16\2\u00ca")
         buf.write("\u00c4\3\2\2\2\u00ca\u00c9\3\2\2\2\u00cb\u00dd\3\2\2\2")
-        buf.write("\u00cc\u00ce\f\6\2\2\u00cd\u00cf\7\26\2\2\u00ce\u00cd")
+        buf.write("\u00cc\u00ce\f\6\2\2\u00cd\u00cf\7\27\2\2\u00ce\u00cd")
         buf.write("\3\2\2\2\u00ce\u00cf\3\2\2\2\u00cf\u00d0\3\2\2\2\u00d0")
         buf.write("\u00dc\5\34\17\2\u00d1\u00d3\f\5\2\2\u00d2\u00d4\5&\24")
         buf.write("\2\u00d3\u00d2\3\2\2\2\u00d3\u00d4\3\2\2\2\u00d4\u00d5")
-        buf.write("\3\2\2\2\u00d5\u00d6\7 \2\2\u00d6\u00d9\5\26\f\2\u00d7")
-        buf.write("\u00d8\7%\2\2\u00d8\u00da\5\f\7\2\u00d9\u00d7\3\2\2\2")
+        buf.write("\3\2\2\2\u00d5\u00d6\7!\2\2\u00d6\u00d9\5\26\f\2\u00d7")
+        buf.write("\u00d8\7&\2\2\u00d8\u00da\5\f\7\2\u00d9\u00d7\3\2\2\2")
         buf.write("\u00d9\u00da\3\2\2\2\u00da\u00dc\3\2\2\2\u00db\u00cc\3")
         buf.write("\2\2\2\u00db\u00d1\3\2\2\2\u00dc\u00df\3\2\2\2\u00dd\u00db")
         buf.write("\3\2\2\2\u00dd\u00de\3\2\2\2\u00de\27\3\2\2\2\u00df\u00dd")
@@ -114,16 +114,16 @@ def serializedATN():
         buf.write("\2\2\u00e7\u00e5\3\2\2\2\u00e8\u00ed\5\34\17\2\u00e9\u00ea")
         buf.write("\7\b\2\2\u00ea\u00ec\5\34\17\2\u00eb\u00e9\3\2\2\2\u00ec")
         buf.write("\u00ef\3\2\2\2\u00ed\u00eb\3\2\2\2\u00ed\u00ee\3\2\2\2")
-        buf.write("\u00ee\33\3\2\2\2\u00ef\u00ed\3\2\2\2\u00f0\u00f3\7.\2")
-        buf.write("\2\u00f1\u00f3\7/\2\2\u00f2\u00f0\3\2\2\2\u00f2\u00f1")
-        buf.write("\3\2\2\2\u00f3\35\3\2\2\2\u00f4\u00f5\7-\2\2\u00f5\37")
-        buf.write("\3\2\2\2\u00f6\u00f7\7,\2\2\u00f7!\3\2\2\2\u00f8\u00f9")
-        buf.write("\7$\2\2\u00f9#\3\2\2\2\u00fa\u00fb\t\3\2\2\u00fb%\3\2")
-        buf.write("\2\2\u00fc\u0109\7\36\2\2\u00fd\u0109\7!\2\2\u00fe\u00ff")
-        buf.write("\7!\2\2\u00ff\u0109\7\'\2\2\u0100\u0109\7(\2\2\u0101\u0102")
-        buf.write("\7(\2\2\u0102\u0109\7\'\2\2\u0103\u0109\7\33\2\2\u0104")
-        buf.write("\u0105\7\33\2\2\u0105\u0109\7\'\2\2\u0106\u0109\7\30\2")
-        buf.write("\2\u0107\u0109\7\"\2\2\u0108\u00fc\3\2\2\2\u0108\u00fd")
+        buf.write("\u00ee\33\3\2\2\2\u00ef\u00ed\3\2\2\2\u00f0\u00f3\7/\2")
+        buf.write("\2\u00f1\u00f3\7\60\2\2\u00f2\u00f0\3\2\2\2\u00f2\u00f1")
+        buf.write("\3\2\2\2\u00f3\35\3\2\2\2\u00f4\u00f5\7.\2\2\u00f5\37")
+        buf.write("\3\2\2\2\u00f6\u00f7\7-\2\2\u00f7!\3\2\2\2\u00f8\u00f9")
+        buf.write("\7%\2\2\u00f9#\3\2\2\2\u00fa\u00fb\t\3\2\2\u00fb%\3\2")
+        buf.write("\2\2\u00fc\u0109\7\37\2\2\u00fd\u0109\7\"\2\2\u00fe\u00ff")
+        buf.write("\7\"\2\2\u00ff\u0109\7(\2\2\u0100\u0109\7)\2\2\u0101\u0102")
+        buf.write("\7)\2\2\u0102\u0109\7(\2\2\u0103\u0109\7\34\2\2\u0104")
+        buf.write("\u0105\7\34\2\2\u0105\u0109\7(\2\2\u0106\u0109\7\31\2")
+        buf.write("\2\u0107\u0109\7#\2\2\u0108\u00fc\3\2\2\2\u0108\u00fd")
         buf.write("\3\2\2\2\u0108\u00fe\3\2\2\2\u0108\u0100\3\2\2\2\u0108")
         buf.write("\u0101\3\2\2\2\u0108\u0103\3\2\2\2\u0108\u0104\3\2\2\2")
         buf.write("\u0108\u0106\3\2\2\2\u0108\u0107\3\2\2\2\u0109\'\3\2\2")
@@ -147,21 +147,21 @@ class SnowflakeSqlParser ( Parser ):
 
     literalNames = [ "<INVALID>", "';'", "','", "'('", "')'", "'*'", "'.'", 
                      "'='", "'!='", "'<>'", "'<'", "'<='", "'>'", "'>='", 
-                     "'+'", "'-'", "'/'", "'%'", "'all'", "'and'", "'as'", 
-                     "'by'", "'cross'", "'distinct'", "'from'", "'full'", 
-                     "'group'", "'in'", "'inner'", "'is'", "'join'", "'left'", 
-                     "'natural'", "'not'", "'null'", "'on'", "'or'", "'outer'", 
-                     "'right'", "'select'", "'where'", "'with'" ]
+                     "'+'", "'-'", "'/'", "'%'", "'||'", "'all'", "'and'", 
+                     "'as'", "'by'", "'cross'", "'distinct'", "'from'", 
+                     "'full'", "'group'", "'in'", "'inner'", "'is'", "'join'", 
+                     "'left'", "'natural'", "'not'", "'null'", "'on'", "'or'", 
+                     "'outer'", "'right'", "'select'", "'where'", "'with'" ]
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "<INVALID>", "ALL", "AND", "AS", "BY", 
-                      "CROSS", "DISTINCT", "FROM", "FULL", "GROUP", "IN", 
-                      "INNER", "IS", "JOIN", "LEFT", "NATURAL", "NOT", "NULL", 
-                      "ON", "OR", "OUTER", "RIGHT", "SELECT", "WHERE", "WITH", 
-                      "STRING", "INTEGER_VALUE", "IDENTIFIER", "QUOTED_IDENTIFIER", 
+                      "<INVALID>", "<INVALID>", "<INVALID>", "ALL", "AND", 
+                      "AS", "BY", "CROSS", "DISTINCT", "FROM", "FULL", "GROUP", 
+                      "IN", "INNER", "IS", "JOIN", "LEFT", "NATURAL", "NOT", 
+                      "NULL", "ON", "OR", "OUTER", "RIGHT", "SELECT", "WHERE", 
+                      "WITH", "STRING", "INTEGER_VALUE", "IDENTIFIER", "QUOTED_IDENTIFIER", 
                       "COMMENT", "WS" ]
 
     RULE_singleStatement = 0
@@ -212,36 +212,37 @@ class SnowflakeSqlParser ( Parser ):
     T__14=15
     T__15=16
     T__16=17
-    ALL=18
-    AND=19
-    AS=20
-    BY=21
-    CROSS=22
-    DISTINCT=23
-    FROM=24
-    FULL=25
-    GROUP=26
-    IN=27
-    INNER=28
-    IS=29
-    JOIN=30
-    LEFT=31
-    NATURAL=32
-    NOT=33
-    NULL=34
-    ON=35
-    OR=36
-    OUTER=37
-    RIGHT=38
-    SELECT=39
-    WHERE=40
-    WITH=41
-    STRING=42
-    INTEGER_VALUE=43
-    IDENTIFIER=44
-    QUOTED_IDENTIFIER=45
-    COMMENT=46
-    WS=47
+    T__17=18
+    ALL=19
+    AND=20
+    AS=21
+    BY=22
+    CROSS=23
+    DISTINCT=24
+    FROM=25
+    FULL=26
+    GROUP=27
+    IN=28
+    INNER=29
+    IS=30
+    JOIN=31
+    LEFT=32
+    NATURAL=33
+    NOT=34
+    NULL=35
+    ON=36
+    OR=37
+    OUTER=38
+    RIGHT=39
+    SELECT=40
+    WHERE=41
+    WITH=42
+    STRING=43
+    INTEGER_VALUE=44
+    IDENTIFIER=45
+    QUOTED_IDENTIFIER=46
+    COMMENT=47
+    WS=48
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -2372,7 +2373,7 @@ class SnowflakeSqlParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 266
             _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__4) | (1 << SnowflakeSqlParser.T__13) | (1 << SnowflakeSqlParser.T__14) | (1 << SnowflakeSqlParser.T__15) | (1 << SnowflakeSqlParser.T__16))) != 0)):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__4) | (1 << SnowflakeSqlParser.T__13) | (1 << SnowflakeSqlParser.T__14) | (1 << SnowflakeSqlParser.T__15) | (1 << SnowflakeSqlParser.T__16) | (1 << SnowflakeSqlParser.T__17))) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
