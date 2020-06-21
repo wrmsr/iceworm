@@ -90,6 +90,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#castBooleanExpression.
+    def enterCastBooleanExpression(self, ctx:SnowflakeSqlParser.CastBooleanExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#castBooleanExpression.
+    def exitCastBooleanExpression(self, ctx:SnowflakeSqlParser.CastBooleanExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#cmpPredicate.
     def enterCmpPredicate(self, ctx:SnowflakeSqlParser.CmpPredicateContext):
         pass
@@ -186,6 +195,24 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#caseItem.
     def exitCaseItem(self, ctx:SnowflakeSqlParser.CaseItemContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#over.
+    def enterOver(self, ctx:SnowflakeSqlParser.OverContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#over.
+    def exitOver(self, ctx:SnowflakeSqlParser.OverContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#sortItem.
+    def enterSortItem(self, ctx:SnowflakeSqlParser.SortItemContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#sortItem.
+    def exitSortItem(self, ctx:SnowflakeSqlParser.SortItemContext):
         pass
 
 

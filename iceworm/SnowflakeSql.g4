@@ -11,6 +11,7 @@ selectStatement
       (FROM relation (',' relation)*)?
       (WHERE where=booleanExpression)?
       (GROUP BY groupBy)?
+      (ORDER BY sortItem (',' sortItem)*)?
     ;
 
 cte
@@ -30,6 +31,7 @@ booleanExpression
     : valueExpression predicate[$valueExpression.ctx]?   #predicatedBooleanExpression
     | op=NOT booleanExpression                           #unaryBooleanExpression
     | booleanExpression op=(AND | OR) booleanExpression  #binaryBooleanExpression
+    | booleanExpression '::' identifier                  #castBooleanExpression
     ;
 
 predicate[ParserRuleContext value]
@@ -45,9 +47,9 @@ valueExpression
     ;
 
 primaryExpression
-    : identifier '(' (expression (',' expression)*)? ')'  #functionCallPrimaryExpression
-    | CASE caseItem* (ELSE expression)? END               #casePrimaryExpression
-    | simpleExpression                                    #simplePrimaryExpression
+    : identifier '(' (expression (',' expression)*)? ')' over? #functionCallPrimaryExpression
+    | CASE caseItem* (ELSE expression)? END                    #casePrimaryExpression
+    | simpleExpression                                         #simplePrimaryExpression
     ;
 
 simpleExpression
@@ -60,6 +62,14 @@ simpleExpression
 
 caseItem
     : WHEN expression THEN expression
+    ;
+
+over
+    : OVER '(' (ORDER BY sortItem (',' sortItem)*)? ')'
+    ;
+
+sortItem
+    : expression direction=(ASC | DESC)?
     ;
 
 relation
@@ -138,9 +148,11 @@ unaryOp
 ALL: 'all';
 AND: 'and';
 AS: 'as';
+ASC: 'asc';
 BY: 'by';
 CASE: 'case';
 CROSS: 'cross';
+DESC: 'desc';
 DISTINCT: 'distinct';
 ELSE: 'else';
 END: 'end';
@@ -157,7 +169,9 @@ NOT: 'not';
 NULL: 'null';
 ON: 'on';
 OR: 'or';
+ORDER: 'order';
 OUTER: 'outer';
+OVER: 'over';
 RIGHT: 'right';
 SELECT: 'select';
 THEN: 'then';

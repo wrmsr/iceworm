@@ -118,6 +118,24 @@ class Case(Expr):
     default: ta.Optional[Expr] = None
 
 
+class Cast(Expr):
+    value: Expr
+    type: Identifier
+
+
+class Direction(enum.Enum):
+    ASC = 'asc'
+    DESC = 'desc'
+
+
+DIRECTION_MAP: ta.Mapping[str, Direction] = {v.value: v for v in Direction.__members__.values()}
+
+
+class SortItem(Node):
+    value: Expr
+    direction: ta.Optional[Direction] = None
+
+
 class Relation(Node, abstract=True):
     pass
 
@@ -154,10 +172,6 @@ class AliasedRelation(Relation):
     alias: Identifier
 
 
-class GroupBy(Node):
-    exprs: ta.Sequence[Expr]
-
-
 class SelectItem(Node, abstract=True):
     pass
 
@@ -167,7 +181,7 @@ class AllSelectItem(SelectItem):
 
 
 class ExprSelectItem(Node):
-    expr: Expr
+    value: Expr
     label: ta.Optional[Identifier] = None
 
 
@@ -184,6 +198,13 @@ class Cte(Node):
     select: 'Select'
 
 
+class GroupItem(Node):
+    value: Expr
+
+
+class GroupBy(Node):
+    items: ta.Sequence[GroupItem]
+
 
 class Select(Node):
     items: ta.Sequence[SelectItem]
@@ -192,3 +213,4 @@ class Select(Node):
     ctes: ta.Optional[ta.Sequence[Cte]] = None
     set_quantifier: ta.Optional[SetQuantifier] = None
     group_by: ta.Optional[GroupBy] = None
+    order_by: ta.Optional[ta.Sequence[SortItem]] = None

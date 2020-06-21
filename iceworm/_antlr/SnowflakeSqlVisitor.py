@@ -55,6 +55,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#castBooleanExpression.
+    def visitCastBooleanExpression(self, ctx:SnowflakeSqlParser.CastBooleanExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#cmpPredicate.
     def visitCmpPredicate(self, ctx:SnowflakeSqlParser.CmpPredicateContext):
         return self.visitChildren(ctx)
@@ -107,6 +112,16 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#caseItem.
     def visitCaseItem(self, ctx:SnowflakeSqlParser.CaseItemContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#over.
+    def visitOver(self, ctx:SnowflakeSqlParser.OverContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#sortItem.
+    def visitSortItem(self, ctx:SnowflakeSqlParser.SortItemContext):
         return self.visitChildren(ctx)
 
 

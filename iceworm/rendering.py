@@ -34,17 +34,23 @@ class Renderer(dispatch.Class):
     def render(self, node: no.CaseItem) -> str:  # noqa
         return 'when ' + self.render(node.when) + ' then ' + self.render(node.then)
 
+    def render(self, node: no.Cast) -> str:  # noqa
+        return self.render(node.value) + ' :: ' + self.render(node.type)
+
     def render(self, node: no.Cte) -> str:  # noqa
         return self.render(node.name) + ' as ' + paren(self.render(node.select))
 
     def render(self, node: no.ExprSelectItem) -> str:  # noqa
-        return paren(self.render(node.expr)) + ((' as ' + self.render(node.label)) if node.label is not None else '')
+        return paren(self.render(node.value)) + ((' as ' + self.render(node.label)) if node.label is not None else '')
 
     def render(self, node: no.FunctionCall) -> str:  # noqa
         return self.render(node.name) + '(' + ', '.join(paren(self.render(a)) for a in node.args) + ')'
 
     def render(self, node: no.GroupBy) -> str:  # noqa
-        return ', '.join(paren(self.render(e)) for e in node.exprs)
+        return ', '.join(self.render(i) for i in node.items)
+
+    def render(self, node: no.GroupItem) -> str:  # noqa
+        return self.render(node.value)
 
     def render(self, node: no.Identifier) -> str:  # noqa
         return quote(node.name, '"')
@@ -76,8 +82,12 @@ class Renderer(dispatch.Class):
                 ', '.join(self.render(i) for i in node.items) +
                 ((' from ' + ', '.join(self.render(r) for r in node.relations)) if node.relations else '') +
                 ((' where ' + self.render(node.where)) if node.where is not None else '') +
-                ((' group by ' + self.render(node.group_by)) if node.group_by is not None else '')
+                ((' group by ' + self.render(node.group_by)) if node.group_by is not None else '') +
+                ((' order by ' + ', '.join(self.render(e) for e in node.order_by)) if node.order_by else '')
         )
+
+    def render(self, node: no.SortItem) -> str:  # noqa
+        return self.render(node.value) + ((' ' + node.direction.value) if node.direction is not None else '')
 
     def render(self, node: no.String) -> str:  # noqa
         return quote(node.value, "'")

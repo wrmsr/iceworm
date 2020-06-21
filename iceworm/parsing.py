@@ -46,6 +46,11 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         default = self.visit(ctx.expression()) if ctx.expression() is not None else None
         return no.Case(items, default)
 
+    def visitCastBooleanExpression(self, ctx: SnowflakeSqlParser.CastBooleanExpressionContext):
+        value = self.visit(ctx.booleanExpression())
+        type = self.visit(ctx.identifier())
+        return no.Cast(value, type)
+
     def visitCmpPredicate(self, ctx: SnowflakeSqlParser.CmpPredicateContext):
         left = self.visit(ctx.value)
         op = no.BINARY_OP_MAP[ctx.cmpOp().getText().lower()]
@@ -58,9 +63,9 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         return no.Cte(name, select)
 
     def visitExpressionSelectItem(self, ctx: SnowflakeSqlParser.ExpressionSelectItemContext):
-        expr = self.visit(ctx.expression())
+        value = self.visit(ctx.expression())
         label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
-        return no.ExprSelectItem(expr, label)
+        return no.ExprSelectItem(value, label)
 
     def visitFunctionCallPrimaryExpression(self, ctx:SnowflakeSqlParser.FunctionCallPrimaryExpressionContext):
         name = self.visit(ctx.identifier())
@@ -68,8 +73,8 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         return no.FunctionCall(name, args)
 
     def visitGroupBy(self, ctx: SnowflakeSqlParser.GroupByContext):
-        exprs = [self.visit(e) for e in ctx.expression()]
-        return no.GroupBy(exprs)
+        items = [self.visit(e) for e in ctx.expression()]
+        return no.GroupBy(items)
 
     def visitIntegerNumber(self, ctx: SnowflakeSqlParser.IntegerNumberContext):
         return no.Integer(int(ctx.INTEGER_VALUE().getText()))
@@ -107,6 +112,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             if ctx.setQuantifier() is not None else None
         where = self.visit(ctx.where) if ctx.where is not None else None
         group_by = self.visit(ctx.groupBy()) if ctx.groupBy() else None
+        order_by = [self.visit(s) for s in ctx.sortItem()] if ctx.sortItem() is not None else None
         return no.Select(
             items,
             relations,
@@ -114,7 +120,13 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             ctes=ctes,
             set_quantifier=set_quantifier,
             group_by=group_by,
+            order_by=order_by,
         )
+
+    def visitSortItem(self, ctx: SnowflakeSqlParser.SortItemContext):
+        value = self.visit(ctx.expression())
+        direction = no.DIRECTION_MAP[ctx.direction.text.lower()] if ctx.direction is not None else None
+        return no.SortItem(value, direction)
 
     def visitString(self, ctx: SnowflakeSqlParser.StringContext):
         value = unquote(ctx.STRING().getText(), "'")
