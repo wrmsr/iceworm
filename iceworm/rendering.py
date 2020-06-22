@@ -27,7 +27,7 @@ class Renderer(dispatch.Class):
         return (
                 'case' +
                 ((' ' + ' '.join(self.render(i) for i in node.items)) if node.items else '') +
-                ((' else ' + self.render(node.default)) if node.items else '') +
+                ((' else ' + self.render(node.default)) if node.default is not None else '') +
                 ' end'
         )
 
