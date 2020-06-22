@@ -190,8 +190,8 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#unquotedIdentifier.
-    def visitUnquotedIdentifier(self, ctx:SnowflakeSqlParser.UnquotedIdentifierContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#identifier.
+    def visitIdentifier(self, ctx:SnowflakeSqlParser.IdentifierContext):
         return self.visitChildren(ctx)
 
 
@@ -237,6 +237,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#unaryOp.
     def visitUnaryOp(self, ctx:SnowflakeSqlParser.UnaryOpContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#unquotedIdentifier.
+    def visitUnquotedIdentifier(self, ctx:SnowflakeSqlParser.UnquotedIdentifierContext):
         return self.visitChildren(ctx)
 
 

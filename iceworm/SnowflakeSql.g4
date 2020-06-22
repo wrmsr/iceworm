@@ -105,8 +105,12 @@ qualifiedName
     ;
 
 identifier
-    : IDENTIFIER         #unquotedIdentifier
-    | QUOTED_IDENTIFIER  #quotedIdentifier
+    : unquotedIdentifier
+    | quotedIdentifier
+    ;
+
+quotedIdentifier
+    : QUOTED_IDENTIFIER
     ;
 
 number
@@ -160,6 +164,11 @@ arithOp
 unaryOp
     : '+'
     | '-'
+    ;
+
+unquotedIdentifier
+    : IDENTIFIER
+    | LEFT
     ;
 
 ALL: 'all';

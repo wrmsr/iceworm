@@ -168,7 +168,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         return no.UnionSelect(left, items) if items else left
 
     def visitUnquotedIdentifier(self, ctx: SnowflakeSqlParser.UnquotedIdentifierContext):
-        return no.Identifier(ctx.IDENTIFIER().getText())
+        return no.Identifier(ctx.getText())
 
 
 def parse_statement(buf: str) -> no.Node:

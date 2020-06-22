@@ -333,12 +333,12 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#unquotedIdentifier.
-    def enterUnquotedIdentifier(self, ctx:SnowflakeSqlParser.UnquotedIdentifierContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#identifier.
+    def enterIdentifier(self, ctx:SnowflakeSqlParser.IdentifierContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#unquotedIdentifier.
-    def exitUnquotedIdentifier(self, ctx:SnowflakeSqlParser.UnquotedIdentifierContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#identifier.
+    def exitIdentifier(self, ctx:SnowflakeSqlParser.IdentifierContext):
         pass
 
 
@@ -420,6 +420,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#unaryOp.
     def exitUnaryOp(self, ctx:SnowflakeSqlParser.UnaryOpContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#unquotedIdentifier.
+    def enterUnquotedIdentifier(self, ctx:SnowflakeSqlParser.UnquotedIdentifierContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#unquotedIdentifier.
+    def exitUnquotedIdentifier(self, ctx:SnowflakeSqlParser.UnquotedIdentifierContext):
         pass
 
 
