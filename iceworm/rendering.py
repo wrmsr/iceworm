@@ -62,8 +62,27 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Identifier) -> str:  # noqa
         return quote(node.name, '"')
 
+    def render(self, node: no.InList) -> str:  # noqa
+        return (
+                self.render(node.needle) +
+                (' not' if node.not_ else '') +
+                ' in ' +
+                paren(', '.join(self.render(e) for e in node.haystack))
+        )
+
+    def render(self, node: no.InSelect) -> str:  # noqa
+        return (
+            self.render(node.needle) +
+            (' not' if node.not_ else '') +
+            ' in ' +
+            paren(self.render(node.haystack))
+        )
+
     def render(self, node: no.Integer) -> str:  # noqa
         return str(node.value)
+
+    def render(self, node: no.IsNull) -> str:  # noqa
+        return self.render(node.value) + ' is ' + ('not ' if node.not_ else '') + 'null'
 
     def render(self, node: no.Join) -> str:  # noqa
         return (
@@ -76,7 +95,12 @@ class Renderer(dispatch.Class):
         )
 
     def render(self, node: no.Like) -> str:  # noqa
-        return self.render(node.value) + ' like ' + self.render(node.pattern)
+        return (
+                self.render(node.value) +
+                (' not' if node.not_ else '') +
+                ' like ' +
+                self.render(node.pattern)
+        )
 
     def render(self, node: no.Null) -> str:  # noqa
         return 'null'

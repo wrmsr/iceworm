@@ -144,6 +144,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#isNullPredicate.
+    def enterIsNullPredicate(self, ctx:SnowflakeSqlParser.IsNullPredicateContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#isNullPredicate.
+    def exitIsNullPredicate(self, ctx:SnowflakeSqlParser.IsNullPredicateContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#inListPredicate.
     def enterInListPredicate(self, ctx:SnowflakeSqlParser.InListPredicateContext):
         pass
@@ -159,15 +168,6 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#inSelectPredicate.
     def exitInSelectPredicate(self, ctx:SnowflakeSqlParser.InSelectPredicateContext):
-        pass
-
-
-    # Enter a parse tree produced by SnowflakeSqlParser#isNullPredicate.
-    def enterIsNullPredicate(self, ctx:SnowflakeSqlParser.IsNullPredicateContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#isNullPredicate.
-    def exitIsNullPredicate(self, ctx:SnowflakeSqlParser.IsNullPredicateContext):
         pass
 
 

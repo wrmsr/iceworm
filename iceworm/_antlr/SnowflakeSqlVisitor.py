@@ -85,6 +85,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#isNullPredicate.
+    def visitIsNullPredicate(self, ctx:SnowflakeSqlParser.IsNullPredicateContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#inListPredicate.
     def visitInListPredicate(self, ctx:SnowflakeSqlParser.InListPredicateContext):
         return self.visitChildren(ctx)
@@ -92,11 +97,6 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#inSelectPredicate.
     def visitInSelectPredicate(self, ctx:SnowflakeSqlParser.InSelectPredicateContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by SnowflakeSqlParser#isNullPredicate.
-    def visitIsNullPredicate(self, ctx:SnowflakeSqlParser.IsNullPredicateContext):
         return self.visitChildren(ctx)
 
 

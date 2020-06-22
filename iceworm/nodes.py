@@ -123,9 +123,27 @@ class Cast(Expr):
     type: Identifier
 
 
+class IsNull(Expr):
+    value: Expr
+    not_: bool = False
+
+
 class Like(Expr):
     value: Expr
     pattern: Expr
+    not_: bool = False
+
+
+class InList(Expr):
+    needle: Expr
+    haystack: ta.Sequence[Expr]
+    not_: bool = False
+
+
+class InSelect(Expr):
+    needle: Expr
+    haystack: 'Selectable'
+    not_: bool = False
 
 
 class Direction(enum.Enum):

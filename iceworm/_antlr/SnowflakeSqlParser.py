@@ -29,11 +29,11 @@ def serializedATN():
         buf.write("\t\5\t\u0099\n\t\5\t\u009b\n\t\3\n\3\n\3\13\3\13\3\13")
         buf.write("\5\13\u00a2\n\13\3\13\3\13\5\13\u00a6\n\13\3\13\3\13\3")
         buf.write("\13\3\13\3\13\3\13\7\13\u00ae\n\13\f\13\16\13\u00b1\13")
-        buf.write("\13\3\f\3\f\3\f\3\f\5\f\u00b7\n\f\3\f\3\f\3\f\3\f\3\f")
-        buf.write("\7\f\u00be\n\f\f\f\16\f\u00c1\13\f\3\f\3\f\3\f\5\f\u00c6")
-        buf.write("\n\f\3\f\3\f\3\f\3\f\3\f\3\f\3\f\5\f\u00cf\n\f\3\f\3\f")
-        buf.write("\5\f\u00d3\n\f\3\f\3\f\5\f\u00d7\n\f\3\r\3\r\3\r\3\r\3")
-        buf.write("\r\5\r\u00de\n\r\3\r\3\r\3\r\3\r\7\r\u00e4\n\r\f\r\16")
+        buf.write("\13\3\f\3\f\3\f\3\f\3\f\5\f\u00b8\n\f\3\f\3\f\5\f\u00bc")
+        buf.write("\n\f\3\f\3\f\3\f\3\f\3\f\7\f\u00c3\n\f\f\f\16\f\u00c6")
+        buf.write("\13\f\3\f\3\f\3\f\5\f\u00cb\n\f\3\f\3\f\3\f\3\f\3\f\3")
+        buf.write("\f\5\f\u00d3\n\f\3\f\3\f\5\f\u00d7\n\f\3\r\3\r\3\r\3\r")
+        buf.write("\3\r\5\r\u00de\n\r\3\r\3\r\3\r\3\r\7\r\u00e4\n\r\f\r\16")
         buf.write("\r\u00e7\13\r\3\16\3\16\3\16\3\16\3\16\7\16\u00ee\n\16")
         buf.write("\f\16\16\16\u00f1\13\16\5\16\u00f3\n\16\3\16\3\16\5\16")
         buf.write("\u00f7\n\16\3\16\3\16\7\16\u00fb\n\16\f\16\16\16\u00fe")
@@ -101,22 +101,22 @@ def serializedATN():
         buf.write("\u00ad\u00aa\3\2\2\2\u00ae\u00b1\3\2\2\2\u00af\u00ad\3")
         buf.write("\2\2\2\u00af\u00b0\3\2\2\2\u00b0\25\3\2\2\2\u00b1\u00af")
         buf.write("\3\2\2\2\u00b2\u00b3\58\35\2\u00b3\u00b4\5\30\r\2\u00b4")
-        buf.write("\u00d7\3\2\2\2\u00b5\u00b7\7+\2\2\u00b6\u00b5\3\2\2\2")
-        buf.write("\u00b6\u00b7\3\2\2\2\u00b7\u00b8\3\2\2\2\u00b8\u00b9\7")
-        buf.write("$\2\2\u00b9\u00ba\7\5\2\2\u00ba\u00bf\5\22\n\2\u00bb\u00bc")
-        buf.write("\7\4\2\2\u00bc\u00be\5\22\n\2\u00bd\u00bb\3\2\2\2\u00be")
-        buf.write("\u00c1\3\2\2\2\u00bf\u00bd\3\2\2\2\u00bf\u00c0\3\2\2\2")
-        buf.write("\u00c0\u00c2\3\2\2\2\u00c1\u00bf\3\2\2\2\u00c2\u00c3\7")
-        buf.write("\6\2\2\u00c3\u00d7\3\2\2\2\u00c4\u00c6\7+\2\2\u00c5\u00c4")
-        buf.write("\3\2\2\2\u00c5\u00c6\3\2\2\2\u00c6\u00c7\3\2\2\2\u00c7")
-        buf.write("\u00c8\7$\2\2\u00c8\u00c9\7\5\2\2\u00c9\u00ca\5\4\3\2")
-        buf.write("\u00ca\u00cb\7\6\2\2\u00cb\u00d7\3\2\2\2\u00cc\u00ce\7")
-        buf.write("&\2\2\u00cd\u00cf\7+\2\2\u00ce\u00cd\3\2\2\2\u00ce\u00cf")
-        buf.write("\3\2\2\2\u00cf\u00d0\3\2\2\2\u00d0\u00d7\7,\2\2\u00d1")
+        buf.write("\u00d7\3\2\2\2\u00b5\u00b7\7&\2\2\u00b6\u00b8\7+\2\2\u00b7")
+        buf.write("\u00b6\3\2\2\2\u00b7\u00b8\3\2\2\2\u00b8\u00b9\3\2\2\2")
+        buf.write("\u00b9\u00d7\7,\2\2\u00ba\u00bc\7+\2\2\u00bb\u00ba\3\2")
+        buf.write("\2\2\u00bb\u00bc\3\2\2\2\u00bc\u00bd\3\2\2\2\u00bd\u00be")
+        buf.write("\7$\2\2\u00be\u00bf\7\5\2\2\u00bf\u00c4\5\22\n\2\u00c0")
+        buf.write("\u00c1\7\4\2\2\u00c1\u00c3\5\22\n\2\u00c2\u00c0\3\2\2")
+        buf.write("\2\u00c3\u00c6\3\2\2\2\u00c4\u00c2\3\2\2\2\u00c4\u00c5")
+        buf.write("\3\2\2\2\u00c5\u00c7\3\2\2\2\u00c6\u00c4\3\2\2\2\u00c7")
+        buf.write("\u00c8\7\6\2\2\u00c8\u00d7\3\2\2\2\u00c9\u00cb\7+\2\2")
+        buf.write("\u00ca\u00c9\3\2\2\2\u00ca\u00cb\3\2\2\2\u00cb\u00cc\3")
+        buf.write("\2\2\2\u00cc\u00cd\7$\2\2\u00cd\u00ce\7\5\2\2\u00ce\u00cf")
+        buf.write("\5\4\3\2\u00cf\u00d0\7\6\2\2\u00d0\u00d7\3\2\2\2\u00d1")
         buf.write("\u00d3\7+\2\2\u00d2\u00d1\3\2\2\2\u00d2\u00d3\3\2\2\2")
         buf.write("\u00d3\u00d4\3\2\2\2\u00d4\u00d5\7)\2\2\u00d5\u00d7\5")
-        buf.write("\22\n\2\u00d6\u00b2\3\2\2\2\u00d6\u00b6\3\2\2\2\u00d6")
-        buf.write("\u00c5\3\2\2\2\u00d6\u00cc\3\2\2\2\u00d6\u00d2\3\2\2\2")
+        buf.write("\22\n\2\u00d6\u00b2\3\2\2\2\u00d6\u00b5\3\2\2\2\u00d6")
+        buf.write("\u00bb\3\2\2\2\u00d6\u00ca\3\2\2\2\u00d6\u00d2\3\2\2\2")
         buf.write("\u00d7\27\3\2\2\2\u00d8\u00d9\b\r\1\2\u00d9\u00de\5\32")
         buf.write("\16\2\u00da\u00db\5<\37\2\u00db\u00dc\5\30\r\4\u00dc\u00de")
         buf.write("\3\2\2\2\u00dd\u00d8\3\2\2\2\u00dd\u00da\3\2\2\2\u00de")
@@ -193,7 +193,7 @@ def serializedATN():
         buf.write("\t\6\2\2\u017d;\3\2\2\2\u017e\u017f\t\7\2\2\u017f=\3\2")
         buf.write("\2\2\u0180\u0181\t\b\2\2\u0181?\3\2\2\2\61LO]bhox{\177")
         buf.write("\u0084\u008d\u0090\u0095\u0098\u009a\u00a1\u00a5\u00ad")
-        buf.write("\u00af\u00b6\u00bf\u00c5\u00ce\u00d2\u00d6\u00dd\u00e5")
+        buf.write("\u00af\u00b7\u00bb\u00c4\u00ca\u00d2\u00d6\u00dd\u00e5")
         buf.write("\u00ef\u00f2\u00f6\u00fc\u0101\u010d\u0113\u0123\u0126")
         buf.write("\u012c\u0138\u013c\u0141\u0147\u0149\u014b\u0153\u015b")
         buf.write("\u0160\u0178")
@@ -1492,74 +1492,74 @@ class SnowflakeSqlParser ( Parser ):
                 pass
 
             elif la_ == 2:
-                localctx = SnowflakeSqlParser.InListPredicateContext(self, localctx)
+                localctx = SnowflakeSqlParser.IsNullPredicateContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 180
+                self.state = 179
+                self.match(SnowflakeSqlParser.IS)
+                self.state = 181
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==SnowflakeSqlParser.NOT:
-                    self.state = 179
+                    self.state = 180
                     self.match(SnowflakeSqlParser.NOT)
 
 
-                self.state = 182
-                self.match(SnowflakeSqlParser.IN)
                 self.state = 183
-                self.match(SnowflakeSqlParser.T__2)
-                self.state = 184
-                self.expression()
-                self.state = 189
-                self._errHandler.sync(self)
-                _la = self._input.LA(1)
-                while _la==SnowflakeSqlParser.T__1:
-                    self.state = 185
-                    self.match(SnowflakeSqlParser.T__1)
-                    self.state = 186
-                    self.expression()
-                    self.state = 191
-                    self._errHandler.sync(self)
-                    _la = self._input.LA(1)
-
-                self.state = 192
-                self.match(SnowflakeSqlParser.T__3)
+                self.match(SnowflakeSqlParser.NULL)
                 pass
 
             elif la_ == 3:
-                localctx = SnowflakeSqlParser.InSelectPredicateContext(self, localctx)
+                localctx = SnowflakeSqlParser.InListPredicateContext(self, localctx)
                 self.enterOuterAlt(localctx, 3)
-                self.state = 195
+                self.state = 185
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==SnowflakeSqlParser.NOT:
-                    self.state = 194
+                    self.state = 184
                     self.match(SnowflakeSqlParser.NOT)
 
 
-                self.state = 197
+                self.state = 187
                 self.match(SnowflakeSqlParser.IN)
-                self.state = 198
+                self.state = 188
                 self.match(SnowflakeSqlParser.T__2)
-                self.state = 199
-                self.select()
-                self.state = 200
+                self.state = 189
+                self.expression()
+                self.state = 194
+                self._errHandler.sync(self)
+                _la = self._input.LA(1)
+                while _la==SnowflakeSqlParser.T__1:
+                    self.state = 190
+                    self.match(SnowflakeSqlParser.T__1)
+                    self.state = 191
+                    self.expression()
+                    self.state = 196
+                    self._errHandler.sync(self)
+                    _la = self._input.LA(1)
+
+                self.state = 197
                 self.match(SnowflakeSqlParser.T__3)
                 pass
 
             elif la_ == 4:
-                localctx = SnowflakeSqlParser.IsNullPredicateContext(self, localctx)
+                localctx = SnowflakeSqlParser.InSelectPredicateContext(self, localctx)
                 self.enterOuterAlt(localctx, 4)
-                self.state = 202
-                self.match(SnowflakeSqlParser.IS)
-                self.state = 204
+                self.state = 200
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==SnowflakeSqlParser.NOT:
-                    self.state = 203
+                    self.state = 199
                     self.match(SnowflakeSqlParser.NOT)
 
 
-                self.state = 206
-                self.match(SnowflakeSqlParser.NULL)
+                self.state = 202
+                self.match(SnowflakeSqlParser.IN)
+                self.state = 203
+                self.match(SnowflakeSqlParser.T__2)
+                self.state = 204
+                self.select()
+                self.state = 205
+                self.match(SnowflakeSqlParser.T__3)
                 pass
 
             elif la_ == 5:

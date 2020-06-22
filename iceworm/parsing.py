@@ -98,8 +98,25 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         items = [self.visit(e) for e in ctx.expression()]
         return no.GroupBy(items)
 
+    def visitInListPredicate(self, ctx: SnowflakeSqlParser.InListPredicateContext):
+        needle = self.visit(ctx.value)
+        haystack = [self.visit(e) for e in ctx.expression()]
+        not_ = ctx.NOT() is not None
+        return no.InList(needle, haystack, not_=not_)
+
+    def visitInSelectPredicate(self, ctx: SnowflakeSqlParser.InSelectPredicateContext):
+        needle = self.visit(ctx.value)
+        haystack = self.visit(ctx.select())
+        not_ = ctx.NOT() is not None
+        return no.InSelect(needle, haystack, not_=not_)
+
     def visitIntegerNumber(self, ctx: SnowflakeSqlParser.IntegerNumberContext):
         return no.Integer(int(ctx.INTEGER_VALUE().getText()))
+
+    def visitIsNullPredicate(self, ctx: SnowflakeSqlParser.IsNullPredicateContext):
+        value = self.visit(ctx.value)
+        not_ = ctx.NOT() is not None
+        return no.IsNull(value, not_=not_)
 
     def visitJoinRelation(self, ctx: SnowflakeSqlParser.JoinRelationContext):
         left = self.visit(ctx.left)
@@ -112,7 +129,8 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitLikePredicate(self, ctx: SnowflakeSqlParser.LikePredicateContext):
         value = self.visit(ctx.value)
         pattern = self.visit(ctx.expression())
-        return no.Like(value, pattern)
+        not_ = ctx.NOT() is not None
+        return no.Like(value, pattern, not_=not_)
 
     def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
         return no.Null()
