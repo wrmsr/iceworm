@@ -35,3 +35,5 @@ select * from x order by f desc;
 select 1 union select 2;
 select 1 union all select 2;
 with a as (select 1) select 1 from a union all select 2 from a;
+select * from (select 1);
+select (select 1);

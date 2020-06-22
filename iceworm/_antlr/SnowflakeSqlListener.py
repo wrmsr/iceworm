@@ -207,6 +207,24 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#selectPrimaryExpression.
+    def enterSelectPrimaryExpression(self, ctx:SnowflakeSqlParser.SelectPrimaryExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#selectPrimaryExpression.
+    def exitSelectPrimaryExpression(self, ctx:SnowflakeSqlParser.SelectPrimaryExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#parenPrimaryExpression.
+    def enterParenPrimaryExpression(self, ctx:SnowflakeSqlParser.ParenPrimaryExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#parenPrimaryExpression.
+    def exitParenPrimaryExpression(self, ctx:SnowflakeSqlParser.ParenPrimaryExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#simplePrimaryExpression.
     def enterSimplePrimaryExpression(self, ctx:SnowflakeSqlParser.SimplePrimaryExpressionContext):
         pass
@@ -267,6 +285,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#joinRelation.
     def exitJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#selectRelation.
+    def enterSelectRelation(self, ctx:SnowflakeSqlParser.SelectRelationContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#selectRelation.
+    def exitSelectRelation(self, ctx:SnowflakeSqlParser.SelectRelationContext):
         pass
 
 

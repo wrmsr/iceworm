@@ -120,6 +120,16 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#selectPrimaryExpression.
+    def visitSelectPrimaryExpression(self, ctx:SnowflakeSqlParser.SelectPrimaryExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#parenPrimaryExpression.
+    def visitParenPrimaryExpression(self, ctx:SnowflakeSqlParser.ParenPrimaryExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#simplePrimaryExpression.
     def visitSimplePrimaryExpression(self, ctx:SnowflakeSqlParser.SimplePrimaryExpressionContext):
         return self.visitChildren(ctx)
@@ -152,6 +162,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#joinRelation.
     def visitJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#selectRelation.
+    def visitSelectRelation(self, ctx:SnowflakeSqlParser.SelectRelationContext):
         return self.visitChildren(ctx)
 
 

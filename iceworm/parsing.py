@@ -126,6 +126,14 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         name = unquote(ctx.QUOTED_IDENTIFIER().getText(), '"')
         return no.Identifier(name)
 
+    def visitSelectPrimaryExpression(self, ctx: SnowflakeSqlParser.SelectPrimaryExpressionContext):
+        select = self.visit(ctx.select())
+        return no.SelectExpr(select)
+
+    def visitSelectRelation(self, ctx: SnowflakeSqlParser.SelectRelationContext):
+        select = self.visit(ctx.select())
+        return no.SelectRelation(select)
+
     def visitSortItem(self, ctx: SnowflakeSqlParser.SortItemContext):
         value = self.visit(ctx.expression())
         direction = no.DIRECTION_MAP[ctx.direction.text.lower()] if ctx.direction is not None else None

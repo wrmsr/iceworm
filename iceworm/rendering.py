@@ -47,7 +47,11 @@ class Renderer(dispatch.Class):
         return paren(self.render(node.value)) + ((' as ' + self.render(node.label)) if node.label is not None else '')
 
     def render(self, node: no.FunctionCall) -> str:  # noqa
-        return self.render(node.name) + '(' + ', '.join(paren(self.render(a)) for a in node.args) + ')'
+        return (
+                self.render(node.name) +
+                paren(', '.join(paren(self.render(a)) for a in node.args))
+                # FIXME: ((' over ' ) ... ) +
+        )
 
     def render(self, node: no.GroupBy) -> str:  # noqa
         return ', '.join(self.render(i) for i in node.items)
@@ -87,6 +91,12 @@ class Renderer(dispatch.Class):
                 ((' group by ' + self.render(node.group_by)) if node.group_by is not None else '') +
                 ((' order by ' + ', '.join(self.render(e) for e in node.order_by)) if node.order_by else '')
         )
+
+    def render(self, node: no.SelectExpr) -> str:  # noqa
+        return paren(self.render(node.select))
+
+    def render(self, node: no.SelectRelation) -> str:  # noqa
+        return paren(self.render(node.select))
 
     def render(self, node: no.SortItem) -> str:  # noqa
         return self.render(node.value) + ((' ' + node.direction.value) if node.direction is not None else '')

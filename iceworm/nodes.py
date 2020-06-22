@@ -232,3 +232,11 @@ class UnionItem(Node):
 class UnionSelect(Selectable):
     left: Selectable
     items: ta.Sequence[UnionItem]
+
+
+class SelectExpr(Expr):
+    select: 'Selectable'
+
+
+class SelectRelation(Relation):
+    select: 'Selectable'

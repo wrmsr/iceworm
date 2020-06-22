@@ -64,12 +64,13 @@ valueExpression
 primaryExpression
     : identifier '(' (expression (',' expression)*)? ')' over? #functionCallPrimaryExpression
     | CASE caseItem* (ELSE expression)? END                    #casePrimaryExpression
+    | '(' select ')'                                           #selectPrimaryExpression
+    | '(' expression ')'                                       #parenPrimaryExpression
     | simpleExpression                                         #simplePrimaryExpression
     ;
 
 simpleExpression
-    : '(' expression ')'
-    | qualifiedName
+    : qualifiedName
     | number
     | string
     | null
@@ -90,6 +91,7 @@ sortItem
 relation
     : relation AS? identifier                                                      #aliasedRelation
     | left=relation ty=joinType? JOIN right=relation (ON cond=booleanExpression)?  #joinRelation
+    | '(' select ')'                                                               #selectRelation
     | '(' relation ')'                                                             #parenRelation
     | qualifiedName                                                                #tableRelation
     ;
