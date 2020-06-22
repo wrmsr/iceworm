@@ -32,6 +32,23 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         op = no.BINARY_OP_MAP[ctx.op.getText().lower()]
         return no.BinaryExpr(left, op, right)
 
+    def visitBaseSelect(self, ctx: SnowflakeSqlParser.BaseSelectContext):
+        items = [self.visit(i) for i in ctx.selectItem()]
+        relations = [self.visit(r) for r in ctx.relation()]
+        set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
+            if ctx.setQuantifier() is not None else None
+        where = self.visit(ctx.where) if ctx.where is not None else None
+        group_by = self.visit(ctx.groupBy()) if ctx.groupBy() else None
+        order_by = [self.visit(s) for s in ctx.sortItem()] if ctx.sortItem() is not None else None
+        return no.Select(
+            items,
+            relations,
+            where,
+            set_quantifier=set_quantifier,
+            group_by=group_by,
+            order_by=order_by,
+        )
+
     def visitBinaryBooleanExpression(self, ctx: SnowflakeSqlParser.BinaryBooleanExpressionContext):
         left, right = [self.visit(e) for e in ctx.booleanExpression()]
         op = no.BINARY_OP_MAP[ctx.op.text.lower()]
@@ -59,8 +76,13 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitCte(self, ctx: SnowflakeSqlParser.CteContext):
         name = self.visit(ctx.identifier())
-        select = self.visit(ctx.selectStatement())
+        select = self.visit(ctx.select())
         return no.Cte(name, select)
+
+    def visitCteSelect(self, ctx: SnowflakeSqlParser.CteSelectContext):
+        ctes = [self.visit(c) for c in ctx.cte()]
+        select = self.visit(ctx.unionSelect())
+        return no.CteSelect(ctes, select) if ctes else select
 
     def visitExpressionSelectItem(self, ctx: SnowflakeSqlParser.ExpressionSelectItemContext):
         value = self.visit(ctx.expression())
@@ -103,25 +125,6 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitQuotedIdentifier(self, ctx: SnowflakeSqlParser.QuotedIdentifierContext):
         name = unquote(ctx.QUOTED_IDENTIFIER().getText(), '"')
         return no.Identifier(name)
-
-    def visitSelectStatement(self, ctx: SnowflakeSqlParser.SelectStatementContext):
-        ctes = [self.visit(c) for c in ctx.cte()]
-        items = [self.visit(i) for i in ctx.selectItem()]
-        relations = [self.visit(r) for r in ctx.relation()]
-        set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
-            if ctx.setQuantifier() is not None else None
-        where = self.visit(ctx.where) if ctx.where is not None else None
-        group_by = self.visit(ctx.groupBy()) if ctx.groupBy() else None
-        order_by = [self.visit(s) for s in ctx.sortItem()] if ctx.sortItem() is not None else None
-        return no.Select(
-            items,
-            relations,
-            where,
-            ctes=ctes,
-            set_quantifier=set_quantifier,
-            group_by=group_by,
-            order_by=order_by,
-        )
 
     def visitSortItem(self, ctx: SnowflakeSqlParser.SortItemContext):
         value = self.visit(ctx.expression())

@@ -2,20 +2,35 @@ grammar SnowflakeSql;
 
 
 singleStatement
-    : selectStatement ';' EOF
+    : select ';' EOF
     ;
 
-selectStatement
-    : (WITH cte (',' cte)*)?
-      SELECT setQuantifier? selectItem (',' selectItem)*
+select
+    : cteSelect
+    ;
+
+cteSelect
+    : (WITH cte (',' cte)*)? unionSelect
+    ;
+
+cte
+    : identifier AS '(' select ')'
+    ;
+
+unionSelect
+    : baseSelect (unionSpec baseSelect)*
+    ;
+
+unionSpec
+    : UNION ALL?
+    ;
+
+baseSelect
+    : SELECT setQuantifier? selectItem (',' selectItem)*
       (FROM relation (',' relation)*)?
       (WHERE where=booleanExpression)?
       (GROUP BY groupBy)?
       (ORDER BY sortItem (',' sortItem)*)?
-    ;
-
-cte
-    : identifier AS '(' selectStatement ')'
     ;
 
 selectItem
@@ -175,6 +190,7 @@ OVER: 'over';
 RIGHT: 'right';
 SELECT: 'select';
 THEN: 'then';
+UNION: 'union';
 WHEN: 'when';
 WHERE: 'where';
 WITH: 'with';

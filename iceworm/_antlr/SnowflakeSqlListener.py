@@ -18,12 +18,21 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#selectStatement.
-    def enterSelectStatement(self, ctx:SnowflakeSqlParser.SelectStatementContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#select.
+    def enterSelect(self, ctx:SnowflakeSqlParser.SelectContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#selectStatement.
-    def exitSelectStatement(self, ctx:SnowflakeSqlParser.SelectStatementContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#select.
+    def exitSelect(self, ctx:SnowflakeSqlParser.SelectContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#cteSelect.
+    def enterCteSelect(self, ctx:SnowflakeSqlParser.CteSelectContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#cteSelect.
+    def exitCteSelect(self, ctx:SnowflakeSqlParser.CteSelectContext):
         pass
 
 
@@ -33,6 +42,33 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#cte.
     def exitCte(self, ctx:SnowflakeSqlParser.CteContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#unionSelect.
+    def enterUnionSelect(self, ctx:SnowflakeSqlParser.UnionSelectContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#unionSelect.
+    def exitUnionSelect(self, ctx:SnowflakeSqlParser.UnionSelectContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#unionSpec.
+    def enterUnionSpec(self, ctx:SnowflakeSqlParser.UnionSpecContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#unionSpec.
+    def exitUnionSpec(self, ctx:SnowflakeSqlParser.UnionSpecContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#baseSelect.
+    def enterBaseSelect(self, ctx:SnowflakeSqlParser.BaseSelectContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#baseSelect.
+    def exitBaseSelect(self, ctx:SnowflakeSqlParser.BaseSelectContext):
         pass
 
 

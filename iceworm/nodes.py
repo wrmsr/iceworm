@@ -193,11 +193,6 @@ class SetQuantifier(enum.Enum):
 SET_QUANTIFIER_MAP: ta.Mapping[str, SetQuantifier] = {v.value: v for v in SetQuantifier.__members__.values()}
 
 
-class Cte(Node):
-    name: Identifier
-    select: 'Select'
-
-
 class GroupItem(Node):
     value: Expr
 
@@ -206,11 +201,30 @@ class GroupBy(Node):
     items: ta.Sequence[GroupItem]
 
 
-class Select(Node):
+class Selectable(Node, abstract=True):
+    pass
+
+
+class Select(Selectable):
     items: ta.Sequence[SelectItem]
     relations: ta.Sequence[Relation]
     where: ta.Optional[Expr] = None
-    ctes: ta.Optional[ta.Sequence[Cte]] = None
     set_quantifier: ta.Optional[SetQuantifier] = None
     group_by: ta.Optional[GroupBy] = None
     order_by: ta.Optional[ta.Sequence[SortItem]] = None
+
+
+class Cte(Node):
+    name: Identifier
+    select: 'Selectable'
+
+
+class CteSelect(Selectable):
+    ctes: ta.Optional[ta.Sequence[Cte]]
+    select: Selectable
+
+
+class UnionSelect(Selectable):
+    left: Selectable
+    right: Selectable
+    set_quantifier: SetQuantifier = None
