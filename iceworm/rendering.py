@@ -158,7 +158,7 @@ class Renderer(dispatch.Class):
         return self.render(node.name)
 
     def render(self, node: no.UnaryExpr) -> str:  # noqa
-        return node.op.value + ' ' + self.render(node.value)
+        return node.op.value + ' ' + self.paren_render(node.value)
 
     def render(self, node: no.UnionItem) -> str:  # noqa
         return (

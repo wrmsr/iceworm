@@ -31,13 +31,6 @@ def test_iceworm():
             try:
                 assert reparsed == node
             except Exception:
-                """
-# node.ctes[1].select.select.where, reparsed.ctes[1].select.select.where
-# select * from a where p.u_i is null and not (d.b_u = 'p' and p.u_i is null and c.u_i is null);
-# select * from a where p.u_i is null and not ((d.b_u = 'p') and p.u_i is null) and c.u_i is null
-0 = {BinaryExpr} BinaryExpr(left=IsNull(value=QualifiedName(parts=[Identifier(name='p'), Identifier(name='u_i')]), not_=False), op=<BinaryOp.AND: 'and'>, right=UnaryExpr(op=<UnaryOp.NOT: 'not'>, value=BinaryExpr(left=BinaryExpr(left=BinaryExpr(left=QualifiedName(parts=[Ide
-1 = {BinaryExpr} BinaryExpr(left=BinaryExpr(left=IsNull(value=QualifiedName(parts=[Identifier(name='p'), Identifier(name='u_i')]), not_=False), op=<BinaryOp.AND: 'and'>, right=UnaryExpr(op=<UnaryOp.NOT: 'not'>, value=BinaryExpr(left=BinaryExpr(left=QualifiedName(parts=[Ide
-                """
                 raise
 
             print()
