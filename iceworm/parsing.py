@@ -58,7 +58,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         when, then = [self.visit(e) for e in ctx.expression()]
         return no.CaseItem(when, then)
 
-    def visitCasePrimaryExpression(self, ctx: SnowflakeSqlParser.CasePrimaryExpressionContext):
+    def visitCaseExpression(self, ctx: SnowflakeSqlParser.CaseExpressionContext):
         items = [self.visit(i) for i in ctx.caseItem()]
         default = self.visit(ctx.expression()) if ctx.expression() is not None else None
         return no.Case(items, default)
@@ -89,7 +89,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
         return no.ExprSelectItem(value, label)
 
-    def visitFunctionCallPrimaryExpression(self, ctx:SnowflakeSqlParser.FunctionCallPrimaryExpressionContext):
+    def visitFunctionCallExpression(self, ctx:SnowflakeSqlParser.FunctionCallExpressionContext):
         name = self.visit(ctx.identifier())
         args = [self.visit(a) for a in ctx.expression()]
         return no.FunctionCall(name, args)
@@ -109,6 +109,11 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         condition = self.visit(ctx.cond) if ctx.cond is not None else None
         return no.Join(left, ty, right, condition)
 
+    def visitLikePredicate(self, ctx: SnowflakeSqlParser.LikePredicateContext):
+        value = self.visit(ctx.value)
+        pattern = self.visit(ctx.expression())
+        return no.Like(value, pattern)
+
     def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
         return no.Null()
 
@@ -126,7 +131,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         name = unquote(ctx.QUOTED_IDENTIFIER().getText(), '"')
         return no.Identifier(name)
 
-    def visitSelectPrimaryExpression(self, ctx: SnowflakeSqlParser.SelectPrimaryExpressionContext):
+    def visitSelectExpression(self, ctx: SnowflakeSqlParser.SelectExpressionContext):
         select = self.visit(ctx.select())
         return no.SelectExpr(select)
 

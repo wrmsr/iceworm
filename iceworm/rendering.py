@@ -75,6 +75,9 @@ class Renderer(dispatch.Class):
                 ((' on ' + self.render(node.condition)) if node.condition is not None else '')
         )
 
+    def render(self, node: no.Like) -> str:  # noqa
+        return self.render(node.value) + ' like ' + self.render(node.pattern)
+
     def render(self, node: no.Null) -> str:  # noqa
         return 'null'
 

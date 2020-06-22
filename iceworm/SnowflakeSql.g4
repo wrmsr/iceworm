@@ -53,6 +53,7 @@ predicate[ParserRuleContext value]
     : cmpOp right=valueExpression                   #cmpPredicate
     | NOT? IN '(' expression (',' expression)* ')'  #inListPredicate
     | IS NOT? NULL                                  #isNullPredicate
+    | LIKE expression                               #likePredicate
     ;
 
 valueExpression
@@ -62,10 +63,10 @@ valueExpression
     ;
 
 primaryExpression
-    : identifier '(' (expression (',' expression)*)? ')' over? #functionCallPrimaryExpression
-    | CASE caseItem* (ELSE expression)? END                    #casePrimaryExpression
-    | '(' select ')'                                           #selectPrimaryExpression
-    | '(' expression ')'                                       #parenPrimaryExpression
+    : identifier '(' (expression (',' expression)*)? ')' over? #functionCallExpression
+    | CASE caseItem* (ELSE expression)? END                    #caseExpression
+    | '(' select ')'                                           #selectExpression
+    | '(' expression ')'                                       #parenExpression
     | simpleExpression                                         #simplePrimaryExpression
     ;
 
@@ -168,7 +169,10 @@ unaryOp
 
 unquotedIdentifier
     : IDENTIFIER
+
     | LEFT
+    | RIGHT
+
     ;
 
 ALL: 'all';
@@ -190,6 +194,7 @@ INNER: 'inner';
 IS: 'is';
 JOIN: 'join';
 LEFT: 'left';
+LIKE: 'like';
 NATURAL: 'natural';
 NOT: 'not';
 NULL: 'null';

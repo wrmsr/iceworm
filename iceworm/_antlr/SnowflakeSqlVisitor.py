@@ -95,6 +95,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#likePredicate.
+    def visitLikePredicate(self, ctx:SnowflakeSqlParser.LikePredicateContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#primaryValueExpression.
     def visitPrimaryValueExpression(self, ctx:SnowflakeSqlParser.PrimaryValueExpressionContext):
         return self.visitChildren(ctx)
@@ -110,23 +115,23 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#functionCallPrimaryExpression.
-    def visitFunctionCallPrimaryExpression(self, ctx:SnowflakeSqlParser.FunctionCallPrimaryExpressionContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#functionCallExpression.
+    def visitFunctionCallExpression(self, ctx:SnowflakeSqlParser.FunctionCallExpressionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#casePrimaryExpression.
-    def visitCasePrimaryExpression(self, ctx:SnowflakeSqlParser.CasePrimaryExpressionContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#caseExpression.
+    def visitCaseExpression(self, ctx:SnowflakeSqlParser.CaseExpressionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#selectPrimaryExpression.
-    def visitSelectPrimaryExpression(self, ctx:SnowflakeSqlParser.SelectPrimaryExpressionContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#selectExpression.
+    def visitSelectExpression(self, ctx:SnowflakeSqlParser.SelectExpressionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#parenPrimaryExpression.
-    def visitParenPrimaryExpression(self, ctx:SnowflakeSqlParser.ParenPrimaryExpressionContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#parenExpression.
+    def visitParenExpression(self, ctx:SnowflakeSqlParser.ParenExpressionContext):
         return self.visitChildren(ctx)
 
 

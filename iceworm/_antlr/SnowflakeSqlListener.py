@@ -162,6 +162,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#likePredicate.
+    def enterLikePredicate(self, ctx:SnowflakeSqlParser.LikePredicateContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#likePredicate.
+    def exitLikePredicate(self, ctx:SnowflakeSqlParser.LikePredicateContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#primaryValueExpression.
     def enterPrimaryValueExpression(self, ctx:SnowflakeSqlParser.PrimaryValueExpressionContext):
         pass
@@ -189,39 +198,39 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#functionCallPrimaryExpression.
-    def enterFunctionCallPrimaryExpression(self, ctx:SnowflakeSqlParser.FunctionCallPrimaryExpressionContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#functionCallExpression.
+    def enterFunctionCallExpression(self, ctx:SnowflakeSqlParser.FunctionCallExpressionContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#functionCallPrimaryExpression.
-    def exitFunctionCallPrimaryExpression(self, ctx:SnowflakeSqlParser.FunctionCallPrimaryExpressionContext):
-        pass
-
-
-    # Enter a parse tree produced by SnowflakeSqlParser#casePrimaryExpression.
-    def enterCasePrimaryExpression(self, ctx:SnowflakeSqlParser.CasePrimaryExpressionContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#casePrimaryExpression.
-    def exitCasePrimaryExpression(self, ctx:SnowflakeSqlParser.CasePrimaryExpressionContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#functionCallExpression.
+    def exitFunctionCallExpression(self, ctx:SnowflakeSqlParser.FunctionCallExpressionContext):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#selectPrimaryExpression.
-    def enterSelectPrimaryExpression(self, ctx:SnowflakeSqlParser.SelectPrimaryExpressionContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#caseExpression.
+    def enterCaseExpression(self, ctx:SnowflakeSqlParser.CaseExpressionContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#selectPrimaryExpression.
-    def exitSelectPrimaryExpression(self, ctx:SnowflakeSqlParser.SelectPrimaryExpressionContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#caseExpression.
+    def exitCaseExpression(self, ctx:SnowflakeSqlParser.CaseExpressionContext):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#parenPrimaryExpression.
-    def enterParenPrimaryExpression(self, ctx:SnowflakeSqlParser.ParenPrimaryExpressionContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#selectExpression.
+    def enterSelectExpression(self, ctx:SnowflakeSqlParser.SelectExpressionContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#parenPrimaryExpression.
-    def exitParenPrimaryExpression(self, ctx:SnowflakeSqlParser.ParenPrimaryExpressionContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#selectExpression.
+    def exitSelectExpression(self, ctx:SnowflakeSqlParser.SelectExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#parenExpression.
+    def enterParenExpression(self, ctx:SnowflakeSqlParser.ParenExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#parenExpression.
+    def exitParenExpression(self, ctx:SnowflakeSqlParser.ParenExpressionContext):
         pass
 
 

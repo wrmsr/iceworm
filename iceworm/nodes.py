@@ -123,6 +123,11 @@ class Cast(Expr):
     type: Identifier
 
 
+class Like(Expr):
+    value: Expr
+    pattern: Expr
+
+
 class Direction(enum.Enum):
     ASC = 'asc'
     DESC = 'desc'
