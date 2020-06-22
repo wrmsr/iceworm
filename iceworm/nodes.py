@@ -126,6 +126,14 @@ class Null(Expr):
     pass
 
 
+class ETrue(Expr):
+    pass
+
+
+class EFalse(Expr):
+    pass
+
+
 class CaseItem(Node):
     when: Expr
     then: Expr

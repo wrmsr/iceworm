@@ -89,6 +89,9 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
         return no.ExprSelectItem(value, label)
 
+    def visitFalse(self, ctx: SnowflakeSqlParser.FalseContext):
+        return no.EFalse()
+
     def visitFunctionCallExpression(self, ctx:SnowflakeSqlParser.FunctionCallExpressionContext):
         name = self.visit(ctx.identifier())
         args = [self.visit(a) for a in ctx.expression()]
@@ -173,6 +176,9 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitTableRelation(self, ctx: SnowflakeSqlParser.TableRelationContext):
         return no.Table(self.visit(ctx.qualifiedName()))
+
+    def visitTrue(self, ctx: SnowflakeSqlParser.TrueContext):
+        return no.ETrue()
 
     def visitUnaryValueExpression(self, ctx: SnowflakeSqlParser.UnaryValueExpressionContext):
         op = no.UNARY_OP_MAP[ctx.op.getText().lower()]

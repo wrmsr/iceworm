@@ -63,6 +63,12 @@ class Renderer(dispatch.Class):
     def render(self, node: no.CteSelect) -> str:  # noqa
         return 'with ' + ', '.join(self.render(c) for c in node.ctes) + ' ' + self.render(node.select)
 
+    def render(self, node: no.EFalse) -> str:  # noqa
+        return 'false'
+
+    def render(self, node: no.ETrue) -> str:  # noqa
+        return 'true'
+
     def render(self, node: no.ExprSelectItem) -> str:  # noqa
         return self.paren_render(node.value) + ((' as ' + self.render(node.label)) if node.label is not None else '')
 

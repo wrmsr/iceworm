@@ -225,6 +225,16 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#true.
+    def visitTrue(self, ctx:SnowflakeSqlParser.TrueContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#false.
+    def visitFalse(self, ctx:SnowflakeSqlParser.FalseContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#setQuantifier.
     def visitSetQuantifier(self, ctx:SnowflakeSqlParser.SetQuantifierContext):
         return self.visitChildren(ctx)

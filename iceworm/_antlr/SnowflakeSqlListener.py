@@ -396,6 +396,24 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#true.
+    def enterTrue(self, ctx:SnowflakeSqlParser.TrueContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#true.
+    def exitTrue(self, ctx:SnowflakeSqlParser.TrueContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#false.
+    def enterFalse(self, ctx:SnowflakeSqlParser.FalseContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#false.
+    def exitFalse(self, ctx:SnowflakeSqlParser.FalseContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#setQuantifier.
     def enterSetQuantifier(self, ctx:SnowflakeSqlParser.SetQuantifierContext):
         pass

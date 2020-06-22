@@ -39,3 +39,6 @@ select * from (select 1);
 select (select 1);
 select a like 'b';
 select f() over (order by x asc);
+select true;
+select 'true';
+select "true";

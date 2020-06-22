@@ -76,6 +76,8 @@ simpleExpression
     | number
     | string
     | null
+    | true
+    | false
     ;
 
 caseItem
@@ -125,6 +127,14 @@ string
 
 null
     : NULL
+    ;
+
+true
+    : TRUE
+    ;
+
+false
+    : FALSE
     ;
 
 setQuantifier
@@ -187,6 +197,7 @@ DESC: 'desc';
 DISTINCT: 'distinct';
 ELSE: 'else';
 END: 'end';
+FALSE: 'false';
 FROM: 'from';
 FULL: 'full';
 GROUP: 'group';
@@ -207,6 +218,7 @@ OVER: 'over';
 RIGHT: 'right';
 SELECT: 'select';
 THEN: 'then';
+TRUE: 'true';
 UNION: 'union';
 WHEN: 'when';
 WHERE: 'where';
