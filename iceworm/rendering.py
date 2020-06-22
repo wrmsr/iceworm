@@ -100,6 +100,19 @@ class Renderer(dispatch.Class):
     def render(self, node: no.UnaryExpr) -> str:  # noqa
         return node.op.value + ' ' + paren(self.render(node.value))
 
+    def render(self, node: no.UnionItem) -> str:  # noqa
+        return (
+                'union ' +
+                ((node.set_quantifier.value + ' ') if node.set_quantifier is not None else '') +
+                self.render(node.right)
+        )
+
+    def render(self, node: no.UnionSelect) -> str:  # noqa
+        return (
+                self.render(node.left) +
+                ((' ' + ' '.join(self.render(i) for i in node.items)) if node.items else '')
+        )
+
 
 def render(node: no.Node) -> str:
     return Renderer().render(node)

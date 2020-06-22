@@ -18,11 +18,11 @@ cte
     ;
 
 unionSelect
-    : baseSelect (unionSpec baseSelect)*
+    : baseSelect unionItem*
     ;
 
-unionSpec
-    : UNION ALL?
+unionItem
+    : UNION setQuantifier? baseSelect
     ;
 
 baseSelect

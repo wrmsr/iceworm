@@ -32,5 +32,6 @@ with a as (with b as (select 1) select * from b) select * from a;
 select case when s = 'c' then v_u when s = 'd' then v_d else 0 end;
 select '1'::int;
 select * from x order by f desc;
-select distinct m.i as u_i from e.p p left join e.a a on p.a_i = a.i left join e.i i on p.i_i = i.i left join e.i2 ir on i.i_i = ir.i inner join e.u u on c(a.u_i, ir.u_i) = u.i inner join et.u2 m on u.c_u_u = m.u where p.c_a is not null;
-select distinct m.i as u_i, t_d(c_t('u', 'a/l_a', c_a)) as dt from e.p p left join e.a a on p.a_i = a.i left join e.i i on p.i_i = i.i left join e.i2 ir on i.i_i = ir.i inner join e.u u on c(a.u_i, ir.u_i) = u.i inner join et.u2 m on u.c_u_u = m.u where p.c_a is not null;
+select 1 union select 2;
+select 1 union all select 2;
+with a as (select 1) select 1 from a union all select 2 from a;

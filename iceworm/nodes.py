@@ -224,7 +224,11 @@ class CteSelect(Selectable):
     select: Selectable
 
 
-class UnionSelect(Selectable):
-    left: Selectable
+class UnionItem(Node):
     right: Selectable
     set_quantifier: SetQuantifier = None
+
+
+class UnionSelect(Selectable):
+    left: Selectable
+    items: ta.Sequence[UnionItem]

@@ -54,12 +54,12 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#unionSpec.
-    def enterUnionSpec(self, ctx:SnowflakeSqlParser.UnionSpecContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#unionItem.
+    def enterUnionItem(self, ctx:SnowflakeSqlParser.UnionItemContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#unionSpec.
-    def exitUnionSpec(self, ctx:SnowflakeSqlParser.UnionSpecContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#unionItem.
+    def exitUnionItem(self, ctx:SnowflakeSqlParser.UnionItemContext):
         pass
 
 

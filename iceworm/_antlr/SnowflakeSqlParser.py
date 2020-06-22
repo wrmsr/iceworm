@@ -20,7 +20,7 @@ def serializedATN():
         buf.write("\t\31\4\32\t\32\4\33\t\33\4\34\t\34\4\35\t\35\4\36\t\36")
         buf.write("\3\2\3\2\3\2\3\2\3\3\3\3\3\4\3\4\3\4\3\4\7\4G\n\4\f\4")
         buf.write("\16\4J\13\4\5\4L\n\4\3\4\3\4\3\5\3\5\3\5\3\5\3\5\3\5\3")
-        buf.write("\6\3\6\3\6\3\6\7\6Z\n\6\f\6\16\6]\13\6\3\7\3\7\5\7a\n")
+        buf.write("\6\3\6\7\6X\n\6\f\6\16\6[\13\6\3\7\3\7\5\7_\n\7\3\7\3")
         buf.write("\7\3\b\3\b\5\be\n\b\3\b\3\b\3\b\7\bj\n\b\f\b\16\bm\13")
         buf.write("\b\3\b\3\b\3\b\3\b\7\bs\n\b\f\b\16\bv\13\b\5\bx\n\b\3")
         buf.write("\b\3\b\5\b|\n\b\3\b\3\b\3\b\5\b\u0081\n\b\3\b\3\b\3\b")
@@ -52,7 +52,7 @@ def serializedATN():
         buf.write("\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62")
         buf.write("\64\668:\2\b\4\2\27\27--\4\2\31\31\35\35\4\2\26\26\36")
         buf.write("\36\3\2\n\20\4\2\7\7\21\25\3\2\21\22\2\u0181\2<\3\2\2")
-        buf.write("\2\4@\3\2\2\2\6K\3\2\2\2\bO\3\2\2\2\nU\3\2\2\2\f^\3\2")
+        buf.write("\2\4@\3\2\2\2\6K\3\2\2\2\bO\3\2\2\2\nU\3\2\2\2\f\\\3\2")
         buf.write("\2\2\16b\3\2\2\2\20\u0096\3\2\2\2\22\u0098\3\2\2\2\24")
         buf.write("\u00a1\3\2\2\2\26\u00c5\3\2\2\2\30\u00cc\3\2\2\2\32\u00f4")
         buf.write("\3\2\2\2\34\u00fe\3\2\2\2\36\u0100\3\2\2\2 \u0105\3\2")
@@ -65,12 +65,12 @@ def serializedATN():
         buf.write("\2\2\2HF\3\2\2\2HI\3\2\2\2IL\3\2\2\2JH\3\2\2\2KB\3\2\2")
         buf.write("\2KL\3\2\2\2LM\3\2\2\2MN\5\n\6\2N\7\3\2\2\2OP\5*\26\2")
         buf.write("PQ\7\30\2\2QR\7\5\2\2RS\5\4\3\2ST\7\6\2\2T\t\3\2\2\2U")
-        buf.write("[\5\16\b\2VW\5\f\7\2WX\5\16\b\2XZ\3\2\2\2YV\3\2\2\2Z]")
-        buf.write("\3\2\2\2[Y\3\2\2\2[\\\3\2\2\2\\\13\3\2\2\2][\3\2\2\2^")
-        buf.write("`\7\64\2\2_a\7\26\2\2`_\3\2\2\2`a\3\2\2\2a\r\3\2\2\2b")
-        buf.write("d\7\62\2\2ce\5\62\32\2dc\3\2\2\2de\3\2\2\2ef\3\2\2\2f")
-        buf.write("k\5\20\t\2gh\7\4\2\2hj\5\20\t\2ig\3\2\2\2jm\3\2\2\2ki")
-        buf.write("\3\2\2\2kl\3\2\2\2lw\3\2\2\2mk\3\2\2\2no\7!\2\2ot\5$\23")
+        buf.write("Y\5\16\b\2VX\5\f\7\2WV\3\2\2\2X[\3\2\2\2YW\3\2\2\2YZ\3")
+        buf.write("\2\2\2Z\13\3\2\2\2[Y\3\2\2\2\\^\7\64\2\2]_\5\62\32\2^")
+        buf.write("]\3\2\2\2^_\3\2\2\2_`\3\2\2\2`a\5\16\b\2a\r\3\2\2\2bd")
+        buf.write("\7\62\2\2ce\5\62\32\2dc\3\2\2\2de\3\2\2\2ef\3\2\2\2fk")
+        buf.write("\5\20\t\2gh\7\4\2\2hj\5\20\t\2ig\3\2\2\2jm\3\2\2\2ki\3")
+        buf.write("\2\2\2kl\3\2\2\2lw\3\2\2\2mk\3\2\2\2no\7!\2\2ot\5$\23")
         buf.write("\2pq\7\4\2\2qs\5$\23\2rp\3\2\2\2sv\3\2\2\2tr\3\2\2\2t")
         buf.write("u\3\2\2\2ux\3\2\2\2vt\3\2\2\2wn\3\2\2\2wx\3\2\2\2x{\3")
         buf.write("\2\2\2yz\7\66\2\2z|\5\24\13\2{y\3\2\2\2{|\3\2\2\2|\u0080")
@@ -175,7 +175,7 @@ def serializedATN():
         buf.write("\u0159\3\2\2\2\u015d\u015b\3\2\2\2\u015d\u015c\3\2\2\2")
         buf.write("\u015e\65\3\2\2\2\u015f\u0160\t\5\2\2\u0160\67\3\2\2\2")
         buf.write("\u0161\u0162\t\6\2\2\u01629\3\2\2\2\u0163\u0164\t\7\2")
-        buf.write("\2\u0164;\3\2\2\2/HK[`dktw{\u0080\u0089\u008c\u0091\u0094")
+        buf.write("\2\u0164;\3\2\2\2/HKY^dktw{\u0080\u0089\u008c\u0091\u0094")
         buf.write("\u0096\u009d\u00a1\u00a9\u00ab\u00b2\u00bb\u00c2\u00c5")
         buf.write("\u00cc\u00d4\u00de\u00e1\u00e5\u00eb\u00f0\u00f4\u00fe")
         buf.write("\u010e\u0111\u0117\u011f\u0123\u0128\u012e\u0130\u0132")
@@ -221,7 +221,7 @@ class SnowflakeSqlParser ( Parser ):
     RULE_cteSelect = 2
     RULE_cte = 3
     RULE_unionSelect = 4
-    RULE_unionSpec = 5
+    RULE_unionItem = 5
     RULE_baseSelect = 6
     RULE_selectItem = 7
     RULE_expression = 8
@@ -247,7 +247,7 @@ class SnowflakeSqlParser ( Parser ):
     RULE_unaryOp = 28
 
     ruleNames =  [ "singleStatement", "select", "cteSelect", "cte", "unionSelect", 
-                   "unionSpec", "baseSelect", "selectItem", "expression", 
+                   "unionItem", "baseSelect", "selectItem", "expression", 
                    "booleanExpression", "predicate", "valueExpression", 
                    "primaryExpression", "simpleExpression", "caseItem", 
                    "over", "sortItem", "relation", "groupBy", "qualifiedName", 
@@ -573,18 +573,15 @@ class SnowflakeSqlParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def baseSelect(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(SnowflakeSqlParser.BaseSelectContext)
-            else:
-                return self.getTypedRuleContext(SnowflakeSqlParser.BaseSelectContext,i)
+        def baseSelect(self):
+            return self.getTypedRuleContext(SnowflakeSqlParser.BaseSelectContext,0)
 
 
-        def unionSpec(self, i:int=None):
+        def unionItem(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(SnowflakeSqlParser.UnionSpecContext)
+                return self.getTypedRuleContexts(SnowflakeSqlParser.UnionItemContext)
             else:
-                return self.getTypedRuleContext(SnowflakeSqlParser.UnionSpecContext,i)
+                return self.getTypedRuleContext(SnowflakeSqlParser.UnionItemContext,i)
 
 
         def getRuleIndex(self):
@@ -616,15 +613,13 @@ class SnowflakeSqlParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 83
             self.baseSelect()
-            self.state = 89
+            self.state = 87
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while _la==SnowflakeSqlParser.UNION:
                 self.state = 84
-                self.unionSpec()
-                self.state = 85
-                self.baseSelect()
-                self.state = 91
+                self.unionItem()
+                self.state = 89
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
@@ -637,7 +632,7 @@ class SnowflakeSqlParser ( Parser ):
         return localctx
 
 
-    class UnionSpecContext(ParserRuleContext):
+    class UnionItemContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -646,46 +641,53 @@ class SnowflakeSqlParser ( Parser ):
         def UNION(self):
             return self.getToken(SnowflakeSqlParser.UNION, 0)
 
-        def ALL(self):
-            return self.getToken(SnowflakeSqlParser.ALL, 0)
+        def baseSelect(self):
+            return self.getTypedRuleContext(SnowflakeSqlParser.BaseSelectContext,0)
+
+
+        def setQuantifier(self):
+            return self.getTypedRuleContext(SnowflakeSqlParser.SetQuantifierContext,0)
+
 
         def getRuleIndex(self):
-            return SnowflakeSqlParser.RULE_unionSpec
+            return SnowflakeSqlParser.RULE_unionItem
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterUnionSpec" ):
-                listener.enterUnionSpec(self)
+            if hasattr( listener, "enterUnionItem" ):
+                listener.enterUnionItem(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitUnionSpec" ):
-                listener.exitUnionSpec(self)
+            if hasattr( listener, "exitUnionItem" ):
+                listener.exitUnionItem(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitUnionSpec" ):
-                return visitor.visitUnionSpec(self)
+            if hasattr( visitor, "visitUnionItem" ):
+                return visitor.visitUnionItem(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def unionSpec(self):
+    def unionItem(self):
 
-        localctx = SnowflakeSqlParser.UnionSpecContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 10, self.RULE_unionSpec)
+        localctx = SnowflakeSqlParser.UnionItemContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 10, self.RULE_unionItem)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 92
+            self.state = 90
             self.match(SnowflakeSqlParser.UNION)
-            self.state = 94
+            self.state = 92
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if _la==SnowflakeSqlParser.ALL:
-                self.state = 93
-                self.match(SnowflakeSqlParser.ALL)
+            if _la==SnowflakeSqlParser.ALL or _la==SnowflakeSqlParser.DISTINCT:
+                self.state = 91
+                self.setQuantifier()
 
 
+            self.state = 94
+            self.baseSelect()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)

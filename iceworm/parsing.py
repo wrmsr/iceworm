@@ -148,6 +148,17 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         value = self.visit(ctx.booleanExpression())
         return no.UnaryExpr(op, value)
 
+    def visitUnionItem(self, ctx: SnowflakeSqlParser.UnionItemContext):
+        right = self.visit(ctx.baseSelect())
+        set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
+            if ctx.setQuantifier() is not None else None
+        return no.UnionItem(right, set_quantifier)
+
+    def visitUnionSelect(self, ctx: SnowflakeSqlParser.UnionSelectContext):
+        left = self.visit(ctx.baseSelect())
+        items = [self.visit(i) for i in ctx.unionItem()]
+        return no.UnionSelect(left, items) if items else left
+
     def visitUnquotedIdentifier(self, ctx: SnowflakeSqlParser.UnquotedIdentifierContext):
         return no.Identifier(ctx.IDENTIFIER().getText())
 
