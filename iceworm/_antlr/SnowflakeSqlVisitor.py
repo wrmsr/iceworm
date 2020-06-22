@@ -40,8 +40,8 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#baseSelect.
-    def visitBaseSelect(self, ctx:SnowflakeSqlParser.BaseSelectContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#primarySelect.
+    def visitPrimarySelect(self, ctx:SnowflakeSqlParser.PrimarySelectContext):
         return self.visitChildren(ctx)
 
 

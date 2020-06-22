@@ -135,7 +135,7 @@ cteSelect
 cte
 unionSelect
 unionItem
-baseSelect
+primarySelect
 selectItem
 expression
 booleanExpression

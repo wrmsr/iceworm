@@ -18,14 +18,14 @@ cte
     ;
 
 unionSelect
-    : baseSelect unionItem*
+    : primarySelect unionItem*
     ;
 
 unionItem
-    : UNION setQuantifier? baseSelect
+    : UNION setQuantifier? primarySelect
     ;
 
-baseSelect
+primarySelect
     : SELECT setQuantifier? selectItem (',' selectItem)*
       (FROM relation (',' relation)*)?
       (WHERE where=booleanExpression)?

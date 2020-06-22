@@ -63,12 +63,12 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#baseSelect.
-    def enterBaseSelect(self, ctx:SnowflakeSqlParser.BaseSelectContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#primarySelect.
+    def enterPrimarySelect(self, ctx:SnowflakeSqlParser.PrimarySelectContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#baseSelect.
-    def exitBaseSelect(self, ctx:SnowflakeSqlParser.BaseSelectContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#primarySelect.
+    def exitPrimarySelect(self, ctx:SnowflakeSqlParser.PrimarySelectContext):
         pass
 
 

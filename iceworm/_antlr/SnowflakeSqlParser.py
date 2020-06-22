@@ -244,7 +244,7 @@ class SnowflakeSqlParser ( Parser ):
     RULE_cte = 3
     RULE_unionSelect = 4
     RULE_unionItem = 5
-    RULE_baseSelect = 6
+    RULE_primarySelect = 6
     RULE_selectItem = 7
     RULE_expression = 8
     RULE_booleanExpression = 9
@@ -273,7 +273,7 @@ class SnowflakeSqlParser ( Parser ):
     RULE_unquotedIdentifier = 32
 
     ruleNames =  [ "singleStatement", "select", "cteSelect", "cte", "unionSelect", 
-                   "unionItem", "baseSelect", "selectItem", "expression", 
+                   "unionItem", "primarySelect", "selectItem", "expression", 
                    "booleanExpression", "predicate", "valueExpression", 
                    "primaryExpression", "simpleExpression", "caseItem", 
                    "over", "sortItem", "relation", "groupBy", "qualifiedName", 
@@ -603,8 +603,8 @@ class SnowflakeSqlParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def baseSelect(self):
-            return self.getTypedRuleContext(SnowflakeSqlParser.BaseSelectContext,0)
+        def primarySelect(self):
+            return self.getTypedRuleContext(SnowflakeSqlParser.PrimarySelectContext,0)
 
 
         def unionItem(self, i:int=None):
@@ -642,7 +642,7 @@ class SnowflakeSqlParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 91
-            self.baseSelect()
+            self.primarySelect()
             self.state = 95
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -671,8 +671,8 @@ class SnowflakeSqlParser ( Parser ):
         def UNION(self):
             return self.getToken(SnowflakeSqlParser.UNION, 0)
 
-        def baseSelect(self):
-            return self.getTypedRuleContext(SnowflakeSqlParser.BaseSelectContext,0)
+        def primarySelect(self):
+            return self.getTypedRuleContext(SnowflakeSqlParser.PrimarySelectContext,0)
 
 
         def setQuantifier(self):
@@ -717,7 +717,7 @@ class SnowflakeSqlParser ( Parser ):
 
 
             self.state = 102
-            self.baseSelect()
+            self.primarySelect()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -727,7 +727,7 @@ class SnowflakeSqlParser ( Parser ):
         return localctx
 
 
-    class BaseSelectContext(ParserRuleContext):
+    class PrimarySelectContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -789,29 +789,29 @@ class SnowflakeSqlParser ( Parser ):
 
 
         def getRuleIndex(self):
-            return SnowflakeSqlParser.RULE_baseSelect
+            return SnowflakeSqlParser.RULE_primarySelect
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterBaseSelect" ):
-                listener.enterBaseSelect(self)
+            if hasattr( listener, "enterPrimarySelect" ):
+                listener.enterPrimarySelect(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitBaseSelect" ):
-                listener.exitBaseSelect(self)
+            if hasattr( listener, "exitPrimarySelect" ):
+                listener.exitPrimarySelect(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitBaseSelect" ):
-                return visitor.visitBaseSelect(self)
+            if hasattr( visitor, "visitPrimarySelect" ):
+                return visitor.visitPrimarySelect(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def baseSelect(self):
+    def primarySelect(self):
 
-        localctx = SnowflakeSqlParser.BaseSelectContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 12, self.RULE_baseSelect)
+        localctx = SnowflakeSqlParser.PrimarySelectContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 12, self.RULE_primarySelect)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
