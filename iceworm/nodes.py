@@ -99,9 +99,27 @@ class String(Expr):
     value: str
 
 
+class Direction(enum.Enum):
+    ASC = 'asc'
+    DESC = 'desc'
+
+
+DIRECTION_MAP: ta.Mapping[str, Direction] = {v.value: v for v in Direction.__members__.values()}
+
+
+class SortItem(Node):
+    value: Expr
+    direction: ta.Optional[Direction] = None
+
+
+class Over(Node):
+    order_by: ta.Optional[ta.Sequence[SortItem]] = None
+
+
 class FunctionCall(Expr):
     name: Identifier
     args: ta.Sequence[Expr]
+    over: ta.Optional[Over] = None
 
 
 class Null(Expr):
@@ -144,19 +162,6 @@ class InSelect(Expr):
     needle: Expr
     haystack: 'Selectable'
     not_: bool = False
-
-
-class Direction(enum.Enum):
-    ASC = 'asc'
-    DESC = 'desc'
-
-
-DIRECTION_MAP: ta.Mapping[str, Direction] = {v.value: v for v in Direction.__members__.values()}
-
-
-class SortItem(Node):
-    value: Expr
-    direction: ta.Optional[Direction] = None
 
 
 class Relation(Node, abstract=True):

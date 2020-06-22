@@ -38,3 +38,4 @@ with a as (select 1) select 1 from a union all select 2 from a;
 select * from (select 1);
 select (select 1);
 select a like 'b';
+select f() over (order by x asc);

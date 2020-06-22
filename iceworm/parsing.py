@@ -92,7 +92,8 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitFunctionCallExpression(self, ctx:SnowflakeSqlParser.FunctionCallExpressionContext):
         name = self.visit(ctx.identifier())
         args = [self.visit(a) for a in ctx.expression()]
-        return no.FunctionCall(name, args)
+        over = self.visit(ctx.over()) if ctx.over() is not None else None
+        return no.FunctionCall(name, args, over=over)
 
     def visitGroupBy(self, ctx: SnowflakeSqlParser.GroupByContext):
         items = [self.visit(e) for e in ctx.expression()]
@@ -134,6 +135,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
         return no.Null()
+
+    def visitOver(self, ctx: SnowflakeSqlParser.OverContext):
+        order_by = [self.visit(s) for s in ctx.sortItem()] if ctx.sortItem() is not None else None
+        return no.Over(order_by=order_by)
 
     def visitParenRelation(self, ctx: SnowflakeSqlParser.ParenRelationContext):
         return self.visit(ctx.relation())
