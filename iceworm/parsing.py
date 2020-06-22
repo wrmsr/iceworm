@@ -9,6 +9,11 @@ from ._antlr.SnowflakeSqlVisitor import SnowflakeSqlVisitor
 from .quoting import unquote
 
 
+def strip_jinja(text: str) -> str:
+    check.arg(text.startswith('{{') and text.endswith('}}'))
+    return text[2:-2].strip()
+
+
 class _ParseVisitor(SnowflakeSqlVisitor):
 
     def aggregateResult(self, aggregate, nextResult):
@@ -85,6 +90,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         items = [self.visit(e) for e in ctx.expression()]
         return no.GroupBy(items)
 
+    def visitInJinjaPredicate(self, ctx: SnowflakeSqlParser.InJinjaPredicateContext):
+        needle = self.visit(ctx.value)
+        text = strip_jinja(ctx.JINJA().getText())
+        not_ = ctx.NOT() is not None
+        return no.InJinja(needle, text, not_=not_)
+
     def visitInListPredicate(self, ctx: SnowflakeSqlParser.InListPredicateContext):
         needle = self.visit(ctx.value)
         haystack = [self.visit(e) for e in ctx.expression()]
@@ -105,13 +116,21 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         not_ = ctx.NOT() is not None
         return no.IsNull(value, not_=not_)
 
+    def visitJinjaExpression(self, ctx: SnowflakeSqlParser.JinjaExpressionContext):
+        text = strip_jinja(ctx.getText())
+        return no.JinjaExpr(text)
+
+    def visitJinjaRelation(self, ctx: SnowflakeSqlParser.JinjaRelationContext):
+        text = strip_jinja(ctx.getText())
+        return no.JinjaRelation(text)
+
     def visitJoinRelation(self, ctx: SnowflakeSqlParser.JoinRelationContext):
         left = self.visit(ctx.left)
-        ty = no.JOIN_TYPE_MAP[' '.join(c.getText().lower() for c in ctx.joinType().children)] \
+        type_ = no.JOIN_TYPE_MAP[' '.join(c.getText().lower() for c in ctx.joinType().children)] \
             if ctx.joinType() is not None else no.JoinType.DEFAULT
         right = self.visit(ctx.right)
         condition = self.visit(ctx.cond) if ctx.cond is not None else None
-        return no.Join(left, ty, right, condition)
+        return no.Join(left, type_, right, condition)
 
     def visitLikePredicate(self, ctx: SnowflakeSqlParser.LikePredicateContext):
         value = self.visit(ctx.value)

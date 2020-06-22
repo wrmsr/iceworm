@@ -276,3 +276,17 @@ class SelectExpr(Expr):
 
 class SelectRelation(Relation):
     select: 'Selectable'
+
+
+class JinjaExpr(Expr):
+    text: str
+
+
+class JinjaRelation(Relation):
+    text: str
+
+
+class InJinja(Expr):
+    needle: Expr
+    text: str
+    not_: bool = False

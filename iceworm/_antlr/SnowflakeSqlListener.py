@@ -171,6 +171,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#inJinjaPredicate.
+    def enterInJinjaPredicate(self, ctx:SnowflakeSqlParser.InJinjaPredicateContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#inJinjaPredicate.
+    def exitInJinjaPredicate(self, ctx:SnowflakeSqlParser.InJinjaPredicateContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#likePredicate.
     def enterLikePredicate(self, ctx:SnowflakeSqlParser.LikePredicateContext):
         pass
@@ -243,6 +252,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#jinjaExpression.
+    def enterJinjaExpression(self, ctx:SnowflakeSqlParser.JinjaExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#jinjaExpression.
+    def exitJinjaExpression(self, ctx:SnowflakeSqlParser.JinjaExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#simplePrimaryExpression.
     def enterSimplePrimaryExpression(self, ctx:SnowflakeSqlParser.SimplePrimaryExpressionContext):
         pass
@@ -285,6 +303,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#sortItem.
     def exitSortItem(self, ctx:SnowflakeSqlParser.SortItemContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#jinjaRelation.
+    def enterJinjaRelation(self, ctx:SnowflakeSqlParser.JinjaRelationContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#jinjaRelation.
+    def exitJinjaRelation(self, ctx:SnowflakeSqlParser.JinjaRelationContext):
         pass
 
 

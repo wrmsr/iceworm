@@ -88,6 +88,15 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Identifier) -> str:  # noqa
         return quote(node.name, '"')
 
+    def render(self, node: no.InJinja) -> str:  # noqa
+        return (
+                self.render(node.needle) +
+                (' not' if node.not_ else '') +
+                ' in {{ ' +
+                node.text +
+                ' }}'
+        )
+
     def render(self, node: no.InList) -> str:  # noqa
         return (
                 self.render(node.needle) +
@@ -109,6 +118,12 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.IsNull) -> str:  # noqa
         return self.render(node.value) + ' is ' + ('not ' if node.not_ else '') + 'null'
+
+    def render(self, node: no.JinjaExpr) -> str:  # noqa
+        return '{{ ' + node.text + '}}'
+
+    def render(self, node: no.JinjaRelation) -> str:  # noqa
+        return '{{ ' + node.text + '}}'
 
     def render(self, node: no.Join) -> str:  # noqa
         return (

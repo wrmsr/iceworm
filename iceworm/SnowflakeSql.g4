@@ -54,6 +54,7 @@ predicate[ParserRuleContext value]
     | IS NOT? NULL                                  #isNullPredicate
     | NOT? IN '(' expression (',' expression)* ')'  #inListPredicate
     | NOT? IN '(' select ')'                        #inSelectPredicate
+    | NOT? IN JINJA                                 #inJinjaPredicate
     | NOT? LIKE expression                          #likePredicate
     ;
 
@@ -68,6 +69,7 @@ primaryExpression
     | CASE caseItem* (ELSE expression)? END                    #caseExpression
     | '(' select ')'                                           #selectExpression
     | '(' expression ')'                                       #parenExpression
+    | JINJA                                                    #jinjaExpression
     | simpleExpression                                         #simplePrimaryExpression
     ;
 
@@ -97,6 +99,7 @@ relation
     | left=relation ty=joinType? JOIN right=relation (ON cond=booleanExpression)?  #joinRelation
     | '(' select ')'                                                               #selectRelation
     | '(' relation ')'                                                             #parenRelation
+    | JINJA                                                                        #jinjaRelation
     | qualifiedName                                                                #tableRelation
     ;
 
@@ -240,6 +243,10 @@ QUOTED_IDENTIFIER
     : '"' (~'"' | '""')* '"'
     ;
 
+JINJA
+    : '{{' .*? '}}'
+    ;
+
 fragment DIGIT
     : [0-9]
     ;
@@ -250,6 +257,10 @@ fragment LETTER
 
 COMMENT
     : '--' ~[\r\n]* '\r'? '\n'? -> channel(HIDDEN)
+    ;
+
+BLOCK_COMMENT
+    : '/*' .*? '*/' -> channel(HIDDEN)
     ;
 
 WS

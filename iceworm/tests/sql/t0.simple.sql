@@ -42,3 +42,6 @@ select f() over (order by x asc);
 select true;
 select 'true';
 select "true";
+select {{ hi }};
+select * from {{ hi }};
+select * where a in {{ a }};

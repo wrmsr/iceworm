@@ -100,6 +100,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#inJinjaPredicate.
+    def visitInJinjaPredicate(self, ctx:SnowflakeSqlParser.InJinjaPredicateContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#likePredicate.
     def visitLikePredicate(self, ctx:SnowflakeSqlParser.LikePredicateContext):
         return self.visitChildren(ctx)
@@ -140,6 +145,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#jinjaExpression.
+    def visitJinjaExpression(self, ctx:SnowflakeSqlParser.JinjaExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#simplePrimaryExpression.
     def visitSimplePrimaryExpression(self, ctx:SnowflakeSqlParser.SimplePrimaryExpressionContext):
         return self.visitChildren(ctx)
@@ -162,6 +172,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#sortItem.
     def visitSortItem(self, ctx:SnowflakeSqlParser.SortItemContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#jinjaRelation.
+    def visitJinjaRelation(self, ctx:SnowflakeSqlParser.JinjaRelationContext):
         return self.visitChildren(ctx)
 
 
