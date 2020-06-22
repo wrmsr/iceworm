@@ -52,8 +52,9 @@ booleanExpression
 predicate[ParserRuleContext value]
     : cmpOp right=valueExpression                   #cmpPredicate
     | NOT? IN '(' expression (',' expression)* ')'  #inListPredicate
+    | NOT? IN '(' select ')'                        #inSelectPredicate
     | IS NOT? NULL                                  #isNullPredicate
-    | LIKE expression                               #likePredicate
+    | NOT? LIKE expression                          #likePredicate
     ;
 
 valueExpression
