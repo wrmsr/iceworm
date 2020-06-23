@@ -45,3 +45,7 @@ select "true";
 select {{ hi }};
 select * from {{ hi }};
 select * where a in {{ a }};
+select count(*);
+select * having 1;
+select * from (select * from t) unpivot(v for v in (a, b));
+select * from (select * from c join n on n.i = c.i) pivot(min(v) for v in (a, b)) p(i, j);
