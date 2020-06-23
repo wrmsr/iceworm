@@ -45,6 +45,8 @@ select "true";
 select {{ hi }};
 select * from {{ hi }};
 select * where a in {{ a }};
+
+-- FIXME:
 select count(*);
 select * having 1;
 select * from (select * from t) unpivot(v for v in (a, b));
