@@ -63,6 +63,9 @@ class Renderer(dispatch.Class):
     def render(self, node: no.CteSelect) -> str:  # noqa
         return 'with ' + ', '.join(self.render(c) for c in node.ctes) + ' ' + self.render(node.select)
 
+    def render(self, node: no.Decimal) -> str:  # noqa
+        return node.value
+
     def render(self, node: no.EFalse) -> str:  # noqa
         return 'false'
 
@@ -71,6 +74,9 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.ExprSelectItem) -> str:  # noqa
         return self.paren_render(node.value) + ((' as ' + self.render(node.label)) if node.label is not None else '')
+
+    def render(self, node: no.Float) -> str:  # noqa
+        return node.value
 
     def render(self, node: no.FunctionCall) -> str:  # noqa
         return (

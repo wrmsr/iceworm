@@ -240,6 +240,16 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#decimalNumber.
+    def visitDecimalNumber(self, ctx:SnowflakeSqlParser.DecimalNumberContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#floatNumber.
+    def visitFloatNumber(self, ctx:SnowflakeSqlParser.FloatNumberContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#string.
     def visitString(self, ctx:SnowflakeSqlParser.StringContext):
         return self.visitChildren(ctx)

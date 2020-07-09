@@ -423,6 +423,24 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#decimalNumber.
+    def enterDecimalNumber(self, ctx:SnowflakeSqlParser.DecimalNumberContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#decimalNumber.
+    def exitDecimalNumber(self, ctx:SnowflakeSqlParser.DecimalNumberContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#floatNumber.
+    def enterFloatNumber(self, ctx:SnowflakeSqlParser.FloatNumberContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#floatNumber.
+    def exitFloatNumber(self, ctx:SnowflakeSqlParser.FloatNumberContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#string.
     def enterString(self, ctx:SnowflakeSqlParser.StringContext):
         pass

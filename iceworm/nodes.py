@@ -95,6 +95,14 @@ class Integer(Expr):
     value: int
 
 
+class Decimal(Expr):
+    value: str
+
+
+class Float(Expr):
+    value: str
+
+
 class String(Expr):
     value: str
 

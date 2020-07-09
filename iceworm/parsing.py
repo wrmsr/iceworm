@@ -72,6 +72,9 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         select = self.visit(ctx.unionSelect())
         return no.CteSelect(ctes, select) if ctes else select
 
+    def visitDecimalNumber(self, ctx: SnowflakeSqlParser.DecimalNumberContext):
+        return no.Decimal(ctx.DECIMAL_VALUE().getText())
+
     def visitExpressionSelectItem(self, ctx: SnowflakeSqlParser.ExpressionSelectItemContext):
         value = self.visit(ctx.expression())
         label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
@@ -80,15 +83,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitFalse(self, ctx: SnowflakeSqlParser.FalseContext):
         return no.EFalse()
 
+    def visitFloatNumber(self, ctx: SnowflakeSqlParser.FloatNumberContext):
+        return no.Float(ctx.FLOAT_VALUE().getText())
+
     def visitFunctionCallExpression(self, ctx:SnowflakeSqlParser.FunctionCallExpressionContext):
         name = self.visit(ctx.identifier())
         args = [self.visit(a) for a in ctx.expression()]
-        over = self.visit(ctx.over()) if ctx.over() is not None else None
-        return no.FunctionCall(name, args, over=over)
-
-    def visitStarFunctionCallExpression(self, ctx:SnowflakeSqlParser.StarFunctionCallExpressionContext):
-        name = self.visit(ctx.identifier())
-        args = [no.StarExpr()]
         over = self.visit(ctx.over()) if ctx.over() is not None else None
         return no.FunctionCall(name, args, over=over)
 
@@ -198,6 +198,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         value = self.visit(ctx.expression())
         direction = no.DIRECTION_MAP[ctx.direction.text.lower()] if ctx.direction is not None else None
         return no.SortItem(value, direction)
+
+    def visitStarFunctionCallExpression(self, ctx:SnowflakeSqlParser.StarFunctionCallExpressionContext):
+        name = self.visit(ctx.identifier())
+        args = [no.StarExpr()]
+        over = self.visit(ctx.over()) if ctx.over() is not None else None
+        return no.FunctionCall(name, args, over=over)
 
     def visitString(self, ctx: SnowflakeSqlParser.StringContext):
         value = unquote(ctx.STRING().getText(), "'")

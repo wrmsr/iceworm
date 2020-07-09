@@ -128,6 +128,8 @@ quotedIdentifier
 
 number
     : INTEGER_VALUE  #integerNumber
+    | DECIMAL_VALUE  #decimalNumber
+    | FLOAT_VALUE    #floatNumber
     ;
 
 string
@@ -243,6 +245,16 @@ INTEGER_VALUE
     : DIGIT+
     ;
 
+DECIMAL_VALUE
+    : DIGIT+ '.' DIGIT*
+    | '.' DIGIT+
+    ;
+
+FLOAT_VALUE
+    : DIGIT+ ('.' DIGIT*)? EXPONENT
+    | '.' DIGIT+ EXPONENT
+    ;
+
 IDENTIFIER
     : (LETTER | '_') (LETTER | DIGIT | '_' | '@' | ':' | '$')*
     ;
@@ -253,6 +265,10 @@ QUOTED_IDENTIFIER
 
 JINJA
     : '{{' .*? '}}'
+    ;
+
+fragment EXPONENT
+    : [Ee] [+-]? DIGIT+
     ;
 
 fragment DIGIT
