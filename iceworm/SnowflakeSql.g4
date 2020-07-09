@@ -69,13 +69,13 @@ valueExpression
     ;
 
 primaryExpression
-    : identifier '(' (expression (',' expression)*)? ')' over? #functionCallExpression
-    | identifier '(' '*' ')' over?                             #starFunctionCallExpression
-    | CASE caseItem* (ELSE expression)? END                    #caseExpression
-    | '(' select ')'                                           #selectExpression
-    | '(' expression ')'                                       #parenExpression
-    | JINJA                                                    #jinjaExpression
-    | simpleExpression                                         #simplePrimaryExpression
+    : identifier '(' (expression (',' expression)*)? ')' over?  #functionCallExpression
+    | identifier '(' '*' ')' over?                              #starFunctionCallExpression
+    | CASE caseItem* (ELSE expression)? END                     #caseExpression
+    | '(' select ')'                                            #selectExpression
+    | '(' expression ')'                                        #parenExpression
+    | JINJA                                                     #jinjaExpression
+    | simpleExpression                                          #simplePrimaryExpression
     ;
 
 simpleExpression

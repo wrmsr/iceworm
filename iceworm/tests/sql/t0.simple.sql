@@ -45,18 +45,11 @@ select "true";
 select {{ hi }};
 select * from {{ hi }};
 select * where a in {{ a }};
-<<<<<<< HEAD
 select count(*);
 select * having x = 1;
 select top 1 *;
 select 1.2;  -- [+-][digits][.digits][e[+-]digits]
 select 0.1e4;
 select +0.1e-4;
-=======
-
--- FIXME:
-select count(*);
-select * having 1;
 select * from (select * from t) unpivot(v for v in (a, b));
 select * from (select * from c join n on n.i = c.i) pivot(min(v) for v in (a, b)) p(i, j);
->>>>>>> 0f60adb822846053482a23bcb9e13475524f5560
