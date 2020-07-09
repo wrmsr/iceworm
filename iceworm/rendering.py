@@ -155,6 +155,7 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Select) -> str:  # noqa
         return (
                 'select ' +
+                (('top ' + self.render(node.top_n) + ' ') if node.top_n is not None else '') +
                 ((node.set_quantifier.value + ' ') if node.set_quantifier is not None else '') +
                 ', '.join(self.render(i) for i in node.items) +
                 ((' from ' + ', '.join(self.paren_render(r) for r in node.relations)) if node.relations else '') +
@@ -171,6 +172,9 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.SortItem) -> str:  # noqa
         return self.render(node.value) + ((' ' + node.direction.value) if node.direction is not None else '')
+
+    def render(self, node: no.StarExpr) -> str:  # noqa
+        return '*'
 
     def render(self, node: no.String) -> str:  # noqa
         return quote(node.value, "'")

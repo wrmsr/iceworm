@@ -116,6 +116,10 @@ class Over(Node):
     order_by: ta.Optional[ta.Sequence[SortItem]] = None
 
 
+class StarExpr(Expr):
+    pass
+
+
 class FunctionCall(Expr):
     name: Identifier
     args: ta.Sequence[Expr]
@@ -245,6 +249,7 @@ class Select(Selectable):
     items: ta.Sequence[SelectItem]
     relations: ta.Sequence[Relation]
     where: ta.Optional[Expr] = None
+    top_n: ta.Optional[Integer] = None
     set_quantifier: ta.Optional[SetQuantifier] = None
     group_by: ta.Optional[GroupBy] = None
     order_by: ta.Optional[ta.Sequence[SortItem]] = None

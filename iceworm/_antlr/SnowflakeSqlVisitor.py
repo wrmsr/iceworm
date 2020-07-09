@@ -45,6 +45,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#topN.
+    def visitTopN(self, ctx:SnowflakeSqlParser.TopNContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#allSelectItem.
     def visitAllSelectItem(self, ctx:SnowflakeSqlParser.AllSelectItemContext):
         return self.visitChildren(ctx)
@@ -127,6 +132,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#functionCallExpression.
     def visitFunctionCallExpression(self, ctx:SnowflakeSqlParser.FunctionCallExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#starFunctionCallExpression.
+    def visitStarFunctionCallExpression(self, ctx:SnowflakeSqlParser.StarFunctionCallExpressionContext):
         return self.visitChildren(ctx)
 
 

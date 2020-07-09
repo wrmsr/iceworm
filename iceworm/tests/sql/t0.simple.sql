@@ -45,3 +45,9 @@ select "true";
 select {{ hi }};
 select * from {{ hi }};
 select * where a in {{ a }};
+select count(*);
+select * having x = 1;
+select top 1 *;
+select 1.2;  -- [+-][digits][.digits][e[+-]digits]
+select 0.1e4;
+select +0.1e-4;

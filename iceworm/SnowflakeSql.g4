@@ -26,11 +26,15 @@ unionItem
     ;
 
 primarySelect
-    : SELECT setQuantifier? selectItem (',' selectItem)*
+    : SELECT topN? setQuantifier? selectItem (',' selectItem)*
       (FROM relation (',' relation)*)?
       (WHERE where=booleanExpression)?
       (GROUP BY groupBy)?
       (ORDER BY sortItem (',' sortItem)*)?
+    ;
+
+topN
+    : TOP INTEGER_VALUE
     ;
 
 selectItem
@@ -66,6 +70,7 @@ valueExpression
 
 primaryExpression
     : identifier '(' (expression (',' expression)*)? ')' over? #functionCallExpression
+    | identifier '(' '*' ')' over?                             #starFunctionCallExpression
     | CASE caseItem* (ELSE expression)? END                    #caseExpression
     | '(' select ')'                                           #selectExpression
     | '(' expression ')'                                       #parenExpression
@@ -221,6 +226,7 @@ OVER: 'over';
 RIGHT: 'right';
 SELECT: 'select';
 THEN: 'then';
+TOP: 'top';
 TRUE: 'true';
 UNION: 'union';
 WHEN: 'when';

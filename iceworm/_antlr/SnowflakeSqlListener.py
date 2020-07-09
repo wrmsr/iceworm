@@ -72,6 +72,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#topN.
+    def enterTopN(self, ctx:SnowflakeSqlParser.TopNContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#topN.
+    def exitTopN(self, ctx:SnowflakeSqlParser.TopNContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#allSelectItem.
     def enterAllSelectItem(self, ctx:SnowflakeSqlParser.AllSelectItemContext):
         pass
@@ -222,6 +231,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#functionCallExpression.
     def exitFunctionCallExpression(self, ctx:SnowflakeSqlParser.FunctionCallExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#starFunctionCallExpression.
+    def enterStarFunctionCallExpression(self, ctx:SnowflakeSqlParser.StarFunctionCallExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#starFunctionCallExpression.
+    def exitStarFunctionCallExpression(self, ctx:SnowflakeSqlParser.StarFunctionCallExpressionContext):
         pass
 
 

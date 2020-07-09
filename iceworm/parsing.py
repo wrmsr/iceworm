@@ -86,6 +86,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         over = self.visit(ctx.over()) if ctx.over() is not None else None
         return no.FunctionCall(name, args, over=over)
 
+    def visitStarFunctionCallExpression(self, ctx:SnowflakeSqlParser.StarFunctionCallExpressionContext):
+        name = self.visit(ctx.identifier())
+        args = [no.StarExpr()]
+        over = self.visit(ctx.over()) if ctx.over() is not None else None
+        return no.FunctionCall(name, args, over=over)
+
     def visitGroupBy(self, ctx: SnowflakeSqlParser.GroupByContext):
         items = [self.visit(e) for e in ctx.expression()]
         return no.GroupBy(items)
@@ -154,6 +160,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitPrimarySelect(self, ctx: SnowflakeSqlParser.PrimarySelectContext):
         items = [self.visit(i) for i in ctx.selectItem()]
         relations = [self.visit(r) for r in ctx.relation()]
+        top_n = self.visit(ctx.topN()) if ctx.topN() is not None else None
         set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
             if ctx.setQuantifier() is not None else None
         where = self.visit(ctx.where) if ctx.where is not None else None
@@ -163,6 +170,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             items,
             relations,
             where,
+            top_n=top_n,
             set_quantifier=set_quantifier,
             group_by=group_by,
             order_by=order_by,
