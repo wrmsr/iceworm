@@ -30,11 +30,12 @@ primarySelect
       (FROM relation (',' relation)*)?
       (WHERE where=booleanExpression)?
       (GROUP BY groupBy)?
+      (HAVING having=booleanExpression)?
       (ORDER BY sortItem (',' sortItem)*)?
     ;
 
 topN
-    : TOP INTEGER_VALUE
+    : TOP number
     ;
 
 selectItem
@@ -209,6 +210,7 @@ FALSE: 'false';
 FROM: 'from';
 FULL: 'full';
 GROUP: 'group';
+HAVING: 'having';
 IN: 'in';
 INNER: 'inner';
 IS: 'is';

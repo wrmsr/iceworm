@@ -252,6 +252,7 @@ class Select(Selectable):
     top_n: ta.Optional[Integer] = None
     set_quantifier: ta.Optional[SetQuantifier] = None
     group_by: ta.Optional[GroupBy] = None
+    having: ta.Optional[Expr] = None
     order_by: ta.Optional[ta.Sequence[SortItem]] = None
 
 

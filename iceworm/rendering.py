@@ -161,6 +161,7 @@ class Renderer(dispatch.Class):
                 ((' from ' + ', '.join(self.paren_render(r) for r in node.relations)) if node.relations else '') +
                 ((' where ' + self.render(node.where)) if node.where is not None else '') +
                 ((' group by ' + self.render(node.group_by)) if node.group_by is not None else '') +
+                ((' having ' + self.render(node.having)) if node.having is not None else '') +
                 ((' order by ' + ', '.join(self.render(e) for e in node.order_by)) if node.order_by else '')
         )
 

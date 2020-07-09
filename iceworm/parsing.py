@@ -165,6 +165,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             if ctx.setQuantifier() is not None else None
         where = self.visit(ctx.where) if ctx.where is not None else None
         group_by = self.visit(ctx.groupBy()) if ctx.groupBy() else None
+        having = self.visit(ctx.having) if ctx.having is not None else None
         order_by = [self.visit(s) for s in ctx.sortItem()] if ctx.sortItem() is not None else None
         return no.Select(
             items,
@@ -173,6 +174,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             top_n=top_n,
             set_quantifier=set_quantifier,
             group_by=group_by,
+            having=having,
             order_by=order_by,
         )
 
