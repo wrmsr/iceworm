@@ -1,3 +1,4 @@
+import abc
 import enum
 import typing as ta
 
@@ -211,12 +212,27 @@ class Join(Relation):
     condition: ta.Optional[Expr] = None
 
 
-class Pivot(Relation):
+class Pivotal(Relation, abstract=True):
     relation: Relation
     func: QualifiedName
     pivot_col: Identifier
     value_col: Identifier
     values: ta.Sequence[Expr]
+
+    @abc.abstractproperty
+    def TAG(self) -> str:
+        raise NotImplementedError
+
+
+class Pivot(Pivotal):
+    TAG = 'PIVOT'
+
+
+class Unpivot(Pivotal):
+    TAG = 'UNPIVOT'
+
+
+PIVOTALS_BY_TAG = {cls.TAG: cls for cls in [Pivot, Unpivot]}
 
 
 class Table(Relation):

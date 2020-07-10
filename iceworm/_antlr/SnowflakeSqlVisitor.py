@@ -195,13 +195,13 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#joinRelation.
-    def visitJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#pivotalRelation.
+    def visitPivotalRelation(self, ctx:SnowflakeSqlParser.PivotalRelationContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#pivotRelation.
-    def visitPivotRelation(self, ctx:SnowflakeSqlParser.PivotRelationContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#joinRelation.
+    def visitJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
         return self.visitChildren(ctx)
 
 

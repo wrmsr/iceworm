@@ -154,13 +154,15 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitParenRelation(self, ctx: SnowflakeSqlParser.ParenRelationContext):
         return self.visit(ctx.relation())
 
-    def visitPivotRelation(self, ctx: SnowflakeSqlParser.PivotRelationContext):
+    def visitPivotalRelation(self, ctx: SnowflakeSqlParser.PivotalRelationContext):
+        ty = ctx.ty.text
         relation = self.visit(ctx.relation())
         func = self.visit(ctx.func)
         pivot_col = self.visit(ctx.pc)
         value_col = self.visit(ctx.vc)
         values = [self.visit(e) for e in ctx.expression()]
-        return no.Pivot(
+        cls = no.PIVOTALS_BY_TAG[ty.upper()]
+        return cls(
             relation,
             func,
             pivot_col,

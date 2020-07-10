@@ -15,6 +15,7 @@ select x from y group by 1;
 select null;
 select * from x;
 select * from (x);
+select * from (select * from t);
 select (1) x;
 select 1 - 2;
 select -1;
@@ -52,5 +53,5 @@ select 1.2;  -- [+-][digits][.digits][e[+-]digits]
 select 0.1e4;
 select +0.1e-4;
 select * from (select * from c join n on n.i = c.i) pivot(min(v) for v in (a, b)) p;
-select * from (select * from c join n on n.i = c.i) pivot(min(v) for v in (a, b)) p(i, j);
+-- select * from (select * from c join n on n.i = c.i) pivot(min(v) for v in (a, b)) p(i, j);
 select * from (select * from t) unpivot(v for v in (a, b));

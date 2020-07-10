@@ -155,10 +155,12 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Over) -> str:  # noqa
         return ('order by ' + ', '.join(self.render(e) for e in node.order_by)) if node.order_by else ''
 
-    def render(self, node: no.Pivot) -> str:  # noqa
+    def render(self, node: no.Pivotal) -> str:  # noqa
         return (
                 self.render(node.relation) +
-                ' PIVOT ' +
+                ' ' +
+                node.TAG +
+                ' ' +
                 self.render(node.func) +
                 '(' +
                 self.render(node.pivot_col) +
@@ -189,7 +191,7 @@ class Renderer(dispatch.Class):
         return self.render(node.select)
 
     def render(self, node: no.SelectRelation) -> str:  # noqa
-        return self.render(node.select)
+        return self.paren_render(node.select)
 
     def render(self, node: no.SortItem) -> str:  # noqa
         return self.render(node.value) + ((' ' + node.direction.value) if node.direction is not None else '')
