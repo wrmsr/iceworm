@@ -200,6 +200,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#pivotRelation.
+    def visitPivotRelation(self, ctx:SnowflakeSqlParser.PivotRelationContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#selectRelation.
     def visitSelectRelation(self, ctx:SnowflakeSqlParser.SelectRelationContext):
         return self.visitChildren(ctx)

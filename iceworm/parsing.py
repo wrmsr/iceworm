@@ -87,7 +87,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         return no.Float(ctx.FLOAT_VALUE().getText())
 
     def visitFunctionCallExpression(self, ctx:SnowflakeSqlParser.FunctionCallExpressionContext):
-        name = self.visit(ctx.identifier())
+        name = self.visit(ctx.qualifiedName())
         args = [self.visit(a) for a in ctx.expression()]
         over = self.visit(ctx.over()) if ctx.over() is not None else None
         return no.FunctionCall(name, args, over=over)
@@ -154,6 +154,20 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitParenRelation(self, ctx: SnowflakeSqlParser.ParenRelationContext):
         return self.visit(ctx.relation())
 
+    def visitPivotRelation(self, ctx: SnowflakeSqlParser.PivotRelationContext):
+        relation = self.visit(ctx.relation())
+        func = self.visit(ctx.func)
+        pivot_col = self.visit(ctx.pc)
+        value_col = self.visit(ctx.vc)
+        values = [self.visit(e) for e in ctx.expression()]
+        return no.Pivot(
+            relation,
+            func,
+            pivot_col,
+            value_col,
+            values,
+        )
+
     def visitPredicatedBooleanExpression(self, ctx: SnowflakeSqlParser.PredicatedBooleanExpressionContext):
         return self.visit(ctx.predicate()) if ctx.predicate() is not None else self.visit(ctx.valueExpression())
 
@@ -200,7 +214,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         return no.SortItem(value, direction)
 
     def visitStarFunctionCallExpression(self, ctx:SnowflakeSqlParser.StarFunctionCallExpressionContext):
-        name = self.visit(ctx.identifier())
+        name = self.visit(ctx.qualifiedName())
         args = [no.StarExpr()]
         over = self.visit(ctx.over()) if ctx.over() is not None else None
         return no.FunctionCall(name, args, over=over)

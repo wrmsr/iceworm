@@ -70,13 +70,13 @@ valueExpression
     ;
 
 primaryExpression
-    : identifier '(' (expression (',' expression)*)? ')' over?  #functionCallExpression
-    | identifier '(' '*' ')' over?                              #starFunctionCallExpression
-    | CASE caseItem* (ELSE expression)? END                     #caseExpression
-    | '(' select ')'                                            #selectExpression
-    | '(' expression ')'                                        #parenExpression
-    | JINJA                                                     #jinjaExpression
-    | simpleExpression                                          #simplePrimaryExpression
+    : qualifiedName '(' (expression (',' expression)*)? ')' over?  #functionCallExpression
+    | qualifiedName '(' '*' ')' over?                              #starFunctionCallExpression
+    | CASE caseItem* (ELSE expression)? END                        #caseExpression
+    | '(' select ')'                                               #selectExpression
+    | '(' expression ')'                                           #parenExpression
+    | JINJA                                                        #jinjaExpression
+    | simpleExpression                                             #simplePrimaryExpression
     ;
 
 simpleExpression
@@ -103,6 +103,9 @@ sortItem
 relation
     : relation AS? identifier                                                      #aliasedRelation
     | left=relation ty=joinType? JOIN right=relation (ON cond=booleanExpression)?  #joinRelation
+    | relation PIVOT '('
+      func=qualifiedName '(' pc=identifier ')'
+      FOR vc=identifier IN '(' expression* ')' ')'                                 #pivotRelation
     | '(' select ')'                                                               #selectRelation
     | '(' relation ')'                                                             #parenRelation
     | JINJA                                                                        #jinjaRelation
@@ -209,6 +212,7 @@ DISTINCT: 'distinct';
 ELSE: 'else';
 END: 'end';
 FALSE: 'false';
+FOR: 'for';
 FROM: 'from';
 FULL: 'full';
 GROUP: 'group';
@@ -227,12 +231,14 @@ OR: 'or';
 ORDER: 'order';
 OUTER: 'outer';
 OVER: 'over';
+PIVOT: 'pivot';
 RIGHT: 'right';
 SELECT: 'select';
 THEN: 'then';
 TOP: 'top';
 TRUE: 'true';
 UNION: 'union';
+UNPIVOT: 'unpivot';
 WHEN: 'when';
 WHERE: 'where';
 WITH: 'with';

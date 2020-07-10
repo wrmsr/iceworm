@@ -155,6 +155,20 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Over) -> str:  # noqa
         return ('order by ' + ', '.join(self.render(e) for e in node.order_by)) if node.order_by else ''
 
+    def render(self, node: no.Pivot) -> str:  # noqa
+        return (
+                self.render(node.relation) +
+                ' PIVOT ' +
+                self.render(node.func) +
+                '(' +
+                self.render(node.pivot_col) +
+                ') FOR ' +
+                self.render(node.value_col) +
+                ' IN (' +
+                ', '.join(self.render(e) for e in node.values) +
+                ')'
+        )
+
     def render(self, node: no.QualifiedName) -> str:  # noqa
         return '.'.join(self.render(i) for i in node.parts)
 

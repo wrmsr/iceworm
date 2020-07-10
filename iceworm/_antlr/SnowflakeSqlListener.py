@@ -351,6 +351,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#pivotRelation.
+    def enterPivotRelation(self, ctx:SnowflakeSqlParser.PivotRelationContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#pivotRelation.
+    def exitPivotRelation(self, ctx:SnowflakeSqlParser.PivotRelationContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#selectRelation.
     def enterSelectRelation(self, ctx:SnowflakeSqlParser.SelectRelationContext):
         pass

@@ -129,7 +129,7 @@ class StarExpr(Expr):
 
 
 class FunctionCall(Expr):
-    name: Identifier
+    name: QualifiedName
     args: ta.Sequence[Expr]
     over: ta.Optional[Over] = None
 
@@ -209,6 +209,14 @@ class Join(Relation):
     type: JoinType
     right: Relation
     condition: ta.Optional[Expr] = None
+
+
+class Pivot(Relation):
+    relation: Relation
+    func: QualifiedName
+    pivot_col: Identifier
+    value_col: Identifier
+    values: ta.Sequence[Expr]
 
 
 class Table(Relation):
