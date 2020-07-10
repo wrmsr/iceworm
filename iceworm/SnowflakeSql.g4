@@ -105,7 +105,7 @@ relation
     | left=relation ty=joinType? JOIN right=relation (ON cond=booleanExpression)?  #joinRelation
     | relation PIVOT '('
       func=qualifiedName '(' pc=identifier ')'
-      FOR vc=identifier IN '(' expression* ')' ')'                                 #pivotRelation
+      FOR vc=identifier IN '(' (expression (',' expression)*)? ')' ')'             #pivotRelation
     | '(' select ')'                                                               #selectRelation
     | '(' relation ')'                                                             #parenRelation
     | JINJA                                                                        #jinjaRelation
