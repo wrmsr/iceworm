@@ -1,3 +1,4 @@
+select * from (select * from c join n on n.i = c.i) pivot(min(v) for v in (a, b)) p;
 select 1;
 select 'x';
 select 1 from x;

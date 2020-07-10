@@ -14,7 +14,6 @@ NEEDS_PAREN_TYPES: ta.AbstractSet[ta.Type[no.Node]] = {
     no.BinaryExpr,
     no.IsNull,
     no.SelectExpr,
-    no.SelectRelation,
 }
 
 
@@ -160,7 +159,7 @@ class Renderer(dispatch.Class):
                 self.render(node.relation) +
                 ' ' +
                 node.TAG +
-                ' ' +
+                '(' +
                 self.render(node.func) +
                 '(' +
                 self.render(node.pivot_col) +
@@ -168,7 +167,7 @@ class Renderer(dispatch.Class):
                 self.render(node.value_col) +
                 ' IN (' +
                 ', '.join(self.render(e) for e in node.values) +
-                ')'
+                '))'
         )
 
     def render(self, node: no.QualifiedName) -> str:  # noqa
@@ -191,7 +190,7 @@ class Renderer(dispatch.Class):
         return self.render(node.select)
 
     def render(self, node: no.SelectRelation) -> str:  # noqa
-        return self.paren_render(node.select)
+        return paren(self.render(node.select))
 
     def render(self, node: no.SortItem) -> str:  # noqa
         return self.render(node.value) + ((' ' + node.direction.value) if node.direction is not None else '')
