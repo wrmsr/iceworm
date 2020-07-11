@@ -194,7 +194,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitQualifiedName(self, ctx: SnowflakeSqlParser.QualifiedNameContext):
         parts = [self.visit(i) for i in ctx.identifier()]
-        return no.QualifiedName(parts)
+        return no.QualifiedNameNode(parts)
 
     def visitQuotedIdentifier(self, ctx: SnowflakeSqlParser.QuotedIdentifierContext):
         name = unquote(ctx.QUOTED_IDENTIFIER().getText(), '"')

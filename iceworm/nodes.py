@@ -87,7 +87,7 @@ class Identifier(Expr):
     name: str
 
 
-class QualifiedName(Expr):
+class QualifiedNameNode(Expr):
     parts: ta.Sequence[Identifier]
 
 
@@ -129,7 +129,7 @@ class StarExpr(Expr):
 
 
 class FunctionCall(Expr):
-    name: QualifiedName
+    name: QualifiedNameNode
     args: ta.Sequence[Expr]
     over: ta.Optional[Over] = None
 
@@ -213,7 +213,7 @@ class Join(Relation):
 
 class Pivot(Relation):
     relation: Relation
-    func: QualifiedName
+    func: QualifiedNameNode
     pivot_col: Identifier
     value_col: Identifier
     values: ta.Sequence[Expr]
@@ -227,7 +227,7 @@ class Unpivot(Relation):
 
 
 class Table(Relation):
-    name: QualifiedName
+    name: QualifiedNameNode
 
 
 class AliasedRelation(Relation):

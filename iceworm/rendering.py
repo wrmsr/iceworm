@@ -168,7 +168,7 @@ class Renderer(dispatch.Class):
                 '))'
         )
 
-    def render(self, node: no.QualifiedName) -> str:  # noqa
+    def render(self, node: no.QualifiedNameNode) -> str:  # noqa
         return '.'.join(self.render(i) for i in node.parts)
 
     def render(self, node: no.Select) -> str:  # noqa
