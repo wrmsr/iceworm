@@ -324,6 +324,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#unpivotRelation.
+    def enterUnpivotRelation(self, ctx:SnowflakeSqlParser.UnpivotRelationContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#unpivotRelation.
+    def exitUnpivotRelation(self, ctx:SnowflakeSqlParser.UnpivotRelationContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#jinjaRelation.
     def enterJinjaRelation(self, ctx:SnowflakeSqlParser.JinjaRelationContext):
         pass
@@ -342,21 +351,21 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#pivotalRelation.
-    def enterPivotalRelation(self, ctx:SnowflakeSqlParser.PivotalRelationContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#pivotalRelation.
-    def exitPivotalRelation(self, ctx:SnowflakeSqlParser.PivotalRelationContext):
-        pass
-
-
     # Enter a parse tree produced by SnowflakeSqlParser#joinRelation.
     def enterJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
         pass
 
     # Exit a parse tree produced by SnowflakeSqlParser#joinRelation.
     def exitJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#pivotRelation.
+    def enterPivotRelation(self, ctx:SnowflakeSqlParser.PivotRelationContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#pivotRelation.
+    def exitPivotRelation(self, ctx:SnowflakeSqlParser.PivotRelationContext):
         pass
 
 
@@ -402,6 +411,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#qualifiedName.
     def exitQualifiedName(self, ctx:SnowflakeSqlParser.QualifiedNameContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#identifierList.
+    def enterIdentifierList(self, ctx:SnowflakeSqlParser.IdentifierListContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#identifierList.
+    def exitIdentifierList(self, ctx:SnowflakeSqlParser.IdentifierListContext):
         pass
 
 

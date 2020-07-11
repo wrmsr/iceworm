@@ -185,6 +185,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#unpivotRelation.
+    def visitUnpivotRelation(self, ctx:SnowflakeSqlParser.UnpivotRelationContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#jinjaRelation.
     def visitJinjaRelation(self, ctx:SnowflakeSqlParser.JinjaRelationContext):
         return self.visitChildren(ctx)
@@ -195,13 +200,13 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#pivotalRelation.
-    def visitPivotalRelation(self, ctx:SnowflakeSqlParser.PivotalRelationContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#joinRelation.
+    def visitJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#joinRelation.
-    def visitJoinRelation(self, ctx:SnowflakeSqlParser.JoinRelationContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#pivotRelation.
+    def visitPivotRelation(self, ctx:SnowflakeSqlParser.PivotRelationContext):
         return self.visitChildren(ctx)
 
 
@@ -227,6 +232,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#qualifiedName.
     def visitQualifiedName(self, ctx:SnowflakeSqlParser.QualifiedNameContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#identifierList.
+    def visitIdentifierList(self, ctx:SnowflakeSqlParser.IdentifierListContext):
         return self.visitChildren(ctx)
 
 

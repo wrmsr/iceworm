@@ -212,27 +212,19 @@ class Join(Relation):
     condition: ta.Optional[Expr] = None
 
 
-class Pivotal(Relation, abstract=True):
+class Pivot(Relation):
     relation: Relation
     func: QualifiedName
     pivot_col: Identifier
     value_col: Identifier
     values: ta.Sequence[Expr]
 
-    @abc.abstractproperty
-    def TAG(self) -> str:
-        raise NotImplementedError
 
-
-class Pivot(Pivotal):
-    TAG = 'PIVOT'
-
-
-class Unpivot(Pivotal):
-    TAG = 'UNPIVOT'
-
-
-PIVOTALS_BY_TAG = {cls.TAG: cls for cls in [Pivot, Unpivot]}
+class Unpivot(Relation):
+    relation: Relation
+    value_col: Identifier
+    name_col: Identifier
+    pivot_cols: ta.Sequence[Identifier]
 
 
 class Table(Relation):

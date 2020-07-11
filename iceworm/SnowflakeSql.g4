@@ -103,9 +103,12 @@ sortItem
 relation
     : relation AS? identifier                                                      #aliasedRelation
     | left=relation ty=joinType? JOIN right=relation (ON cond=booleanExpression)?  #joinRelation
-    | relation ty=(PIVOT | UNPIVOT) '('
+    | relation PIVOT '('
       func=qualifiedName '(' pc=identifier ')'
-      FOR vc=identifier IN '(' (expression (',' expression)*)? ')' ')'             #pivotalRelation
+      FOR vc=identifier IN '(' (expression (',' expression)*)? ')' ')'             #pivotRelation
+    | relation UNPIVOT '('
+      vc=identifier
+      FOR nc=identifier IN '(' identifierList? ')' ')'                             #unpivotRelation
     | '(' select ')'                                                               #selectRelation
     | '(' relation ')'                                                             #parenRelation
     | JINJA                                                                        #jinjaRelation
@@ -118,6 +121,10 @@ groupBy
 
 qualifiedName
     : identifier ('.' identifier)*
+    ;
+
+identifierList
+    : identifier (',' identifier)*
     ;
 
 identifier

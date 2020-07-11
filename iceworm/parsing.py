@@ -154,15 +154,13 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitParenRelation(self, ctx: SnowflakeSqlParser.ParenRelationContext):
         return self.visit(ctx.relation())
 
-    def visitPivotalRelation(self, ctx: SnowflakeSqlParser.PivotalRelationContext):
-        ty = ctx.ty.text
+    def visitPivotRelation(self, ctx: SnowflakeSqlParser.PivotRelationContext):
         relation = self.visit(ctx.relation())
         func = self.visit(ctx.func)
         pivot_col = self.visit(ctx.pc)
         value_col = self.visit(ctx.vc)
         values = [self.visit(e) for e in ctx.expression()]
-        cls = no.PIVOTALS_BY_TAG[ty.upper()]
-        return cls(
+        return no.Pivot(
             relation,
             func,
             pivot_col,
@@ -251,6 +249,18 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         left = self.visit(ctx.primarySelect())
         items = [self.visit(i) for i in ctx.unionItem()]
         return no.UnionSelect(left, items) if items else left
+
+    def visitUnpivotRelation(self, ctx: SnowflakeSqlParser.UnpivotRelationContext):
+        relation = self.visit(ctx.relation())
+        name_col = self.visit(ctx.nc)
+        value_col = self.visit(ctx.vc)
+        pivot_cols = [self.visit(c) for c in ctx.identifierList().identifier()]
+        return no.Unpivot(
+            relation,
+            name_col,
+            value_col,
+            pivot_cols,
+        )
 
     def visitUnquotedIdentifier(self, ctx: SnowflakeSqlParser.UnquotedIdentifierContext):
         return no.Identifier(ctx.getText())
