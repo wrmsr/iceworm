@@ -9,6 +9,7 @@ wheel>=0.34.2
 
 ## actual code deps
 
+docker==4.2.2
 pytest-benchmark==3.2.3
 pytest-randomly==3.4.0
 pytest-xdist==1.32.0

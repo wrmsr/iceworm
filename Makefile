@@ -272,3 +272,26 @@ endef
 .PHONY: dist
 dist: venv
 	$(call do-dist,.venv,0)
+
+
+### Docker
+
+.PHONY: docker-clean
+docker-clean:
+	(cd docker && $(MAKE) clean)
+
+.PHONY: docker-stop
+docker-stop:
+	(cd docker && $(MAKE) stop)
+
+.PHONY: docker-rmdev
+docker-rmdev:
+	(cd docker && $(MAKE) rmdev)
+
+.PHONY: docker-reup
+docker-reup:
+	(cd docker && $(MAKE) reup)
+
+.PHONY: docker-invalidate
+docker-invalidate:
+	date +%s > .dockertimestamp

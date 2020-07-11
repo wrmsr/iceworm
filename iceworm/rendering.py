@@ -231,6 +231,5 @@ class Renderer(dispatch.Class):
         )
 
 
-
 def render(node: no.Node) -> str:
     return Renderer().render(node)
