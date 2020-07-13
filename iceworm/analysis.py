@@ -6,6 +6,7 @@ import typing as ta
 
 from omnibus import collections as ocol
 from omnibus import dispatch
+from omnibus import lang
 from omnibus import properties
 
 from . import nodes as no
@@ -79,8 +80,8 @@ class BasicAnalysis:
 basic = BasicAnalysis
 
 
-class Analyzer(dispatch.Class, ta.Generic[T]):
-    analyze = dispatch.property()
+class Analyzer(dispatch.Class, lang.Abstract, ta.Generic[T]):
+    __call__ = dispatch.property()
 
-    def analyze(self, node: no.Node) -> T:  # noqa
+    def __call__(self, node: no.Node) -> T:  # noqa
         raise TypeError(node)
