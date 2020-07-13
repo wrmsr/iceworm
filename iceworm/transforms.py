@@ -24,7 +24,12 @@ class ReplaceNamesTransform(Transformer):
         self._dct = dct
 
     def __call__(self, node: no.QualifiedNameNode) -> no.QualifiedNameNode:  # noqa
-        raise NotImplementedError
+        try:
+            repl = self._dct[node.name]
+        except KeyError:
+            return node
+        else:
+            return no.QualifiedNameNode.of(repl)
 
 
 def replace_names(node: no.Node, dct: ta.Mapping[QualifiedName, QualifiedName]) -> no.Node:
