@@ -1,5 +1,6 @@
 import typing as ta
 
+from omnibus import dataclasses as dc
 from omnibus import dispatch
 from omnibus import lang
 
@@ -17,15 +18,13 @@ class Transformer(dispatch.Class, lang.Abstract, ta.Generic[NodeT]):
         return node.map(self)
 
 
+@dc.dataclass(frozen=True)
 class ReplaceNamesTransform(Transformer):
-
-    def __init__(self, dct: ta.Mapping[QualifiedName, QualifiedName]) -> None:
-        super().__init__()
-        self._dct = dct
+    dct: ta.Mapping[QualifiedName, QualifiedName]
 
     def __call__(self, node: no.QualifiedNameNode) -> no.QualifiedNameNode:  # noqa
         try:
-            repl = self._dct[node.name]
+            repl = self.dct[node.name]
         except KeyError:
             return node
         else:
