@@ -1,8 +1,12 @@
+import collections.abc
 import enum
 import typing as ta
 
 from omnibus import check
 from omnibus import dataclasses as dc
+from omnibus import properties
+
+from .types import QualifiedName
 
 
 NodeGen = ta.Generator['Node', None, None]
@@ -98,17 +102,44 @@ class UnaryExpr(Expr):
 class Identifier(Expr):
     name: str
 
+    @classmethod
+    def of(cls, obj: ta.Union['Identifier', str]) -> 'Identifier':
+        if isinstance(obj, Identifier):
+            return cls(obj.name)
+        elif isinstance(obj, str):
+            return cls(obj)
+        else:
+            raise TypeError(obj)
+
 
 class QualifiedNameNode(Expr):
     parts: ta.Sequence[Identifier]
+
+    @properties.cached
+    def name(self) -> QualifiedName:
+        return QualifiedName([p.name for p in self.parts])
 
     @property
     def children(self) -> NodeGen:
         yield from self.parts
 
     @classmethod
-    def of(cls, *parts: ta.Union[str, Identifier]) -> 'QualifiedNameNode':
-        return cls([check.isinstance(Identifier(p) if isinstance(p, str) else p, Identifier) for p in parts])
+    def of(
+            cls,
+            obj: ta.Union[
+                'QualifiedNameNode',
+                QualifiedName,
+                ta.Iterable[ta.Union[Identifier, str]],
+            ]
+    ) -> 'QualifiedNameNode':
+        if isinstance(obj, QualifiedNameNode):
+            return cls([Identifier.of(p) for p in obj.parts])
+        elif isinstance(obj, QualifiedName):
+            return cls([Identifier(p) for p in obj])
+        elif isinstance(obj, collections.abc.Iterable):
+            return cls([Identifier.of(p) for p in check.not_isinstance(obj, str)])
+        else:
+            raise TypeError(obj)
 
 
 class Integer(Expr):
