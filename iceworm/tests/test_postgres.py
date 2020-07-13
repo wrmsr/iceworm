@@ -29,7 +29,7 @@ def test_docker_postgres():
             print(conn.scalar(sa.select([sa.func.version()])))
 
             conn.execute(textwrap.dedent("""
-            CREATE EXTENSION IF NOT EXISTS plv8;
+            create extension if not exists plv8;
             """))
 
             conn.execute(textwrap.dedent("""
@@ -37,21 +37,22 @@ def test_docker_postgres():
             """))
 
             conn.execute(textwrap.dedent("""
-            CREATE OR REPLACE FUNCTION plv8_test(keys TEXT[], vals TEXT[]) RETURNS JSON AS $$
+            create or replace function plv8_test(keys text[], vals text[]) returns json as $$
                 var o = {};
                 for(var i=0; i<keys.length; i++){
                     o[keys[i]] = vals[i];
                 }
                 return o;
-            $$ LANGUAGE plv8 IMMUTABLE STRICT;
+            $$ language plv8 immutable strict;
             """))
 
             result = conn.scalar(textwrap.dedent("""
-            SELECT plv8_test(ARRAY['name', 'age'], ARRAY['Tom', '29']);
+            select plv8_test(array['name', 'age'], array['tom', '29']);
             """))
-            assert result == {'name': 'Tom', 'age': '29'}
+            assert result == {'name': 'tom', 'age': '29'}
 
-            conn.execute("""CREATE OR REPLACE TABLE t(id INTEGER PRIMARY KEY)""")
+            conn.execute("""drop table if exists t""")
+            conn.execute("""create table t(id integer primary key)""")
             metadata = sa.MetaData()
             t = sa.Table('t', metadata, autoload=True, autoload_with=engine)
             print(t)
