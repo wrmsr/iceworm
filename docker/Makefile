@@ -5,8 +5,7 @@ DOCKER_IMAGES:= \
 	iceworm-postgres \
 
 DOCKER_COMPOSE_DEFAULT_SERVICES:= \
-	iceworm-postgres-master \
-	iceworm-postgres-slave \
+	iceworm-postgres \
 
 DOCKER_COMPOSE_SERVICES:= \
 	$(DOCKER_COMPOSE_DEFAULT_SERVICES) \

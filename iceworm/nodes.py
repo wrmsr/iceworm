@@ -1,6 +1,7 @@
 import enum
 import typing as ta
 
+from omnibus import check
 from omnibus import dataclasses as dc
 
 
@@ -90,6 +91,10 @@ class Identifier(Expr):
 class QualifiedNameNode(Expr):
     parts: ta.Sequence[Identifier]
 
+    @classmethod
+    def of(cls, *parts: ta.Union[str, Identifier]) -> 'QualifiedNameNode':
+        return cls([check.isinstance(Identifier(p) if isinstance(p, str) else p, Identifier) for p in parts])
+
 
 class Integer(Expr):
     value: int
@@ -130,7 +135,7 @@ class StarExpr(Expr):
 
 class FunctionCall(Expr):
     name: QualifiedNameNode
-    args: ta.Sequence[Expr]
+    args: ta.Sequence[Expr] = ()
     over: ta.Optional[Over] = None
 
 
@@ -270,7 +275,7 @@ class Selectable(Node, abstract=True):
 
 class Select(Selectable):
     items: ta.Sequence[SelectItem]
-    relations: ta.Sequence[Relation]
+    relations: ta.Sequence[Relation] = ()
     where: ta.Optional[Expr] = None
     top_n: ta.Optional[Integer] = None
     set_quantifier: ta.Optional[SetQuantifier] = None
