@@ -7,9 +7,11 @@ from .. import nodes as no
 @pytest.mark.xfail()
 def test_names():
     root = no.Select([
-        no.FunctionCall(
-            no.QualifiedNameNode.of(['a', 'b'])
-        )
+        no.ExprSelectItem(
+            no.FunctionCall(
+                no.QualifiedNameNode.of(['a', 'b'])
+            ),
+        ),
     ])
 
     basic = ana.basic(root)

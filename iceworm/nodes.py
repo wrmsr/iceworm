@@ -1,3 +1,7 @@
+"""
+TODO:
+ - enable type checking
+"""
 import collections.abc
 import enum
 import typing as ta
@@ -117,7 +121,7 @@ class QualifiedNameNode(Expr):
 
     @properties.cached
     def name(self) -> QualifiedName:
-        return QualifiedName([p.name for p in self.parts])
+        return QualifiedName(tuple(p.name for p in self.parts))
 
     @property
     def children(self) -> NodeGen:
