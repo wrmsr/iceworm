@@ -1,11 +1,8 @@
-import pytest
-
 from .. import nodes as no
 from .. import transforms as tfm
 from ..types import QualifiedName
 
 
-@pytest.mark.xfail()
 def test_replace_names():
     root = no.Select([
         no.ExprSelectItem(

@@ -1,10 +1,7 @@
-import pytest
-
 from .. import analysis as ana
 from .. import nodes as no
 
 
-@pytest.mark.xfail()
 def test_names():
     root = no.Select([
         no.ExprSelectItem(

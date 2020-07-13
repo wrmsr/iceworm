@@ -7,7 +7,10 @@ git+https://github.com/wrmsr/omnibus@wrmsr_working
 Jinja2==2.11.2
 PyYAML==5.3.1
 
-pg8000==1.16.0
 PyHive==0.6.2
-snowflake-connector-python==2.2.8
 SQLAlchemy==1.3.18
+pg8000==1.16.0
+snowflake-connector-python==2.2.8
+snowflake-sqlalchemy==1.2.3
+
+docutils==0.15.2

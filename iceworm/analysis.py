@@ -1,6 +1,6 @@
 """
 TODO:
- - parents, dom's, origins/sym resolution (shallow), types
+ - dom's, origins/sym resolution (shallow), types
 """
 import typing as ta
 
