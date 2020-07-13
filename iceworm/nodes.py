@@ -1,8 +1,6 @@
 """
 TODO:
  - enable type checking
- - __init_subclass__ check if children overriden then map overridden
-  - prob req dc fix
 """
 import collections.abc
 import enum
