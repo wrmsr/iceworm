@@ -1,6 +1,8 @@
 """
 TODO:
  - enable type checking
+ - __init_subclass__ check if children overriden then map overridden
+  - prob req dc fix
 """
 import collections.abc
 import enum
@@ -14,6 +16,7 @@ from .types import QualifiedName
 
 
 NodeGen = ta.Generator['Node', None, None]
+NodeMapper = ta.Callable[['Node'], 'Node']
 
 
 class Node(dc.Enum, sealed=True):
@@ -22,6 +25,9 @@ class Node(dc.Enum, sealed=True):
     def children(self) -> NodeGen:
         return
         yield
+
+    def map(self, fn: NodeMapper) -> 'Node':
+        return dc.replace(self)
 
 
 class Expr(Node, abstract=True):
@@ -102,6 +108,12 @@ class UnaryExpr(Expr):
     def children(self) -> NodeGen:
         yield self.value
 
+    def map(self, fn: NodeMapper) -> 'Node':
+        return dc.replace(
+            self,
+            value=fn(self.value),
+        )
+
 
 class Identifier(Expr):
     name: str
@@ -126,6 +138,12 @@ class QualifiedNameNode(Expr):
     @property
     def children(self) -> NodeGen:
         yield from self.parts
+
+    def map(self, fn: NodeMapper) -> 'Node':
+        return dc.replace(
+            self,
+            parts=[fn(p) for p in self.parts],
+        )
 
     @classmethod
     def of(
@@ -180,6 +198,12 @@ class SortItem(Node):
         if self.direction is not None:
             yield self.direction
 
+    def map(self, fn: NodeMapper) -> 'Node':
+        return dc.replace(
+            self,
+            value=fn(self.value),
+        )
+
 
 class Over(Node):
     order_by: ta.Optional[ta.Sequence[SortItem]] = None
@@ -188,6 +212,12 @@ class Over(Node):
     def children(self) -> NodeGen:
         if self.order_by is not None:
             yield from self.order_by
+
+    def map(self, fn: NodeMapper) -> 'Node':
+        return dc.replace(
+            self,
+            order_by=[fn(c) for c in self.order_by] if self.order_by is not None else None,
+        )
 
 
 class StarExpr(Expr):
@@ -205,6 +235,14 @@ class FunctionCall(Expr):
         yield from self.args
         if self.over is not None:
             yield self.over
+
+    def map(self, fn: NodeMapper) -> 'Node':
+        return dc.replace(
+            self,
+            name=fn(self.name),
+            args=[fn(c) for c in self.args],
+            over=fn(self.over) if self.over is not None else None,
+        )
 
 
 class Null(Expr):
@@ -225,7 +263,15 @@ class CaseItem(Node):
 
     @property
     def children(self) -> NodeGen:
-        yield from [self.when, self.then]
+        yield self.whenl
+        yield self.then
+
+    def map(self, fn: NodeMapper) -> 'Node':
+        return dc.replace(
+            self,
+            when=fn(self.when),
+            then=fn(self.then),
+        )
 
 
 class Case(Expr):
@@ -238,6 +284,13 @@ class Case(Expr):
         if self.default is not None:
             yield self.default
 
+    def map(self, fn: NodeMapper) -> 'Node':
+        return dc.replace(
+            self,
+            items=[fn(c) for c in self.items],
+            default=fn(self.default) if self.default is not None else None,
+        )
+
 
 class Cast(Expr):
     value: Expr
@@ -245,7 +298,15 @@ class Cast(Expr):
 
     @property
     def children(self) -> NodeGen:
-        yield from [self.value, self.type]
+        yield self.value
+        yield self.type
+
+    def map(self, fn: NodeMapper) -> 'Node':
+        return dc.replace(
+            self,
+            value=fn(self.value),
+            type=fn(self.type),
+        )
 
 
 class IsNull(Expr):
@@ -256,6 +317,12 @@ class IsNull(Expr):
     def children(self) -> NodeGen:
         yield self.value
 
+    def map(self, fn: NodeMapper) -> 'Node':
+        return dc.replace(
+            self,
+            value=fn(self.value),
+        )
+
 
 class Like(Expr):
     value: Expr
@@ -264,7 +331,15 @@ class Like(Expr):
 
     @property
     def children(self) -> NodeGen:
-        yield from [self.value, self.pattern]
+        yield self.value
+        yield self.pattern
+
+    def map(self, fn: NodeMapper) -> 'Node':
+        return dc.replace(
+            self,
+            value=fn(self.value),
+            pattern=fn(self.pattern),
+        )
 
 
 class InList(Expr):
@@ -285,7 +360,8 @@ class InSelect(Expr):
 
     @property
     def children(self) -> NodeGen:
-        yield from [self.needle, self.haystack]
+        yield self.needle
+        yield self.haystack
 
 
 class Relation(Node, abstract=True):
@@ -316,7 +392,8 @@ class Join(Relation):
 
     @property
     def children(self) -> NodeGen:
-        yield from [self.left, self.right]
+        yield self.left
+        yield self.right
         if self.condition is not None:
             yield self.condition
 
@@ -330,7 +407,10 @@ class Pivot(Relation):
 
     @property
     def children(self) -> NodeGen:
-        yield from [self.relation, self.func, self.pivot_col, self.values]
+        yield self.relation
+        yield self.func
+        yield self.pivot_col
+        yield self.value_col
         yield from self.values
 
 
@@ -342,7 +422,9 @@ class Unpivot(Relation):
 
     @property
     def children(self) -> NodeGen:
-        yield from [self.relation, self.value_col, self.name_col]
+        yield self.relation
+        yield self.value_col
+        yield self.name_col
         yield from self.pivot_cols
 
 
@@ -360,7 +442,8 @@ class AliasedRelation(Relation):
 
     @property
     def children(self) -> NodeGen:
-        yield from [self.relation, self.alias]
+        yield self.relation
+        yield self.alias
 
 
 class SelectItem(Node, abstract=True):
@@ -444,7 +527,8 @@ class Cte(Node):
 
     @property
     def children(self) -> NodeGen:
-        yield from [self.name, self.select]
+        yield self.name
+        yield self.select
 
 
 class CteSelect(Selectable):
