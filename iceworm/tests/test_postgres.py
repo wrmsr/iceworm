@@ -33,7 +33,7 @@ def test_docker_postgres():
             """))
 
             conn.execute(textwrap.dedent("""
-            DO $$ plv8.elog(NOTICE, "hello there!"); $$ LANGUAGE plv8;
+            do $$ plv8.elog(NOTICE, "hello there!"); $$ LANGUAGE plv8;
             """))
 
             conn.execute(textwrap.dedent("""
@@ -51,8 +51,13 @@ def test_docker_postgres():
             """))
             assert result == {'name': 'tom', 'age': '29'}
 
-            conn.execute("""drop table if exists t""")
-            conn.execute("""create table t(id integer primary key)""")
+            conn.execute(textwrap.dedent("""
+            drop table if exists t;
+            """))
+            conn.execute(textwrap.dedent("""
+            create table t(id integer primary key);
+            """))
+
             metadata = sa.MetaData()
             t = sa.Table('t', metadata, autoload=True, autoload_with=engine)
             print(t)
