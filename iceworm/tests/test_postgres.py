@@ -1,3 +1,7 @@
+"""
+TODO:
+ - snowflake engine session sharing
+"""
 import textwrap
 
 from omnibus import docker
@@ -46,3 +50,8 @@ def test_docker_postgres():
             SELECT plv8_test(ARRAY['name', 'age'], ARRAY['Tom', '29']);
             """))
             assert result == {'name': 'Tom', 'age': '29'}
+
+            conn.execute("""CREATE OR REPLACE TABLE t(id INTEGER PRIMARY KEY)""")
+            metadata = sa.MetaData()
+            t = sa.Table('t', metadata, autoload=True, autoload_with=engine)
+            print(t)

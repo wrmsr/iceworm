@@ -3,7 +3,7 @@
 
 ## packaging deps
 
-twine==3.1.1
+twine==3.2.0
 wheel>=0.34.2
 
 
@@ -11,18 +11,18 @@ wheel>=0.34.2
 
 docker==4.2.2
 pytest-benchmark==3.2.3
-pytest-randomly==3.4.0
-pytest-xdist==1.32.0
+pytest-randomly==3.4.1
+pytest-xdist==1.33.0
 pytest==5.4.3
 
 
 ## useful tools
 
 flake8==3.8.3
-ipdb==0.13.2
-ipython==7.15.0
-mypy==0.780
-pipdeptree==0.13.2
+ipdb==0.13.3
+ipython==7.16.1
+mypy==0.782
+pipdeptree==1.0.0
 pyflakes==2.2.0
 sqlparse==0.3.1
 typed-ast==1.4.1
