@@ -5,8 +5,15 @@ from omnibus import check
 from omnibus import dataclasses as dc
 
 
+NodeGen = ta.Generator['Node', None, None]
+
+
 class Node(dc.Enum, sealed=True):
-    pass
+
+    @property
+    def children(self) -> NodeGen:
+        return
+        yield
 
 
 class Expr(Node, abstract=True):
@@ -83,6 +90,10 @@ class UnaryExpr(Expr):
     op: UnaryOp
     value: Expr
 
+    @property
+    def children(self) -> NodeGen:
+        yield self.value
+
 
 class Identifier(Expr):
     name: str
@@ -90,6 +101,10 @@ class Identifier(Expr):
 
 class QualifiedNameNode(Expr):
     parts: ta.Sequence[Identifier]
+
+    @property
+    def children(self) -> NodeGen:
+        yield from self.parts
 
     @classmethod
     def of(cls, *parts: ta.Union[str, Identifier]) -> 'QualifiedNameNode':
@@ -124,9 +139,20 @@ class SortItem(Node):
     value: Expr
     direction: ta.Optional[Direction] = None
 
+    @property
+    def children(self) -> NodeGen:
+        yield self.value
+        if self.direction is not None:
+            yield self.direction
+
 
 class Over(Node):
     order_by: ta.Optional[ta.Sequence[SortItem]] = None
+
+    @property
+    def children(self) -> NodeGen:
+        if self.order_by is not None:
+            yield from self.order_by
 
 
 class StarExpr(Expr):
@@ -137,6 +163,13 @@ class FunctionCall(Expr):
     name: QualifiedNameNode
     args: ta.Sequence[Expr] = ()
     over: ta.Optional[Over] = None
+
+    @property
+    def children(self) -> NodeGen:
+        yield self.name
+        yield from self.args
+        if self.over is not None:
+            yield self.over
 
 
 class Null(Expr):
@@ -155,20 +188,38 @@ class CaseItem(Node):
     when: Expr
     then: Expr
 
+    @property
+    def children(self) -> NodeGen:
+        yield from [self.when, self.then]
+
 
 class Case(Expr):
     items: ta.Sequence[CaseItem]
     default: ta.Optional[Expr] = None
+
+    @property
+    def children(self) -> NodeGen:
+        yield from self.items
+        if self.default is not None:
+            yield self.default
 
 
 class Cast(Expr):
     value: Expr
     type: Identifier
 
+    @property
+    def children(self) -> NodeGen:
+        yield from [self.value, self.type]
+
 
 class IsNull(Expr):
     value: Expr
     not_: bool = False
+
+    @property
+    def children(self) -> NodeGen:
+        yield self.value
 
 
 class Like(Expr):
@@ -176,17 +227,30 @@ class Like(Expr):
     pattern: Expr
     not_: bool = False
 
+    @property
+    def children(self) -> NodeGen:
+        yield from [self.value, self.pattern]
+
 
 class InList(Expr):
     needle: Expr
     haystack: ta.Sequence[Expr]
     not_: bool = False
 
+    @property
+    def children(self) -> NodeGen:
+        yield self.needle
+        yield from self.haystack
+
 
 class InSelect(Expr):
     needle: Expr
     haystack: 'Selectable'
     not_: bool = False
+
+    @property
+    def children(self) -> NodeGen:
+        yield from [self.needle, self.haystack]
 
 
 class Relation(Node, abstract=True):
@@ -215,6 +279,12 @@ class Join(Relation):
     right: Relation
     condition: ta.Optional[Expr] = None
 
+    @property
+    def children(self) -> NodeGen:
+        yield from [self.left, self.right]
+        if self.condition is not None:
+            yield self.condition
+
 
 class Pivot(Relation):
     relation: Relation
@@ -223,6 +293,11 @@ class Pivot(Relation):
     value_col: Identifier
     values: ta.Sequence[Expr]
 
+    @property
+    def children(self) -> NodeGen:
+        yield from [self.relation, self.func, self.pivot_col, self.values]
+        yield from self.values
+
 
 class Unpivot(Relation):
     relation: Relation
@@ -230,14 +305,27 @@ class Unpivot(Relation):
     name_col: Identifier
     pivot_cols: ta.Sequence[Identifier]
 
+    @property
+    def children(self) -> NodeGen:
+        yield from [self.relation, self.value_col, self.name_col]
+        yield from self.pivot_cols
+
 
 class Table(Relation):
     name: QualifiedNameNode
+
+    @property
+    def children(self) -> NodeGen:
+        yield self.name
 
 
 class AliasedRelation(Relation):
     relation: Relation
     alias: Identifier
+
+    @property
+    def children(self) -> NodeGen:
+        yield from [self.relation, self.alias]
 
 
 class SelectItem(Node, abstract=True):
@@ -252,6 +340,12 @@ class ExprSelectItem(Node):
     value: Expr
     label: ta.Optional[Identifier] = None
 
+    @property
+    def children(self) -> NodeGen:
+        yield self.value
+        if self.label is not None:
+            yield self.label
+
 
 class SetQuantifier(enum.Enum):
     DISTINCT = 'distinct'
@@ -264,9 +358,17 @@ SET_QUANTIFIER_MAP: ta.Mapping[str, SetQuantifier] = {v.value: v for v in SetQua
 class GroupItem(Node):
     value: Expr
 
+    @property
+    def children(self) -> NodeGen:
+        yield self.value
+
 
 class GroupBy(Node):
     items: ta.Sequence[GroupItem]
+
+    @property
+    def children(self) -> NodeGen:
+        yield from self.items
 
 
 class Selectable(Node, abstract=True):
@@ -283,33 +385,78 @@ class Select(Selectable):
     having: ta.Optional[Expr] = None
     order_by: ta.Optional[ta.Sequence[SortItem]] = None
 
+    @property
+    def children(self) -> NodeGen:
+        yield from self.items
+        yield from self.relations
+        if self.where is not None:
+            yield self.where
+        if self.top_n is not None:
+            yield self.top_n
+        if self.set_quantifier is not None:
+            yield self.set_quantifier
+        if self.group_by is not None:
+            yield self.group_by
+        if self.having is not None:
+            yield self.having
+        if self.order_by is not None:
+            yield from self.order_by
+
 
 class Cte(Node):
     name: Identifier
     select: 'Selectable'
 
+    @property
+    def children(self) -> NodeGen:
+        yield from [self.name, self.select]
+
 
 class CteSelect(Selectable):
-    ctes: ta.Optional[ta.Sequence[Cte]]
+    ctes: ta.Sequence[Cte]
     select: Selectable
+
+    @property
+    def children(self) -> NodeGen:
+        yield from self.ctes
+        yield self.select
 
 
 class UnionItem(Node):
     right: Selectable
     set_quantifier: SetQuantifier = None
 
+    @property
+    def children(self) -> NodeGen:
+        yield self.right
+        if self.set_quantifier is not None:
+            yield self.set_quantifier
+
 
 class UnionSelect(Selectable):
     left: Selectable
     items: ta.Sequence[UnionItem]
 
+    @property
+    def children(self) -> NodeGen:
+        yield self.left
+        yield from self.items
+
 
 class SelectExpr(Expr):
     select: 'Selectable'
 
+    @property
+    def children(self) -> NodeGen:
+        yield self.select
+
 
 class SelectRelation(Relation):
     select: 'Selectable'
+
+    @property
+    def children(self) -> NodeGen:
+        yield self.select
 
 
 class JinjaExpr(Expr):
@@ -324,3 +471,7 @@ class InJinja(Expr):
     needle: Expr
     text: str
     not_: bool = False
+
+    @property
+    def children(self) -> NodeGen:
+        yield self.needle

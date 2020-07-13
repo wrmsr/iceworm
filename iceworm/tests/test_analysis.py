@@ -12,5 +12,5 @@ def test_names():
         )
     ])
 
-    dct = ana.collect_name_references(root)
-    print(dct)
+    basic = ana.basic(root)
+    print(basic.get_node_type_set(no.QualifiedNameNode))
