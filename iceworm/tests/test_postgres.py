@@ -33,7 +33,7 @@ def test_docker_postgres():
             """))
 
             conn.execute(textwrap.dedent("""
-            do $$ plv8.elog(NOTICE, "hello there!"); $$ LANGUAGE plv8;
+            do $$ plv8.elog(NOTICE, "hello there!"); $$ language plv8;
             """))
 
             conn.execute(textwrap.dedent("""
