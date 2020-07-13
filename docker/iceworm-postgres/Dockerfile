@@ -37,7 +37,3 @@ RUN ( \
   make && \
   make install \
 )
-
-
-COPY docker/omnibus-postgres/docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
