@@ -5,7 +5,7 @@ from .. import parsing
 from .. import rendering
 
 
-def test_iceworm():
+def test_parsing():
     file_paths = sorted(glob.glob(os.path.join(os.path.dirname(__file__), 'sql', '*.sql'), recursive=True))
 
     for file_path in file_paths:

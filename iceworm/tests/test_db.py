@@ -6,7 +6,7 @@ from .. import db
 
 
 @pytest.mark.xfail()
-def test_snowflake():
+def test_db():
     with lang.disposing(sa.create_engine(db.get_url())) as engine:
         with engine.connect() as conn:
             print(conn.scalar('select current_version()'))
