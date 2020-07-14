@@ -52,6 +52,11 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         default = self.visit(ctx.default) if ctx.default is not None else None
         return no.Case(value, items, default)
 
+    def visitCastCallExpression(self, ctx: SnowflakeSqlParser.CastCallExpressionContext):
+        value = self.visit(ctx.expression())
+        type = self.visit(ctx.identifier())
+        return no.CastCall(value, type)
+
     def visitCastValueExpression(self, ctx: SnowflakeSqlParser.CastValueExpressionContext):
         value = self.visit(ctx.valueExpression())
         type = self.visit(ctx.identifier())
@@ -314,6 +319,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         op = no.UNARY_OP_MAP[ctx.op.text.lower()]
         value = self.visit(ctx.booleanExpression())
         return no.UnaryExpr(op, value)
+
+    def visitUnboundedFrame(self, ctx: SnowflakeSqlParser.UnboundedFrameContext):
+        precedence = no.Precedence.PRECEDING if ctx.PRECEDING() is not None else no.Precedence.FOLLOWING
+        return no.UnboundedFrame(precedence)
 
     def visitUnionItem(self, ctx: SnowflakeSqlParser.UnionItemContext):
         right = self.visit(ctx.primarySelect())

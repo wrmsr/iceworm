@@ -297,6 +297,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#castCallExpression.
+    def enterCastCallExpression(self, ctx:SnowflakeSqlParser.CastCallExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#castCallExpression.
+    def exitCastCallExpression(self, ctx:SnowflakeSqlParser.CastCallExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#jinjaExpression.
     def enterJinjaExpression(self, ctx:SnowflakeSqlParser.JinjaExpressionContext):
         pass
@@ -411,6 +420,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#slidingFrameMax.
     def exitSlidingFrameMax(self, ctx:SnowflakeSqlParser.SlidingFrameMaxContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#unboundedFrame.
+    def enterUnboundedFrame(self, ctx:SnowflakeSqlParser.UnboundedFrameContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#unboundedFrame.
+    def exitUnboundedFrame(self, ctx:SnowflakeSqlParser.UnboundedFrameContext):
         pass
 
 

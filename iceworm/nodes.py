@@ -187,6 +187,15 @@ class Frame(Node, abstract=True):
     pass
 
 
+class Precedence(enum.Enum):
+    PRECEDING = 'preceding'
+    FOLLOWING = 'following'
+
+
+class UnboundedFrame(Frame):
+    precedence: Precedence
+
+
 class CumulativeFrameMin(Node, abstract=True):
     pass
 
@@ -220,11 +229,6 @@ class CumulativeFrame(Frame):
     rows_or_range: RowsOrRange
     min: CumulativeFrameMin
     max: CumulativeFrameMax
-
-
-class Precedence(enum.Enum):
-    PRECEDING = 'preceding'
-    FOLLOWING = 'following'
 
 
 class SlidingFrameMin(Node, abstract=True):
@@ -313,6 +317,11 @@ class Case(Expr):
 
 
 class Cast(Expr):
+    value: Expr
+    type: Identifier
+
+
+class CastCall(Expr):
     value: Expr
     type: Identifier
 

@@ -81,6 +81,7 @@ primaryExpression
     | INTERVAL expression                                              #intervalExpression
     | '(' select ')'                                                   #selectExpression
     | '(' expression ')'                                               #parenExpression
+    | CAST '(' expression AS identifier ')'                            #castCallExpression
     | JINJA                                                            #jinjaExpression
     | simpleExpression                                                 #simplePrimaryExpression
     ;
@@ -133,7 +134,8 @@ slidingFrameMax
     ;
 
 frame
-    : (ROWS | RANGE) BETWEEN cumulativeFrameMin AND cumulativeFrameMax  #cumulativeFrame
+    : ROWS UNBOUNDED (PRECEDING | FOLLOWING)                            #unboundedFrame
+    | (ROWS | RANGE) BETWEEN cumulativeFrameMin AND cumulativeFrameMax  #cumulativeFrame
     | ROWS BETWEEN slidingFrameMin AND slidingFrameMax                  #slidingFrame
     ;
 
@@ -257,6 +259,7 @@ ASC: 'asc';
 BETWEEN: 'between';
 BY: 'by';
 CASE: 'case';
+CAST: 'cast';
 CROSS: 'cross';
 CURRENT: 'current';
 DESC: 'desc';

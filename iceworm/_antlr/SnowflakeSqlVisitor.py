@@ -170,6 +170,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#castCallExpression.
+    def visitCastCallExpression(self, ctx:SnowflakeSqlParser.CastCallExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#jinjaExpression.
     def visitJinjaExpression(self, ctx:SnowflakeSqlParser.JinjaExpressionContext):
         return self.visitChildren(ctx)
@@ -232,6 +237,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#slidingFrameMax.
     def visitSlidingFrameMax(self, ctx:SnowflakeSqlParser.SlidingFrameMaxContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#unboundedFrame.
+    def visitUnboundedFrame(self, ctx:SnowflakeSqlParser.UnboundedFrameContext):
         return self.visitChildren(ctx)
 
 

@@ -57,6 +57,9 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Cast) -> str:  # noqa
         return self.render(node.value) + ' :: ' + self.render(node.type)
 
+    def render(self, node: no.CastCall) -> str:  # noqa
+        return 'cast(' + self.render(node.value) + ' as ' + self.render(node.type) + ')'
+
     def render(self, node: no.Cte) -> str:  # noqa
         return self.render(node.name) + ' as ' + paren(self.render(node.select))
 
@@ -273,6 +276,9 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.UnboundedFollowingSlidingFrameMax) -> str:  # noqa
         return 'unbounded following'
+
+    def render(self, node: no.UnboundedFrame) -> str:  # noqa
+        return 'rows unbounded ' + node.precedence.value
 
     def render(self, node: no.UnboundedPrecedingCumulativeFrameMin) -> str:  # noqa
         return 'unbounded preceding'
