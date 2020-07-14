@@ -74,13 +74,13 @@ valueExpression
     ;
 
 primaryExpression
-    : qualifiedName '(' (expression (',' expression)*)? ')' over?  #functionCallExpression
-    | qualifiedName '(' '*' ')' over?                              #starFunctionCallExpression
-    | CASE caseItem* (ELSE expression)? END                        #caseExpression
-    | '(' select ')'                                               #selectExpression
-    | '(' expression ')'                                           #parenExpression
-    | JINJA                                                        #jinjaExpression
-    | simpleExpression                                             #simplePrimaryExpression
+    : qualifiedName '(' (expression (',' expression)*)? ')' over?   #functionCallExpression
+    | qualifiedName '(' '*' ')' over?                               #starFunctionCallExpression
+    | CASE (val=expression)? caseItem* (ELSE default=expression)? END  #caseExpression
+    | '(' select ')'                                                #selectExpression
+    | '(' expression ')'                                            #parenExpression
+    | JINJA                                                         #jinjaExpression
+    | simpleExpression                                              #simplePrimaryExpression
     ;
 
 simpleExpression

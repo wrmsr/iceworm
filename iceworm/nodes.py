@@ -215,6 +215,7 @@ class CaseItem(Node):
 
 
 class Case(Expr):
+    value: ta.Optional[Expr]
     items: ta.Sequence[CaseItem]
     default: ta.Optional[Expr] = None
 

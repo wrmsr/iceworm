@@ -65,6 +65,7 @@ class Cli:
 
                 with open(path, 'r') as f:
                     txt = f.read()
+                txt = txt.lower()
 
                 if self.args.strip_header:
                     lines = txt.splitlines()

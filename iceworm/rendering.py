@@ -45,6 +45,7 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Case) -> str:  # noqa
         return (
                 'case' +
+                ((' ' + self.render(node.value)) if node.value is not None else '') +
                 ((' ' + ' '.join(self.render(i) for i in node.items)) if node.items else '') +
                 ((' else ' + self.render(node.default)) if node.default is not None else '') +
                 ' end'

@@ -30,7 +30,7 @@ select * from t where a = b;
 select f(g(x));
 with a as (select 1) select * from a;
 with a as (with b as (select 1) select * from b) select * from a;
-select case when s = 'c' then v_u when s = 'd' then v_d else 0 end;
+select case v when s = 'c' then v_u when s = 'd' then v_d else 0 end;
 select '1'::int;
 select * from x order by f desc;
 select 1 union select 2;
