@@ -331,6 +331,10 @@ class AllSelectItem(SelectItem):
     pass
 
 
+class IdentifierAllSelectItem(SelectItem):
+    identifier: Identifier
+
+
 class ExprSelectItem(Node):
     value: Expr
     label: ta.Optional[Identifier] = None

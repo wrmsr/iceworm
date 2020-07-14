@@ -99,6 +99,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#identifierAllSelectItem.
+    def enterIdentifierAllSelectItem(self, ctx:SnowflakeSqlParser.IdentifierAllSelectItemContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#identifierAllSelectItem.
+    def exitIdentifierAllSelectItem(self, ctx:SnowflakeSqlParser.IdentifierAllSelectItemContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#expressionSelectItem.
     def enterExpressionSelectItem(self, ctx:SnowflakeSqlParser.ExpressionSelectItemContext):
         pass

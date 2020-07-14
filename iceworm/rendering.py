@@ -100,6 +100,9 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Identifier) -> str:  # noqa
         return quote(node.name, '"')
 
+    def render(self, node: no.IdentifierAllSelectItem) -> str:  # noqa
+        return self.render(node.identifier) + '.*'
+
     def render(self, node: no.Ilike) -> str:  # noqa
         return (
                 self.render(node.value) +

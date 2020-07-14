@@ -44,6 +44,7 @@ topN
 
 selectItem
     : '*'                           #allSelectItem
+    | identifier '.' '*'            #identifierAllSelectItem
     | expression (AS? identifier)?  #expressionSelectItem
     ;
 

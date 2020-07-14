@@ -105,6 +105,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         items = [self.visit(e) for e in ctx.expression()]
         return no.GroupBy(items)
 
+    def visitIdentifierAllSelectItem(self, ctx: SnowflakeSqlParser.IdentifierAllSelectItemContext):
+        identifier = self.visit(ctx.identifier())
+        return no.IdentifierAllSelectItem(identifier)
+
     def visitIlikePredicate(self, ctx: SnowflakeSqlParser.IlikePredicateContext):
         value = self.visit(ctx.value)
         pattern = self.visit(ctx.expression())

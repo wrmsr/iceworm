@@ -60,6 +60,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#identifierAllSelectItem.
+    def visitIdentifierAllSelectItem(self, ctx:SnowflakeSqlParser.IdentifierAllSelectItemContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#expressionSelectItem.
     def visitExpressionSelectItem(self, ctx:SnowflakeSqlParser.ExpressionSelectItemContext):
         return self.visitChildren(ctx)
