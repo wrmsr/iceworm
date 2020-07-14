@@ -201,6 +201,7 @@ class FunctionCall(Node):
     name: QualifiedNameNode
     args: ta.Sequence[Expr] = ()
     kwargs: ta.Sequence[Kwarg] = ()
+    set_quantifier: ta.Optional['SetQuantifier'] = None
     over: ta.Optional[Over] = None
 
 

@@ -81,7 +81,10 @@ class Renderer(dispatch.Class):
     def render(self, node: no.FunctionCall) -> str:  # noqa
         return (
                 self.render(node.name) +
-                paren(', '.join(self.paren_render(a) for a in [*node.args, *node.kwargs])) +
+                '(' +
+                ((node.set_quantifier.value + ' ') if node.set_quantifier is not None else '') +
+                ', '.join(self.paren_render(a) for a in [*node.args, *node.kwargs]) +
+                ')' +
                 ((' over ' + paren(self.render(node.over))) if node.over is not None else '')
         )
 

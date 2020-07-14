@@ -79,8 +79,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitExpressionFunctionCall(self, ctx:SnowflakeSqlParser.ExpressionFunctionCallContext):
         name = self.visit(ctx.qualifiedName())
         args = [self.visit(a) for a in ctx.expression()]
+        set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
+            if ctx.setQuantifier() is not None else None
         over = self.visit(ctx.over()) if ctx.over() is not None else None
-        return no.FunctionCall(name, args=args, over=over)
+        return no.FunctionCall(name, args=args, set_quantifier=set_quantifier, over=over)
 
     def visitExpressionSelectItem(self, ctx: SnowflakeSqlParser.ExpressionSelectItemContext):
         value = self.visit(ctx.expression())

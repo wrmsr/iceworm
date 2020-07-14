@@ -95,9 +95,9 @@ simpleExpression
     ;
 
 functionCall
-    : qualifiedName '(' (expression (',' expression)*)? ')' over?  #expressionFunctionCall
-    | qualifiedName '(' kwarg (',' kwarg)* ')' over?               #kwargFunctionCall
-    | qualifiedName '(' '*' ')' over?                              #starFunctionCall
+    : qualifiedName '(' setQuantifier? (expression (',' expression)*)? ')' over?  #expressionFunctionCall
+    | qualifiedName '(' kwarg (',' kwarg)* ')' over?                              #kwargFunctionCall
+    | qualifiedName '(' '*' ')' over?                                             #starFunctionCall
     ;
 
 kwarg
