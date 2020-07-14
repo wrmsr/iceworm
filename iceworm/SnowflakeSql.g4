@@ -74,13 +74,12 @@ valueExpression
     ;
 
 primaryExpression
-    : qualifiedName '(' (expression (',' expression)*)? ')' over?   #functionCallExpression
-    | qualifiedName '(' '*' ')' over?                               #starFunctionCallExpression
+    : functionCall                                                     #functionCallExpression
     | CASE (val=expression)? caseItem* (ELSE default=expression)? END  #caseExpression
-    | '(' select ')'                                                #selectExpression
-    | '(' expression ')'                                            #parenExpression
-    | JINJA                                                         #jinjaExpression
-    | simpleExpression                                              #simplePrimaryExpression
+    | '(' select ')'                                                   #selectExpression
+    | '(' expression ')'                                               #parenExpression
+    | JINJA                                                            #jinjaExpression
+    | simpleExpression                                                 #simplePrimaryExpression
     ;
 
 simpleExpression
@@ -90,6 +89,16 @@ simpleExpression
     | null
     | true
     | false
+    ;
+
+functionCall
+    : qualifiedName '(' (expression (',' expression)*)? ')' over?  #expressionFunctionCall
+    | qualifiedName '(' kwarg (',' kwarg)* ')' over?               #kwargFunctionCall
+    | qualifiedName '(' '*' ')' over?                              #starFunctionCall
+    ;
+
+kwarg
+    : identifier '=>' expression
     ;
 
 caseItem
@@ -113,6 +122,7 @@ relation
     | relation UNPIVOT '('
       vc=identifier
       FOR nc=identifier IN '(' identifierList? ')' ')'                             #unpivotRelation
+    | functionCall                                                                 #functionCallRelation
     | '(' select ')'                                                               #selectRelation
     | '(' relation ')'                                                             #parenRelation
     | JINJA                                                                        #jinjaRelation

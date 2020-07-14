@@ -140,11 +140,6 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#starFunctionCallExpression.
-    def visitStarFunctionCallExpression(self, ctx:SnowflakeSqlParser.StarFunctionCallExpressionContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by SnowflakeSqlParser#caseExpression.
     def visitCaseExpression(self, ctx:SnowflakeSqlParser.CaseExpressionContext):
         return self.visitChildren(ctx)
@@ -175,6 +170,26 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#expressionFunctionCall.
+    def visitExpressionFunctionCall(self, ctx:SnowflakeSqlParser.ExpressionFunctionCallContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#kwargFunctionCall.
+    def visitKwargFunctionCall(self, ctx:SnowflakeSqlParser.KwargFunctionCallContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#starFunctionCall.
+    def visitStarFunctionCall(self, ctx:SnowflakeSqlParser.StarFunctionCallContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#kwarg.
+    def visitKwarg(self, ctx:SnowflakeSqlParser.KwargContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#caseItem.
     def visitCaseItem(self, ctx:SnowflakeSqlParser.CaseItemContext):
         return self.visitChildren(ctx)
@@ -192,6 +207,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#unpivotRelation.
     def visitUnpivotRelation(self, ctx:SnowflakeSqlParser.UnpivotRelationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#functionCallRelation.
+    def visitFunctionCallRelation(self, ctx:SnowflakeSqlParser.FunctionCallRelationContext):
         return self.visitChildren(ctx)
 
 

@@ -243,15 +243,6 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#starFunctionCallExpression.
-    def enterStarFunctionCallExpression(self, ctx:SnowflakeSqlParser.StarFunctionCallExpressionContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#starFunctionCallExpression.
-    def exitStarFunctionCallExpression(self, ctx:SnowflakeSqlParser.StarFunctionCallExpressionContext):
-        pass
-
-
     # Enter a parse tree produced by SnowflakeSqlParser#caseExpression.
     def enterCaseExpression(self, ctx:SnowflakeSqlParser.CaseExpressionContext):
         pass
@@ -306,6 +297,42 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#expressionFunctionCall.
+    def enterExpressionFunctionCall(self, ctx:SnowflakeSqlParser.ExpressionFunctionCallContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#expressionFunctionCall.
+    def exitExpressionFunctionCall(self, ctx:SnowflakeSqlParser.ExpressionFunctionCallContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#kwargFunctionCall.
+    def enterKwargFunctionCall(self, ctx:SnowflakeSqlParser.KwargFunctionCallContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#kwargFunctionCall.
+    def exitKwargFunctionCall(self, ctx:SnowflakeSqlParser.KwargFunctionCallContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#starFunctionCall.
+    def enterStarFunctionCall(self, ctx:SnowflakeSqlParser.StarFunctionCallContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#starFunctionCall.
+    def exitStarFunctionCall(self, ctx:SnowflakeSqlParser.StarFunctionCallContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#kwarg.
+    def enterKwarg(self, ctx:SnowflakeSqlParser.KwargContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#kwarg.
+    def exitKwarg(self, ctx:SnowflakeSqlParser.KwargContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#caseItem.
     def enterCaseItem(self, ctx:SnowflakeSqlParser.CaseItemContext):
         pass
@@ -339,6 +366,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#unpivotRelation.
     def exitUnpivotRelation(self, ctx:SnowflakeSqlParser.UnpivotRelationContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#functionCallRelation.
+    def enterFunctionCallRelation(self, ctx:SnowflakeSqlParser.FunctionCallRelationContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#functionCallRelation.
+    def exitFunctionCallRelation(self, ctx:SnowflakeSqlParser.FunctionCallRelationContext):
         pass
 
 

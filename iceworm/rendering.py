@@ -81,9 +81,15 @@ class Renderer(dispatch.Class):
     def render(self, node: no.FunctionCall) -> str:  # noqa
         return (
                 self.render(node.name) +
-                paren(', '.join(self.paren_render(a) for a in node.args)) +
+                paren(', '.join(self.paren_render(a) for a in [*node.args, *node.kwargs])) +
                 ((' over ' + paren(self.render(node.over))) if node.over is not None else '')
         )
+
+    def render(self, node: no.FunctionCallExpr) -> str:  # noqa
+        return self.render(node.call)
+
+    def render(self, node: no.FunctionCallRelation) -> str:  # noqa
+        return self.render(node.call)
 
     def render(self, node: no.GroupBy) -> str:  # noqa
         return ', '.join(self.render(i) for i in node.items)
@@ -140,6 +146,9 @@ class Renderer(dispatch.Class):
                 self.render(node.right) +
                 ((' on ' + self.render(node.condition)) if node.condition is not None else '')
         )
+
+    def render(self, node: no.Kwarg) -> str:  # noqa
+        return self.render(node.name) + ' => ' + self.render(node.value)
 
     def render(self, node: no.Like) -> str:  # noqa
         return (

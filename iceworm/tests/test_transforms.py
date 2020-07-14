@@ -6,8 +6,10 @@ from ..types import QualifiedName
 def test_replace_names():
     root = no.Select([
         no.ExprSelectItem(
-            no.FunctionCall(
-                no.QualifiedNameNode.of(['a', 'b'])
+            no.FunctionCallExpr(
+                no.FunctionCall(
+                    no.QualifiedNameNode.of(['a', 'b'])
+                ),
             ),
         ),
     ])

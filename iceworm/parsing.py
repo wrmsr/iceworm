@@ -76,6 +76,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitDecimalNumber(self, ctx: SnowflakeSqlParser.DecimalNumberContext):
         return no.Decimal(ctx.DECIMAL_VALUE().getText())
 
+    def visitExpressionFunctionCall(self, ctx:SnowflakeSqlParser.ExpressionFunctionCallContext):
+        name = self.visit(ctx.qualifiedName())
+        args = [self.visit(a) for a in ctx.expression()]
+        over = self.visit(ctx.over()) if ctx.over() is not None else None
+        return no.FunctionCall(name, args=args, over=over)
+
     def visitExpressionSelectItem(self, ctx: SnowflakeSqlParser.ExpressionSelectItemContext):
         value = self.visit(ctx.expression())
         label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
@@ -87,11 +93,13 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitFloatNumber(self, ctx: SnowflakeSqlParser.FloatNumberContext):
         return no.Float(ctx.FLOAT_VALUE().getText())
 
-    def visitFunctionCallExpression(self, ctx:SnowflakeSqlParser.FunctionCallExpressionContext):
-        name = self.visit(ctx.qualifiedName())
-        args = [self.visit(a) for a in ctx.expression()]
-        over = self.visit(ctx.over()) if ctx.over() is not None else None
-        return no.FunctionCall(name, args, over=over)
+    def visitFunctionCallExpression(self, ctx: SnowflakeSqlParser.FunctionCallExpressionContext):
+        call = self.visit(ctx.functionCall())
+        return no.FunctionCallExpr(call)
+
+    def visitFunctionCallRelation(self, ctx: SnowflakeSqlParser.FunctionCallRelationContext):
+        call = self.visit(ctx.functionCall())
+        return no.FunctionCallRelation(call)
 
     def visitGroupBy(self, ctx: SnowflakeSqlParser.GroupByContext):
         items = [self.visit(e) for e in ctx.expression()]
@@ -138,6 +146,17 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         right = self.visit(ctx.right)
         condition = self.visit(ctx.cond) if ctx.cond is not None else None
         return no.Join(left, type_, right, condition)
+
+    def visitKwarg(self, ctx: SnowflakeSqlParser.KwargContext):
+        name = self.visit(ctx.identifier())
+        value = self.visit(ctx.expression())
+        return no.Kwarg(name, value)
+
+    def visitKwargFunctionCall(self, ctx: SnowflakeSqlParser.KwargFunctionCallContext):
+        name = self.visit(ctx.qualifiedName())
+        kwargs = [self.visit(a) for a in ctx.kwarg()]
+        over = self.visit(ctx.over()) if ctx.over() is not None else None
+        return no.FunctionCall(name, kwargs=kwargs, over=over)
 
     def visitLikePredicate(self, ctx: SnowflakeSqlParser.LikePredicateContext):
         value = self.visit(ctx.value)
@@ -214,11 +233,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         direction = no.DIRECTION_MAP[ctx.direction.text.lower()] if ctx.direction is not None else None
         return no.SortItem(value, direction)
 
-    def visitStarFunctionCallExpression(self, ctx:SnowflakeSqlParser.StarFunctionCallExpressionContext):
+    def visitStarFunctionCall(self, ctx:SnowflakeSqlParser.StarFunctionCallContext):
         name = self.visit(ctx.qualifiedName())
-        args = [no.StarExpr()]
         over = self.visit(ctx.over()) if ctx.over() is not None else None
-        return no.FunctionCall(name, args, over=over)
+        return no.FunctionCall(name, args=[no.StarExpr()], over=over)
 
     def visitString(self, ctx: SnowflakeSqlParser.StringContext):
         value = unquote(ctx.STRING().getText(), "'")

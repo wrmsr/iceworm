@@ -26,7 +26,7 @@ class Node(dc.Enum, sealed=True):
             val = getattr(self, fld.name)
             if isinstance(val, Node):
                 yield val
-            elif isinstance(val, collections.abc.Iterable):
+            elif isinstance(val, collections.abc.Sequence):
                 yield from (item for item in val if isinstance(item, Node))
 
     def map(self: SelfNode, fn: NodeMapper) -> SelfNode:
@@ -35,7 +35,7 @@ class Node(dc.Enum, sealed=True):
             val = getattr(self, fld.name)
             if isinstance(val, Node):
                 kw[fld.name] = fn(val)
-            elif isinstance(val, collections.abc.Iterable):
+            elif isinstance(val, collections.abc.Sequence):
                 kw[fld.name] = [fn(item) if isinstance(item, Node) else item for item in val]
         return dc.replace(self, **kw)
 
@@ -191,10 +191,20 @@ class StarExpr(Expr):
     pass
 
 
-class FunctionCall(Expr):
+class Kwarg(Node):
+    name: Identifier
+    value: Expr
+
+
+class FunctionCall(Node):
     name: QualifiedNameNode
     args: ta.Sequence[Expr] = ()
+    kwargs: ta.Sequence[Kwarg] = ()
     over: ta.Optional[Over] = None
+
+
+class FunctionCallExpr(Expr):
+    call: FunctionCall
 
 
 class Null(Expr):
@@ -288,6 +298,10 @@ class Unpivot(Relation):
     value_col: Identifier
     name_col: Identifier
     pivot_cols: ta.Sequence[Identifier]
+
+
+class FunctionCallRelation(Relation):
+    call: FunctionCall
 
 
 class Table(Relation):

@@ -5,8 +5,10 @@ from .. import nodes as no
 def test_names():
     root = no.Select([
         no.ExprSelectItem(
-            no.FunctionCall(
-                no.QualifiedNameNode.of(['a', 'b'])
+            no.FunctionCallExpr(
+                no.FunctionCall(
+                    no.QualifiedNameNode.of(['a', 'b'])
+                ),
             ),
         ),
     ])
