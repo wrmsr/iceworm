@@ -14,14 +14,14 @@ def get_config() -> ta.Mapping[str, str]:
 
     parser = configparser.ConfigParser()
     parser.read_file(io.StringIO(txt))
-    return dict(parser.items('snowflake'))
+    return {k.lower(): v for k, v in parser.items('snowflake')}
 
 
 @lang.cached_nullary
 def get_url() -> str:
     cfg = get_config()
     not_url_params = {'user', 'password', 'host'}
-    url_params = {k: v for k, v in cfg.items() if k not in not_url_params}
+    url_params = {k.lo: v for k, v in cfg.items() if k not in not_url_params}
     return (
             'snowflake://' +
             cfg['user'] +

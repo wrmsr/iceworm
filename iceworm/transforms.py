@@ -19,7 +19,7 @@ class Transformer(dispatch.Class, lang.Abstract, ta.Generic[NodeT]):
 
 
 @dc.dataclass(frozen=True)
-class ReplaceNamesTransform(Transformer):
+class ReplaceNamesTransformer(Transformer):
     dct: ta.Mapping[QualifiedName, QualifiedName]
 
     def __call__(self, node: no.QualifiedNameNode) -> no.QualifiedNameNode:  # noqa
@@ -32,4 +32,4 @@ class ReplaceNamesTransform(Transformer):
 
 
 def replace_names(node: no.Node, dct: ta.Mapping[QualifiedName, QualifiedName]) -> no.Node:
-    return ReplaceNamesTransform(dct)(node)
+    return ReplaceNamesTransformer(dct)(node)
