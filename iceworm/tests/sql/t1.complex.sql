@@ -4,3 +4,4 @@ select distinct d, sum(e_b_u) as sum from t.f_u_d_c_c_b where dt = left(c_t('u/p
 select * from a where p.u_i is null and not (d.b_u = 'p' and p.u_i is null and c.u_i is null);
 select x, row_number() over (partition by p.c, p.o_t order by datediff(SECOND, p.o_t, p.c_t) desc) as row_num;
 select sum(c.d_h * c.a_s)::float / sum(c.a_s)::float as w_m_h_d;
+select avg(b.s_b) over (partition by b.c, b.u_i order by b.d asc rows between 7 preceding and 1 preceding) as p_w_a_b;

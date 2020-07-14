@@ -109,7 +109,32 @@ caseItem
     ;
 
 over
-    : OVER '(' (PARTITION BY (expression (',' expression)*))? (ORDER BY sortItem (',' sortItem)*)? ')'
+    : OVER '(' (PARTITION BY (expression (',' expression)*))? (ORDER BY sortItem (',' sortItem)*)? frame? ')'
+    ;
+
+cumulativeFrameMin
+    : UNBOUNDED PRECEDING
+    | CURRENT ROW
+    ;
+
+cumulativeFrameMax
+    : UNBOUNDED FOLLOWING
+    | CURRENT ROW
+    ;
+
+slidingFrameMin
+    : INTEGER_VALUE (PRECEDING | FOLLOWING)
+    | UNBOUNDED PRECEDING
+    ;
+
+slidingFrameMax
+    : INTEGER_VALUE (PRECEDING | FOLLOWING)
+    | UNBOUNDED FOLLOWING
+    ;
+
+frame
+    : (ROWS | RANGE) BETWEEN cumulativeFrameMin AND cumulativeFrameMax  #cumulativeFrame
+    | ROWS BETWEEN slidingFrameMin AND slidingFrameMax                  #slidingFrame
     ;
 
 sortItem
@@ -229,14 +254,17 @@ ALL: 'all';
 AND: 'and';
 AS: 'as';
 ASC: 'asc';
+BETWEEN: 'between';
 BY: 'by';
 CASE: 'case';
 CROSS: 'cross';
+CURRENT: 'current';
 DESC: 'desc';
 DISTINCT: 'distinct';
 ELSE: 'else';
 END: 'end';
 FALSE: 'false';
+FOLLOWING: 'following';
 FOR: 'for';
 FROM: 'from';
 FULL: 'full';
@@ -261,11 +289,16 @@ OUTER: 'outer';
 OVER: 'over';
 PARTITION: 'partition';
 PIVOT: 'pivot';
+PRECEDING: 'preceding';
+RANGE: 'range';
 RIGHT: 'right';
+ROW: 'row';
+ROWS: 'rows';
 SELECT: 'select';
 THEN: 'then';
 TOP: 'top';
 TRUE: 'true';
+UNBOUNDED: 'unbounded';
 UNION: 'union';
 UNPIVOT: 'unpivot';
 WHEN: 'when';

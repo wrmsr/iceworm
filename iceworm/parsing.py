@@ -73,6 +73,24 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         select = self.visit(ctx.unionSelect())
         return no.CteSelect(ctes, select) if ctes else select
 
+    def visitCumulativeFrame(self, ctx: SnowflakeSqlParser.CumulativeFrameContext):
+        rows_or_range = no.RowsOrRange.ROWS if ctx.ROWS() is not None else no.RowsOrRange.RANGE
+        min = self.visit(ctx.cumulativeFrameMin())
+        max = self.visit(ctx.cumulativeFrameMax())
+        return no.CumulativeFrame(rows_or_range, min, max)
+
+    def visitCumulativeFrameMin(self, ctx: SnowflakeSqlParser.CumulativeFrameMinContext):
+        if ctx.UNBOUNDED() is not None:
+            return no.UnboundedPrecedingCumulativeFrameMin()
+        else:
+            return no.CurrentRowCumulativeFrameMin()
+
+    def visitCumulativeFrameMax(self, ctx: SnowflakeSqlParser.CumulativeFrameMaxContext):
+        if ctx.UNBOUNDED() is not None:
+            return no.UnboundedFollowingCumulativeFrameMax()
+        else:
+            return no.CurrentRowCumulativeFrameMax()
+
     def visitDecimalNumber(self, ctx: SnowflakeSqlParser.DecimalNumberContext):
         return no.Decimal(ctx.DECIMAL_VALUE().getText())
 
@@ -186,7 +204,8 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitOver(self, ctx: SnowflakeSqlParser.OverContext):
         partition_by = [self.visit(p) for p in ctx.expression()]
         order_by = [self.visit(s) for s in ctx.sortItem()]
-        return no.Over(partition_by=partition_by, order_by=order_by)
+        frame = self.visit(ctx.frame()) if ctx.frame() is not None else None
+        return no.Over(partition_by=partition_by, order_by=order_by, frame=frame)
 
     def visitParenRelation(self, ctx: SnowflakeSqlParser.ParenRelationContext):
         return self.visit(ctx.relation())
@@ -244,6 +263,27 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitSelectRelation(self, ctx: SnowflakeSqlParser.SelectRelationContext):
         select = self.visit(ctx.select())
         return no.SelectRelation(select)
+
+    def visitSlidingFrame(self, ctx: SnowflakeSqlParser.SlidingFrameContext):
+        min = self.visit(ctx.slidingFrameMin())
+        max = self.visit(ctx.slidingFrameMax())
+        return no.SlidingFrame(min, max)
+
+    def visitSlidingFrameMin(self, ctx: SnowflakeSqlParser.SlidingFrameMinContext):
+        if ctx.INTEGER_VALUE() is not None:
+            num = int(ctx.INTEGER_VALUE().getText())
+            precedence = no.Precedence.PRECEDING if ctx.PRECEDING() is not None else no.Precedence.FOLLOWING
+            return no.IntSlidingFrameMin(num, precedence)
+        else:
+            return no.UnboundedPrecedingSlidingFrameMin()
+
+    def visitSlidingFrameMax(self, ctx: SnowflakeSqlParser.SlidingFrameMaxContext):
+        if ctx.INTEGER_VALUE() is not None:
+            num = int(ctx.INTEGER_VALUE().getText())
+            precedence = no.Precedence.PRECEDING if ctx.PRECEDING() is not None else no.Precedence.FOLLOWING
+            return no.IntSlidingFrameMax(num, precedence)
+        else:
+            return no.UnboundedFollowingSlidingFrameMax()
 
     def visitSortItem(self, ctx: SnowflakeSqlParser.SortItemContext):
         value = self.visit(ctx.expression())

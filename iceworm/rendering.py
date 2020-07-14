@@ -63,6 +63,21 @@ class Renderer(dispatch.Class):
     def render(self, node: no.CteSelect) -> str:  # noqa
         return 'with ' + ', '.join(self.render(c) for c in node.ctes) + ' ' + self.render(node.select)
 
+    def render(self, node: no.CumulativeFrame) -> str:  # noqa
+        return (
+                node.rows_or_range.value +
+                ' between ' +
+                self.render(node.min) +
+                ' and ' +
+                self.render(node.max)
+        )
+
+    def render(self, node: no.CurrentRowCumulativeFrameMax) -> str:  # noqa
+        return 'current row'
+
+    def render(self, node: no.CurrentRowCumulativeFrameMin) -> str:  # noqa
+        return 'current row'
+
     def render(self, node: no.Decimal) -> str:  # noqa
         return node.value
 
@@ -145,6 +160,12 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Interval) -> str:  # noqa
         return 'interval ' + self.render(node.value)
 
+    def render(self, node: no.IntSlidingFrameMax) -> str:  # noqa
+        return str(node.num) + ' ' + node.precedence.value
+
+    def render(self, node: no.IntSlidingFrameMin) -> str:  # noqa
+        return str(node.num) + ' ' + node.precedence.value
+
     def render(self, node: no.IsNull) -> str:  # noqa
         return self.render(node.value) + ' is ' + ('not ' if node.not_ else '') + 'null'
 
@@ -182,10 +203,11 @@ class Renderer(dispatch.Class):
         return 'null'
 
     def render(self, node: no.Over) -> str:  # noqa
-        return (
-                (('partition by ' + ', '.join(self.render(e) for e in node.partition_by)) if node.partition_by else '') +  # noqa
-                (('order by ' + ', '.join(self.render(e) for e in node.order_by)) if node.order_by else '')
-        )
+        return ' '.join(p for p in [
+                (('partition by ' + ', '.join(self.render(e) for e in node.partition_by)) if node.partition_by else ''),
+                (('order by ' + ', '.join(self.render(e) for e in node.order_by)) if node.order_by else ''),
+                (self.render(node.frame) if node.frame is not None else ''),
+        ] if p)
 
     def render(self, node: no.Pivot) -> str:  # noqa
         return (
@@ -223,6 +245,14 @@ class Renderer(dispatch.Class):
     def render(self, node: no.SelectRelation) -> str:  # noqa
         return paren(self.render(node.select))
 
+    def render(self, node: no.SlidingFrame) -> str:  # noqa
+        return (
+                'rows between ' +
+                self.render(node.min) +
+                ' and ' +
+                self.render(node.max)
+        )
+
     def render(self, node: no.SortItem) -> str:  # noqa
         return self.render(node.value) + ((' ' + node.direction.value) if node.direction is not None else '')
 
@@ -237,6 +267,18 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.UnaryExpr) -> str:  # noqa
         return node.op.value + ' ' + self.paren_render(node.value)
+
+    def render(self, node: no.UnboundedFollowingCumulativeFrameMax) -> str:  # noqa
+        return 'unbounded following'
+
+    def render(self, node: no.UnboundedFollowingSlidingFrameMax) -> str:  # noqa
+        return 'unbounded following'
+
+    def render(self, node: no.UnboundedPrecedingCumulativeFrameMin) -> str:  # noqa
+        return 'unbounded preceding'
+
+    def render(self, node: no.UnboundedPrecedingSlidingFrameMin) -> str:  # noqa
+        return 'unbounded preceding'
 
     def render(self, node: no.UnionItem) -> str:  # noqa
         return (

@@ -215,6 +215,36 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#cumulativeFrameMin.
+    def visitCumulativeFrameMin(self, ctx:SnowflakeSqlParser.CumulativeFrameMinContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#cumulativeFrameMax.
+    def visitCumulativeFrameMax(self, ctx:SnowflakeSqlParser.CumulativeFrameMaxContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#slidingFrameMin.
+    def visitSlidingFrameMin(self, ctx:SnowflakeSqlParser.SlidingFrameMinContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#slidingFrameMax.
+    def visitSlidingFrameMax(self, ctx:SnowflakeSqlParser.SlidingFrameMaxContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#cumulativeFrame.
+    def visitCumulativeFrame(self, ctx:SnowflakeSqlParser.CumulativeFrameContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#slidingFrame.
+    def visitSlidingFrame(self, ctx:SnowflakeSqlParser.SlidingFrameContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#sortItem.
     def visitSortItem(self, ctx:SnowflakeSqlParser.SortItemContext):
         return self.visitChildren(ctx)

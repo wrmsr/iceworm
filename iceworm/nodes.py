@@ -183,9 +183,85 @@ class SortItem(Node):
     direction: ta.Optional[Direction] = None
 
 
+class Frame(Node, abstract=True):
+    pass
+
+
+class CumulativeFrameMin(Node, abstract=True):
+    pass
+
+
+class UnboundedPrecedingCumulativeFrameMin(CumulativeFrameMin):
+    pass
+
+
+class CurrentRowCumulativeFrameMin(CumulativeFrameMin):
+    pass
+
+
+class CumulativeFrameMax(Node, abstract=True):
+    pass
+
+
+class UnboundedFollowingCumulativeFrameMax(CumulativeFrameMax):
+    pass
+
+
+class CurrentRowCumulativeFrameMax(CumulativeFrameMax):
+    pass
+
+
+class RowsOrRange(enum.Enum):
+    ROWS = 'rows'
+    RANGE = 'range'
+
+
+class CumulativeFrame(Frame):
+    rows_or_range: RowsOrRange
+    min: CumulativeFrameMin
+    max: CumulativeFrameMax
+
+
+class Precedence(enum.Enum):
+    PRECEDING = 'preceding'
+    FOLLOWING = 'following'
+
+
+class SlidingFrameMin(Node, abstract=True):
+    pass
+
+
+class IntSlidingFrameMin(SlidingFrameMin):
+    num: int
+    precedence: Precedence
+
+
+class UnboundedPrecedingSlidingFrameMin(SlidingFrameMin):
+    pass
+
+
+class SlidingFrameMax(Node, abstract=True):
+    pass
+
+
+class IntSlidingFrameMax(SlidingFrameMax):
+    num: int
+    precedence: Precedence
+
+
+class UnboundedFollowingSlidingFrameMax(SlidingFrameMax):
+    pass
+
+
+class SlidingFrame(Frame):
+    min: SlidingFrameMin
+    max: SlidingFrameMax
+
+
 class Over(Node):
     partition_by: ta.Sequence[Expr] = ()
     order_by: ta.Sequence[SortItem] = ()
+    frame: ta.Optional[Frame] = None
 
 
 class StarExpr(Expr):

@@ -378,6 +378,60 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#cumulativeFrameMin.
+    def enterCumulativeFrameMin(self, ctx:SnowflakeSqlParser.CumulativeFrameMinContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#cumulativeFrameMin.
+    def exitCumulativeFrameMin(self, ctx:SnowflakeSqlParser.CumulativeFrameMinContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#cumulativeFrameMax.
+    def enterCumulativeFrameMax(self, ctx:SnowflakeSqlParser.CumulativeFrameMaxContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#cumulativeFrameMax.
+    def exitCumulativeFrameMax(self, ctx:SnowflakeSqlParser.CumulativeFrameMaxContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#slidingFrameMin.
+    def enterSlidingFrameMin(self, ctx:SnowflakeSqlParser.SlidingFrameMinContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#slidingFrameMin.
+    def exitSlidingFrameMin(self, ctx:SnowflakeSqlParser.SlidingFrameMinContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#slidingFrameMax.
+    def enterSlidingFrameMax(self, ctx:SnowflakeSqlParser.SlidingFrameMaxContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#slidingFrameMax.
+    def exitSlidingFrameMax(self, ctx:SnowflakeSqlParser.SlidingFrameMaxContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#cumulativeFrame.
+    def enterCumulativeFrame(self, ctx:SnowflakeSqlParser.CumulativeFrameContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#cumulativeFrame.
+    def exitCumulativeFrame(self, ctx:SnowflakeSqlParser.CumulativeFrameContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#slidingFrame.
+    def enterSlidingFrame(self, ctx:SnowflakeSqlParser.SlidingFrameContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#slidingFrame.
+    def exitSlidingFrame(self, ctx:SnowflakeSqlParser.SlidingFrameContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#sortItem.
     def enterSortItem(self, ctx:SnowflakeSqlParser.SortItemContext):
         pass
