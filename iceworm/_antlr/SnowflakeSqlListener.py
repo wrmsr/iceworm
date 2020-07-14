@@ -207,6 +207,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#ilikePredicate.
+    def enterIlikePredicate(self, ctx:SnowflakeSqlParser.IlikePredicateContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#ilikePredicate.
+    def exitIlikePredicate(self, ctx:SnowflakeSqlParser.IlikePredicateContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#primaryValueExpression.
     def enterPrimaryValueExpression(self, ctx:SnowflakeSqlParser.PrimaryValueExpressionContext):
         pass
@@ -393,6 +402,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#aliasedRelation.
     def exitAliasedRelation(self, ctx:SnowflakeSqlParser.AliasedRelationContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#lateralRelation.
+    def enterLateralRelation(self, ctx:SnowflakeSqlParser.LateralRelationContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#lateralRelation.
+    def exitLateralRelation(self, ctx:SnowflakeSqlParser.LateralRelationContext):
         pass
 
 

@@ -246,6 +246,12 @@ class Like(Expr):
     not_: bool = False
 
 
+class Ilike(Expr):
+    value: Expr
+    pattern: Expr
+    not_: bool = False
+
+
 class InList(Expr):
     needle: Expr
     haystack: ta.Sequence[Expr]
@@ -298,6 +304,10 @@ class Unpivot(Relation):
     value_col: Identifier
     name_col: Identifier
     pivot_cols: ta.Sequence[Identifier]
+
+
+class Lateral(Relation):
+    relation: Relation
 
 
 class FunctionCallRelation(Relation):

@@ -120,6 +120,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#ilikePredicate.
+    def visitIlikePredicate(self, ctx:SnowflakeSqlParser.IlikePredicateContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#primaryValueExpression.
     def visitPrimaryValueExpression(self, ctx:SnowflakeSqlParser.PrimaryValueExpressionContext):
         return self.visitChildren(ctx)
@@ -222,6 +227,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#aliasedRelation.
     def visitAliasedRelation(self, ctx:SnowflakeSqlParser.AliasedRelationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#lateralRelation.
+    def visitLateralRelation(self, ctx:SnowflakeSqlParser.LateralRelationContext):
         return self.visitChildren(ctx)
 
 

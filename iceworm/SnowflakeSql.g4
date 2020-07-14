@@ -65,6 +65,7 @@ predicate[ParserRuleContext value]
     | NOT? IN '(' select ')'                        #inSelectPredicate
     | NOT? IN JINJA                                 #inJinjaPredicate
     | NOT? LIKE expression                          #likePredicate
+    | NOT? ILIKE expression                         #ilikePredicate
     ;
 
 valueExpression
@@ -122,6 +123,7 @@ relation
     | relation UNPIVOT '('
       vc=identifier
       FOR nc=identifier IN '(' identifierList? ')' ')'                             #unpivotRelation
+    | LATERAL relation                                                             #lateralRelation
     | functionCall                                                                 #functionCallRelation
     | '(' select ')'                                                               #selectRelation
     | '(' relation ')'                                                             #parenRelation
@@ -238,10 +240,12 @@ FROM: 'from';
 FULL: 'full';
 GROUP: 'group';
 HAVING: 'having';
+ILIKE: 'ilike';
 IN: 'in';
 INNER: 'inner';
 IS: 'is';
 JOIN: 'join';
+LATERAL: 'lateral';
 LEFT: 'left';
 LIKE: 'like';
 NATURAL: 'natural';

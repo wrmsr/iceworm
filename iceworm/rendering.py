@@ -100,6 +100,14 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Identifier) -> str:  # noqa
         return quote(node.name, '"')
 
+    def render(self, node: no.Ilike) -> str:  # noqa
+        return (
+                self.render(node.value) +
+                (' not' if node.not_ else '') +
+                ' ilike ' +
+                self.render(node.pattern)
+        )
+
     def render(self, node: no.InJinja) -> str:  # noqa
         return (
                 self.render(node.needle) +
@@ -149,6 +157,9 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.Kwarg) -> str:  # noqa
         return self.render(node.name) + ' => ' + self.render(node.value)
+
+    def render(self, node: no.Lateral) -> str:  # noqa
+        return 'lateral ' + self.render(node.relation)
 
     def render(self, node: no.Like) -> str:  # noqa
         return (

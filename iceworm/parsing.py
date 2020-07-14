@@ -105,6 +105,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         items = [self.visit(e) for e in ctx.expression()]
         return no.GroupBy(items)
 
+    def visitIlikePredicate(self, ctx: SnowflakeSqlParser.IlikePredicateContext):
+        value = self.visit(ctx.value)
+        pattern = self.visit(ctx.expression())
+        not_ = ctx.NOT() is not None
+        return no.Ilike(value, pattern, not_=not_)
+
     def visitInJinjaPredicate(self, ctx: SnowflakeSqlParser.InJinjaPredicateContext):
         needle = self.visit(ctx.value)
         text = strip_jinja(ctx.JINJA().getText())
