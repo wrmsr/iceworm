@@ -72,6 +72,7 @@ valueExpression
     : primaryExpression                                      #primaryValueExpression
     | op=unaryOp valueExpression                             #unaryValueExpression
     | left=valueExpression op=arithOp right=valueExpression  #arithValueExpression
+    | valueExpression ':' identifier                         #elementValueExpression
     | valueExpression '::' typeSpec                          #castValueExpression
     ;
 
@@ -332,7 +333,7 @@ FLOAT_VALUE
     ;
 
 IDENTIFIER
-    : (LETTER | '_') (LETTER | DIGIT | '_' | '@' | ':' | '$')*
+    : (LETTER | '_') (LETTER | DIGIT | '_' | '@' | '$')*
     ;
 
 QUOTED_IDENTIFIER

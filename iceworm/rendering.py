@@ -90,6 +90,9 @@ class Renderer(dispatch.Class):
     def render(self, node: no.ETrue) -> str:  # noqa
         return 'true'
 
+    def render(self, node: no.Element) -> str:  # noqa
+        return self.render(node.value) + ':' + self.render(node.name)
+
     def render(self, node: no.ExprSelectItem) -> str:  # noqa
         return self.paren_render(node.value) + ((' as ' + self.render(node.label)) if node.label is not None else '')
 

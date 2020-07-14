@@ -316,6 +316,11 @@ class Case(Expr):
     default: ta.Optional[Expr] = None
 
 
+class Element(Expr):
+    value: Expr
+    name: Identifier
+
+
 class TypeSpec(Node):
     name: Identifier
     args: ta.Sequence[Expr] = ()

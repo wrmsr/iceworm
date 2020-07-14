@@ -243,6 +243,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#elementValueExpression.
+    def enterElementValueExpression(self, ctx:SnowflakeSqlParser.ElementValueExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#elementValueExpression.
+    def exitElementValueExpression(self, ctx:SnowflakeSqlParser.ElementValueExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#arithValueExpression.
     def enterArithValueExpression(self, ctx:SnowflakeSqlParser.ArithValueExpressionContext):
         pass

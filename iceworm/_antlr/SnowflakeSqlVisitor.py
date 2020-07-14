@@ -140,6 +140,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#elementValueExpression.
+    def visitElementValueExpression(self, ctx:SnowflakeSqlParser.ElementValueExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#arithValueExpression.
     def visitArithValueExpression(self, ctx:SnowflakeSqlParser.ArithValueExpressionContext):
         return self.visitChildren(ctx)

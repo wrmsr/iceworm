@@ -99,6 +99,11 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitDecimalNumber(self, ctx: SnowflakeSqlParser.DecimalNumberContext):
         return no.Decimal(ctx.DECIMAL_VALUE().getText())
 
+    def visitElementValueExpression(self, ctx: SnowflakeSqlParser.ElementValueExpressionContext):
+        value = self.visit(ctx.valueExpression())
+        name = self.visit(ctx.identifier())
+        return no.Element(value, name)
+
     def visitExpressionFunctionCall(self, ctx:SnowflakeSqlParser.ExpressionFunctionCallContext):
         name = self.visit(ctx.qualifiedName())
         args = [self.visit(a) for a in ctx.expression()]
