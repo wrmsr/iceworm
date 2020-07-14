@@ -220,6 +220,10 @@ class EFalse(Expr):
     pass
 
 
+class Interval(Expr):
+    value: Expr
+
+
 class CaseItem(Node):
     when: Expr
     then: Expr

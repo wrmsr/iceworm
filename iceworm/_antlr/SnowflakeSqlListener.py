@@ -270,6 +270,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#intervalExpression.
+    def enterIntervalExpression(self, ctx:SnowflakeSqlParser.IntervalExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#intervalExpression.
+    def exitIntervalExpression(self, ctx:SnowflakeSqlParser.IntervalExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#selectExpression.
     def enterSelectExpression(self, ctx:SnowflakeSqlParser.SelectExpressionContext):
         pass

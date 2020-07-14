@@ -78,6 +78,7 @@ valueExpression
 primaryExpression
     : functionCall                                                     #functionCallExpression
     | CASE (val=expression)? caseItem* (ELSE default=expression)? END  #caseExpression
+    | INTERVAL expression                                              #intervalExpression
     | '(' select ')'                                                   #selectExpression
     | '(' expression ')'                                               #parenExpression
     | JINJA                                                            #jinjaExpression
@@ -244,6 +245,7 @@ HAVING: 'having';
 ILIKE: 'ilike';
 IN: 'in';
 INNER: 'inner';
+INTERVAL: 'interval';
 IS: 'is';
 JOIN: 'join';
 LATERAL: 'lateral';

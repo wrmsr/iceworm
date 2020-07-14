@@ -155,6 +155,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#intervalExpression.
+    def visitIntervalExpression(self, ctx:SnowflakeSqlParser.IntervalExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#selectExpression.
     def visitSelectExpression(self, ctx:SnowflakeSqlParser.SelectExpressionContext):
         return self.visitChildren(ctx)

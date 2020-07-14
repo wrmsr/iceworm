@@ -139,6 +139,9 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Integer) -> str:  # noqa
         return str(node.value)
 
+    def render(self, node: no.Interval) -> str:  # noqa
+        return 'interval ' + self.render(node.value)
+
     def render(self, node: no.IsNull) -> str:  # noqa
         return self.render(node.value) + ' is ' + ('not ' if node.not_ else '') + 'null'
 

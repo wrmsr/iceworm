@@ -136,6 +136,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitIntegerNumber(self, ctx: SnowflakeSqlParser.IntegerNumberContext):
         return no.Integer(int(ctx.INTEGER_VALUE().getText()))
 
+    def visitIntervalExpression(self, ctx: SnowflakeSqlParser.IntervalExpressionContext):
+        value = self.visit(ctx.expression())
+        return no.Interval(value)
+
     def visitIsNullPredicate(self, ctx: SnowflakeSqlParser.IsNullPredicateContext):
         value = self.visit(ctx.value)
         not_ = ctx.NOT() is not None

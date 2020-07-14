@@ -69,3 +69,4 @@ select * from t, lateral (select * from u) t;
 select * from t, lateral (select * from u) as t;
 select * from t, lateral f(x => x + 1);
 select * from t join lateral (select * from u);
+select interval 'x';
