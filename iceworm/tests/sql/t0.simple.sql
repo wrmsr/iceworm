@@ -79,3 +79,4 @@ select f(x => 1, y => 2);
 select f(outer => 2);
 select x:y;
 select x:y::int;
+select '?';

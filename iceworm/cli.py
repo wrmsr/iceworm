@@ -79,7 +79,7 @@ class Cli:
         paths = sorted(paths)
 
         for i, path in enumerate(paths):
-            log.info(f'Parsing {i} / {len(paths)} ({i / len(paths):0.02f}%) : {path}')
+            log.info(f'Parsing {i} / {len(paths)} ({i * 100. / len(paths):0.02f}%) : {path}')
 
             with open(path, 'r') as f:
                 txt = f.read()
