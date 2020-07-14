@@ -252,6 +252,7 @@ unquotedIdentifier
     : IDENTIFIER
 
     | LEFT
+    | OUTER
     | RIGHT
 
     ;

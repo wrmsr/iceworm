@@ -78,8 +78,8 @@ def serializedATN():
         buf.write("\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62\64")
         buf.write("\668:<>@BDFHJLNPRTVX\2\13\4\2\30\3099\4\2&&??\4\2@@CC")
         buf.write("\4\2\32\32!!\4\2\27\27\"\"\3\2\13\21\4\2\7\7\22\26\3\2")
-        buf.write("\22\23\5\2\63\63AARR\2\u02a4\2Z\3\2\2\2\4`\3\2\2\2\6b")
-        buf.write("\3\2\2\2\bm\3\2\2\2\nq\3\2\2\2\fw\3\2\2\2\16~\3\2\2\2")
+        buf.write("\22\23\6\2\63\63;;AARR\2\u02a4\2Z\3\2\2\2\4`\3\2\2\2\6")
+        buf.write("b\3\2\2\2\bm\3\2\2\2\nq\3\2\2\2\fw\3\2\2\2\16~\3\2\2\2")
         buf.write("\20\u0084\3\2\2\2\22\u00b7\3\2\2\2\24\u00c6\3\2\2\2\26")
         buf.write("\u00c8\3\2\2\2\30\u00d1\3\2\2\2\32\u0109\3\2\2\2\34\u0110")
         buf.write("\3\2\2\2\36\u0141\3\2\2\2 \u0149\3\2\2\2\"\u014b\3\2\2")
@@ -1343,7 +1343,7 @@ class SnowflakeSqlParser ( Parser ):
                 self.state = 194
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if ((((_la - 23)) & ~0x3f) == 0 and ((1 << (_la - 23)) & ((1 << (SnowflakeSqlParser.AS - 23)) | (1 << (SnowflakeSqlParser.LEFT - 23)) | (1 << (SnowflakeSqlParser.RIGHT - 23)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 23)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 23)))) != 0):
+                if ((((_la - 23)) & ~0x3f) == 0 and ((1 << (_la - 23)) & ((1 << (SnowflakeSqlParser.AS - 23)) | (1 << (SnowflakeSqlParser.LEFT - 23)) | (1 << (SnowflakeSqlParser.OUTER - 23)) | (1 << (SnowflakeSqlParser.RIGHT - 23)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 23)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 23)))) != 0):
                     self.state = 191
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
@@ -1534,7 +1534,7 @@ class SnowflakeSqlParser ( Parser ):
             self.state = 207
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [SnowflakeSqlParser.T__2, SnowflakeSqlParser.T__15, SnowflakeSqlParser.T__16, SnowflakeSqlParser.CASE, SnowflakeSqlParser.CAST, SnowflakeSqlParser.FALSE, SnowflakeSqlParser.INTERVAL, SnowflakeSqlParser.LEFT, SnowflakeSqlParser.NULL, SnowflakeSqlParser.RIGHT, SnowflakeSqlParser.TRUE, SnowflakeSqlParser.STRING, SnowflakeSqlParser.INTEGER_VALUE, SnowflakeSqlParser.DECIMAL_VALUE, SnowflakeSqlParser.FLOAT_VALUE, SnowflakeSqlParser.IDENTIFIER, SnowflakeSqlParser.QUOTED_IDENTIFIER, SnowflakeSqlParser.JINJA]:
+            if token in [SnowflakeSqlParser.T__2, SnowflakeSqlParser.T__15, SnowflakeSqlParser.T__16, SnowflakeSqlParser.CASE, SnowflakeSqlParser.CAST, SnowflakeSqlParser.FALSE, SnowflakeSqlParser.INTERVAL, SnowflakeSqlParser.LEFT, SnowflakeSqlParser.NULL, SnowflakeSqlParser.OUTER, SnowflakeSqlParser.RIGHT, SnowflakeSqlParser.TRUE, SnowflakeSqlParser.STRING, SnowflakeSqlParser.INTEGER_VALUE, SnowflakeSqlParser.DECIMAL_VALUE, SnowflakeSqlParser.FLOAT_VALUE, SnowflakeSqlParser.IDENTIFIER, SnowflakeSqlParser.QUOTED_IDENTIFIER, SnowflakeSqlParser.JINJA]:
                 localctx = SnowflakeSqlParser.PredicatedBooleanExpressionContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
@@ -2118,7 +2118,7 @@ class SnowflakeSqlParser ( Parser ):
             self.state = 270
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [SnowflakeSqlParser.T__2, SnowflakeSqlParser.CASE, SnowflakeSqlParser.CAST, SnowflakeSqlParser.FALSE, SnowflakeSqlParser.INTERVAL, SnowflakeSqlParser.LEFT, SnowflakeSqlParser.NULL, SnowflakeSqlParser.RIGHT, SnowflakeSqlParser.TRUE, SnowflakeSqlParser.STRING, SnowflakeSqlParser.INTEGER_VALUE, SnowflakeSqlParser.DECIMAL_VALUE, SnowflakeSqlParser.FLOAT_VALUE, SnowflakeSqlParser.IDENTIFIER, SnowflakeSqlParser.QUOTED_IDENTIFIER, SnowflakeSqlParser.JINJA]:
+            if token in [SnowflakeSqlParser.T__2, SnowflakeSqlParser.CASE, SnowflakeSqlParser.CAST, SnowflakeSqlParser.FALSE, SnowflakeSqlParser.INTERVAL, SnowflakeSqlParser.LEFT, SnowflakeSqlParser.NULL, SnowflakeSqlParser.OUTER, SnowflakeSqlParser.RIGHT, SnowflakeSqlParser.TRUE, SnowflakeSqlParser.STRING, SnowflakeSqlParser.INTEGER_VALUE, SnowflakeSqlParser.DECIMAL_VALUE, SnowflakeSqlParser.FLOAT_VALUE, SnowflakeSqlParser.IDENTIFIER, SnowflakeSqlParser.QUOTED_IDENTIFIER, SnowflakeSqlParser.JINJA]:
                 localctx = SnowflakeSqlParser.PrimaryValueExpressionContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
@@ -2457,7 +2457,7 @@ class SnowflakeSqlParser ( Parser ):
                 self.state = 287
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__2) | (1 << SnowflakeSqlParser.T__15) | (1 << SnowflakeSqlParser.T__16) | (1 << SnowflakeSqlParser.CASE) | (1 << SnowflakeSqlParser.CAST) | (1 << SnowflakeSqlParser.FALSE) | (1 << SnowflakeSqlParser.INTERVAL) | (1 << SnowflakeSqlParser.LEFT) | (1 << SnowflakeSqlParser.NOT) | (1 << SnowflakeSqlParser.NULL) | (1 << SnowflakeSqlParser.RIGHT))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (SnowflakeSqlParser.TRUE - 69)) | (1 << (SnowflakeSqlParser.STRING - 69)) | (1 << (SnowflakeSqlParser.INTEGER_VALUE - 69)) | (1 << (SnowflakeSqlParser.DECIMAL_VALUE - 69)) | (1 << (SnowflakeSqlParser.FLOAT_VALUE - 69)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 69)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 69)) | (1 << (SnowflakeSqlParser.JINJA - 69)))) != 0):
+                if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__2) | (1 << SnowflakeSqlParser.T__15) | (1 << SnowflakeSqlParser.T__16) | (1 << SnowflakeSqlParser.CASE) | (1 << SnowflakeSqlParser.CAST) | (1 << SnowflakeSqlParser.FALSE) | (1 << SnowflakeSqlParser.INTERVAL) | (1 << SnowflakeSqlParser.LEFT) | (1 << SnowflakeSqlParser.NOT) | (1 << SnowflakeSqlParser.NULL) | (1 << SnowflakeSqlParser.OUTER) | (1 << SnowflakeSqlParser.RIGHT))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (SnowflakeSqlParser.TRUE - 69)) | (1 << (SnowflakeSqlParser.STRING - 69)) | (1 << (SnowflakeSqlParser.INTEGER_VALUE - 69)) | (1 << (SnowflakeSqlParser.DECIMAL_VALUE - 69)) | (1 << (SnowflakeSqlParser.FLOAT_VALUE - 69)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 69)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 69)) | (1 << (SnowflakeSqlParser.JINJA - 69)))) != 0):
                     self.state = 286
                     localctx.val = self.expression()
 
@@ -2616,7 +2616,7 @@ class SnowflakeSqlParser ( Parser ):
             self.state = 327
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [SnowflakeSqlParser.LEFT, SnowflakeSqlParser.RIGHT, SnowflakeSqlParser.IDENTIFIER, SnowflakeSqlParser.QUOTED_IDENTIFIER]:
+            if token in [SnowflakeSqlParser.LEFT, SnowflakeSqlParser.OUTER, SnowflakeSqlParser.RIGHT, SnowflakeSqlParser.IDENTIFIER, SnowflakeSqlParser.QUOTED_IDENTIFIER]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 321
                 self.qualifiedName()
@@ -2713,7 +2713,7 @@ class SnowflakeSqlParser ( Parser ):
                 self.state = 339
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if ((((_la - 35)) & ~0x3f) == 0 and ((1 << (_la - 35)) & ((1 << (SnowflakeSqlParser.FALSE - 35)) | (1 << (SnowflakeSqlParser.LEFT - 35)) | (1 << (SnowflakeSqlParser.NULL - 35)) | (1 << (SnowflakeSqlParser.RIGHT - 35)) | (1 << (SnowflakeSqlParser.TRUE - 35)) | (1 << (SnowflakeSqlParser.STRING - 35)) | (1 << (SnowflakeSqlParser.INTEGER_VALUE - 35)) | (1 << (SnowflakeSqlParser.DECIMAL_VALUE - 35)) | (1 << (SnowflakeSqlParser.FLOAT_VALUE - 35)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 35)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 35)))) != 0):
+                if ((((_la - 35)) & ~0x3f) == 0 and ((1 << (_la - 35)) & ((1 << (SnowflakeSqlParser.FALSE - 35)) | (1 << (SnowflakeSqlParser.LEFT - 35)) | (1 << (SnowflakeSqlParser.NULL - 35)) | (1 << (SnowflakeSqlParser.OUTER - 35)) | (1 << (SnowflakeSqlParser.RIGHT - 35)) | (1 << (SnowflakeSqlParser.TRUE - 35)) | (1 << (SnowflakeSqlParser.STRING - 35)) | (1 << (SnowflakeSqlParser.INTEGER_VALUE - 35)) | (1 << (SnowflakeSqlParser.DECIMAL_VALUE - 35)) | (1 << (SnowflakeSqlParser.FLOAT_VALUE - 35)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 35)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 35)))) != 0):
                     self.state = 331
                     self.simpleExpression()
                     self.state = 336
@@ -2886,7 +2886,7 @@ class SnowflakeSqlParser ( Parser ):
                 self.state = 357
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__2) | (1 << SnowflakeSqlParser.T__15) | (1 << SnowflakeSqlParser.T__16) | (1 << SnowflakeSqlParser.CASE) | (1 << SnowflakeSqlParser.CAST) | (1 << SnowflakeSqlParser.FALSE) | (1 << SnowflakeSqlParser.INTERVAL) | (1 << SnowflakeSqlParser.LEFT) | (1 << SnowflakeSqlParser.NOT) | (1 << SnowflakeSqlParser.NULL) | (1 << SnowflakeSqlParser.RIGHT))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (SnowflakeSqlParser.TRUE - 69)) | (1 << (SnowflakeSqlParser.STRING - 69)) | (1 << (SnowflakeSqlParser.INTEGER_VALUE - 69)) | (1 << (SnowflakeSqlParser.DECIMAL_VALUE - 69)) | (1 << (SnowflakeSqlParser.FLOAT_VALUE - 69)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 69)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 69)) | (1 << (SnowflakeSqlParser.JINJA - 69)))) != 0):
+                if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__2) | (1 << SnowflakeSqlParser.T__15) | (1 << SnowflakeSqlParser.T__16) | (1 << SnowflakeSqlParser.CASE) | (1 << SnowflakeSqlParser.CAST) | (1 << SnowflakeSqlParser.FALSE) | (1 << SnowflakeSqlParser.INTERVAL) | (1 << SnowflakeSqlParser.LEFT) | (1 << SnowflakeSqlParser.NOT) | (1 << SnowflakeSqlParser.NULL) | (1 << SnowflakeSqlParser.OUTER) | (1 << SnowflakeSqlParser.RIGHT))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (SnowflakeSqlParser.TRUE - 69)) | (1 << (SnowflakeSqlParser.STRING - 69)) | (1 << (SnowflakeSqlParser.INTEGER_VALUE - 69)) | (1 << (SnowflakeSqlParser.DECIMAL_VALUE - 69)) | (1 << (SnowflakeSqlParser.FLOAT_VALUE - 69)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 69)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 69)) | (1 << (SnowflakeSqlParser.JINJA - 69)))) != 0):
                     self.state = 349
                     self.expression()
                     self.state = 354
@@ -4286,7 +4286,7 @@ class SnowflakeSqlParser ( Parser ):
                         self.state = 521
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
-                        if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__2) | (1 << SnowflakeSqlParser.T__15) | (1 << SnowflakeSqlParser.T__16) | (1 << SnowflakeSqlParser.CASE) | (1 << SnowflakeSqlParser.CAST) | (1 << SnowflakeSqlParser.FALSE) | (1 << SnowflakeSqlParser.INTERVAL) | (1 << SnowflakeSqlParser.LEFT) | (1 << SnowflakeSqlParser.NOT) | (1 << SnowflakeSqlParser.NULL) | (1 << SnowflakeSqlParser.RIGHT))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (SnowflakeSqlParser.TRUE - 69)) | (1 << (SnowflakeSqlParser.STRING - 69)) | (1 << (SnowflakeSqlParser.INTEGER_VALUE - 69)) | (1 << (SnowflakeSqlParser.DECIMAL_VALUE - 69)) | (1 << (SnowflakeSqlParser.FLOAT_VALUE - 69)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 69)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 69)) | (1 << (SnowflakeSqlParser.JINJA - 69)))) != 0):
+                        if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__2) | (1 << SnowflakeSqlParser.T__15) | (1 << SnowflakeSqlParser.T__16) | (1 << SnowflakeSqlParser.CASE) | (1 << SnowflakeSqlParser.CAST) | (1 << SnowflakeSqlParser.FALSE) | (1 << SnowflakeSqlParser.INTERVAL) | (1 << SnowflakeSqlParser.LEFT) | (1 << SnowflakeSqlParser.NOT) | (1 << SnowflakeSqlParser.NULL) | (1 << SnowflakeSqlParser.OUTER) | (1 << SnowflakeSqlParser.RIGHT))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (SnowflakeSqlParser.TRUE - 69)) | (1 << (SnowflakeSqlParser.STRING - 69)) | (1 << (SnowflakeSqlParser.INTEGER_VALUE - 69)) | (1 << (SnowflakeSqlParser.DECIMAL_VALUE - 69)) | (1 << (SnowflakeSqlParser.FLOAT_VALUE - 69)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 69)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 69)) | (1 << (SnowflakeSqlParser.JINJA - 69)))) != 0):
                             self.state = 513
                             self.expression()
                             self.state = 518
@@ -4333,7 +4333,7 @@ class SnowflakeSqlParser ( Parser ):
                         self.state = 535
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
-                        if ((((_la - 49)) & ~0x3f) == 0 and ((1 << (_la - 49)) & ((1 << (SnowflakeSqlParser.LEFT - 49)) | (1 << (SnowflakeSqlParser.RIGHT - 49)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 49)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 49)))) != 0):
+                        if ((((_la - 49)) & ~0x3f) == 0 and ((1 << (_la - 49)) & ((1 << (SnowflakeSqlParser.LEFT - 49)) | (1 << (SnowflakeSqlParser.OUTER - 49)) | (1 << (SnowflakeSqlParser.RIGHT - 49)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 49)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 49)))) != 0):
                             self.state = 534
                             self.identifierList()
 
@@ -4589,7 +4589,7 @@ class SnowflakeSqlParser ( Parser ):
             self.state = 571
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [SnowflakeSqlParser.LEFT, SnowflakeSqlParser.RIGHT, SnowflakeSqlParser.IDENTIFIER]:
+            if token in [SnowflakeSqlParser.LEFT, SnowflakeSqlParser.OUTER, SnowflakeSqlParser.RIGHT, SnowflakeSqlParser.IDENTIFIER]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 569
                 self.unquotedIdentifier()
@@ -5310,6 +5310,9 @@ class SnowflakeSqlParser ( Parser ):
         def LEFT(self):
             return self.getToken(SnowflakeSqlParser.LEFT, 0)
 
+        def OUTER(self):
+            return self.getToken(SnowflakeSqlParser.OUTER, 0)
+
         def RIGHT(self):
             return self.getToken(SnowflakeSqlParser.RIGHT, 0)
 
@@ -5342,7 +5345,7 @@ class SnowflakeSqlParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 610
             _la = self._input.LA(1)
-            if not(((((_la - 49)) & ~0x3f) == 0 and ((1 << (_la - 49)) & ((1 << (SnowflakeSqlParser.LEFT - 49)) | (1 << (SnowflakeSqlParser.RIGHT - 49)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 49)))) != 0)):
+            if not(((((_la - 49)) & ~0x3f) == 0 and ((1 << (_la - 49)) & ((1 << (SnowflakeSqlParser.LEFT - 49)) | (1 << (SnowflakeSqlParser.OUTER - 49)) | (1 << (SnowflakeSqlParser.RIGHT - 49)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 49)))) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)

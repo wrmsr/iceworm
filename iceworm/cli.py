@@ -1,6 +1,7 @@
 import argparse
 import glob
 import logging
+import re
 import typing as ta
 
 from omnibus import collections as ocol
@@ -9,6 +10,7 @@ from omnibus import logs
 from omnibus import properties
 
 from . import parsing
+from . import rendering
 
 
 log = logging.getLogger(__name__)
@@ -56,30 +58,49 @@ class Cli:
     @_cmd(
         cmds,
         _arg('--glob', action='append'),
+        _arg('--not', dest='not_pats', action='append'),
         _arg('--strip-header', action='store_true'),
     )
     def cmd_run(self) -> None:
-        for pat in self.args.glob:
-            for path in glob.iglob(pat, recursive=True):
-                log.info(f'Parsing {path}')
+        not_pats = [re.compile(n) for n in self.args.not_pats if self.args.not_pats]
 
-                with open(path, 'r') as f:
-                    txt = f.read()
-                txt = txt.lower()
+        paths = set()
+        for glob_pat in self.args.glob:
+            for path in glob.iglob(glob_pat, recursive=True):
+                skip = False
+                for not_pat in not_pats:
+                    if not_pat.match(path):
+                        log.info(f'Skipping : {path}')
+                        skip = True
+                        break
+                if skip:
+                    continue
+                paths.add(path)
+        paths = sorted(paths)
 
-                if self.args.strip_header:
-                    lines = txt.splitlines()
-                    for i in range(len(lines)):
-                        if lines[i].strip() == '---':
-                            lines = lines[i+1:]
-                            break
-                    txt = '\n'.join(lines)
+        for i, path in enumerate(paths):
+            log.info(f'Parsing {i} / {len(paths)} ({i / len(paths):0.02f}%) : {path}')
 
-                try:
-                    root = parsing.parse_statement(txt)  # noqa
-                except Exception as e:  # noqa
-                    log.exception('Parse failure')
-                    log.error('Body:\n' + txt)
+            with open(path, 'r') as f:
+                txt = f.read()
+            txt = txt.lower()
+
+            if self.args.strip_header:
+                lines = txt.splitlines()
+                for i in range(len(lines)):
+                    if lines[i].strip() == '---':
+                        lines = lines[i+1:]
+                        break
+                txt = '\n'.join(lines)
+
+            try:
+                root = parsing.parse_statement(txt)  # noqa
+                rendered = rendering.render(root)
+                reparsed = parsing.parse_statement(rendered + ';')
+                if reparsed != root:
+                    raise ValueError
+            except Exception as e:  # noqa
+                log.exception('Parse failure')
 
     def run(self) -> None:
         fn = getattr(self.args, 'fn', None)

@@ -75,3 +75,7 @@ select count(distinct x);
 select cast('x' as int);
 select x::decimal(1);
 select cast(x as decimal(1));
+select f(x => 1, y => 2);
+select f(outer => 2);
+select x:y;
+select x:y::int;
