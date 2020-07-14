@@ -183,7 +183,7 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.Over) -> str:  # noqa
         return (
-                (('partition by ' + self.render(node.partition_by)) if node.partition_by is not None else '') +
+                (('partition by ' + ', '.join(self.render(e) for e in node.partition_by)) if node.partition_by else '') +  # noqa
                 (('order by ' + ', '.join(self.render(e) for e in node.order_by)) if node.order_by else '')
         )
 

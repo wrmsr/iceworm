@@ -109,7 +109,7 @@ caseItem
     ;
 
 over
-    : OVER '(' (PARTITION BY part=expression)? (ORDER BY sortItem (',' sortItem)*)? ')'
+    : OVER '(' (PARTITION BY (expression (',' expression)*))? (ORDER BY sortItem (',' sortItem)*)? ')'
     ;
 
 sortItem

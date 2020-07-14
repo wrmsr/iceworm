@@ -184,8 +184,8 @@ class SortItem(Node):
 
 
 class Over(Node):
-    partition_by: ta.Optional[Expr] = None
-    order_by: ta.Optional[ta.Sequence[SortItem]] = None
+    partition_by: ta.Sequence[Expr] = ()
+    order_by: ta.Sequence[SortItem] = ()
 
 
 class StarExpr(Expr):

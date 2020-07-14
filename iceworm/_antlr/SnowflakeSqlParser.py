@@ -13,7 +13,7 @@ else:
 def serializedATN():
     with StringIO() as buf:
         buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3N")
-        buf.write("\u0212\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
+        buf.write("\u0219\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
         buf.write("\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4\f\t\f\4\r\t\r\4\16")
         buf.write("\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22\4\23\t\23")
         buf.write("\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31")
@@ -49,37 +49,38 @@ def serializedATN():
         buf.write("\22\u0151\n\22\f\22\16\22\u0154\13\22\3\22\3\22\5\22\u0158")
         buf.write("\n\22\3\22\3\22\3\22\3\22\3\22\5\22\u015f\n\22\5\22\u0161")
         buf.write("\n\22\3\23\3\23\3\23\3\23\3\24\3\24\3\24\3\24\3\24\3\25")
-        buf.write("\3\25\3\25\3\25\3\25\5\25\u0171\n\25\3\25\3\25\3\25\3")
-        buf.write("\25\3\25\7\25\u0178\n\25\f\25\16\25\u017b\13\25\5\25\u017d")
-        buf.write("\n\25\3\25\3\25\3\26\3\26\5\26\u0183\n\26\3\27\3\27\3")
+        buf.write("\3\25\3\25\3\25\3\25\3\25\3\25\7\25\u0173\n\25\f\25\16")
+        buf.write("\25\u0176\13\25\5\25\u0178\n\25\3\25\3\25\3\25\3\25\3")
+        buf.write("\25\7\25\u017f\n\25\f\25\16\25\u0182\13\25\5\25\u0184")
+        buf.write("\n\25\3\25\3\25\3\26\3\26\5\26\u018a\n\26\3\27\3\27\3")
         buf.write("\27\3\27\3\27\3\27\3\27\3\27\3\27\3\27\3\27\3\27\3\27")
-        buf.write("\3\27\5\27\u0193\n\27\3\27\3\27\5\27\u0197\n\27\3\27\3")
-        buf.write("\27\3\27\5\27\u019c\n\27\3\27\3\27\3\27\3\27\5\27\u01a2")
+        buf.write("\3\27\5\27\u019a\n\27\3\27\3\27\5\27\u019e\n\27\3\27\3")
+        buf.write("\27\3\27\5\27\u01a3\n\27\3\27\3\27\3\27\3\27\5\27\u01a9")
         buf.write("\n\27\3\27\3\27\3\27\3\27\3\27\3\27\3\27\3\27\3\27\3\27")
-        buf.write("\3\27\3\27\3\27\3\27\7\27\u01b2\n\27\f\27\16\27\u01b5")
-        buf.write("\13\27\5\27\u01b7\n\27\3\27\3\27\3\27\3\27\3\27\3\27\3")
-        buf.write("\27\3\27\3\27\3\27\3\27\3\27\5\27\u01c5\n\27\3\27\3\27")
-        buf.write("\3\27\7\27\u01ca\n\27\f\27\16\27\u01cd\13\27\3\30\3\30")
-        buf.write("\3\30\7\30\u01d2\n\30\f\30\16\30\u01d5\13\30\3\31\3\31")
-        buf.write("\3\31\7\31\u01da\n\31\f\31\16\31\u01dd\13\31\3\32\3\32")
-        buf.write("\3\32\7\32\u01e2\n\32\f\32\16\32\u01e5\13\32\3\33\3\33")
-        buf.write("\5\33\u01e9\n\33\3\34\3\34\3\35\3\35\3\35\5\35\u01f0\n")
+        buf.write("\3\27\3\27\3\27\3\27\7\27\u01b9\n\27\f\27\16\27\u01bc")
+        buf.write("\13\27\5\27\u01be\n\27\3\27\3\27\3\27\3\27\3\27\3\27\3")
+        buf.write("\27\3\27\3\27\3\27\3\27\3\27\5\27\u01cc\n\27\3\27\3\27")
+        buf.write("\3\27\7\27\u01d1\n\27\f\27\16\27\u01d4\13\27\3\30\3\30")
+        buf.write("\3\30\7\30\u01d9\n\30\f\30\16\30\u01dc\13\30\3\31\3\31")
+        buf.write("\3\31\7\31\u01e1\n\31\f\31\16\31\u01e4\13\31\3\32\3\32")
+        buf.write("\3\32\7\32\u01e9\n\32\f\32\16\32\u01ec\13\32\3\33\3\33")
+        buf.write("\5\33\u01f0\n\33\3\34\3\34\3\35\3\35\3\35\5\35\u01f7\n")
         buf.write("\35\3\36\3\36\3\37\3\37\3 \3 \3!\3!\3\"\3\"\3#\3#\3#\3")
-        buf.write("#\3#\3#\3#\3#\3#\3#\3#\3#\5#\u0208\n#\3$\3$\3%\3%\3&\3")
+        buf.write("#\3#\3#\3#\3#\3#\3#\3#\3#\5#\u020f\n#\3$\3$\3%\3%\3&\3")
         buf.write("&\3\'\3\'\3\'\2\5\30\34,(\2\4\6\b\n\f\16\20\22\24\26\30")
         buf.write("\32\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJL\2\t\4\2\30\30")
         buf.write("\65\65\4\2\32\32\36\36\4\2\27\27\37\37\3\2\13\21\4\2\7")
-        buf.write("\7\22\26\3\2\22\23\5\2//;;II\2\u0249\2N\3\2\2\2\4T\3\2")
+        buf.write("\7\22\26\3\2\22\23\5\2//;;II\2\u0251\2N\3\2\2\2\4T\3\2")
         buf.write("\2\2\6V\3\2\2\2\ba\3\2\2\2\ne\3\2\2\2\fk\3\2\2\2\16r\3")
         buf.write("\2\2\2\20x\3\2\2\2\22\u00ab\3\2\2\2\24\u00ba\3\2\2\2\26")
         buf.write("\u00bc\3\2\2\2\30\u00c5\3\2\2\2\32\u0100\3\2\2\2\34\u0107")
         buf.write("\3\2\2\2\36\u012e\3\2\2\2 \u0136\3\2\2\2\"\u0160\3\2\2")
-        buf.write("\2$\u0162\3\2\2\2&\u0166\3\2\2\2(\u016b\3\2\2\2*\u0180")
-        buf.write("\3\2\2\2,\u0192\3\2\2\2.\u01ce\3\2\2\2\60\u01d6\3\2\2")
-        buf.write("\2\62\u01de\3\2\2\2\64\u01e8\3\2\2\2\66\u01ea\3\2\2\2")
-        buf.write("8\u01ef\3\2\2\2:\u01f1\3\2\2\2<\u01f3\3\2\2\2>\u01f5\3")
-        buf.write("\2\2\2@\u01f7\3\2\2\2B\u01f9\3\2\2\2D\u0207\3\2\2\2F\u0209")
-        buf.write("\3\2\2\2H\u020b\3\2\2\2J\u020d\3\2\2\2L\u020f\3\2\2\2")
+        buf.write("\2$\u0162\3\2\2\2&\u0166\3\2\2\2(\u016b\3\2\2\2*\u0187")
+        buf.write("\3\2\2\2,\u0199\3\2\2\2.\u01d5\3\2\2\2\60\u01dd\3\2\2")
+        buf.write("\2\62\u01e5\3\2\2\2\64\u01ef\3\2\2\2\66\u01f1\3\2\2\2")
+        buf.write("8\u01f6\3\2\2\2:\u01f8\3\2\2\2<\u01fa\3\2\2\2>\u01fc\3")
+        buf.write("\2\2\2@\u01fe\3\2\2\2B\u0200\3\2\2\2D\u020e\3\2\2\2F\u0210")
+        buf.write("\3\2\2\2H\u0212\3\2\2\2J\u0214\3\2\2\2L\u0216\3\2\2\2")
         buf.write("NP\5\4\3\2OQ\7\3\2\2PO\3\2\2\2PQ\3\2\2\2QR\3\2\2\2RS\7")
         buf.write("\2\2\3S\3\3\2\2\2TU\5\6\4\2U\5\3\2\2\2VW\5\b\5\2W\7\3")
         buf.write("\2\2\2XY\7D\2\2Y^\5\n\6\2Z[\7\4\2\2[]\5\n\6\2\\Z\3\2\2")
@@ -197,85 +198,88 @@ def serializedATN():
         buf.write("\5\64\33\2\u0163\u0164\7\n\2\2\u0164\u0165\5\26\f\2\u0165")
         buf.write("%\3\2\2\2\u0166\u0167\7B\2\2\u0167\u0168\5\26\f\2\u0168")
         buf.write("\u0169\7=\2\2\u0169\u016a\5\26\f\2\u016a\'\3\2\2\2\u016b")
-        buf.write("\u016c\78\2\2\u016c\u0170\7\5\2\2\u016d\u016e\79\2\2\u016e")
-        buf.write("\u016f\7\33\2\2\u016f\u0171\5\26\f\2\u0170\u016d\3\2\2")
-        buf.write("\2\u0170\u0171\3\2\2\2\u0171\u017c\3\2\2\2\u0172\u0173")
-        buf.write("\7\66\2\2\u0173\u0174\7\33\2\2\u0174\u0179\5*\26\2\u0175")
-        buf.write("\u0176\7\4\2\2\u0176\u0178\5*\26\2\u0177\u0175\3\2\2\2")
-        buf.write("\u0178\u017b\3\2\2\2\u0179\u0177\3\2\2\2\u0179\u017a\3")
-        buf.write("\2\2\2\u017a\u017d\3\2\2\2\u017b\u0179\3\2\2\2\u017c\u0172")
-        buf.write("\3\2\2\2\u017c\u017d\3\2\2\2\u017d\u017e\3\2\2\2\u017e")
-        buf.write("\u017f\7\6\2\2\u017f)\3\2\2\2\u0180\u0182\5\26\f\2\u0181")
-        buf.write("\u0183\t\3\2\2\u0182\u0181\3\2\2\2\u0182\u0183\3\2\2\2")
-        buf.write("\u0183+\3\2\2\2\u0184\u0185\b\27\1\2\u0185\u0186\7.\2")
-        buf.write("\2\u0186\u0193\5,\27\b\u0187\u0193\5\"\22\2\u0188\u0189")
-        buf.write("\7\5\2\2\u0189\u018a\5\6\4\2\u018a\u018b\7\6\2\2\u018b")
-        buf.write("\u0193\3\2\2\2\u018c\u018d\7\5\2\2\u018d\u018e\5,\27\2")
-        buf.write("\u018e\u018f\7\6\2\2\u018f\u0193\3\2\2\2\u0190\u0193\7")
-        buf.write("K\2\2\u0191\u0193\5\60\31\2\u0192\u0184\3\2\2\2\u0192")
-        buf.write("\u0187\3\2\2\2\u0192\u0188\3\2\2\2\u0192\u018c\3\2\2\2")
-        buf.write("\u0192\u0190\3\2\2\2\u0192\u0191\3\2\2\2\u0193\u01cb\3")
-        buf.write("\2\2\2\u0194\u0196\f\f\2\2\u0195\u0197\7\31\2\2\u0196")
-        buf.write("\u0195\3\2\2\2\u0196\u0197\3\2\2\2\u0197\u0198\3\2\2\2")
-        buf.write("\u0198\u01ca\5\64\33\2\u0199\u019b\f\13\2\2\u019a\u019c")
-        buf.write("\5D#\2\u019b\u019a\3\2\2\2\u019b\u019c\3\2\2\2\u019c\u019d")
-        buf.write("\3\2\2\2\u019d\u019e\7-\2\2\u019e\u01a1\5,\27\2\u019f")
-        buf.write("\u01a0\7\64\2\2\u01a0\u01a2\5\30\r\2\u01a1\u019f\3\2\2")
-        buf.write("\2\u01a1\u01a2\3\2\2\2\u01a2\u01ca\3\2\2\2\u01a3\u01a4")
-        buf.write("\f\n\2\2\u01a4\u01a5\7:\2\2\u01a5\u01a6\7\5\2\2\u01a6")
-        buf.write("\u01a7\5\60\31\2\u01a7\u01a8\7\5\2\2\u01a8\u01a9\5\64")
-        buf.write("\33\2\u01a9\u01aa\7\6\2\2\u01aa\u01ab\7#\2\2\u01ab\u01ac")
-        buf.write("\5\64\33\2\u01ac\u01ad\7)\2\2\u01ad\u01b6\7\5\2\2\u01ae")
-        buf.write("\u01b3\5\26\f\2\u01af\u01b0\7\4\2\2\u01b0\u01b2\5\26\f")
-        buf.write("\2\u01b1\u01af\3\2\2\2\u01b2\u01b5\3\2\2\2\u01b3\u01b1")
-        buf.write("\3\2\2\2\u01b3\u01b4\3\2\2\2\u01b4\u01b7\3\2\2\2\u01b5")
-        buf.write("\u01b3\3\2\2\2\u01b6\u01ae\3\2\2\2\u01b6\u01b7\3\2\2\2")
-        buf.write("\u01b7\u01b8\3\2\2\2\u01b8\u01b9\7\6\2\2\u01b9\u01ba\7")
-        buf.write("\6\2\2\u01ba\u01ca\3\2\2\2\u01bb\u01bc\f\t\2\2\u01bc\u01bd")
-        buf.write("\7A\2\2\u01bd\u01be\7\5\2\2\u01be\u01bf\5\64\33\2\u01bf")
-        buf.write("\u01c0\7#\2\2\u01c0\u01c1\5\64\33\2\u01c1\u01c2\7)\2\2")
-        buf.write("\u01c2\u01c4\7\5\2\2\u01c3\u01c5\5\62\32\2\u01c4\u01c3")
-        buf.write("\3\2\2\2\u01c4\u01c5\3\2\2\2\u01c5\u01c6\3\2\2\2\u01c6")
-        buf.write("\u01c7\7\6\2\2\u01c7\u01c8\7\6\2\2\u01c8\u01ca\3\2\2\2")
-        buf.write("\u01c9\u0194\3\2\2\2\u01c9\u0199\3\2\2\2\u01c9\u01a3\3")
-        buf.write("\2\2\2\u01c9\u01bb\3\2\2\2\u01ca\u01cd\3\2\2\2\u01cb\u01c9")
-        buf.write("\3\2\2\2\u01cb\u01cc\3\2\2\2\u01cc-\3\2\2\2\u01cd\u01cb")
-        buf.write("\3\2\2\2\u01ce\u01d3\5\26\f\2\u01cf\u01d0\7\4\2\2\u01d0")
-        buf.write("\u01d2\5\26\f\2\u01d1\u01cf\3\2\2\2\u01d2\u01d5\3\2\2")
-        buf.write("\2\u01d3\u01d1\3\2\2\2\u01d3\u01d4\3\2\2\2\u01d4/\3\2")
-        buf.write("\2\2\u01d5\u01d3\3\2\2\2\u01d6\u01db\5\64\33\2\u01d7\u01d8")
-        buf.write("\7\b\2\2\u01d8\u01da\5\64\33\2\u01d9\u01d7\3\2\2\2\u01da")
-        buf.write("\u01dd\3\2\2\2\u01db\u01d9\3\2\2\2\u01db\u01dc\3\2\2\2")
-        buf.write("\u01dc\61\3\2\2\2\u01dd\u01db\3\2\2\2\u01de\u01e3\5\64")
-        buf.write("\33\2\u01df\u01e0\7\4\2\2\u01e0\u01e2\5\64\33\2\u01e1")
-        buf.write("\u01df\3\2\2\2\u01e2\u01e5\3\2\2\2\u01e3\u01e1\3\2\2\2")
-        buf.write("\u01e3\u01e4\3\2\2\2\u01e4\63\3\2\2\2\u01e5\u01e3\3\2")
-        buf.write("\2\2\u01e6\u01e9\5L\'\2\u01e7\u01e9\5\66\34\2\u01e8\u01e6")
-        buf.write("\3\2\2\2\u01e8\u01e7\3\2\2\2\u01e9\65\3\2\2\2\u01ea\u01eb")
-        buf.write("\7J\2\2\u01eb\67\3\2\2\2\u01ec\u01f0\7F\2\2\u01ed\u01f0")
-        buf.write("\7G\2\2\u01ee\u01f0\7H\2\2\u01ef\u01ec\3\2\2\2\u01ef\u01ed")
-        buf.write("\3\2\2\2\u01ef\u01ee\3\2\2\2\u01f09\3\2\2\2\u01f1\u01f2")
-        buf.write("\7E\2\2\u01f2;\3\2\2\2\u01f3\u01f4\7\63\2\2\u01f4=\3\2")
-        buf.write("\2\2\u01f5\u01f6\7?\2\2\u01f6?\3\2\2\2\u01f7\u01f8\7\"")
-        buf.write("\2\2\u01f8A\3\2\2\2\u01f9\u01fa\t\4\2\2\u01faC\3\2\2\2")
-        buf.write("\u01fb\u0208\7*\2\2\u01fc\u0208\7/\2\2\u01fd\u01fe\7/")
-        buf.write("\2\2\u01fe\u0208\7\67\2\2\u01ff\u0208\7;\2\2\u0200\u0201")
-        buf.write("\7;\2\2\u0201\u0208\7\67\2\2\u0202\u0208\7%\2\2\u0203")
-        buf.write("\u0204\7%\2\2\u0204\u0208\7\67\2\2\u0205\u0208\7\35\2")
-        buf.write("\2\u0206\u0208\7\61\2\2\u0207\u01fb\3\2\2\2\u0207\u01fc")
-        buf.write("\3\2\2\2\u0207\u01fd\3\2\2\2\u0207\u01ff\3\2\2\2\u0207")
-        buf.write("\u0200\3\2\2\2\u0207\u0202\3\2\2\2\u0207\u0203\3\2\2\2")
-        buf.write("\u0207\u0205\3\2\2\2\u0207\u0206\3\2\2\2\u0208E\3\2\2")
-        buf.write("\2\u0209\u020a\t\5\2\2\u020aG\3\2\2\2\u020b\u020c\t\6")
-        buf.write("\2\2\u020cI\3\2\2\2\u020d\u020e\t\7\2\2\u020eK\3\2\2\2")
-        buf.write("\u020f\u0210\t\b\2\2\u0210M\3\2\2\2BP^aotz}\u0084\u008d")
+        buf.write("\u016c\78\2\2\u016c\u0177\7\5\2\2\u016d\u016e\79\2\2\u016e")
+        buf.write("\u016f\7\33\2\2\u016f\u0174\5\26\f\2\u0170\u0171\7\4\2")
+        buf.write("\2\u0171\u0173\5\26\f\2\u0172\u0170\3\2\2\2\u0173\u0176")
+        buf.write("\3\2\2\2\u0174\u0172\3\2\2\2\u0174\u0175\3\2\2\2\u0175")
+        buf.write("\u0178\3\2\2\2\u0176\u0174\3\2\2\2\u0177\u016d\3\2\2\2")
+        buf.write("\u0177\u0178\3\2\2\2\u0178\u0183\3\2\2\2\u0179\u017a\7")
+        buf.write("\66\2\2\u017a\u017b\7\33\2\2\u017b\u0180\5*\26\2\u017c")
+        buf.write("\u017d\7\4\2\2\u017d\u017f\5*\26\2\u017e\u017c\3\2\2\2")
+        buf.write("\u017f\u0182\3\2\2\2\u0180\u017e\3\2\2\2\u0180\u0181\3")
+        buf.write("\2\2\2\u0181\u0184\3\2\2\2\u0182\u0180\3\2\2\2\u0183\u0179")
+        buf.write("\3\2\2\2\u0183\u0184\3\2\2\2\u0184\u0185\3\2\2\2\u0185")
+        buf.write("\u0186\7\6\2\2\u0186)\3\2\2\2\u0187\u0189\5\26\f\2\u0188")
+        buf.write("\u018a\t\3\2\2\u0189\u0188\3\2\2\2\u0189\u018a\3\2\2\2")
+        buf.write("\u018a+\3\2\2\2\u018b\u018c\b\27\1\2\u018c\u018d\7.\2")
+        buf.write("\2\u018d\u019a\5,\27\b\u018e\u019a\5\"\22\2\u018f\u0190")
+        buf.write("\7\5\2\2\u0190\u0191\5\6\4\2\u0191\u0192\7\6\2\2\u0192")
+        buf.write("\u019a\3\2\2\2\u0193\u0194\7\5\2\2\u0194\u0195\5,\27\2")
+        buf.write("\u0195\u0196\7\6\2\2\u0196\u019a\3\2\2\2\u0197\u019a\7")
+        buf.write("K\2\2\u0198\u019a\5\60\31\2\u0199\u018b\3\2\2\2\u0199")
+        buf.write("\u018e\3\2\2\2\u0199\u018f\3\2\2\2\u0199\u0193\3\2\2\2")
+        buf.write("\u0199\u0197\3\2\2\2\u0199\u0198\3\2\2\2\u019a\u01d2\3")
+        buf.write("\2\2\2\u019b\u019d\f\f\2\2\u019c\u019e\7\31\2\2\u019d")
+        buf.write("\u019c\3\2\2\2\u019d\u019e\3\2\2\2\u019e\u019f\3\2\2\2")
+        buf.write("\u019f\u01d1\5\64\33\2\u01a0\u01a2\f\13\2\2\u01a1\u01a3")
+        buf.write("\5D#\2\u01a2\u01a1\3\2\2\2\u01a2\u01a3\3\2\2\2\u01a3\u01a4")
+        buf.write("\3\2\2\2\u01a4\u01a5\7-\2\2\u01a5\u01a8\5,\27\2\u01a6")
+        buf.write("\u01a7\7\64\2\2\u01a7\u01a9\5\30\r\2\u01a8\u01a6\3\2\2")
+        buf.write("\2\u01a8\u01a9\3\2\2\2\u01a9\u01d1\3\2\2\2\u01aa\u01ab")
+        buf.write("\f\n\2\2\u01ab\u01ac\7:\2\2\u01ac\u01ad\7\5\2\2\u01ad")
+        buf.write("\u01ae\5\60\31\2\u01ae\u01af\7\5\2\2\u01af\u01b0\5\64")
+        buf.write("\33\2\u01b0\u01b1\7\6\2\2\u01b1\u01b2\7#\2\2\u01b2\u01b3")
+        buf.write("\5\64\33\2\u01b3\u01b4\7)\2\2\u01b4\u01bd\7\5\2\2\u01b5")
+        buf.write("\u01ba\5\26\f\2\u01b6\u01b7\7\4\2\2\u01b7\u01b9\5\26\f")
+        buf.write("\2\u01b8\u01b6\3\2\2\2\u01b9\u01bc\3\2\2\2\u01ba\u01b8")
+        buf.write("\3\2\2\2\u01ba\u01bb\3\2\2\2\u01bb\u01be\3\2\2\2\u01bc")
+        buf.write("\u01ba\3\2\2\2\u01bd\u01b5\3\2\2\2\u01bd\u01be\3\2\2\2")
+        buf.write("\u01be\u01bf\3\2\2\2\u01bf\u01c0\7\6\2\2\u01c0\u01c1\7")
+        buf.write("\6\2\2\u01c1\u01d1\3\2\2\2\u01c2\u01c3\f\t\2\2\u01c3\u01c4")
+        buf.write("\7A\2\2\u01c4\u01c5\7\5\2\2\u01c5\u01c6\5\64\33\2\u01c6")
+        buf.write("\u01c7\7#\2\2\u01c7\u01c8\5\64\33\2\u01c8\u01c9\7)\2\2")
+        buf.write("\u01c9\u01cb\7\5\2\2\u01ca\u01cc\5\62\32\2\u01cb\u01ca")
+        buf.write("\3\2\2\2\u01cb\u01cc\3\2\2\2\u01cc\u01cd\3\2\2\2\u01cd")
+        buf.write("\u01ce\7\6\2\2\u01ce\u01cf\7\6\2\2\u01cf\u01d1\3\2\2\2")
+        buf.write("\u01d0\u019b\3\2\2\2\u01d0\u01a0\3\2\2\2\u01d0\u01aa\3")
+        buf.write("\2\2\2\u01d0\u01c2\3\2\2\2\u01d1\u01d4\3\2\2\2\u01d2\u01d0")
+        buf.write("\3\2\2\2\u01d2\u01d3\3\2\2\2\u01d3-\3\2\2\2\u01d4\u01d2")
+        buf.write("\3\2\2\2\u01d5\u01da\5\26\f\2\u01d6\u01d7\7\4\2\2\u01d7")
+        buf.write("\u01d9\5\26\f\2\u01d8\u01d6\3\2\2\2\u01d9\u01dc\3\2\2")
+        buf.write("\2\u01da\u01d8\3\2\2\2\u01da\u01db\3\2\2\2\u01db/\3\2")
+        buf.write("\2\2\u01dc\u01da\3\2\2\2\u01dd\u01e2\5\64\33\2\u01de\u01df")
+        buf.write("\7\b\2\2\u01df\u01e1\5\64\33\2\u01e0\u01de\3\2\2\2\u01e1")
+        buf.write("\u01e4\3\2\2\2\u01e2\u01e0\3\2\2\2\u01e2\u01e3\3\2\2\2")
+        buf.write("\u01e3\61\3\2\2\2\u01e4\u01e2\3\2\2\2\u01e5\u01ea\5\64")
+        buf.write("\33\2\u01e6\u01e7\7\4\2\2\u01e7\u01e9\5\64\33\2\u01e8")
+        buf.write("\u01e6\3\2\2\2\u01e9\u01ec\3\2\2\2\u01ea\u01e8\3\2\2\2")
+        buf.write("\u01ea\u01eb\3\2\2\2\u01eb\63\3\2\2\2\u01ec\u01ea\3\2")
+        buf.write("\2\2\u01ed\u01f0\5L\'\2\u01ee\u01f0\5\66\34\2\u01ef\u01ed")
+        buf.write("\3\2\2\2\u01ef\u01ee\3\2\2\2\u01f0\65\3\2\2\2\u01f1\u01f2")
+        buf.write("\7J\2\2\u01f2\67\3\2\2\2\u01f3\u01f7\7F\2\2\u01f4\u01f7")
+        buf.write("\7G\2\2\u01f5\u01f7\7H\2\2\u01f6\u01f3\3\2\2\2\u01f6\u01f4")
+        buf.write("\3\2\2\2\u01f6\u01f5\3\2\2\2\u01f79\3\2\2\2\u01f8\u01f9")
+        buf.write("\7E\2\2\u01f9;\3\2\2\2\u01fa\u01fb\7\63\2\2\u01fb=\3\2")
+        buf.write("\2\2\u01fc\u01fd\7?\2\2\u01fd?\3\2\2\2\u01fe\u01ff\7\"")
+        buf.write("\2\2\u01ffA\3\2\2\2\u0200\u0201\t\4\2\2\u0201C\3\2\2\2")
+        buf.write("\u0202\u020f\7*\2\2\u0203\u020f\7/\2\2\u0204\u0205\7/")
+        buf.write("\2\2\u0205\u020f\7\67\2\2\u0206\u020f\7;\2\2\u0207\u0208")
+        buf.write("\7;\2\2\u0208\u020f\7\67\2\2\u0209\u020f\7%\2\2\u020a")
+        buf.write("\u020b\7%\2\2\u020b\u020f\7\67\2\2\u020c\u020f\7\35\2")
+        buf.write("\2\u020d\u020f\7\61\2\2\u020e\u0202\3\2\2\2\u020e\u0203")
+        buf.write("\3\2\2\2\u020e\u0204\3\2\2\2\u020e\u0206\3\2\2\2\u020e")
+        buf.write("\u0207\3\2\2\2\u020e\u0209\3\2\2\2\u020e\u020a\3\2\2\2")
+        buf.write("\u020e\u020c\3\2\2\2\u020e\u020d\3\2\2\2\u020fE\3\2\2")
+        buf.write("\2\u0210\u0211\t\5\2\2\u0211G\3\2\2\2\u0212\u0213\t\6")
+        buf.write("\2\2\u0213I\3\2\2\2\u0214\u0215\t\7\2\2\u0215K\3\2\2\2")
+        buf.write("\u0216\u0217\t\b\2\2\u0217M\3\2\2\2CP^aotz}\u0084\u008d")
         buf.write("\u0090\u0094\u0099\u009d\u00a6\u00a9\u00b5\u00b8\u00ba")
         buf.write("\u00c1\u00c5\u00cd\u00cf\u00d7\u00db\u00e4\u00ea\u00f2")
         buf.write("\u00f7\u00fc\u0100\u0107\u010f\u0115\u011a\u011f\u012e")
         buf.write("\u0136\u013b\u0142\u0145\u0149\u0152\u0157\u015e\u0160")
-        buf.write("\u0170\u0179\u017c\u0182\u0192\u0196\u019b\u01a1\u01b3")
-        buf.write("\u01b6\u01c4\u01c9\u01cb\u01d3\u01db\u01e3\u01e8\u01ef")
-        buf.write("\u0207")
+        buf.write("\u0174\u0177\u0180\u0183\u0189\u0199\u019d\u01a2\u01a8")
+        buf.write("\u01ba\u01bd\u01cb\u01d0\u01d2\u01da\u01e2\u01ea\u01ef")
+        buf.write("\u01f6\u020e")
         return buf.getvalue()
 
 
@@ -2904,7 +2908,6 @@ class SnowflakeSqlParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.part = None # ExpressionContext
 
         def OVER(self):
             return self.getToken(SnowflakeSqlParser.OVER, 0)
@@ -2928,8 +2931,11 @@ class SnowflakeSqlParser ( Parser ):
                 return self.getTypedRuleContext(SnowflakeSqlParser.SortItemContext,i)
 
 
-        def expression(self):
-            return self.getTypedRuleContext(SnowflakeSqlParser.ExpressionContext,0)
+        def expression(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(SnowflakeSqlParser.ExpressionContext)
+            else:
+                return self.getTypedRuleContext(SnowflakeSqlParser.ExpressionContext,i)
 
 
         def getRuleIndex(self):
@@ -2963,7 +2969,7 @@ class SnowflakeSqlParser ( Parser ):
             self.match(SnowflakeSqlParser.OVER)
             self.state = 362
             self.match(SnowflakeSqlParser.T__2)
-            self.state = 366
+            self.state = 373
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==SnowflakeSqlParser.PARTITION:
@@ -2971,35 +2977,48 @@ class SnowflakeSqlParser ( Parser ):
                 self.match(SnowflakeSqlParser.PARTITION)
                 self.state = 364
                 self.match(SnowflakeSqlParser.BY)
+
                 self.state = 365
-                localctx.part = self.expression()
-
-
-            self.state = 378
-            self._errHandler.sync(self)
-            _la = self._input.LA(1)
-            if _la==SnowflakeSqlParser.ORDER:
-                self.state = 368
-                self.match(SnowflakeSqlParser.ORDER)
-                self.state = 369
-                self.match(SnowflakeSqlParser.BY)
+                self.expression()
                 self.state = 370
-                self.sortItem()
-                self.state = 375
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 while _la==SnowflakeSqlParser.T__1:
-                    self.state = 371
+                    self.state = 366
                     self.match(SnowflakeSqlParser.T__1)
+                    self.state = 367
+                    self.expression()
                     self.state = 372
-                    self.sortItem()
-                    self.state = 377
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
 
 
 
-            self.state = 380
+            self.state = 385
+            self._errHandler.sync(self)
+            _la = self._input.LA(1)
+            if _la==SnowflakeSqlParser.ORDER:
+                self.state = 375
+                self.match(SnowflakeSqlParser.ORDER)
+                self.state = 376
+                self.match(SnowflakeSqlParser.BY)
+                self.state = 377
+                self.sortItem()
+                self.state = 382
+                self._errHandler.sync(self)
+                _la = self._input.LA(1)
+                while _la==SnowflakeSqlParser.T__1:
+                    self.state = 378
+                    self.match(SnowflakeSqlParser.T__1)
+                    self.state = 379
+                    self.sortItem()
+                    self.state = 384
+                    self._errHandler.sync(self)
+                    _la = self._input.LA(1)
+
+
+
+            self.state = 387
             self.match(SnowflakeSqlParser.T__3)
         except RecognitionException as re:
             localctx.exception = re
@@ -3054,13 +3073,13 @@ class SnowflakeSqlParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 382
+            self.state = 389
             self.expression()
-            self.state = 384
+            self.state = 391
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==SnowflakeSqlParser.ASC or _la==SnowflakeSqlParser.DESC:
-                self.state = 383
+                self.state = 390
                 localctx.direction = self._input.LT(1)
                 _la = self._input.LA(1)
                 if not(_la==SnowflakeSqlParser.ASC or _la==SnowflakeSqlParser.DESC):
@@ -3419,17 +3438,17 @@ class SnowflakeSqlParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 400
+            self.state = 407
             self._errHandler.sync(self)
-            la_ = self._interp.adaptivePredict(self._input,49,self._ctx)
+            la_ = self._interp.adaptivePredict(self._input,50,self._ctx)
             if la_ == 1:
                 localctx = SnowflakeSqlParser.LateralRelationContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
 
-                self.state = 387
+                self.state = 394
                 self.match(SnowflakeSqlParser.LATERAL)
-                self.state = 388
+                self.state = 395
                 self.relation(6)
                 pass
 
@@ -3437,7 +3456,7 @@ class SnowflakeSqlParser ( Parser ):
                 localctx = SnowflakeSqlParser.FunctionCallRelationContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
-                self.state = 389
+                self.state = 396
                 self.functionCall()
                 pass
 
@@ -3445,11 +3464,11 @@ class SnowflakeSqlParser ( Parser ):
                 localctx = SnowflakeSqlParser.SelectRelationContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
-                self.state = 390
+                self.state = 397
                 self.match(SnowflakeSqlParser.T__2)
-                self.state = 391
+                self.state = 398
                 self.select()
-                self.state = 392
+                self.state = 399
                 self.match(SnowflakeSqlParser.T__3)
                 pass
 
@@ -3457,11 +3476,11 @@ class SnowflakeSqlParser ( Parser ):
                 localctx = SnowflakeSqlParser.ParenRelationContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
-                self.state = 394
+                self.state = 401
                 self.match(SnowflakeSqlParser.T__2)
-                self.state = 395
+                self.state = 402
                 self.relation(0)
-                self.state = 396
+                self.state = 403
                 self.match(SnowflakeSqlParser.T__3)
                 pass
 
@@ -3469,7 +3488,7 @@ class SnowflakeSqlParser ( Parser ):
                 localctx = SnowflakeSqlParser.JinjaRelationContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
-                self.state = 398
+                self.state = 405
                 self.match(SnowflakeSqlParser.JINJA)
                 pass
 
@@ -3477,39 +3496,39 @@ class SnowflakeSqlParser ( Parser ):
                 localctx = SnowflakeSqlParser.TableRelationContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
-                self.state = 399
+                self.state = 406
                 self.qualifiedName()
                 pass
 
 
             self._ctx.stop = self._input.LT(-1)
-            self.state = 457
+            self.state = 464
             self._errHandler.sync(self)
-            _alt = self._interp.adaptivePredict(self._input,57,self._ctx)
+            _alt = self._interp.adaptivePredict(self._input,58,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                 if _alt==1:
                     if self._parseListeners is not None:
                         self.triggerExitRuleEvent()
                     _prevctx = localctx
-                    self.state = 455
+                    self.state = 462
                     self._errHandler.sync(self)
-                    la_ = self._interp.adaptivePredict(self._input,56,self._ctx)
+                    la_ = self._interp.adaptivePredict(self._input,57,self._ctx)
                     if la_ == 1:
                         localctx = SnowflakeSqlParser.AliasedRelationContext(self, SnowflakeSqlParser.RelationContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_relation)
-                        self.state = 402
+                        self.state = 409
                         if not self.precpred(self._ctx, 10):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 10)")
-                        self.state = 404
+                        self.state = 411
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
                         if _la==SnowflakeSqlParser.AS:
-                            self.state = 403
+                            self.state = 410
                             self.match(SnowflakeSqlParser.AS)
 
 
-                        self.state = 406
+                        self.state = 413
                         self.identifier()
                         pass
 
@@ -3517,29 +3536,29 @@ class SnowflakeSqlParser ( Parser ):
                         localctx = SnowflakeSqlParser.JoinRelationContext(self, SnowflakeSqlParser.RelationContext(self, _parentctx, _parentState))
                         localctx.left = _prevctx
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_relation)
-                        self.state = 407
+                        self.state = 414
                         if not self.precpred(self._ctx, 9):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 9)")
-                        self.state = 409
+                        self.state = 416
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
                         if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.CROSS) | (1 << SnowflakeSqlParser.FULL) | (1 << SnowflakeSqlParser.INNER) | (1 << SnowflakeSqlParser.LEFT) | (1 << SnowflakeSqlParser.NATURAL) | (1 << SnowflakeSqlParser.RIGHT))) != 0):
-                            self.state = 408
+                            self.state = 415
                             localctx.ty = self.joinType()
 
 
-                        self.state = 411
+                        self.state = 418
                         self.match(SnowflakeSqlParser.JOIN)
-                        self.state = 412
+                        self.state = 419
                         localctx.right = self.relation(0)
-                        self.state = 415
+                        self.state = 422
                         self._errHandler.sync(self)
-                        la_ = self._interp.adaptivePredict(self._input,52,self._ctx)
+                        la_ = self._interp.adaptivePredict(self._input,53,self._ctx)
                         if la_ == 1:
-                            self.state = 413
+                            self.state = 420
                             self.match(SnowflakeSqlParser.ON)
-                            self.state = 414
+                            self.state = 421
                             localctx.cond = self.booleanExpression(0)
 
 
@@ -3548,95 +3567,95 @@ class SnowflakeSqlParser ( Parser ):
                     elif la_ == 3:
                         localctx = SnowflakeSqlParser.PivotRelationContext(self, SnowflakeSqlParser.RelationContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_relation)
-                        self.state = 417
+                        self.state = 424
                         if not self.precpred(self._ctx, 8):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 8)")
-                        self.state = 418
-                        self.match(SnowflakeSqlParser.PIVOT)
-                        self.state = 419
-                        self.match(SnowflakeSqlParser.T__2)
-                        self.state = 420
-                        localctx.func = self.qualifiedName()
-                        self.state = 421
-                        self.match(SnowflakeSqlParser.T__2)
-                        self.state = 422
-                        localctx.pc = self.identifier()
-                        self.state = 423
-                        self.match(SnowflakeSqlParser.T__3)
-                        self.state = 424
-                        self.match(SnowflakeSqlParser.FOR)
                         self.state = 425
-                        localctx.vc = self.identifier()
+                        self.match(SnowflakeSqlParser.PIVOT)
                         self.state = 426
-                        self.match(SnowflakeSqlParser.IN)
-                        self.state = 427
                         self.match(SnowflakeSqlParser.T__2)
-                        self.state = 436
+                        self.state = 427
+                        localctx.func = self.qualifiedName()
+                        self.state = 428
+                        self.match(SnowflakeSqlParser.T__2)
+                        self.state = 429
+                        localctx.pc = self.identifier()
+                        self.state = 430
+                        self.match(SnowflakeSqlParser.T__3)
+                        self.state = 431
+                        self.match(SnowflakeSqlParser.FOR)
+                        self.state = 432
+                        localctx.vc = self.identifier()
+                        self.state = 433
+                        self.match(SnowflakeSqlParser.IN)
+                        self.state = 434
+                        self.match(SnowflakeSqlParser.T__2)
+                        self.state = 443
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
                         if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__2) | (1 << SnowflakeSqlParser.T__15) | (1 << SnowflakeSqlParser.T__16) | (1 << SnowflakeSqlParser.CASE) | (1 << SnowflakeSqlParser.FALSE) | (1 << SnowflakeSqlParser.INTERVAL) | (1 << SnowflakeSqlParser.LEFT) | (1 << SnowflakeSqlParser.NOT) | (1 << SnowflakeSqlParser.NULL) | (1 << SnowflakeSqlParser.RIGHT) | (1 << SnowflakeSqlParser.TRUE))) != 0) or ((((_la - 67)) & ~0x3f) == 0 and ((1 << (_la - 67)) & ((1 << (SnowflakeSqlParser.STRING - 67)) | (1 << (SnowflakeSqlParser.INTEGER_VALUE - 67)) | (1 << (SnowflakeSqlParser.DECIMAL_VALUE - 67)) | (1 << (SnowflakeSqlParser.FLOAT_VALUE - 67)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 67)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 67)) | (1 << (SnowflakeSqlParser.JINJA - 67)))) != 0):
-                            self.state = 428
+                            self.state = 435
                             self.expression()
-                            self.state = 433
+                            self.state = 440
                             self._errHandler.sync(self)
                             _la = self._input.LA(1)
                             while _la==SnowflakeSqlParser.T__1:
-                                self.state = 429
+                                self.state = 436
                                 self.match(SnowflakeSqlParser.T__1)
-                                self.state = 430
+                                self.state = 437
                                 self.expression()
-                                self.state = 435
+                                self.state = 442
                                 self._errHandler.sync(self)
                                 _la = self._input.LA(1)
 
 
 
-                        self.state = 438
+                        self.state = 445
                         self.match(SnowflakeSqlParser.T__3)
-                        self.state = 439
+                        self.state = 446
                         self.match(SnowflakeSqlParser.T__3)
                         pass
 
                     elif la_ == 4:
                         localctx = SnowflakeSqlParser.UnpivotRelationContext(self, SnowflakeSqlParser.RelationContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_relation)
-                        self.state = 441
+                        self.state = 448
                         if not self.precpred(self._ctx, 7):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 7)")
-                        self.state = 442
+                        self.state = 449
                         self.match(SnowflakeSqlParser.UNPIVOT)
-                        self.state = 443
-                        self.match(SnowflakeSqlParser.T__2)
-                        self.state = 444
-                        localctx.vc = self.identifier()
-                        self.state = 445
-                        self.match(SnowflakeSqlParser.FOR)
-                        self.state = 446
-                        localctx.nc = self.identifier()
-                        self.state = 447
-                        self.match(SnowflakeSqlParser.IN)
-                        self.state = 448
-                        self.match(SnowflakeSqlParser.T__2)
                         self.state = 450
+                        self.match(SnowflakeSqlParser.T__2)
+                        self.state = 451
+                        localctx.vc = self.identifier()
+                        self.state = 452
+                        self.match(SnowflakeSqlParser.FOR)
+                        self.state = 453
+                        localctx.nc = self.identifier()
+                        self.state = 454
+                        self.match(SnowflakeSqlParser.IN)
+                        self.state = 455
+                        self.match(SnowflakeSqlParser.T__2)
+                        self.state = 457
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
                         if ((((_la - 45)) & ~0x3f) == 0 and ((1 << (_la - 45)) & ((1 << (SnowflakeSqlParser.LEFT - 45)) | (1 << (SnowflakeSqlParser.RIGHT - 45)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 45)) | (1 << (SnowflakeSqlParser.QUOTED_IDENTIFIER - 45)))) != 0):
-                            self.state = 449
+                            self.state = 456
                             self.identifierList()
 
 
-                        self.state = 452
+                        self.state = 459
                         self.match(SnowflakeSqlParser.T__3)
-                        self.state = 453
+                        self.state = 460
                         self.match(SnowflakeSqlParser.T__3)
                         pass
 
              
-                self.state = 459
+                self.state = 466
                 self._errHandler.sync(self)
-                _alt = self._interp.adaptivePredict(self._input,57,self._ctx)
+                _alt = self._interp.adaptivePredict(self._input,58,self._ctx)
 
         except RecognitionException as re:
             localctx.exception = re
@@ -3687,17 +3706,17 @@ class SnowflakeSqlParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 460
+            self.state = 467
             self.expression()
-            self.state = 465
+            self.state = 472
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while _la==SnowflakeSqlParser.T__1:
-                self.state = 461
+                self.state = 468
                 self.match(SnowflakeSqlParser.T__1)
-                self.state = 462
+                self.state = 469
                 self.expression()
-                self.state = 467
+                self.state = 474
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
@@ -3749,20 +3768,20 @@ class SnowflakeSqlParser ( Parser ):
         self.enterRule(localctx, 46, self.RULE_qualifiedName)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 468
+            self.state = 475
             self.identifier()
-            self.state = 473
+            self.state = 480
             self._errHandler.sync(self)
-            _alt = self._interp.adaptivePredict(self._input,59,self._ctx)
+            _alt = self._interp.adaptivePredict(self._input,60,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                 if _alt==1:
-                    self.state = 469
+                    self.state = 476
                     self.match(SnowflakeSqlParser.T__5)
-                    self.state = 470
+                    self.state = 477
                     self.identifier() 
-                self.state = 475
+                self.state = 482
                 self._errHandler.sync(self)
-                _alt = self._interp.adaptivePredict(self._input,59,self._ctx)
+                _alt = self._interp.adaptivePredict(self._input,60,self._ctx)
 
         except RecognitionException as re:
             localctx.exception = re
@@ -3813,17 +3832,17 @@ class SnowflakeSqlParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 476
+            self.state = 483
             self.identifier()
-            self.state = 481
+            self.state = 488
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while _la==SnowflakeSqlParser.T__1:
-                self.state = 477
+                self.state = 484
                 self.match(SnowflakeSqlParser.T__1)
-                self.state = 478
+                self.state = 485
                 self.identifier()
-                self.state = 483
+                self.state = 490
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
@@ -3875,17 +3894,17 @@ class SnowflakeSqlParser ( Parser ):
         localctx = SnowflakeSqlParser.IdentifierContext(self, self._ctx, self.state)
         self.enterRule(localctx, 50, self.RULE_identifier)
         try:
-            self.state = 486
+            self.state = 493
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [SnowflakeSqlParser.LEFT, SnowflakeSqlParser.RIGHT, SnowflakeSqlParser.IDENTIFIER]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 484
+                self.state = 491
                 self.unquotedIdentifier()
                 pass
             elif token in [SnowflakeSqlParser.QUOTED_IDENTIFIER]:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 485
+                self.state = 492
                 self.quotedIdentifier()
                 pass
             else:
@@ -3935,7 +3954,7 @@ class SnowflakeSqlParser ( Parser ):
         self.enterRule(localctx, 52, self.RULE_quotedIdentifier)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 488
+            self.state = 495
             self.match(SnowflakeSqlParser.QUOTED_IDENTIFIER)
         except RecognitionException as re:
             localctx.exception = re
@@ -4040,25 +4059,25 @@ class SnowflakeSqlParser ( Parser ):
         localctx = SnowflakeSqlParser.NumberContext(self, self._ctx, self.state)
         self.enterRule(localctx, 54, self.RULE_number)
         try:
-            self.state = 493
+            self.state = 500
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [SnowflakeSqlParser.INTEGER_VALUE]:
                 localctx = SnowflakeSqlParser.IntegerNumberContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
-                self.state = 490
+                self.state = 497
                 self.match(SnowflakeSqlParser.INTEGER_VALUE)
                 pass
             elif token in [SnowflakeSqlParser.DECIMAL_VALUE]:
                 localctx = SnowflakeSqlParser.DecimalNumberContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 491
+                self.state = 498
                 self.match(SnowflakeSqlParser.DECIMAL_VALUE)
                 pass
             elif token in [SnowflakeSqlParser.FLOAT_VALUE]:
                 localctx = SnowflakeSqlParser.FloatNumberContext(self, localctx)
                 self.enterOuterAlt(localctx, 3)
-                self.state = 492
+                self.state = 499
                 self.match(SnowflakeSqlParser.FLOAT_VALUE)
                 pass
             else:
@@ -4108,7 +4127,7 @@ class SnowflakeSqlParser ( Parser ):
         self.enterRule(localctx, 56, self.RULE_string)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 495
+            self.state = 502
             self.match(SnowflakeSqlParser.STRING)
         except RecognitionException as re:
             localctx.exception = re
@@ -4154,7 +4173,7 @@ class SnowflakeSqlParser ( Parser ):
         self.enterRule(localctx, 58, self.RULE_null)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 497
+            self.state = 504
             self.match(SnowflakeSqlParser.NULL)
         except RecognitionException as re:
             localctx.exception = re
@@ -4200,7 +4219,7 @@ class SnowflakeSqlParser ( Parser ):
         self.enterRule(localctx, 60, self.RULE_true)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 499
+            self.state = 506
             self.match(SnowflakeSqlParser.TRUE)
         except RecognitionException as re:
             localctx.exception = re
@@ -4246,7 +4265,7 @@ class SnowflakeSqlParser ( Parser ):
         self.enterRule(localctx, 62, self.RULE_false)
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 501
+            self.state = 508
             self.match(SnowflakeSqlParser.FALSE)
         except RecognitionException as re:
             localctx.exception = re
@@ -4296,7 +4315,7 @@ class SnowflakeSqlParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 503
+            self.state = 510
             _la = self._input.LA(1)
             if not(_la==SnowflakeSqlParser.ALL or _la==SnowflakeSqlParser.DISTINCT):
                 self._errHandler.recoverInline(self)
@@ -4364,66 +4383,66 @@ class SnowflakeSqlParser ( Parser ):
         localctx = SnowflakeSqlParser.JoinTypeContext(self, self._ctx, self.state)
         self.enterRule(localctx, 66, self.RULE_joinType)
         try:
-            self.state = 517
+            self.state = 524
             self._errHandler.sync(self)
-            la_ = self._interp.adaptivePredict(self._input,63,self._ctx)
+            la_ = self._interp.adaptivePredict(self._input,64,self._ctx)
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 505
+                self.state = 512
                 self.match(SnowflakeSqlParser.INNER)
                 pass
 
             elif la_ == 2:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 506
+                self.state = 513
                 self.match(SnowflakeSqlParser.LEFT)
                 pass
 
             elif la_ == 3:
                 self.enterOuterAlt(localctx, 3)
-                self.state = 507
+                self.state = 514
                 self.match(SnowflakeSqlParser.LEFT)
-                self.state = 508
+                self.state = 515
                 self.match(SnowflakeSqlParser.OUTER)
                 pass
 
             elif la_ == 4:
                 self.enterOuterAlt(localctx, 4)
-                self.state = 509
+                self.state = 516
                 self.match(SnowflakeSqlParser.RIGHT)
                 pass
 
             elif la_ == 5:
                 self.enterOuterAlt(localctx, 5)
-                self.state = 510
+                self.state = 517
                 self.match(SnowflakeSqlParser.RIGHT)
-                self.state = 511
+                self.state = 518
                 self.match(SnowflakeSqlParser.OUTER)
                 pass
 
             elif la_ == 6:
                 self.enterOuterAlt(localctx, 6)
-                self.state = 512
+                self.state = 519
                 self.match(SnowflakeSqlParser.FULL)
                 pass
 
             elif la_ == 7:
                 self.enterOuterAlt(localctx, 7)
-                self.state = 513
+                self.state = 520
                 self.match(SnowflakeSqlParser.FULL)
-                self.state = 514
+                self.state = 521
                 self.match(SnowflakeSqlParser.OUTER)
                 pass
 
             elif la_ == 8:
                 self.enterOuterAlt(localctx, 8)
-                self.state = 515
+                self.state = 522
                 self.match(SnowflakeSqlParser.CROSS)
                 pass
 
             elif la_ == 9:
                 self.enterOuterAlt(localctx, 9)
-                self.state = 516
+                self.state = 523
                 self.match(SnowflakeSqlParser.NATURAL)
                 pass
 
@@ -4471,7 +4490,7 @@ class SnowflakeSqlParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 519
+            self.state = 526
             _la = self._input.LA(1)
             if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__8) | (1 << SnowflakeSqlParser.T__9) | (1 << SnowflakeSqlParser.T__10) | (1 << SnowflakeSqlParser.T__11) | (1 << SnowflakeSqlParser.T__12) | (1 << SnowflakeSqlParser.T__13) | (1 << SnowflakeSqlParser.T__14))) != 0)):
                 self._errHandler.recoverInline(self)
@@ -4521,7 +4540,7 @@ class SnowflakeSqlParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 521
+            self.state = 528
             _la = self._input.LA(1)
             if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << SnowflakeSqlParser.T__4) | (1 << SnowflakeSqlParser.T__15) | (1 << SnowflakeSqlParser.T__16) | (1 << SnowflakeSqlParser.T__17) | (1 << SnowflakeSqlParser.T__18) | (1 << SnowflakeSqlParser.T__19))) != 0)):
                 self._errHandler.recoverInline(self)
@@ -4571,7 +4590,7 @@ class SnowflakeSqlParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 523
+            self.state = 530
             _la = self._input.LA(1)
             if not(_la==SnowflakeSqlParser.T__15 or _la==SnowflakeSqlParser.T__16):
                 self._errHandler.recoverInline(self)
@@ -4629,7 +4648,7 @@ class SnowflakeSqlParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 525
+            self.state = 532
             _la = self._input.LA(1)
             if not(((((_la - 45)) & ~0x3f) == 0 and ((1 << (_la - 45)) & ((1 << (SnowflakeSqlParser.LEFT - 45)) | (1 << (SnowflakeSqlParser.RIGHT - 45)) | (1 << (SnowflakeSqlParser.IDENTIFIER - 45)))) != 0)):
                 self._errHandler.recoverInline(self)

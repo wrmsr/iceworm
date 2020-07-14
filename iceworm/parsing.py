@@ -184,8 +184,8 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         return no.Null()
 
     def visitOver(self, ctx: SnowflakeSqlParser.OverContext):
-        partition_by = self.visit(ctx.part) if ctx.part is not None else None
-        order_by = [self.visit(s) for s in ctx.sortItem()] if ctx.sortItem() is not None else None
+        partition_by = [self.visit(p) for p in ctx.expression()]
+        order_by = [self.visit(s) for s in ctx.sortItem()]
         return no.Over(partition_by=partition_by, order_by=order_by)
 
     def visitParenRelation(self, ctx: SnowflakeSqlParser.ParenRelationContext):
