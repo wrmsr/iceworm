@@ -52,8 +52,8 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         default = self.visit(ctx.default) if ctx.default is not None else None
         return no.Case(value, items, default)
 
-    def visitCastBooleanExpression(self, ctx: SnowflakeSqlParser.CastBooleanExpressionContext):
-        value = self.visit(ctx.booleanExpression())
+    def visitCastValueExpression(self, ctx: SnowflakeSqlParser.CastValueExpressionContext):
+        value = self.visit(ctx.valueExpression())
         type = self.visit(ctx.identifier())
         return no.Cast(value, type)
 

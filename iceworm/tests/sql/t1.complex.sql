@@ -3,3 +3,4 @@ select distinct m.i as u_i, t_d(c_t('u', 'a/l_a', c_a)) as dt from e.p p left jo
 select distinct d, sum(e_b_u) as sum from t.f_u_d_c_c_b where dt = left(c_t('u/p', current_date-1),10) group by u_i, d;
 select * from a where p.u_i is null and not (d.b_u = 'p' and p.u_i is null and c.u_i is null);
 select x, row_number() over (partition by p.c, p.o_t order by datediff(SECOND, p.o_t, p.c_t) desc) as row_num;
+select sum(c.d_h * c.a_s)::float / sum(c.a_s)::float as w_m_h_d;

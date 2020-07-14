@@ -56,7 +56,6 @@ booleanExpression
     : valueExpression predicate[$valueExpression.ctx]?   #predicatedBooleanExpression
     | op=NOT booleanExpression                           #unaryBooleanExpression
     | booleanExpression op=(AND | OR) booleanExpression  #binaryBooleanExpression
-    | booleanExpression '::' identifier                  #castBooleanExpression
     ;
 
 predicate[ParserRuleContext value]
@@ -73,6 +72,7 @@ valueExpression
     : primaryExpression                                      #primaryValueExpression
     | op=unaryOp valueExpression                             #unaryValueExpression
     | left=valueExpression op=arithOp right=valueExpression  #arithValueExpression
+    | valueExpression '::' identifier                        #castValueExpression
     ;
 
 primaryExpression

@@ -153,15 +153,6 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#castBooleanExpression.
-    def enterCastBooleanExpression(self, ctx:SnowflakeSqlParser.CastBooleanExpressionContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#castBooleanExpression.
-    def exitCastBooleanExpression(self, ctx:SnowflakeSqlParser.CastBooleanExpressionContext):
-        pass
-
-
     # Enter a parse tree produced by SnowflakeSqlParser#cmpPredicate.
     def enterCmpPredicate(self, ctx:SnowflakeSqlParser.CmpPredicateContext):
         pass
@@ -240,6 +231,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#unaryValueExpression.
     def exitUnaryValueExpression(self, ctx:SnowflakeSqlParser.UnaryValueExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#castValueExpression.
+    def enterCastValueExpression(self, ctx:SnowflakeSqlParser.CastValueExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#castValueExpression.
+    def exitCastValueExpression(self, ctx:SnowflakeSqlParser.CastValueExpressionContext):
         pass
 
 

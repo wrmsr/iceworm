@@ -1,5 +1,6 @@
 select 1;
 select 'x';
+select 1 / 0;
 select 1 from x;
 select x from y;
 select "x" from "y";
