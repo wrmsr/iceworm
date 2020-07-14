@@ -184,6 +184,7 @@ class SortItem(Node):
 
 
 class Over(Node):
+    partition_by: ta.Optional[Expr] = None
     order_by: ta.Optional[ta.Sequence[SortItem]] = None
 
 

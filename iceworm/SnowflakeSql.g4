@@ -108,7 +108,7 @@ caseItem
     ;
 
 over
-    : OVER '(' (ORDER BY sortItem (',' sortItem)*)? ')'
+    : OVER '(' (PARTITION BY part=expression)? (ORDER BY sortItem (',' sortItem)*)? ')'
     ;
 
 sortItem
@@ -257,6 +257,7 @@ OR: 'or';
 ORDER: 'order';
 OUTER: 'outer';
 OVER: 'over';
+PARTITION: 'partition';
 PIVOT: 'pivot';
 RIGHT: 'right';
 SELECT: 'select';

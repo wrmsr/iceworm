@@ -43,6 +43,8 @@ select a ilike 'b';
 select a not like 'b';
 select a not ilike 'b';
 select f() over (order by x asc);
+select f() over (partition by x);
+select f() over (partition by x order by y asc);
 select true;
 select 'true';
 select "true";
