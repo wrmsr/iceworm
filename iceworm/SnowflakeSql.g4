@@ -2,7 +2,11 @@ grammar SnowflakeSql;
 
 
 singleStatement
-    : select ';' EOF
+    : statement ';'? EOF
+    ;
+
+statement
+    : select
     ;
 
 select

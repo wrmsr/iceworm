@@ -15,6 +15,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#statement.
+    def visitStatement(self, ctx:SnowflakeSqlParser.StatementContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#select.
     def visitSelect(self, ctx:SnowflakeSqlParser.SelectContext):
         return self.visitChildren(ctx)
