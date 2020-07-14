@@ -333,6 +333,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#typeSpec.
+    def enterTypeSpec(self, ctx:SnowflakeSqlParser.TypeSpecContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#typeSpec.
+    def exitTypeSpec(self, ctx:SnowflakeSqlParser.TypeSpecContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#expressionFunctionCall.
     def enterExpressionFunctionCall(self, ctx:SnowflakeSqlParser.ExpressionFunctionCallContext):
         pass

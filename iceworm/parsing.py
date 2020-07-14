@@ -54,12 +54,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitCastCallExpression(self, ctx: SnowflakeSqlParser.CastCallExpressionContext):
         value = self.visit(ctx.expression())
-        type = self.visit(ctx.identifier())
+        type = self.visit(ctx.typeSpec())
         return no.CastCall(value, type)
 
     def visitCastValueExpression(self, ctx: SnowflakeSqlParser.CastValueExpressionContext):
         value = self.visit(ctx.valueExpression())
-        type = self.visit(ctx.identifier())
+        type = self.visit(ctx.typeSpec())
         return no.Cast(value, type)
 
     def visitCmpPredicate(self, ctx: SnowflakeSqlParser.CmpPredicateContext):
@@ -309,6 +309,11 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitTrue(self, ctx: SnowflakeSqlParser.TrueContext):
         return no.ETrue()
+
+    def visitTypeSpec(self, ctx: SnowflakeSqlParser.TypeSpecContext):
+        name = self.visit(ctx.identifier())
+        args = [self.visit(a) for a in ctx.simpleExpression()]
+        return no.TypeSpec(name, args)
 
     def visitUnaryValueExpression(self, ctx: SnowflakeSqlParser.UnaryValueExpressionContext):
         op = no.UNARY_OP_MAP[ctx.op.getText().lower()]

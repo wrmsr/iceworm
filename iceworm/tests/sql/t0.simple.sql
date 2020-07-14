@@ -73,3 +73,5 @@ select * from t join lateral (select * from u);
 select interval 'x';
 select count(distinct x);
 select cast('x' as int);
+select x::decimal(1);
+select cast(x as decimal(1));

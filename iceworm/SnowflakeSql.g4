@@ -72,7 +72,7 @@ valueExpression
     : primaryExpression                                      #primaryValueExpression
     | op=unaryOp valueExpression                             #unaryValueExpression
     | left=valueExpression op=arithOp right=valueExpression  #arithValueExpression
-    | valueExpression '::' identifier                        #castValueExpression
+    | valueExpression '::' typeSpec                          #castValueExpression
     ;
 
 primaryExpression
@@ -81,7 +81,7 @@ primaryExpression
     | INTERVAL expression                                              #intervalExpression
     | '(' select ')'                                                   #selectExpression
     | '(' expression ')'                                               #parenExpression
-    | CAST '(' expression AS identifier ')'                            #castCallExpression
+    | CAST '(' expression AS typeSpec ')'                              #castCallExpression
     | JINJA                                                            #jinjaExpression
     | simpleExpression                                                 #simplePrimaryExpression
     ;
@@ -93,6 +93,10 @@ simpleExpression
     | null
     | true
     | false
+    ;
+
+typeSpec
+    : identifier ('(' (simpleExpression (',' simpleExpression)*)? ')')?
     ;
 
 functionCall

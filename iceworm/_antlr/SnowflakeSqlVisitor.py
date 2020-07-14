@@ -190,6 +190,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#typeSpec.
+    def visitTypeSpec(self, ctx:SnowflakeSqlParser.TypeSpecContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#expressionFunctionCall.
     def visitExpressionFunctionCall(self, ctx:SnowflakeSqlParser.ExpressionFunctionCallContext):
         return self.visitChildren(ctx)

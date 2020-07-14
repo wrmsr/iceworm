@@ -316,14 +316,19 @@ class Case(Expr):
     default: ta.Optional[Expr] = None
 
 
+class TypeSpec(Node):
+    name: Identifier
+    args: ta.Sequence[Expr] = ()
+
+
 class Cast(Expr):
     value: Expr
-    type: Identifier
+    type: TypeSpec
 
 
 class CastCall(Expr):
     value: Expr
-    type: Identifier
+    type: TypeSpec
 
 
 class IsNull(Expr):

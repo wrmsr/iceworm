@@ -268,6 +268,12 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Table) -> str:  # noqa
         return self.render(node.name)
 
+    def render(self, node: no.TypeSpec) -> str:  # noqa
+        return (
+            self.render(node.name) +
+            (('(' + ', '.join(self.render(a) for a in node.args) + ')') if node.args else '')
+        )
+
     def render(self, node: no.UnaryExpr) -> str:  # noqa
         return node.op.value + ' ' + self.paren_render(node.value)
 
