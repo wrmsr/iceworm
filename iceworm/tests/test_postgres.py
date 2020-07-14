@@ -52,12 +52,12 @@ def test_docker_postgres():
             assert result == {'name': 'tom', 'age': '29'}
 
             conn.execute(textwrap.dedent("""
-            drop table if exists t;
+            drop table if exists test;
             """))
             conn.execute(textwrap.dedent("""
-            create table t(id integer primary key);
+            create table test(id integer primary key);
             """))
 
             metadata = sa.MetaData()
-            t = sa.Table('t', metadata, autoload=True, autoload_with=engine)
-            print(t)
+            tbl = sa.Table('test', metadata, autoload=True, autoload_with=engine)
+            print(tbl)

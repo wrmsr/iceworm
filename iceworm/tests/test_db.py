@@ -13,3 +13,7 @@ def test_db():
             print(conn.scalar('select current_warehouse()'))
             print(conn.scalar('select current_database()'))
             print(conn.scalar('select current_schema()'))
+
+            metadata = sa.MetaData()
+            tbl = sa.Table('test', metadata, autoload=True, autoload_with=conn)
+            print(tbl)
