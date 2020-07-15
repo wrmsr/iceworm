@@ -161,20 +161,6 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         identifier = self.visit(ctx.identifier())
         return no.IdentifierAllSelectItem(identifier)
 
-    def visitIlikePredicate(self, ctx: SnowflakeSqlParser.IlikePredicateContext):
-        value = self.visit(ctx.value)
-        pattern = self.visit(ctx.expression())
-        not_ = ctx.NOT() is not None
-        escape = self.visit(ctx.esc) if ctx.esc is not None else None
-        return no.Ilike(value, pattern, not_=not_, escape=escape)
-
-    def visitIlikeAnyPredicate(self, ctx: SnowflakeSqlParser.IlikePredicateContext):
-        value = self.visit(ctx.value)
-        patterns = [self.visit(p) for p in ctx.expression()]
-        not_ = ctx.NOT() is not None
-        escape = self.visit(ctx.esc) if ctx.esc is not None else None
-        return no.IlikeAny(value, patterns, not_=not_, escape=escape)
-
     def visitInJinjaPredicate(self, ctx: SnowflakeSqlParser.InJinjaPredicateContext):
         needle = self.visit(ctx.value)
         text = strip_jinja(ctx.JINJA().getText())
@@ -256,18 +242,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         return no.LastValue(value, nulls, over)
 
     def visitLikePredicate(self, ctx: SnowflakeSqlParser.LikePredicateContext):
+        kind = no.LIKE_KIND_MAP[ctx.kind.text.lower()]
         value = self.visit(ctx.value)
-        pattern = self.visit(ctx.expression())
+        patterns = [self.visit(e) for e in ctx.expression()]
         not_ = ctx.NOT() is not None
         escape = self.visit(ctx.esc) if ctx.esc is not None else None
-        return no.Like(value, pattern, not_=not_, escape=escape)
-
-    def visitLikeAnyPredicate(self, ctx: SnowflakeSqlParser.LikeAnyPredicateContext):
-        value = self.visit(ctx.value)
-        patterns = [self.visit(p) for p in ctx.expression()]
-        not_ = ctx.NOT() is not None
-        escape = self.visit(ctx.esc) if ctx.esc is not None else None
-        return no.LikeAny(value, patterns, not_=not_, escape=escape)
+        return no.Like(kind, value, patterns, not_=not_, escape=escape)
 
     def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
         return no.Null()

@@ -61,18 +61,15 @@ booleanExpression
     ;
 
 predicate[ParserRuleContext value]
-    : cmpOp right=valueExpression                                               #cmpPredicate
-    | IS NOT? NULL                                                              #isNullPredicate
-    | NOT? BETWEEN lower=valueExpression AND upper=valueExpression              #betweenPredicate
-    | NOT? IN '(' expression (',' expression)* ')'                              #inListPredicate
-    | NOT? IN '(' select ')'                                                    #inSelectPredicate
-    | NOT? IN JINJA                                                             #inJinjaPredicate
-    | NOT? LIKE expression (ESCAPE esc=string)?                                 #likePredicate
-    | NOT? ILIKE expression  (ESCAPE esc=string)?                               #ilikePredicate
-    | NOT? LIKE ANY expression (ESCAPE esc=string)?                             #likeAnyPredicate
-    | NOT? ILIKE ANY expression (ESCAPE esc=string)?                            #ilikeAnyPredicate
-    | NOT? LIKE ANY '(' expression (',' expression)* ')' (ESCAPE esc=string)?   #likeAnyPredicate
-    | NOT? ILIKE ANY '(' expression (',' expression)* ')' (ESCAPE esc=string)?  #ilikeAnyPredicate
+    : cmpOp right=valueExpression                                   #cmpPredicate
+    | IS NOT? NULL                                                  #isNullPredicate
+    | NOT? BETWEEN lower=valueExpression AND upper=valueExpression  #betweenPredicate
+    | NOT? IN '(' expression (',' expression)* ')'                  #inListPredicate
+    | NOT? IN '(' select ')'                                        #inSelectPredicate
+    | NOT? IN JINJA                                                 #inJinjaPredicate
+    | NOT? kind=(LIKE | ILIKE | RLIKE) ANY?
+      (expression | ('(' expression (',' expression)* ')'))
+      (ESCAPE esc=string)?                                          #likePredicate
     ;
 
 valueExpression
@@ -331,6 +328,7 @@ QUALIFY: 'qualify';
 RANGE: 'range';
 RESPECT: 'respect';
 RIGHT: 'right';
+RLIKE: 'rlike';
 ROW: 'row';
 ROWS: 'rows';
 SELECT: 'select';

@@ -136,25 +136,6 @@ class Renderer(dispatch.Class):
     def render(self, node: no.IdentifierAllSelectItem) -> str:  # noqa
         return self.render(node.identifier) + '.*'
 
-    def render(self, node: no.Ilike) -> str:  # noqa
-        return (
-                self.render(node.value) +
-                (' not' if node.not_ else '') +
-                ' ilike ' +
-                self.render(node.pattern) +
-                ((' escape ' + self.render(node.escape)) if node.escape is not None else '')
-        )
-
-    def render(self, node: no.IlikeAny) -> str:  # noqa
-        return (
-                self.render(node.value) +
-                (' not' if node.not_ else '') +
-                ' ilike any (' +
-                ', '.join(self.render(p) for p in node.patterns) +
-                ')' +
-                ((' escape ' + self.render(node.escape)) if node.escape is not None else '')
-        )
-
     def render(self, node: no.InJinja) -> str:  # noqa
         return (
                 self.render(node.needle) +
@@ -233,18 +214,11 @@ class Renderer(dispatch.Class):
         return (
                 self.render(node.value) +
                 (' not' if node.not_ else '') +
-                ' like ' +
-                self.render(node.pattern) +
-                ((' escape ' + self.render(node.escape)) if node.escape is not None else '')
-        )
-
-    def render(self, node: no.LikeAny) -> str:  # noqa
-        return (
-                self.render(node.value) +
-                (' not' if node.not_ else '') +
-                ' like any (' +
-                ', '.join(self.render(p) for p in node.patterns) +
-                ')' +
+                ' ' +
+                node.kind.value +
+                ' ' +
+                ((' any (' + ', '.join(self.render(p) for p in node.patterns) + ')') if len(node.patterns) != 1 else
+                 (self.render(next(iter(node.patterns))))) +
                 ((' escape ' + self.render(node.escape)) if node.escape is not None else '')
         )
 

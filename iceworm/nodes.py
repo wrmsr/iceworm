@@ -365,31 +365,21 @@ class IsNull(Expr):
     not_: bool = False
 
 
+class LikeKind(enum.Enum):
+    LIKE = 'like'
+    ILIKE = 'ilike'
+    RLIKE = 'rlike'
+
+
+LIKE_KIND_MAP: ta.Mapping[str, LikeKind] = {v.value: v for v in LikeKind.__members__.values()}
+
+
 class Like(Expr):
-    value: Expr
-    pattern: Expr
-    not_: bool = False
-    escape: ta.Optional[Expr] = None
-
-
-class Ilike(Expr):
-    value: Expr
-    pattern: Expr
-    not_: bool = False
-    escape: ta.Optional[Expr] = None
-
-
-class LikeAny(Expr):
+    kind: LikeKind
     value: Expr
     patterns: ta.Sequence[Expr]
     not_: bool = False
-    escape: ta.Optional[Expr] = None
-
-
-class IlikeAny(Expr):
-    value: Expr
-    patterns: ta.Sequence[Expr]
-    not_: bool = False
+    any: bool = False
     escape: ta.Optional[Expr] = None
 
 

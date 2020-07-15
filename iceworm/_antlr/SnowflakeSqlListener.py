@@ -216,33 +216,6 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#ilikePredicate.
-    def enterIlikePredicate(self, ctx:SnowflakeSqlParser.IlikePredicateContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#ilikePredicate.
-    def exitIlikePredicate(self, ctx:SnowflakeSqlParser.IlikePredicateContext):
-        pass
-
-
-    # Enter a parse tree produced by SnowflakeSqlParser#likeAnyPredicate.
-    def enterLikeAnyPredicate(self, ctx:SnowflakeSqlParser.LikeAnyPredicateContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#likeAnyPredicate.
-    def exitLikeAnyPredicate(self, ctx:SnowflakeSqlParser.LikeAnyPredicateContext):
-        pass
-
-
-    # Enter a parse tree produced by SnowflakeSqlParser#ilikeAnyPredicate.
-    def enterIlikeAnyPredicate(self, ctx:SnowflakeSqlParser.IlikeAnyPredicateContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#ilikeAnyPredicate.
-    def exitIlikeAnyPredicate(self, ctx:SnowflakeSqlParser.IlikeAnyPredicateContext):
-        pass
-
-
     # Enter a parse tree produced by SnowflakeSqlParser#primaryValueExpression.
     def enterPrimaryValueExpression(self, ctx:SnowflakeSqlParser.PrimaryValueExpressionContext):
         pass

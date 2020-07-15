@@ -125,21 +125,6 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#ilikePredicate.
-    def visitIlikePredicate(self, ctx:SnowflakeSqlParser.IlikePredicateContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by SnowflakeSqlParser#likeAnyPredicate.
-    def visitLikeAnyPredicate(self, ctx:SnowflakeSqlParser.LikeAnyPredicateContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by SnowflakeSqlParser#ilikeAnyPredicate.
-    def visitIlikeAnyPredicate(self, ctx:SnowflakeSqlParser.IlikeAnyPredicateContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by SnowflakeSqlParser#primaryValueExpression.
     def visitPrimaryValueExpression(self, ctx:SnowflakeSqlParser.PrimaryValueExpressionContext):
         return self.visitChildren(ctx)
