@@ -22,11 +22,11 @@ cte
     ;
 
 unionSelect
-    : primarySelect unionItem*
+    : (primarySelect | ('(' primarySelect ')')) unionItem*
     ;
 
 unionItem
-    : UNION setQuantifier? primarySelect
+    : UNION setQuantifier? (primarySelect | ('(' primarySelect ')'))
     ;
 
 primarySelect
