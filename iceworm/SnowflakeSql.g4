@@ -271,6 +271,7 @@ unaryOp
 unquotedIdentifier
     : IDENTIFIER
 
+    | FIRST
     | LEFT
     | OUTER
     | RIGHT
