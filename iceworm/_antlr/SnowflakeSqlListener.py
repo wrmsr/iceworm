@@ -306,6 +306,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#lastValueExpression.
+    def enterLastValueExpression(self, ctx:SnowflakeSqlParser.LastValueExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#lastValueExpression.
+    def exitLastValueExpression(self, ctx:SnowflakeSqlParser.LastValueExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#caseExpression.
     def enterCaseExpression(self, ctx:SnowflakeSqlParser.CaseExpressionContext):
         pass

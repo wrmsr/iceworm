@@ -84,6 +84,7 @@ valueExpression
 
 primaryExpression
     : functionCall                                                     #functionCallExpression
+    | LAST_VALUE '(' expression ((IGNORE | RESPECT) NULLS)? ')' over?  #lastValueExpression
     | CASE (val=expression)? caseItem* (ELSE default=expression)? END  #caseExpression
     | INTERVAL expression                                              #intervalExpression
     | '(' select ')'                                                   #selectExpression
@@ -286,18 +287,21 @@ FROM: 'from';
 FULL: 'full';
 GROUP: 'group';
 HAVING: 'having';
+IGNORE: 'ignore';
 ILIKE: 'ilike';
 IN: 'in';
 INNER: 'inner';
 INTERVAL: 'interval';
 IS: 'is';
 JOIN: 'join';
+LAST_VALUE: 'last_value';
 LATERAL: 'lateral';
 LEFT: 'left';
 LIKE: 'like';
 NATURAL: 'natural';
 NOT: 'not';
 NULL: 'null';
+NULLS: 'nulls';
 ON: 'on';
 OR: 'or';
 ORDER: 'order';
@@ -307,6 +311,7 @@ PARTITION: 'partition';
 PIVOT: 'pivot';
 PRECEDING: 'preceding';
 RANGE: 'range';
+RESPECT: 'respect';
 RIGHT: 'right';
 ROW: 'row';
 ROWS: 'rows';

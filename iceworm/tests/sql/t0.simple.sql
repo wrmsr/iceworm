@@ -87,3 +87,6 @@ select f()[0]['b'];
 select x like any (1, 2);
 select x like any 1;
 select x between 1 and 2;
+select last_value(0);
+select last_value(0 ignore nulls);
+select last_value(0 ignore nulls) over (order by x);

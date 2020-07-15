@@ -175,6 +175,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#lastValueExpression.
+    def visitLastValueExpression(self, ctx:SnowflakeSqlParser.LastValueExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#caseExpression.
     def visitCaseExpression(self, ctx:SnowflakeSqlParser.CaseExpressionContext):
         return self.visitChildren(ctx)

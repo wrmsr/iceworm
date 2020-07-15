@@ -219,6 +219,13 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         over = self.visit(ctx.over()) if ctx.over() is not None else None
         return no.FunctionCall(name, kwargs=kwargs, over=over)
 
+    def visitLastValueExpression(self, ctx: SnowflakeSqlParser.LastValueExpressionContext):
+        value = self.visit(ctx.expression())
+        nulls = (no.IgnoreOrRespect.IGNORE if ctx.IGNORE() is not None else no.IgnoreOrRespect.RESPECT) \
+            if ctx.NULLS() is not None else None
+        over = self.visit(ctx.over()) if ctx.over() is not None else None
+        return no.LastValue(value, nulls, over)
+
     def visitLikePredicate(self, ctx: SnowflakeSqlParser.LikePredicateContext):
         value = self.visit(ctx.value)
         pattern = self.visit(ctx.expression())
