@@ -110,6 +110,7 @@ RUN ( \
 
 RUN wget "http://mirrors.advancedhosters.com/apache/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz"
 RUN tar xzvf apache-hive-3.1.2-bin.tar.gz
+# https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-RunningHive
 RUN ( \
   ((/usr/sbin/sshd -D -o ListenAddress=0.0.0.0) &) && sleep 3 && \
   ((pg_ctlcluster 12 main start) &) && sleep 3 && \
@@ -126,6 +127,8 @@ RUN ( \
   $HADOOP_HOME/bin/hadoop fs -chmod g+w   /user/hive/warehouse && \
   export HIVE_HOME=/opt/hadoop/apache-hive-3.1.2-bin && \
   export PATH="$HIVE_HOME/bin:$PATH" && \
+  rm apache-hive-3.1.2-bin/lib/guava-19.0.jar && \
+  cp hadoop-3.2.1/share/hadoop/hdfs/lib/guava-27.0-jre.jar apache-hive-3.1.2-bin/lib/ && \
   $HIVE_HOME/bin/schematool -dbType derby -initSchema && \
   hadoop-3.2.1/sbin/stop-dfs.sh && \
   hadoop-3.2.1/sbin/stop-yarn.sh \
