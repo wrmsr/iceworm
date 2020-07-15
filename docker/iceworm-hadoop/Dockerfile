@@ -118,6 +118,8 @@ RUN ( \
   hadoop-3.2.1/sbin/start-yarn.sh && \
   sleep 5 && \
   (for i in $(seq 5) ; do hadoop-3.2.1/bin/hdfs dfsadmin -safemode get ; sleep 2 ; done) && \
+  rm apache-hive-3.1.2-bin/lib/guava-19.0.jar && \
+  cp hadoop-3.2.1/share/hadoop/hdfs/lib/guava-27.0-jre.jar apache-hive-3.1.2-bin/lib/ && \
   cd apache-hive-3.1.2-bin && \
   export HADOOP_HOME=/opt/hadoop/hadoop-3.2.1 && \
   $HADOOP_HOME/bin/hadoop fs -mkdir       /tmp && \
@@ -127,10 +129,8 @@ RUN ( \
   $HADOOP_HOME/bin/hadoop fs -chmod g+w   /user/hive/warehouse && \
   export HIVE_HOME=/opt/hadoop/apache-hive-3.1.2-bin && \
   export PATH="$HIVE_HOME/bin:$PATH" && \
-  rm apache-hive-3.1.2-bin/lib/guava-19.0.jar && \
-  cp hadoop-3.2.1/share/hadoop/hdfs/lib/guava-27.0-jre.jar apache-hive-3.1.2-bin/lib/ && \
   $HIVE_HOME/bin/schematool -dbType derby -initSchema && \
+  cd .. && \
   hadoop-3.2.1/sbin/stop-dfs.sh && \
   hadoop-3.2.1/sbin/stop-yarn.sh \
 )
-
