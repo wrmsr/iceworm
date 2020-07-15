@@ -108,5 +108,6 @@ select * group by grouping sets ((1, 2), (3));
 (select 1) union (select 2);
 select count(e) over (partition by u order by d rows 2 preceding);
 select sum(v) over (order by d rows between 2 preceding and current row);
+-- select 1 except select 1;
 -- select last_value(0) ignore nulls over(order by x);
 -- select coalesce(p:q.q.m, p:q.q[0].m) as i_a;

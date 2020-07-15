@@ -269,6 +269,7 @@ unquotedIdentifier
     | FIRST
     | GROUPING
     | ILIKE
+    | LAST
     | LEFT
     | LIKE
     | OUTER
