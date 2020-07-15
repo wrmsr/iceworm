@@ -50,9 +50,6 @@ class Renderer(dispatch.Class):
     def render(self, node: no.BinaryExpr) -> str:  # noqa
         return self.paren_render(node.left) + ' ' + node.op.value + ' ' + self.paren_render(node.right)
 
-    def render(self, node: no.Bracket) -> str:  # noqa
-        return self.render(node.value) + '[' + self.render(node.index) + ']'
-
     def render(self, node: no.Case) -> str:  # noqa
         return (
                 'case' +
@@ -70,9 +67,6 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.CastCall) -> str:  # noqa
         return 'cast(' + self.render(node.value) + ' as ' + self.render(node.type) + ')'
-
-    def render(self, node: no.Colon) -> str:  # noqa
-        return self.render(node.value) + ':' + self.render(node.name)
 
     def render(self, node: no.Cte) -> str:  # noqa
         return self.render(node.name) + ' as ' + paren(self.render(node.select))

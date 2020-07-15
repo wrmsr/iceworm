@@ -2,7 +2,6 @@
 TODO:
  - enable type checking
 """
-import abc
 import collections.abc
 import enum
 import typing as ta
@@ -297,16 +296,6 @@ class Case(Expr):
     value: ta.Optional[Expr]
     items: ta.Sequence[CaseItem]
     default: ta.Optional[Expr] = None
-
-
-class Colon(Expr):
-    value: Expr
-    name: Identifier
-
-
-class Bracket(Expr):
-    value: Expr
-    index: Expr
 
 
 class TypeSpec(Node):
