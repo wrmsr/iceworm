@@ -135,13 +135,13 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#castValueExpression.
-    def visitCastValueExpression(self, ctx:SnowflakeSqlParser.CastValueExpressionContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#bracketValueExpression.
+    def visitBracketValueExpression(self, ctx:SnowflakeSqlParser.BracketValueExpressionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#brackeetValueExpression.
-    def visitBrackeetValueExpression(self, ctx:SnowflakeSqlParser.BrackeetValueExpressionContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#castValueExpression.
+    def visitCastValueExpression(self, ctx:SnowflakeSqlParser.CastValueExpressionContext):
         return self.visitChildren(ctx)
 
 
@@ -195,8 +195,8 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#extractExpreession.
-    def visitExtractExpreession(self, ctx:SnowflakeSqlParser.ExtractExpreessionContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#extractExpression.
+    def visitExtractExpression(self, ctx:SnowflakeSqlParser.ExtractExpressionContext):
         return self.visitChildren(ctx)
 
 
@@ -250,38 +250,28 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#cumulativeFrameMin.
-    def visitCumulativeFrameMin(self, ctx:SnowflakeSqlParser.CumulativeFrameMinContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#numFrameBound.
+    def visitNumFrameBound(self, ctx:SnowflakeSqlParser.NumFrameBoundContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#cumulativeFrameMax.
-    def visitCumulativeFrameMax(self, ctx:SnowflakeSqlParser.CumulativeFrameMaxContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#unboundedFrameBound.
+    def visitUnboundedFrameBound(self, ctx:SnowflakeSqlParser.UnboundedFrameBoundContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#slidingFrameMin.
-    def visitSlidingFrameMin(self, ctx:SnowflakeSqlParser.SlidingFrameMinContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#currentRowFrameBound.
+    def visitCurrentRowFrameBound(self, ctx:SnowflakeSqlParser.CurrentRowFrameBoundContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#slidingFrameMax.
-    def visitSlidingFrameMax(self, ctx:SnowflakeSqlParser.SlidingFrameMaxContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#singleFrame.
+    def visitSingleFrame(self, ctx:SnowflakeSqlParser.SingleFrameContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#unboundedFrame.
-    def visitUnboundedFrame(self, ctx:SnowflakeSqlParser.UnboundedFrameContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by SnowflakeSqlParser#cumulativeFrame.
-    def visitCumulativeFrame(self, ctx:SnowflakeSqlParser.CumulativeFrameContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by SnowflakeSqlParser#slidingFrame.
-    def visitSlidingFrame(self, ctx:SnowflakeSqlParser.SlidingFrameContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#doubleFrame.
+    def visitDoubleFrame(self, ctx:SnowflakeSqlParser.DoubleFrameContext):
         return self.visitChildren(ctx)
 
 

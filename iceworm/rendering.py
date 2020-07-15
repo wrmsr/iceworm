@@ -80,19 +80,7 @@ class Renderer(dispatch.Class):
     def render(self, node: no.CteSelect) -> str:  # noqa
         return 'with ' + ', '.join(self.render(c) for c in node.ctes) + ' ' + self.render(node.select)
 
-    def render(self, node: no.CumulativeFrame) -> str:  # noqa
-        return (
-                node.rows_or_range.value +
-                ' between ' +
-                self.render(node.min) +
-                ' and ' +
-                self.render(node.max)
-        )
-
-    def render(self, node: no.CurrentRowCumulativeFrameMax) -> str:  # noqa
-        return 'current row'
-
-    def render(self, node: no.CurrentRowCumulativeFrameMin) -> str:  # noqa
+    def render(self, node: no.CurrentRowFrameBound) -> str:  # noqa
         return 'current row'
 
     def render(self, node: no.Date) -> str:  # noqa
@@ -100,6 +88,15 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.Decimal) -> str:  # noqa
         return node.value
+
+    def render(self, node: no.DoubleFrame) -> str:  # noqa
+        return (
+                node.rows_or_range.value +
+                ' between ' +
+                self.render(node.min) +
+                ' and ' +
+                self.render(node.max)
+        )
 
     def render(self, node: no.EFalse) -> str:  # noqa
         return 'false'
@@ -177,12 +174,6 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Interval) -> str:  # noqa
         return 'interval ' + self.render(node.value)
 
-    def render(self, node: no.IntSlidingFrameMax) -> str:  # noqa
-        return str(node.num) + ' ' + node.precedence.value
-
-    def render(self, node: no.IntSlidingFrameMin) -> str:  # noqa
-        return str(node.num) + ' ' + node.precedence.value
-
     def render(self, node: no.IsNull) -> str:  # noqa
         return self.render(node.value) + ' is ' + ('not ' if node.not_ else '') + 'null'
 
@@ -235,6 +226,9 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Null) -> str:  # noqa
         return 'null'
 
+    def render(self, node: no.NumFrameBound) -> str:  # noqa
+        return str(node.num) + ' ' + node.precedence.value
+
     def render(self, node: no.Over) -> str:  # noqa
         return ' '.join(p for p in [
                 (('partition by ' + ', '.join(self.render(e) for e in node.partition_by)) if node.partition_by else ''),
@@ -283,12 +277,11 @@ class Renderer(dispatch.Class):
     def render(self, node: no.SetsGrouping) -> str:  # noqa
         return 'grouping sets ' + paren(', '.join(self.render(i) for i in node.sets))
 
-    def render(self, node: no.SlidingFrame) -> str:  # noqa
+    def render(self, node: no.SingleFrame) -> str:  # noqa
         return (
-                'rows between ' +
-                self.render(node.min) +
-                ' and ' +
-                self.render(node.max)
+                node.rows_or_range.value +
+                ' ' +
+                self.render(node.bound)
         )
 
     def render(self, node: no.SortItem) -> str:  # noqa
@@ -316,20 +309,8 @@ class Renderer(dispatch.Class):
     def render(self, node: no.UnaryExpr) -> str:  # noqa
         return node.op.value + ' ' + self.paren_render(node.value)
 
-    def render(self, node: no.UnboundedFollowingCumulativeFrameMax) -> str:  # noqa
-        return 'unbounded following'
-
-    def render(self, node: no.UnboundedFollowingSlidingFrameMax) -> str:  # noqa
-        return 'unbounded following'
-
-    def render(self, node: no.UnboundedFrame) -> str:  # noqa
-        return 'rows unbounded ' + node.precedence.value
-
-    def render(self, node: no.UnboundedPrecedingCumulativeFrameMin) -> str:  # noqa
-        return 'unbounded preceding'
-
-    def render(self, node: no.UnboundedPrecedingSlidingFrameMin) -> str:  # noqa
-        return 'unbounded preceding'
+    def render(self, node: no.UnboundedFrameBound) -> str:  # noqa
+        return 'unbounded ' + node.precedence.value
 
     def render(self, node: no.UnionItem) -> str:  # noqa
         return (

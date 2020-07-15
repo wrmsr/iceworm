@@ -234,21 +234,21 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#bracketValueExpression.
+    def enterBracketValueExpression(self, ctx:SnowflakeSqlParser.BracketValueExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#bracketValueExpression.
+    def exitBracketValueExpression(self, ctx:SnowflakeSqlParser.BracketValueExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#castValueExpression.
     def enterCastValueExpression(self, ctx:SnowflakeSqlParser.CastValueExpressionContext):
         pass
 
     # Exit a parse tree produced by SnowflakeSqlParser#castValueExpression.
     def exitCastValueExpression(self, ctx:SnowflakeSqlParser.CastValueExpressionContext):
-        pass
-
-
-    # Enter a parse tree produced by SnowflakeSqlParser#brackeetValueExpression.
-    def enterBrackeetValueExpression(self, ctx:SnowflakeSqlParser.BrackeetValueExpressionContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#brackeetValueExpression.
-    def exitBrackeetValueExpression(self, ctx:SnowflakeSqlParser.BrackeetValueExpressionContext):
         pass
 
 
@@ -342,12 +342,12 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#extractExpreession.
-    def enterExtractExpreession(self, ctx:SnowflakeSqlParser.ExtractExpreessionContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#extractExpression.
+    def enterExtractExpression(self, ctx:SnowflakeSqlParser.ExtractExpressionContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#extractExpreession.
-    def exitExtractExpreession(self, ctx:SnowflakeSqlParser.ExtractExpreessionContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#extractExpression.
+    def exitExtractExpression(self, ctx:SnowflakeSqlParser.ExtractExpressionContext):
         pass
 
 
@@ -441,66 +441,48 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#cumulativeFrameMin.
-    def enterCumulativeFrameMin(self, ctx:SnowflakeSqlParser.CumulativeFrameMinContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#numFrameBound.
+    def enterNumFrameBound(self, ctx:SnowflakeSqlParser.NumFrameBoundContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#cumulativeFrameMin.
-    def exitCumulativeFrameMin(self, ctx:SnowflakeSqlParser.CumulativeFrameMinContext):
-        pass
-
-
-    # Enter a parse tree produced by SnowflakeSqlParser#cumulativeFrameMax.
-    def enterCumulativeFrameMax(self, ctx:SnowflakeSqlParser.CumulativeFrameMaxContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#cumulativeFrameMax.
-    def exitCumulativeFrameMax(self, ctx:SnowflakeSqlParser.CumulativeFrameMaxContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#numFrameBound.
+    def exitNumFrameBound(self, ctx:SnowflakeSqlParser.NumFrameBoundContext):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#slidingFrameMin.
-    def enterSlidingFrameMin(self, ctx:SnowflakeSqlParser.SlidingFrameMinContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#unboundedFrameBound.
+    def enterUnboundedFrameBound(self, ctx:SnowflakeSqlParser.UnboundedFrameBoundContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#slidingFrameMin.
-    def exitSlidingFrameMin(self, ctx:SnowflakeSqlParser.SlidingFrameMinContext):
-        pass
-
-
-    # Enter a parse tree produced by SnowflakeSqlParser#slidingFrameMax.
-    def enterSlidingFrameMax(self, ctx:SnowflakeSqlParser.SlidingFrameMaxContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#slidingFrameMax.
-    def exitSlidingFrameMax(self, ctx:SnowflakeSqlParser.SlidingFrameMaxContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#unboundedFrameBound.
+    def exitUnboundedFrameBound(self, ctx:SnowflakeSqlParser.UnboundedFrameBoundContext):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#unboundedFrame.
-    def enterUnboundedFrame(self, ctx:SnowflakeSqlParser.UnboundedFrameContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#currentRowFrameBound.
+    def enterCurrentRowFrameBound(self, ctx:SnowflakeSqlParser.CurrentRowFrameBoundContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#unboundedFrame.
-    def exitUnboundedFrame(self, ctx:SnowflakeSqlParser.UnboundedFrameContext):
-        pass
-
-
-    # Enter a parse tree produced by SnowflakeSqlParser#cumulativeFrame.
-    def enterCumulativeFrame(self, ctx:SnowflakeSqlParser.CumulativeFrameContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#cumulativeFrame.
-    def exitCumulativeFrame(self, ctx:SnowflakeSqlParser.CumulativeFrameContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#currentRowFrameBound.
+    def exitCurrentRowFrameBound(self, ctx:SnowflakeSqlParser.CurrentRowFrameBoundContext):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#slidingFrame.
-    def enterSlidingFrame(self, ctx:SnowflakeSqlParser.SlidingFrameContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#singleFrame.
+    def enterSingleFrame(self, ctx:SnowflakeSqlParser.SingleFrameContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#slidingFrame.
-    def exitSlidingFrame(self, ctx:SnowflakeSqlParser.SlidingFrameContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#singleFrame.
+    def exitSingleFrame(self, ctx:SnowflakeSqlParser.SingleFrameContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#doubleFrame.
+    def enterDoubleFrame(self, ctx:SnowflakeSqlParser.DoubleFrameContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#doubleFrame.
+    def exitDoubleFrame(self, ctx:SnowflakeSqlParser.DoubleFrameContext):
         pass
 
 

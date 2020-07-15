@@ -189,40 +189,29 @@ class SortItem(Node):
     nulls: ta.Optional[FirstOrLast] = None
 
 
-class Frame(Node, abstract=True):
-    pass
-
-
 class Precedence(enum.Enum):
     PRECEDING = 'preceding'
     FOLLOWING = 'following'
 
 
-class UnboundedFrame(Frame):
+class FrameBound(Node, abstract=True):
+    pass
+
+
+class NumFrameBound(FrameBound):
+    num: int
     precedence: Precedence
 
 
-class CumulativeFrameMin(Node, abstract=True):
+class UnboundedFrameBound(FrameBound):
+    precedence: Precedence
+
+
+class CurrentRowFrameBound(FrameBound):
     pass
 
 
-class UnboundedPrecedingCumulativeFrameMin(CumulativeFrameMin):
-    pass
-
-
-class CurrentRowCumulativeFrameMin(CumulativeFrameMin):
-    pass
-
-
-class CumulativeFrameMax(Node, abstract=True):
-    pass
-
-
-class UnboundedFollowingCumulativeFrameMax(CumulativeFrameMax):
-    pass
-
-
-class CurrentRowCumulativeFrameMax(CumulativeFrameMax):
+class Frame(Node, abstract=True):
     pass
 
 
@@ -231,41 +220,15 @@ class RowsOrRange(enum.Enum):
     RANGE = 'range'
 
 
-class CumulativeFrame(Frame):
+class SingleFrame(Node):
     rows_or_range: RowsOrRange
-    min: CumulativeFrameMin
-    max: CumulativeFrameMax
+    bound: FrameBound
 
 
-class SlidingFrameMin(Node, abstract=True):
-    pass
-
-
-class IntSlidingFrameMin(SlidingFrameMin):
-    num: int
-    precedence: Precedence
-
-
-class UnboundedPrecedingSlidingFrameMin(SlidingFrameMin):
-    pass
-
-
-class SlidingFrameMax(Node, abstract=True):
-    pass
-
-
-class IntSlidingFrameMax(SlidingFrameMax):
-    num: int
-    precedence: Precedence
-
-
-class UnboundedFollowingSlidingFrameMax(SlidingFrameMax):
-    pass
-
-
-class SlidingFrame(Frame):
-    min: SlidingFrameMin
-    max: SlidingFrameMax
+class DoubleFrame(Node):
+    rows_or_range: RowsOrRange
+    min: FrameBound
+    max: FrameBound
 
 
 class Over(Node):

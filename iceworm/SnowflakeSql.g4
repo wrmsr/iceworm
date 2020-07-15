@@ -77,7 +77,7 @@ valueExpression
     | op=unaryOp valueExpression                             #unaryValueExpression
     | left=valueExpression op=arithOp right=valueExpression  #arithValueExpression
     | valueExpression ':' identifier                         #colonValueExpression
-    | value=valueExpression '[' index=valueExpression ']'    #brackeetValueExpression
+    | value=valueExpression '[' index=valueExpression ']'    #bracketValueExpression
     | valueExpression '::' typeSpec                          #castValueExpression
     ;
 
@@ -90,7 +90,7 @@ primaryExpression
     | '(' expression ')'                                               #parenExpression
     | CAST '(' expression AS typeSpec ')'                              #castCallExpression
     | DATE string                                                      #dateExpression
-    | EXTRACT '(' part=identifier FROM expression ')'                  #extractExpreession
+    | EXTRACT '(' part=identifier FROM expression ')'                  #extractExpression
     | JINJA                                                            #jinjaExpression
     | simpleExpression                                                 #simplePrimaryExpression
     ;
@@ -136,30 +136,15 @@ over
       frame? ')'
     ;
 
-cumulativeFrameMin
-    : UNBOUNDED PRECEDING
-    | CURRENT ROW
-    ;
-
-cumulativeFrameMax
-    : UNBOUNDED FOLLOWING
-    | CURRENT ROW
-    ;
-
-slidingFrameMin
-    : INTEGER_VALUE (PRECEDING | FOLLOWING)
-    | UNBOUNDED PRECEDING
-    ;
-
-slidingFrameMax
-    : INTEGER_VALUE (PRECEDING | FOLLOWING)
-    | UNBOUNDED FOLLOWING
+frameBound
+    : INTEGER_VALUE (PRECEDING | FOLLOWING)  #numFrameBound
+    | UNBOUNDED (PRECEDING | FOLLOWING)      #unboundedFrameBound
+    | CURRENT ROW                            #currentRowFrameBound
     ;
 
 frame
-    : ROWS UNBOUNDED (PRECEDING | FOLLOWING)                            #unboundedFrame
-    | (ROWS | RANGE) BETWEEN cumulativeFrameMin AND cumulativeFrameMax  #cumulativeFrame
-    | ROWS BETWEEN slidingFrameMin AND slidingFrameMax                  #slidingFrame
+    : (ROWS | RANGE) frameBound                         #singleFrame
+    | (ROWS | RANGE) BETWEEN frameBound AND frameBound  #doubleFrame
     ;
 
 sortItem
