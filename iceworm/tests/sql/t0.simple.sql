@@ -92,3 +92,4 @@ select last_value(0 ignore nulls);
 select last_value(0 ignore nulls) over (order by x);
 select * from l join r using (c);
 select * from l join r using (c, d);
+select * from t order by x nulls last;

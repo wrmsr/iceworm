@@ -297,7 +297,11 @@ class Renderer(dispatch.Class):
         )
 
     def render(self, node: no.SortItem) -> str:  # noqa
-        return self.render(node.value) + ((' ' + node.direction.value) if node.direction is not None else '')
+        return (
+                self.render(node.value) +
+                ((' ' + node.direction.value) if node.direction is not None else '') +
+                ((' nulls ' + node.nulls.value) if node.nulls is not None else '')
+        )
 
     def render(self, node: no.StarExpr) -> str:  # noqa
         return '*'

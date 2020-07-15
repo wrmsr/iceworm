@@ -152,7 +152,7 @@ frame
     ;
 
 sortItem
-    : expression direction=(ASC | DESC)?
+    : expression direction=(ASC | DESC)? (NULLS (FIRST | LAST))?
     ;
 
 relation
@@ -284,6 +284,7 @@ DISTINCT: 'distinct';
 ELSE: 'else';
 END: 'end';
 FALSE: 'false';
+FIRST: 'first';
 FOLLOWING: 'following';
 FOR: 'for';
 FROM: 'from';
@@ -297,6 +298,7 @@ INNER: 'inner';
 INTERVAL: 'interval';
 IS: 'is';
 JOIN: 'join';
+LAST: 'last';
 LAST_VALUE: 'last_value';
 LATERAL: 'lateral';
 LEFT: 'left';

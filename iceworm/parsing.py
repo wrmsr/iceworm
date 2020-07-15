@@ -350,7 +350,9 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitSortItem(self, ctx: SnowflakeSqlParser.SortItemContext):
         value = self.visit(ctx.expression())
         direction = no.DIRECTION_MAP[ctx.direction.text.lower()] if ctx.direction is not None else None
-        return no.SortItem(value, direction)
+        nulls = (no.FirstOrLast.FIRST if ctx.FIRST() is not None else no.FirstOrLast.LAST) \
+            if ctx.NULLS() is not None else None
+        return no.SortItem(value, direction, nulls)
 
     def visitStarFunctionCall(self, ctx:SnowflakeSqlParser.StarFunctionCallContext):
         name = self.visit(ctx.qualifiedName())

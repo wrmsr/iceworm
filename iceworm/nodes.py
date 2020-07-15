@@ -178,9 +178,15 @@ class Direction(enum.Enum):
 DIRECTION_MAP: ta.Mapping[str, Direction] = {v.value: v for v in Direction.__members__.values()}
 
 
+class FirstOrLast(enum.Enum):
+    FIRST = 'first'
+    LAST = 'last'
+
+
 class SortItem(Node):
     value: Expr
     direction: ta.Optional[Direction] = None
+    nulls: ta.Optional[FirstOrLast] = None
 
 
 class Frame(Node, abstract=True):
