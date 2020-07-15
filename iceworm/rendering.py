@@ -112,6 +112,7 @@ class Renderer(dispatch.Class):
                 ((node.set_quantifier.value + ' ') if node.set_quantifier is not None else '') +
                 ', '.join(self.paren_render(a) for a in [*node.args, *node.kwargs]) +
                 ')' +
+                ((node.nulls.value + ' nulls') if node.nulls is not None else '') +
                 ((' over ' + paren(self.render(node.over))) if node.over is not None else '')
         )
 
@@ -203,7 +204,10 @@ class Renderer(dispatch.Class):
                 ((node.type.value + ' ') if node.type != no.JoinType.DEFAULT else '') +
                 'join ' +
                 self.render(node.right) +
-                ((' on ' + self.render(node.condition)) if node.condition is not None else '')
+                ' '.join(t for t in [
+                    (('on ' + self.render(node.condition)) if node.condition is not None else ''),
+                    (('using (' + ', '.join(self.render(i) for i in node.using) + ')') if node.using is not None else ''),  # noqa
+                ] if t)
         )
 
     def render(self, node: no.Kwarg) -> str:  # noqa

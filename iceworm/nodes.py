@@ -277,21 +277,22 @@ class Kwarg(Node):
     value: Expr
 
 
+class IgnoreOrRespect(enum.Enum):
+    IGNORE = 'ignore'
+    RESPECT = 'respect'
+
+
 class FunctionCall(Node):
     name: QualifiedNameNode
     args: ta.Sequence[Expr] = ()
     kwargs: ta.Sequence[Kwarg] = ()
     set_quantifier: ta.Optional['SetQuantifier'] = None
+    nulls: ta.Optional[IgnoreOrRespect] = None
     over: ta.Optional[Over] = None
 
 
 class FunctionCallExpr(Expr):
     call: FunctionCall
-
-
-class IgnoreOrRespect(enum.Enum):
-    IGNORE = 'ignore'
-    RESPECT = 'respect'
 
 
 class LastValue(Expr):
@@ -424,6 +425,7 @@ class Join(Relation):
     type: JoinType
     right: Relation
     condition: ta.Optional[Expr] = None
+    using: ta.Optional[ta.Sequence[Identifier]] = None
 
 
 class Pivot(Relation):

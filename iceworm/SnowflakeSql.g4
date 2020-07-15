@@ -108,9 +108,9 @@ typeSpec
     ;
 
 functionCall
-    : qualifiedName '(' setQuantifier? (expression (',' expression)*)? ')' over?  #expressionFunctionCall
-    | qualifiedName '(' kwarg (',' kwarg)* ')' over?                              #kwargFunctionCall
-    | qualifiedName '(' '*' ')' over?                                             #starFunctionCall
+    : qualifiedName '(' setQuantifier? (expression (',' expression)*)? ')' ((IGNORE | RESPECT) NULLS)? over?  #expressionFunctionCall
+    | qualifiedName '(' kwarg (',' kwarg)* ')' ((IGNORE | RESPECT) NULLS)? over?                              #kwargFunctionCall
+    | qualifiedName '(' '*' ')' over?                                                                         #starFunctionCall
     ;
 
 kwarg
@@ -156,20 +156,23 @@ sortItem
     ;
 
 relation
-    : relation AS? identifier                                                      #aliasedRelation
-    | left=relation ty=joinType? JOIN right=relation (ON cond=booleanExpression)?  #joinRelation
+    : relation AS? identifier                                           #aliasedRelation
+    | left=relation ty=joinType?
+      JOIN right=relation
+      (ON cond=booleanExpression)?
+      (USING '(' using=identifierList ')')?                             #joinRelation
     | relation PIVOT '('
       func=qualifiedName '(' pc=identifier ')'
-      FOR vc=identifier IN '(' (expression (',' expression)*)? ')' ')'             #pivotRelation
+      FOR vc=identifier IN '(' (expression (',' expression)*)? ')' ')'  #pivotRelation
     | relation UNPIVOT '('
       vc=identifier
-      FOR nc=identifier IN '(' identifierList? ')' ')'                             #unpivotRelation
-    | LATERAL relation                                                             #lateralRelation
-    | functionCall                                                                 #functionCallRelation
-    | '(' select ')'                                                               #selectRelation
-    | '(' relation ')'                                                             #parenRelation
-    | JINJA                                                                        #jinjaRelation
-    | qualifiedName                                                                #tableRelation
+      FOR nc=identifier IN '(' identifierList? ')' ')'                  #unpivotRelation
+    | LATERAL relation                                                  #lateralRelation
+    | functionCall                                                      #functionCallRelation
+    | '(' select ')'                                                    #selectRelation
+    | '(' relation ')'                                                  #parenRelation
+    | JINJA                                                             #jinjaRelation
+    | qualifiedName                                                     #tableRelation
     ;
 
 groupBy
@@ -322,6 +325,7 @@ TRUE: 'true';
 UNBOUNDED: 'unbounded';
 UNION: 'union';
 UNPIVOT: 'unpivot';
+USING: 'using';
 WHEN: 'when';
 WHERE: 'where';
 WITH: 'with';

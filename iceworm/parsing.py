@@ -120,8 +120,16 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         args = [self.visit(a) for a in ctx.expression()]
         set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
             if ctx.setQuantifier() is not None else None
+        nulls = (no.IgnoreOrRespect.IGNORE if ctx.IGNORE() is not None else no.IgnoreOrRespect.RESPECT) \
+            if ctx.NULLS() is not None else None
         over = self.visit(ctx.over()) if ctx.over() is not None else None
-        return no.FunctionCall(name, args=args, set_quantifier=set_quantifier, over=over)
+        return no.FunctionCall(
+            name,
+            args=args,
+            set_quantifier=set_quantifier,
+            nulls=nulls,
+            over=over,
+        )
 
     def visitExpressionSelectItem(self, ctx: SnowflakeSqlParser.ExpressionSelectItemContext):
         value = self.visit(ctx.expression())
@@ -206,7 +214,14 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             if ctx.joinType() is not None else no.JoinType.DEFAULT
         right = self.visit(ctx.right)
         condition = self.visit(ctx.cond) if ctx.cond is not None else None
-        return no.Join(left, type_, right, condition)
+        using = [self.visit(i) for i in ctx.using.identifier()] if ctx.using else None
+        return no.Join(
+            left,
+            type_,
+            right,
+            condition=condition,
+            using=using,
+        )
 
     def visitKwarg(self, ctx: SnowflakeSqlParser.KwargContext):
         name = self.visit(ctx.identifier())
@@ -216,8 +231,15 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitKwargFunctionCall(self, ctx: SnowflakeSqlParser.KwargFunctionCallContext):
         name = self.visit(ctx.qualifiedName())
         kwargs = [self.visit(a) for a in ctx.kwarg()]
+        nulls = (no.IgnoreOrRespect.IGNORE if ctx.IGNORE() is not None else no.IgnoreOrRespect.RESPECT) \
+            if ctx.NULLS() is not None else None
         over = self.visit(ctx.over()) if ctx.over() is not None else None
-        return no.FunctionCall(name, kwargs=kwargs, over=over)
+        return no.FunctionCall(
+            name,
+            kwargs=kwargs,
+            nulls=nulls,
+            over=over,
+        )
 
     def visitLastValueExpression(self, ctx: SnowflakeSqlParser.LastValueExpressionContext):
         value = self.visit(ctx.expression())

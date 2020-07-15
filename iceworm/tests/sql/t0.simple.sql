@@ -90,3 +90,5 @@ select x between 1 and 2;
 select last_value(0);
 select last_value(0 ignore nulls);
 select last_value(0 ignore nulls) over (order by x);
+select * from l join r using (c);
+select * from l join r using (c, d);
