@@ -333,6 +333,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#dateExpression.
+    def enterDateExpression(self, ctx:SnowflakeSqlParser.DateExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#dateExpression.
+    def exitDateExpression(self, ctx:SnowflakeSqlParser.DateExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#jinjaExpression.
     def enterJinjaExpression(self, ctx:SnowflakeSqlParser.JinjaExpressionContext):
         pass

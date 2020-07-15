@@ -383,6 +383,10 @@ class Like(Expr):
     escape: ta.Optional[Expr] = None
 
 
+class Date(Expr):
+    value: String
+
+
 class InList(Expr):
     needle: Expr
     haystack: ta.Sequence[Expr]

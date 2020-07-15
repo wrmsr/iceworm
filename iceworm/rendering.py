@@ -91,6 +91,9 @@ class Renderer(dispatch.Class):
     def render(self, node: no.CurrentRowCumulativeFrameMin) -> str:  # noqa
         return 'current row'
 
+    def render(self, node: no.Date) -> str:  # noqa
+        return 'date ' + self.render(node.value)
+
     def render(self, node: no.Decimal) -> str:  # noqa
         return node.value
 

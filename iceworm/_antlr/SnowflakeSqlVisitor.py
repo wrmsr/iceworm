@@ -190,6 +190,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#dateExpression.
+    def visitDateExpression(self, ctx:SnowflakeSqlParser.DateExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#jinjaExpression.
     def visitJinjaExpression(self, ctx:SnowflakeSqlParser.JinjaExpressionContext):
         return self.visitChildren(ctx)

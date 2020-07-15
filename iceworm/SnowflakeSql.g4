@@ -89,6 +89,7 @@ primaryExpression
     | '(' select ')'                                                   #selectExpression
     | '(' expression ')'                                               #parenExpression
     | CAST '(' expression AS typeSpec ')'                              #castCallExpression
+    | DATE string                                                      #dateExpression
     | JINJA                                                            #jinjaExpression
     | simpleExpression                                                 #simplePrimaryExpression
     ;
@@ -128,7 +129,10 @@ caseItem
     ;
 
 over
-    : OVER '(' (PARTITION BY (expression (',' expression)*))? (ORDER BY sortItem (',' sortItem)*)? frame? ')'
+    : OVER '('
+      (PARTITION BY (expression (',' expression)*))?
+      (ORDER BY sortItem (',' sortItem)*)?
+      frame? ')'
     ;
 
 cumulativeFrameMin
@@ -286,6 +290,7 @@ CASE: 'case';
 CAST: 'cast';
 CROSS: 'cross';
 CURRENT: 'current';
+DATE: 'date';
 DESC: 'desc';
 DISTINCT: 'distinct';
 ELSE: 'else';

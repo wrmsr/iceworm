@@ -113,6 +113,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         else:
             return no.CurrentRowCumulativeFrameMax()
 
+    def visitDateExpression(self, ctx: SnowflakeSqlParser.DateExpressionContext):
+        value = self.visit(ctx.string())
+        return no.Date(value)
+
     def visitDecimalNumber(self, ctx: SnowflakeSqlParser.DecimalNumberContext):
         return no.Decimal(ctx.DECIMAL_VALUE().getText())
 
