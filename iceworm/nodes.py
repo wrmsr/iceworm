@@ -2,6 +2,7 @@
 TODO:
  - enable type checking
 """
+import abc
 import collections.abc
 import enum
 import typing as ta
@@ -321,6 +322,11 @@ class Cast(Expr):
 class CastCall(Expr):
     value: Expr
     type: TypeSpec
+
+
+class Traversal(Node):
+    value: Expr
+    keys: ta.Sequence[ta.Union[Identifier, Integer]]
 
 
 class IsNull(Expr):

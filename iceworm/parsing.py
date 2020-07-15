@@ -54,11 +54,6 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         min, max = [self.visit(e) for e in ctx.frameBound()]
         return no.DoubleFrame(rows_or_range, min, max)
 
-    def visitBracketValueExpression(self, ctx: SnowflakeSqlParser.BracketValueExpressionContext):
-        value = self.visit(ctx.value)
-        index = self.visit(ctx.index)
-        return no.Bracket(value, index)
-
     def visitCaseItem(self, ctx: SnowflakeSqlParser.CaseItemContext):
         when, then = [self.visit(e) for e in ctx.expression()]
         return no.CaseItem(when, then)
@@ -84,11 +79,6 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         op = no.BINARY_OP_MAP[ctx.cmpOp().getText().lower()]
         right = self.visit(ctx.valueExpression())
         return no.BinaryExpr(left, op, right)
-
-    def visitColonValueExpression(self, ctx: SnowflakeSqlParser.ColonValueExpressionContext):
-        value = self.visit(ctx.valueExpression())
-        name = self.visit(ctx.identifier())
-        return no.Colon(value, name)
 
     def visitCte(self, ctx: SnowflakeSqlParser.CteContext):
         name = self.visit(ctx.identifier())
@@ -182,7 +172,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         not_ = ctx.NOT() is not None
         return no.InSelect(needle, haystack, not_=not_)
 
-    def visitIntegerNumber(self, ctx: SnowflakeSqlParser.IntegerNumberContext):
+    def visitInteger(self, ctx: SnowflakeSqlParser.IntegerContext):
         return no.Integer(int(ctx.INTEGER_VALUE().getText()))
 
     def visitIntervalExpression(self, ctx: SnowflakeSqlParser.IntervalExpressionContext):
@@ -357,6 +347,11 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitTrue(self, ctx: SnowflakeSqlParser.TrueContext):
         return no.ETrue()
+
+    def visitTraversalValueExpression(self, ctx: SnowflakeSqlParser.TraversalValueExpressionContext):
+        value = self.visit(ctx.valueExpression())
+        keys = [self.visit(k) for k in ctx.traversalKey()]
+        return no.Traversal(value, keys)
 
     def visitTypeSpec(self, ctx: SnowflakeSqlParser.TypeSpecContext):
         name = self.visit(ctx.identifier())

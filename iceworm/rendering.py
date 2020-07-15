@@ -337,6 +337,13 @@ class Renderer(dispatch.Class):
                 '))'
         )
 
+    def render(self, node: no.Traversal) -> str:  # noqa
+        return self.render(node.value) + ':' + ''.join(
+            ('[' + r + ']') if isinstance(k, no.Integer) else (('.' if i else '') + r)
+            for i, k in enumerate(node.keys)
+            for r in [self.render(k)]
+        )
+
 
 def render(node: no.Node) -> str:
     return Renderer().render(node)

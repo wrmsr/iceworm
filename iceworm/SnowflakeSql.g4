@@ -76,9 +76,16 @@ valueExpression
     : primaryExpression                                      #primaryValueExpression
     | op=unaryOp valueExpression                             #unaryValueExpression
     | left=valueExpression op=arithOp right=valueExpression  #arithValueExpression
-    | valueExpression ':' identifier                         #colonValueExpression
-    | value=valueExpression '[' index=valueExpression ']'    #bracketValueExpression
+    | valueExpression
+      (':' traversalKey | ':'? '[' traversalKey ']')
+      ('.' traversalKey | '[' traversalKey ']')*             #traversalValueExpression
     | valueExpression '::' typeSpec                          #castValueExpression
+    ;
+
+traversalKey
+    : identifier
+    | string
+    | integer
     ;
 
 primaryExpression
@@ -198,9 +205,13 @@ quotedIdentifier
     ;
 
 number
-    : INTEGER_VALUE  #integerNumber
+    : integer        #integerNumber
     | DECIMAL_VALUE  #decimalNumber
     | FLOAT_VALUE    #floatNumber
+    ;
+
+integer
+    : INTEGER_VALUE
     ;
 
 string

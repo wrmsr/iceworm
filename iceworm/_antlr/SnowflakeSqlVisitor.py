@@ -135,8 +135,8 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#bracketValueExpression.
-    def visitBracketValueExpression(self, ctx:SnowflakeSqlParser.BracketValueExpressionContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#traversalValueExpression.
+    def visitTraversalValueExpression(self, ctx:SnowflakeSqlParser.TraversalValueExpressionContext):
         return self.visitChildren(ctx)
 
 
@@ -150,8 +150,8 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#colonValueExpression.
-    def visitColonValueExpression(self, ctx:SnowflakeSqlParser.ColonValueExpressionContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#traversalKey.
+    def visitTraversalKey(self, ctx:SnowflakeSqlParser.TraversalKeyContext):
         return self.visitChildren(ctx)
 
 
@@ -377,6 +377,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#floatNumber.
     def visitFloatNumber(self, ctx:SnowflakeSqlParser.FloatNumberContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#integer.
+    def visitInteger(self, ctx:SnowflakeSqlParser.IntegerContext):
         return self.visitChildren(ctx)
 
 

@@ -234,12 +234,12 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#bracketValueExpression.
-    def enterBracketValueExpression(self, ctx:SnowflakeSqlParser.BracketValueExpressionContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#traversalValueExpression.
+    def enterTraversalValueExpression(self, ctx:SnowflakeSqlParser.TraversalValueExpressionContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#bracketValueExpression.
-    def exitBracketValueExpression(self, ctx:SnowflakeSqlParser.BracketValueExpressionContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#traversalValueExpression.
+    def exitTraversalValueExpression(self, ctx:SnowflakeSqlParser.TraversalValueExpressionContext):
         pass
 
 
@@ -261,12 +261,12 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#colonValueExpression.
-    def enterColonValueExpression(self, ctx:SnowflakeSqlParser.ColonValueExpressionContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#traversalKey.
+    def enterTraversalKey(self, ctx:SnowflakeSqlParser.TraversalKeyContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#colonValueExpression.
-    def exitColonValueExpression(self, ctx:SnowflakeSqlParser.ColonValueExpressionContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#traversalKey.
+    def exitTraversalKey(self, ctx:SnowflakeSqlParser.TraversalKeyContext):
         pass
 
 
@@ -672,6 +672,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#floatNumber.
     def exitFloatNumber(self, ctx:SnowflakeSqlParser.FloatNumberContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#integer.
+    def enterInteger(self, ctx:SnowflakeSqlParser.IntegerContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#integer.
+    def exitInteger(self, ctx:SnowflakeSqlParser.IntegerContext):
         pass
 
 
