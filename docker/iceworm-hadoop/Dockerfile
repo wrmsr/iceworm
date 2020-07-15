@@ -102,6 +102,32 @@ RUN ( \
 )
 RUN ( \
   ((pg_ctlcluster 12 main start) &) && sleep 3 && \
+  sudo -upostgres psql -c "create user iceworm password 'iceworm'"  && \
   sudo -upostgres createdb iceworm && \
-  sudo -upostgres psql -c 'select 1' \
+  sudo -upostgres psql -c 'select 1' && \
+  pg_ctlcluster 12 main stop \
 )
+
+RUN wget "http://mirrors.advancedhosters.com/apache/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz"
+RUN tar xzvf apache-hive-3.1.2-bin.tar.gz
+RUN ( \
+  ((/usr/sbin/sshd -D -o ListenAddress=0.0.0.0) &) && sleep 3 && \
+  ((pg_ctlcluster 12 main start) &) && sleep 3 && \
+  hadoop-3.2.1/sbin/start-dfs.sh && \
+  hadoop-3.2.1/sbin/start-yarn.sh && \
+  sleep 5 && \
+  (for i in $(seq 5) ; do hadoop-3.2.1/bin/hdfs dfsadmin -safemode get ; sleep 2 ; done) && \
+  cd apache-hive-3.1.2-bin && \
+  export HADOOP_HOME=/opt/hadoop/hadoop-3.2.1 && \
+  $HADOOP_HOME/bin/hadoop fs -mkdir       /tmp && \
+  $HADOOP_HOME/bin/hadoop fs -mkdir       /user/hive && \
+  $HADOOP_HOME/bin/hadoop fs -mkdir       /user/hive/warehouse && \
+  $HADOOP_HOME/bin/hadoop fs -chmod g+w   /tmp && \
+  $HADOOP_HOME/bin/hadoop fs -chmod g+w   /user/hive/warehouse && \
+  export HIVE_HOME=/opt/hadoop/apache-hive-3.1.2-bin && \
+  export PATH="$HIVE_HOME/bin:$PATH" && \
+  $HIVE_HOME/bin/schematool -dbType derby -initSchema && \
+  hadoop-3.2.1/sbin/stop-dfs.sh && \
+  hadoop-3.2.1/sbin/stop-yarn.sh \
+)
+
