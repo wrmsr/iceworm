@@ -1,3 +1,8 @@
+"""
+TODO:
+ - double check nullsFunctionCall rewriting is correct
+ - fix UNION ALL ALL
+"""
 from omnibus import antlr
 from omnibus import check
 from omnibus._vendor import antlr4
