@@ -27,7 +27,8 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitAliasedRelation(self, ctx: SnowflakeSqlParser.AliasedRelationContext):
         relation = self.visit(ctx.relation())
         alias = self.visit(ctx.identifier())
-        return no.AliasedRelation(relation, alias)
+        columns = [self.visit(i) for i in ctx.identifierList().identifier()] if ctx.identifierList() is not None else []
+        return no.AliasedRelation(relation, alias, columns)
 
     def visitAllSelectItem(self, ctx: SnowflakeSqlParser.AllSelectItemContext):
         return no.AllSelectItem()
@@ -164,13 +165,15 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         value = self.visit(ctx.value)
         pattern = self.visit(ctx.expression())
         not_ = ctx.NOT() is not None
-        return no.Ilike(value, pattern, not_=not_)
+        escape = self.visit(ctx.esc) if ctx.esc is not None else None
+        return no.Ilike(value, pattern, not_=not_, escape=escape)
 
     def visitIlikeAnyPredicate(self, ctx: SnowflakeSqlParser.IlikePredicateContext):
         value = self.visit(ctx.value)
         patterns = [self.visit(p) for p in ctx.expression()]
         not_ = ctx.NOT() is not None
-        return no.IlikeAny(value, patterns, not_=not_)
+        escape = self.visit(ctx.esc) if ctx.esc is not None else None
+        return no.IlikeAny(value, patterns, not_=not_, escape=escape)
 
     def visitInJinjaPredicate(self, ctx: SnowflakeSqlParser.InJinjaPredicateContext):
         needle = self.visit(ctx.value)
@@ -256,13 +259,15 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         value = self.visit(ctx.value)
         pattern = self.visit(ctx.expression())
         not_ = ctx.NOT() is not None
-        return no.Like(value, pattern, not_=not_)
+        escape = self.visit(ctx.esc) if ctx.esc is not None else None
+        return no.Like(value, pattern, not_=not_, escape=escape)
 
     def visitLikeAnyPredicate(self, ctx: SnowflakeSqlParser.LikeAnyPredicateContext):
         value = self.visit(ctx.value)
         patterns = [self.visit(p) for p in ctx.expression()]
         not_ = ctx.NOT() is not None
-        return no.LikeAny(value, patterns, not_=not_)
+        escape = self.visit(ctx.esc) if ctx.esc is not None else None
+        return no.LikeAny(value, patterns, not_=not_, escape=escape)
 
     def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
         return no.Null()
@@ -304,6 +309,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         having = self.visit(ctx.having) if ctx.having is not None else None
         qualify = self.visit(ctx.qualify) if ctx.qualify is not None else None
         order_by = [self.visit(s) for s in ctx.sortItem()] if ctx.sortItem() is not None else None
+        limit = int(ctx.INTEGER_VALUE().getText()) if ctx.INTEGER_VALUE() is not None else None
         return no.Select(
             items,
             relations,
@@ -314,6 +320,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             having=having,
             qualify=qualify,
             order_by=order_by,
+            limit=limit,
         )
 
     def visitQualifiedName(self, ctx: SnowflakeSqlParser.QualifiedNameContext):

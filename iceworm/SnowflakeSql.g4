@@ -37,6 +37,7 @@ primarySelect
       (HAVING having=booleanExpression)?
       (QUALIFY qualify=booleanExpression)?
       (ORDER BY sortItem (',' sortItem)*)?
+      (LIMIT INTEGER_VALUE)?
     ;
 
 topN
@@ -60,18 +61,18 @@ booleanExpression
     ;
 
 predicate[ParserRuleContext value]
-    : cmpOp right=valueExpression                                   #cmpPredicate
-    | IS NOT? NULL                                                  #isNullPredicate
-    | NOT? BETWEEN lower=valueExpression AND upper=valueExpression  #betweenPredicate
-    | NOT? IN '(' expression (',' expression)* ')'                  #inListPredicate
-    | NOT? IN '(' select ')'                                        #inSelectPredicate
-    | NOT? IN JINJA                                                 #inJinjaPredicate
-    | NOT? LIKE expression                                          #likePredicate
-    | NOT? ILIKE expression                                         #ilikePredicate
-    | NOT? LIKE ANY expression                                      #likeAnyPredicate
-    | NOT? ILIKE ANY expression                                     #ilikeAnyPredicate
-    | NOT? LIKE ANY '(' expression (',' expression)* ')'            #likeAnyPredicate
-    | NOT? ILIKE ANY '(' expression (',' expression)* ')'           #ilikeAnyPredicate
+    : cmpOp right=valueExpression                                               #cmpPredicate
+    | IS NOT? NULL                                                              #isNullPredicate
+    | NOT? BETWEEN lower=valueExpression AND upper=valueExpression              #betweenPredicate
+    | NOT? IN '(' expression (',' expression)* ')'                              #inListPredicate
+    | NOT? IN '(' select ')'                                                    #inSelectPredicate
+    | NOT? IN JINJA                                                             #inJinjaPredicate
+    | NOT? LIKE expression (ESCAPE esc=string)?                                 #likePredicate
+    | NOT? ILIKE expression  (ESCAPE esc=string)?                               #ilikePredicate
+    | NOT? LIKE ANY expression (ESCAPE esc=string)?                             #likeAnyPredicate
+    | NOT? ILIKE ANY expression (ESCAPE esc=string)?                            #ilikeAnyPredicate
+    | NOT? LIKE ANY '(' expression (',' expression)* ')' (ESCAPE esc=string)?   #likeAnyPredicate
+    | NOT? ILIKE ANY '(' expression (',' expression)* ')' (ESCAPE esc=string)?  #ilikeAnyPredicate
     ;
 
 valueExpression
@@ -164,7 +165,7 @@ sortItem
     ;
 
 relation
-    : relation AS? identifier                                           #aliasedRelation
+    : relation AS? identifier ('(' identifierList ')')?                 #aliasedRelation
     | left=relation ty=joinType?
       JOIN right=relation
       (ON cond=booleanExpression)?
@@ -291,6 +292,7 @@ DESC: 'desc';
 DISTINCT: 'distinct';
 ELSE: 'else';
 END: 'end';
+ESCAPE: 'escape';
 FALSE: 'false';
 FIRST: 'first';
 FOLLOWING: 'following';
@@ -311,6 +313,7 @@ LAST_VALUE: 'last_value';
 LATERAL: 'lateral';
 LEFT: 'left';
 LIKE: 'like';
+LIMIT: 'limit';
 NATURAL: 'natural';
 NOT: 'not';
 NULL: 'null';

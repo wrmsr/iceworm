@@ -33,7 +33,8 @@ class Renderer(dispatch.Class):
     def render(self, node: no.AliasedRelation) -> str:  # noqa
         return (
                 self.paren_render(node.relation) +
-                ((' as ' + self.render(node.alias)) if node.alias is not None else '')
+                ((' as ' + self.render(node.alias)) if node.alias is not None else '') +
+                (('(' + ', '.join(self.render(i) for i in node.columns) + ')') if node.columns else '')
         )
 
     def render(self, node: no.AllSelectItem) -> str:  # noqa
@@ -140,7 +141,8 @@ class Renderer(dispatch.Class):
                 self.render(node.value) +
                 (' not' if node.not_ else '') +
                 ' ilike ' +
-                self.render(node.pattern)
+                self.render(node.pattern) +
+                ((' escape ' + self.render(node.escape)) if node.escape is not None else '')
         )
 
     def render(self, node: no.IlikeAny) -> str:  # noqa
@@ -149,7 +151,8 @@ class Renderer(dispatch.Class):
                 (' not' if node.not_ else '') +
                 ' ilike any (' +
                 ', '.join(self.render(p) for p in node.patterns) +
-                ')'
+                ')' +
+                ((' escape ' + self.render(node.escape)) if node.escape is not None else '')
         )
 
     def render(self, node: no.InJinja) -> str:  # noqa
@@ -231,7 +234,8 @@ class Renderer(dispatch.Class):
                 self.render(node.value) +
                 (' not' if node.not_ else '') +
                 ' like ' +
-                self.render(node.pattern)
+                self.render(node.pattern) +
+                ((' escape ' + self.render(node.escape)) if node.escape is not None else '')
         )
 
     def render(self, node: no.LikeAny) -> str:  # noqa
@@ -240,7 +244,8 @@ class Renderer(dispatch.Class):
                 (' not' if node.not_ else '') +
                 ' like any (' +
                 ', '.join(self.render(p) for p in node.patterns) +
-                ')'
+                ')' +
+                ((' escape ' + self.render(node.escape)) if node.escape is not None else '')
         )
 
     def render(self, node: no.Null) -> str:  # noqa
@@ -281,7 +286,8 @@ class Renderer(dispatch.Class):
                 ((' group by ' + self.render(node.group_by)) if node.group_by is not None else '') +
                 ((' having ' + self.render(node.having)) if node.having is not None else '') +
                 ((' qualify ' + self.render(node.qualify)) if node.qualify is not None else '') +
-                ((' order by ' + ', '.join(self.render(e) for e in node.order_by)) if node.order_by else '')
+                ((' order by ' + ', '.join(self.render(e) for e in node.order_by)) if node.order_by else '') +
+                ((' limit ' + str(node.limit)) if node.limit is not None else '')
         )
 
     def render(self, node: no.SelectExpr) -> str:  # noqa

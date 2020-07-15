@@ -369,24 +369,28 @@ class Like(Expr):
     value: Expr
     pattern: Expr
     not_: bool = False
+    escape: ta.Optional[Expr] = None
 
 
 class Ilike(Expr):
     value: Expr
     pattern: Expr
     not_: bool = False
+    escape: ta.Optional[Expr] = None
 
 
 class LikeAny(Expr):
     value: Expr
     patterns: ta.Sequence[Expr]
     not_: bool = False
+    escape: ta.Optional[Expr] = None
 
 
 class IlikeAny(Expr):
     value: Expr
     patterns: ta.Sequence[Expr]
     not_: bool = False
+    escape: ta.Optional[Expr] = None
 
 
 class InList(Expr):
@@ -465,6 +469,7 @@ class Table(Relation):
 class AliasedRelation(Relation):
     relation: Relation
     alias: Identifier
+    columns: ta.Sequence[Identifier] = ()
 
 
 class SelectItem(Node, abstract=True):
@@ -514,6 +519,7 @@ class Select(Selectable):
     having: ta.Optional[Expr] = None
     qualify: ta.Optional[Expr] = None
     order_by: ta.Optional[ta.Sequence[SortItem]] = None
+    limit: ta.Optional[int] = None
 
 
 class Cte(Node):
