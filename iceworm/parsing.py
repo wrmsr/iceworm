@@ -151,6 +151,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitFalse(self, ctx: SnowflakeSqlParser.FalseContext):
         return no.EFalse()
 
+    def visitFlatGrouping(self, ctx: SnowflakeSqlParser.FlatGroupingContext):
+        items = [self.visit(e) for e in ctx.expression()]
+        return no.FlatGrouping(items)
+
     def visitFloatNumber(self, ctx: SnowflakeSqlParser.FloatNumberContext):
         return no.Float(ctx.FLOAT_VALUE().getText())
 
@@ -162,9 +166,9 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         call = self.visit(ctx.functionCall())
         return no.FunctionCallRelation(call)
 
-    def visitGroupBy(self, ctx: SnowflakeSqlParser.GroupByContext):
+    def visitGroupingSet(self, ctx: SnowflakeSqlParser.GroupingSetContext):
         items = [self.visit(e) for e in ctx.expression()]
-        return no.GroupBy(items)
+        return no.GroupingSet(items)
 
     def visitIdentifierAllSelectItem(self, ctx: SnowflakeSqlParser.IdentifierAllSelectItemContext):
         identifier = self.visit(ctx.identifier())
@@ -294,7 +298,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
             if ctx.setQuantifier() is not None else None
         where = self.visit(ctx.where) if ctx.where is not None else None
-        group_by = self.visit(ctx.groupBy()) if ctx.groupBy() else None
+        group_by = self.visit(ctx.grouping()) if ctx.grouping() else None
         having = self.visit(ctx.having) if ctx.having is not None else None
         qualify = self.visit(ctx.qualify) if ctx.qualify is not None else None
         order_by = [self.visit(s) for s in ctx.sortItem()] if ctx.sortItem() is not None else None
@@ -327,6 +331,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitSelectRelation(self, ctx: SnowflakeSqlParser.SelectRelationContext):
         select = self.visit(ctx.select())
         return no.SelectRelation(select)
+
+    def visitSetsGrouping(self, ctx: SnowflakeSqlParser.SetsGroupingContext):
+        sets = [self.visit(c) for c in ctx.groupingSet()]
+        return no.SetsGrouping(sets)
 
     def visitSlidingFrame(self, ctx: SnowflakeSqlParser.SlidingFrameContext):
         min = self.visit(ctx.slidingFrameMin())

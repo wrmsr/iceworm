@@ -603,12 +603,30 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#groupBy.
-    def enterGroupBy(self, ctx:SnowflakeSqlParser.GroupByContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#flatGrouping.
+    def enterFlatGrouping(self, ctx:SnowflakeSqlParser.FlatGroupingContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#groupBy.
-    def exitGroupBy(self, ctx:SnowflakeSqlParser.GroupByContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#flatGrouping.
+    def exitFlatGrouping(self, ctx:SnowflakeSqlParser.FlatGroupingContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#setsGrouping.
+    def enterSetsGrouping(self, ctx:SnowflakeSqlParser.SetsGroupingContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#setsGrouping.
+    def exitSetsGrouping(self, ctx:SnowflakeSqlParser.SetsGroupingContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#groupingSet.
+    def enterGroupingSet(self, ctx:SnowflakeSqlParser.GroupingSetContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#groupingSet.
+    def exitGroupingSet(self, ctx:SnowflakeSqlParser.GroupingSetContext):
         pass
 
 

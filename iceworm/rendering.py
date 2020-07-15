@@ -113,6 +113,9 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Extract) -> str:  # noqa
         return 'extract(' + self.render(node.part) + ' from ' + self.render(node.value) + ')'
 
+    def render(self, node: no.FlatGrouping) -> str:  # noqa
+        return ', '.join(self.render(i) for i in node.items)
+
     def render(self, node: no.Float) -> str:  # noqa
         return node.value
 
@@ -134,11 +137,8 @@ class Renderer(dispatch.Class):
     def render(self, node: no.FunctionCallRelation) -> str:  # noqa
         return self.render(node.call)
 
-    def render(self, node: no.GroupBy) -> str:  # noqa
-        return ', '.join(self.render(i) for i in node.items)
-
-    def render(self, node: no.GroupItem) -> str:  # noqa
-        return self.render(node.value)
+    def render(self, node: no.GroupingSet) -> str:  # noqa
+        return paren(', '.join(self.render(i) for i in node.items))
 
     def render(self, node: no.Identifier) -> str:  # noqa
         return quote(node.name, '"')
@@ -279,6 +279,9 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.SelectRelation) -> str:  # noqa
         return paren(self.render(node.select))
+
+    def render(self, node: no.SetsGrouping) -> str:  # noqa
+        return 'grouping sets ' + paren(', '.join(self.render(i) for i in node.sets))
 
     def render(self, node: no.SlidingFrame) -> str:  # noqa
         return (

@@ -33,7 +33,7 @@ primarySelect
     : SELECT topN? setQuantifier? selectItem (',' selectItem)*
       (FROM relation (',' relation)*)?
       (WHERE where=booleanExpression)?
-      (GROUP BY groupBy)?
+      (GROUP BY grouping)?
       (HAVING having=booleanExpression)?
       (QUALIFY qualify=booleanExpression)?
       (ORDER BY sortItem (',' sortItem)*)?
@@ -186,8 +186,13 @@ relation
     | qualifiedName                                                     #tableRelation
     ;
 
-groupBy
-    : expression (',' expression)*
+grouping
+    : expression (',' expression)*                          #flatGrouping
+    | GROUPING SETS '(' groupingSet (',' groupingSet)* ')'  #setsGrouping
+    ;
+
+groupingSet
+    : '(' expression (',' expression)* ')'
     ;
 
 qualifiedName
@@ -305,6 +310,7 @@ FOR: 'for';
 FROM: 'from';
 FULL: 'full';
 GROUP: 'group';
+GROUPING: 'grouping';
 HAVING: 'having';
 IGNORE: 'ignore';
 ILIKE: 'ilike';
@@ -339,6 +345,7 @@ RLIKE: 'rlike';
 ROW: 'row';
 ROWS: 'rows';
 SELECT: 'select';
+SETS: 'sets';
 THEN: 'then';
 TOP: 'top';
 TRUE: 'true';

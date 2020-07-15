@@ -340,8 +340,18 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#groupBy.
-    def visitGroupBy(self, ctx:SnowflakeSqlParser.GroupByContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#flatGrouping.
+    def visitFlatGrouping(self, ctx:SnowflakeSqlParser.FlatGroupingContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#setsGrouping.
+    def visitSetsGrouping(self, ctx:SnowflakeSqlParser.SetsGroupingContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#groupingSet.
+    def visitGroupingSet(self, ctx:SnowflakeSqlParser.GroupingSetContext):
         return self.visitChildren(ctx)
 
 

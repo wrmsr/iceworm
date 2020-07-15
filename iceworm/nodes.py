@@ -496,12 +496,20 @@ class SetQuantifier(enum.Enum):
 SET_QUANTIFIER_MAP: ta.Mapping[str, SetQuantifier] = {v.value: v for v in SetQuantifier.__members__.values()}
 
 
-class GroupItem(Node):
-    value: Expr
+class Grouping(Node, abstract=True):
+    pass
 
 
-class GroupBy(Node):
-    items: ta.Sequence[GroupItem]
+class FlatGrouping(Grouping):
+    items: ta.Sequence[Expr]
+
+
+class GroupingSet(Node):
+    items: ta.Sequence[Expr]
+
+
+class SetsGrouping(Grouping):
+    sets: ta.Sequence[GroupingSet]
 
 
 class Selectable(Node, abstract=True):
@@ -514,7 +522,7 @@ class Select(Selectable):
     where: ta.Optional[Expr] = None
     top_n: ta.Optional[Integer] = None
     set_quantifier: ta.Optional[SetQuantifier] = None
-    group_by: ta.Optional[GroupBy] = None
+    group_by: ta.Optional[Grouping] = None
     having: ta.Optional[Expr] = None
     qualify: ta.Optional[Expr] = None
     order_by: ta.Optional[ta.Sequence[SortItem]] = None
