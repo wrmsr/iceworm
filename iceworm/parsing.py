@@ -227,13 +227,6 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             over=over,
         )
 
-    def visitLastValueExpression(self, ctx: SnowflakeSqlParser.LastValueExpressionContext):
-        value = self.visit(ctx.expression())
-        nulls = (no.IgnoreOrRespect.IGNORE if ctx.IGNORE() is not None else no.IgnoreOrRespect.RESPECT) \
-            if ctx.NULLS() is not None else None
-        over = self.visit(ctx.over()) if ctx.over() is not None else None
-        return no.LastValue(value, nulls, over)
-
     def visitLikePredicate(self, ctx: SnowflakeSqlParser.LikePredicateContext):
         kind = no.LIKE_KIND_MAP[ctx.kind.text.lower()]
         value = self.visit(ctx.value)
@@ -244,6 +237,23 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
         return no.Null()
+
+    def visitNullsFunctionCall(self, ctx: SnowflakeSqlParser.NullsFunctionCallContext):
+        name = self.visit(ctx.qualifiedName())
+        arg = self.visit(ctx.expression())
+        set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
+            if ctx.setQuantifier() is not None else None
+        nulls = no.IgnoreOrRespect.IGNORE if ctx.IGNORE() is not None else no.IgnoreOrRespect.RESPECT
+        within_group = [self.visit(i) for i in ctx.sortItem()]
+        over = self.visit(ctx.over()) if ctx.over() is not None else None
+        return no.FunctionCall(
+            name,
+            args=[arg],
+            set_quantifier=set_quantifier,
+            nulls=nulls,
+            within_group=within_group,
+            over=over,
+        )
 
     def visitNumFrameBound(self, ctx: SnowflakeSqlParser.NumFrameBoundContext):
         num = int(ctx.INTEGER_VALUE().getText())
@@ -318,13 +328,13 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         return no.SelectRelation(select)
 
     def visitSetSelect(self, ctx: SnowflakeSqlParser.SetSelectContext):
-        left = self.visit(ctx.primarySelect())
+        left = self.visit(ctx.parenSelect())
         items = [self.visit(i) for i in ctx.setSelectItem()]
         return no.SetSelect(left, items) if items else left
 
     def visitSetSelectItem(self, ctx: SnowflakeSqlParser.SetSelectItemContext):
         kind = no.SET_SELECT_KIND_MAP[' '.join(c.getText().lower() for c in ctx.setSelectKind().children)]
-        right = self.visit(ctx.primarySelect())
+        right = self.visit(ctx.parenSelect())
         set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
             if ctx.setQuantifier() is not None else None
         return no.SetSelectItem(kind, right, set_quantifier)

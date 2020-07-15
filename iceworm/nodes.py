@@ -265,12 +265,6 @@ class FunctionCallExpr(Expr):
     call: FunctionCall
 
 
-class LastValue(Expr):
-    value: Expr
-    nulls: ta.Optional[IgnoreOrRespect] = None
-    over: ta.Optional[Over] = None
-
-
 class Null(Expr):
     pass
 

@@ -193,15 +193,6 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Kwarg) -> str:  # noqa
         return self.render(node.name) + ' => ' + self.render(node.value)
 
-    def render(self, node: no.LastValue) -> str:  # noqa
-        return (
-                'last_value(' +
-                self.render(node.value) +
-                ((node.nulls.value + ' nulls') if node.nulls is not None else '') +
-                ')' +
-                ((' over ' + paren(self.render(node.over))) if node.over is not None else '')
-        )
-
     def render(self, node: no.Lateral) -> str:  # noqa
         return 'lateral ' + self.render(node.relation)
 

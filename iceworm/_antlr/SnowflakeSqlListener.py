@@ -81,6 +81,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#parenSelect.
+    def enterParenSelect(self, ctx:SnowflakeSqlParser.ParenSelectContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#parenSelect.
+    def exitParenSelect(self, ctx:SnowflakeSqlParser.ParenSelectContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#primarySelect.
     def enterPrimarySelect(self, ctx:SnowflakeSqlParser.PrimarySelectContext):
         pass
@@ -288,15 +297,6 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#lastValueExpression.
-    def enterLastValueExpression(self, ctx:SnowflakeSqlParser.LastValueExpressionContext):
-        pass
-
-    # Exit a parse tree produced by SnowflakeSqlParser#lastValueExpression.
-    def exitLastValueExpression(self, ctx:SnowflakeSqlParser.LastValueExpressionContext):
-        pass
-
-
     # Enter a parse tree produced by SnowflakeSqlParser#caseExpression.
     def enterCaseExpression(self, ctx:SnowflakeSqlParser.CaseExpressionContext):
         pass
@@ -411,6 +411,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#kwargFunctionCall.
     def exitKwargFunctionCall(self, ctx:SnowflakeSqlParser.KwargFunctionCallContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#nullsFunctionCall.
+    def enterNullsFunctionCall(self, ctx:SnowflakeSqlParser.NullsFunctionCallContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#nullsFunctionCall.
+    def exitNullsFunctionCall(self, ctx:SnowflakeSqlParser.NullsFunctionCallContext):
         pass
 
 

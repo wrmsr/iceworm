@@ -50,6 +50,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#parenSelect.
+    def visitParenSelect(self, ctx:SnowflakeSqlParser.ParenSelectContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#primarySelect.
     def visitPrimarySelect(self, ctx:SnowflakeSqlParser.PrimarySelectContext):
         return self.visitChildren(ctx)
@@ -165,11 +170,6 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#lastValueExpression.
-    def visitLastValueExpression(self, ctx:SnowflakeSqlParser.LastValueExpressionContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by SnowflakeSqlParser#caseExpression.
     def visitCaseExpression(self, ctx:SnowflakeSqlParser.CaseExpressionContext):
         return self.visitChildren(ctx)
@@ -232,6 +232,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SnowflakeSqlParser#kwargFunctionCall.
     def visitKwargFunctionCall(self, ctx:SnowflakeSqlParser.KwargFunctionCallContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#nullsFunctionCall.
+    def visitNullsFunctionCall(self, ctx:SnowflakeSqlParser.NullsFunctionCallContext):
         return self.visitChildren(ctx)
 
 

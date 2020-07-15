@@ -22,11 +22,11 @@ cte
     ;
 
 setSelect
-    : (primarySelect | ('(' primarySelect ')')) setSelectItem*
+    : parenSelect setSelectItem*
     ;
 
 setSelectItem
-    : setSelectKind setQuantifier? (primarySelect | ('(' primarySelect ')'))
+    : setSelectKind setQuantifier? parenSelect
     ;
 
 setSelectKind
@@ -34,6 +34,11 @@ setSelectKind
     | MINUS
     | EXCEPT
     | UNION ALL?
+    ;
+
+parenSelect
+    : '(' parenSelect ')'
+    | primarySelect
     ;
 
 primarySelect
@@ -97,7 +102,6 @@ traversalKey
 
 primaryExpression
     : functionCall                                                     #functionCallExpression
-    | LAST_VALUE '(' expression ((IGNORE | RESPECT) NULLS)? ')' over?  #lastValueExpression
     | CASE (val=expression)? caseItem* (ELSE default=expression)? END  #caseExpression
     | INTERVAL expression                                              #intervalExpression
     | '(' select ')'                                                   #selectExpression
@@ -126,13 +130,16 @@ functionCall
     : qualifiedName '(' setQuantifier? (expression (',' expression)*)? ')'
       ((IGNORE | RESPECT) NULLS)?
       (WITHIN GROUP '(' ORDER BY sortItem (',' sortItem)* ')')?
-      over?                                                                 #expressionFunctionCall
+      over?                                                                     #expressionFunctionCall
     | qualifiedName '(' kwarg (',' kwarg)* ')'
       ((IGNORE | RESPECT) NULLS)?
       (WITHIN GROUP '(' ORDER BY sortItem (',' sortItem)* ')')?
-      over?                                                                 #kwargFunctionCall
+      over?                                                                     #kwargFunctionCall
+    | qualifiedName '(' setQuantifier? expression (IGNORE | RESPECT) NULLS ')'
+      (WITHIN GROUP '(' ORDER BY sortItem (',' sortItem)* ')')?
+      over?                                                                     #nullsFunctionCall
     | qualifiedName '(' '*' ')'
-      over?                                                                 #starFunctionCall
+      over?                                                                     #starFunctionCall
     ;
 
 kwarg
@@ -334,7 +341,6 @@ INTERVAL: 'interval';
 IS: 'is';
 JOIN: 'join';
 LAST: 'last';
-LAST_VALUE: 'last_value';
 LATERAL: 'lateral';
 LEFT: 'left';
 LIKE: 'like';
