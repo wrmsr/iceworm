@@ -90,7 +90,7 @@ primaryExpression
     | '(' expression ')'                                               #parenExpression
     | CAST '(' expression AS typeSpec ')'                              #castCallExpression
     | DATE string                                                      #dateExpression
-    | EXTRACT '(' part=identifier FROM expression ')'                  #extractExpression
+    | EXTRACT '(' part=expression FROM value=expression ')'            #extractExpression
     | JINJA                                                            #jinjaExpression
     | simpleExpression                                                 #simplePrimaryExpression
     ;
@@ -263,10 +263,18 @@ unaryOp
 unquotedIdentifier
     : IDENTIFIER
 
+    | CASE
+    | DATE
+    | EXTRACT
     | FIRST
+    | GROUPING
+    | ILIKE
     | LEFT
+    | LIKE
     | OUTER
+    | RANGE
     | RIGHT
+    | RLIKE
 
     ;
 

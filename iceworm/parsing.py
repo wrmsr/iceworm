@@ -135,7 +135,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitExtractExpression(self, ctx: SnowflakeSqlParser.ExtractExpressionContext):
         part = self.visit(ctx.part)
-        value = self.visit(ctx.expression())
+        value = self.visit(ctx.value)
         return no.Extract(part, value)
 
     def visitFalse(self, ctx: SnowflakeSqlParser.FalseContext):
