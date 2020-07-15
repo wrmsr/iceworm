@@ -143,6 +143,11 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
         return no.ExprSelectItem(value, label)
 
+    def visitExtractExpreession(self, ctx: SnowflakeSqlParser.ExtractExpreessionContext):
+        part = self.visit(ctx.part)
+        value = self.visit(ctx.expression())
+        return no.Extract(part, value)
+
     def visitFalse(self, ctx: SnowflakeSqlParser.FalseContext):
         return no.EFalse()
 

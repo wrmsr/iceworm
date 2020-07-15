@@ -1,3 +1,7 @@
+"""
+TODO:
+ - only quote when necessary (for extract)
+"""
 import typing as ta
 
 from omnibus import dispatch
@@ -105,6 +109,9 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.ExprSelectItem) -> str:  # noqa
         return self.paren_render(node.value) + ((' as ' + self.render(node.label)) if node.label is not None else '')
+
+    def render(self, node: no.Extract) -> str:  # noqa
+        return 'extract(' + self.render(node.part) + ' from ' + self.render(node.value) + ')'
 
     def render(self, node: no.Float) -> str:  # noqa
         return node.value

@@ -387,6 +387,11 @@ class Date(Expr):
     value: String
 
 
+class Extract(Expr):
+    part: Identifier
+    value: Expr
+
+
 class InList(Expr):
     needle: Expr
     haystack: ta.Sequence[Expr]

@@ -195,6 +195,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#extractExpreession.
+    def visitExtractExpreession(self, ctx:SnowflakeSqlParser.ExtractExpreessionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#jinjaExpression.
     def visitJinjaExpression(self, ctx:SnowflakeSqlParser.JinjaExpressionContext):
         return self.visitChildren(ctx)

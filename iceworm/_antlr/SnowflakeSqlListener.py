@@ -342,6 +342,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#extractExpreession.
+    def enterExtractExpreession(self, ctx:SnowflakeSqlParser.ExtractExpreessionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#extractExpreession.
+    def exitExtractExpreession(self, ctx:SnowflakeSqlParser.ExtractExpreessionContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#jinjaExpression.
     def enterJinjaExpression(self, ctx:SnowflakeSqlParser.JinjaExpressionContext):
         pass

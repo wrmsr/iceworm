@@ -90,6 +90,7 @@ primaryExpression
     | '(' expression ')'                                               #parenExpression
     | CAST '(' expression AS typeSpec ')'                              #castCallExpression
     | DATE string                                                      #dateExpression
+    | EXTRACT '(' part=identifier FROM expression ')'                  #extractExpreession
     | JINJA                                                            #jinjaExpression
     | simpleExpression                                                 #simplePrimaryExpression
     ;
@@ -296,6 +297,7 @@ DISTINCT: 'distinct';
 ELSE: 'else';
 END: 'end';
 ESCAPE: 'escape';
+EXTRACT: 'extract';
 FALSE: 'false';
 FIRST: 'first';
 FOLLOWING: 'following';
