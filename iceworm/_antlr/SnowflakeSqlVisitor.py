@@ -100,6 +100,11 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#betweenPredicate.
+    def visitBetweenPredicate(self, ctx:SnowflakeSqlParser.BetweenPredicateContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#inListPredicate.
     def visitInListPredicate(self, ctx:SnowflakeSqlParser.InListPredicateContext):
         return self.visitChildren(ctx)
@@ -125,6 +130,16 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by SnowflakeSqlParser#likeAnyPredicate.
+    def visitLikeAnyPredicate(self, ctx:SnowflakeSqlParser.LikeAnyPredicateContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#ilikeAnyPredicate.
+    def visitIlikeAnyPredicate(self, ctx:SnowflakeSqlParser.IlikeAnyPredicateContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by SnowflakeSqlParser#primaryValueExpression.
     def visitPrimaryValueExpression(self, ctx:SnowflakeSqlParser.PrimaryValueExpressionContext):
         return self.visitChildren(ctx)
@@ -140,13 +155,18 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#elementValueExpression.
-    def visitElementValueExpression(self, ctx:SnowflakeSqlParser.ElementValueExpressionContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#brackeetValueExpression.
+    def visitBrackeetValueExpression(self, ctx:SnowflakeSqlParser.BrackeetValueExpressionContext):
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by SnowflakeSqlParser#arithValueExpression.
     def visitArithValueExpression(self, ctx:SnowflakeSqlParser.ArithValueExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#colonValueExpression.
+    def visitColonValueExpression(self, ctx:SnowflakeSqlParser.ColonValueExpressionContext):
         return self.visitChildren(ctx)
 
 

@@ -37,10 +37,21 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         op = no.BINARY_OP_MAP[ctx.op.getText().lower()]
         return no.BinaryExpr(left, op, right)
 
+    def visitBetweenPredicate(self, ctx: SnowflakeSqlParser.BetweenPredicateContext):
+        value = self.visit(ctx.value)
+        lower = self.visit(ctx.lower)
+        upper = self.visit(ctx.upper)
+        return no.Between(value, lower, upper)
+
     def visitBinaryBooleanExpression(self, ctx: SnowflakeSqlParser.BinaryBooleanExpressionContext):
         left, right = [self.visit(e) for e in ctx.booleanExpression()]
         op = no.BINARY_OP_MAP[ctx.op.text.lower()]
         return no.BinaryExpr(left, op, right)
+
+    def visitBrackeetValueExpression(self, ctx: SnowflakeSqlParser.BrackeetValueExpressionContext):
+        value = self.visit(ctx.value)
+        index = self.visit(ctx.index)
+        return no.Bracket(value, index)
 
     def visitCaseItem(self, ctx: SnowflakeSqlParser.CaseItemContext):
         when, then = [self.visit(e) for e in ctx.expression()]
@@ -67,6 +78,11 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         op = no.BINARY_OP_MAP[ctx.cmpOp().getText().lower()]
         right = self.visit(ctx.valueExpression())
         return no.BinaryExpr(left, op, right)
+
+    def visitColonValueExpression(self, ctx: SnowflakeSqlParser.ColonValueExpressionContext):
+        value = self.visit(ctx.valueExpression())
+        name = self.visit(ctx.identifier())
+        return no.Colon(value, name)
 
     def visitCte(self, ctx: SnowflakeSqlParser.CteContext):
         name = self.visit(ctx.identifier())
@@ -98,11 +114,6 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitDecimalNumber(self, ctx: SnowflakeSqlParser.DecimalNumberContext):
         return no.Decimal(ctx.DECIMAL_VALUE().getText())
-
-    def visitElementValueExpression(self, ctx: SnowflakeSqlParser.ElementValueExpressionContext):
-        value = self.visit(ctx.valueExpression())
-        name = self.visit(ctx.identifier())
-        return no.Element(value, name)
 
     def visitExpressionFunctionCall(self, ctx:SnowflakeSqlParser.ExpressionFunctionCallContext):
         name = self.visit(ctx.qualifiedName())
@@ -144,6 +155,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         pattern = self.visit(ctx.expression())
         not_ = ctx.NOT() is not None
         return no.Ilike(value, pattern, not_=not_)
+
+    def visitIlikeAnyPredicate(self, ctx: SnowflakeSqlParser.IlikePredicateContext):
+        value = self.visit(ctx.value)
+        patterns = [self.visit(p) for p in ctx.expression()]
+        not_ = ctx.NOT() is not None
+        return no.IlikeAny(value, patterns, not_=not_)
 
     def visitInJinjaPredicate(self, ctx: SnowflakeSqlParser.InJinjaPredicateContext):
         needle = self.visit(ctx.value)
@@ -207,6 +224,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         pattern = self.visit(ctx.expression())
         not_ = ctx.NOT() is not None
         return no.Like(value, pattern, not_=not_)
+
+    def visitLikeAnyPredicate(self, ctx: SnowflakeSqlParser.LikeAnyPredicateContext):
+        value = self.visit(ctx.value)
+        patterns = [self.visit(p) for p in ctx.expression()]
+        not_ = ctx.NOT() is not None
+        return no.LikeAny(value, patterns, not_=not_)
 
     def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
         return no.Null()

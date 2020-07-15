@@ -39,8 +39,14 @@ class Renderer(dispatch.Class):
     def render(self, node: no.AllSelectItem) -> str:  # noqa
         return '*'
 
+    def render(self, node: no.Between) -> str:  # noqa
+        return self.render(node.value) + ' between ' + self.render(node.lower) + ' and ' + self.render(node.upper)
+
     def render(self, node: no.BinaryExpr) -> str:  # noqa
         return self.paren_render(node.left) + ' ' + node.op.value + ' ' + self.paren_render(node.right)
+
+    def render(self, node: no.Bracket) -> str:  # noqa
+        return self.render(node.value) + '[' + self.render(node.index) + ']'
 
     def render(self, node: no.Case) -> str:  # noqa
         return (
@@ -59,6 +65,9 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.CastCall) -> str:  # noqa
         return 'cast(' + self.render(node.value) + ' as ' + self.render(node.type) + ')'
+
+    def render(self, node: no.Colon) -> str:  # noqa
+        return self.render(node.value) + ':' + self.render(node.name)
 
     def render(self, node: no.Cte) -> str:  # noqa
         return self.render(node.name) + ' as ' + paren(self.render(node.select))
@@ -89,9 +98,6 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.ETrue) -> str:  # noqa
         return 'true'
-
-    def render(self, node: no.Element) -> str:  # noqa
-        return self.render(node.value) + ':' + self.render(node.name)
 
     def render(self, node: no.ExprSelectItem) -> str:  # noqa
         return self.paren_render(node.value) + ((' as ' + self.render(node.label)) if node.label is not None else '')
@@ -133,6 +139,15 @@ class Renderer(dispatch.Class):
                 (' not' if node.not_ else '') +
                 ' ilike ' +
                 self.render(node.pattern)
+        )
+
+    def render(self, node: no.IlikeAny) -> str:  # noqa
+        return (
+                self.render(node.value) +
+                (' not' if node.not_ else '') +
+                ' ilike any (' +
+                ', '.join(self.render(p) for p in node.patterns) +
+                ')'
         )
 
     def render(self, node: no.InJinja) -> str:  # noqa
@@ -203,6 +218,15 @@ class Renderer(dispatch.Class):
                 (' not' if node.not_ else '') +
                 ' like ' +
                 self.render(node.pattern)
+        )
+
+    def render(self, node: no.LikeAny) -> str:  # noqa
+        return (
+                self.render(node.value) +
+                (' not' if node.not_ else '') +
+                ' like any (' +
+                ', '.join(self.render(p) for p in node.patterns) +
+                ')'
         )
 
     def render(self, node: no.Null) -> str:  # noqa

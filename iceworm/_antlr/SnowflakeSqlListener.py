@@ -171,6 +171,15 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#betweenPredicate.
+    def enterBetweenPredicate(self, ctx:SnowflakeSqlParser.BetweenPredicateContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#betweenPredicate.
+    def exitBetweenPredicate(self, ctx:SnowflakeSqlParser.BetweenPredicateContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#inListPredicate.
     def enterInListPredicate(self, ctx:SnowflakeSqlParser.InListPredicateContext):
         pass
@@ -216,6 +225,24 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by SnowflakeSqlParser#likeAnyPredicate.
+    def enterLikeAnyPredicate(self, ctx:SnowflakeSqlParser.LikeAnyPredicateContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#likeAnyPredicate.
+    def exitLikeAnyPredicate(self, ctx:SnowflakeSqlParser.LikeAnyPredicateContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#ilikeAnyPredicate.
+    def enterIlikeAnyPredicate(self, ctx:SnowflakeSqlParser.IlikeAnyPredicateContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#ilikeAnyPredicate.
+    def exitIlikeAnyPredicate(self, ctx:SnowflakeSqlParser.IlikeAnyPredicateContext):
+        pass
+
+
     # Enter a parse tree produced by SnowflakeSqlParser#primaryValueExpression.
     def enterPrimaryValueExpression(self, ctx:SnowflakeSqlParser.PrimaryValueExpressionContext):
         pass
@@ -243,12 +270,12 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#elementValueExpression.
-    def enterElementValueExpression(self, ctx:SnowflakeSqlParser.ElementValueExpressionContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#brackeetValueExpression.
+    def enterBrackeetValueExpression(self, ctx:SnowflakeSqlParser.BrackeetValueExpressionContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#elementValueExpression.
-    def exitElementValueExpression(self, ctx:SnowflakeSqlParser.ElementValueExpressionContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#brackeetValueExpression.
+    def exitBrackeetValueExpression(self, ctx:SnowflakeSqlParser.BrackeetValueExpressionContext):
         pass
 
 
@@ -258,6 +285,15 @@ class SnowflakeSqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by SnowflakeSqlParser#arithValueExpression.
     def exitArithValueExpression(self, ctx:SnowflakeSqlParser.ArithValueExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#colonValueExpression.
+    def enterColonValueExpression(self, ctx:SnowflakeSqlParser.ColonValueExpressionContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#colonValueExpression.
+    def exitColonValueExpression(self, ctx:SnowflakeSqlParser.ColonValueExpressionContext):
         pass
 
 

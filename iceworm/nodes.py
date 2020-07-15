@@ -316,9 +316,14 @@ class Case(Expr):
     default: ta.Optional[Expr] = None
 
 
-class Element(Expr):
+class Colon(Expr):
     value: Expr
     name: Identifier
+
+
+class Bracket(Expr):
+    value: Expr
+    index: Expr
 
 
 class TypeSpec(Node):
@@ -353,6 +358,18 @@ class Ilike(Expr):
     not_: bool = False
 
 
+class LikeAny(Expr):
+    value: Expr
+    patterns: ta.Sequence[Expr]
+    not_: bool = False
+
+
+class IlikeAny(Expr):
+    value: Expr
+    patterns: ta.Sequence[Expr]
+    not_: bool = False
+
+
 class InList(Expr):
     needle: Expr
     haystack: ta.Sequence[Expr]
@@ -363,6 +380,12 @@ class InSelect(Expr):
     needle: Expr
     haystack: 'Selectable'
     not_: bool = False
+
+
+class Between(Expr):
+    value: Expr
+    lower: Expr
+    upper: Expr
 
 
 class Relation(Node, abstract=True):

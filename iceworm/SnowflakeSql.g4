@@ -59,20 +59,26 @@ booleanExpression
     ;
 
 predicate[ParserRuleContext value]
-    : cmpOp right=valueExpression                   #cmpPredicate
-    | IS NOT? NULL                                  #isNullPredicate
-    | NOT? IN '(' expression (',' expression)* ')'  #inListPredicate
-    | NOT? IN '(' select ')'                        #inSelectPredicate
-    | NOT? IN JINJA                                 #inJinjaPredicate
-    | NOT? LIKE expression                          #likePredicate
-    | NOT? ILIKE expression                         #ilikePredicate
+    : cmpOp right=valueExpression                                   #cmpPredicate
+    | IS NOT? NULL                                                  #isNullPredicate
+    | NOT? BETWEEN lower=valueExpression AND upper=valueExpression  #betweenPredicate
+    | NOT? IN '(' expression (',' expression)* ')'                  #inListPredicate
+    | NOT? IN '(' select ')'                                        #inSelectPredicate
+    | NOT? IN JINJA                                                 #inJinjaPredicate
+    | NOT? LIKE expression                                          #likePredicate
+    | NOT? ILIKE expression                                         #ilikePredicate
+    | NOT? LIKE ANY expression                                      #likeAnyPredicate
+    | NOT? ILIKE ANY expression                                     #ilikeAnyPredicate
+    | NOT? LIKE ANY '(' expression (',' expression)* ')'            #likeAnyPredicate
+    | NOT? ILIKE ANY '(' expression (',' expression)* ')'           #ilikeAnyPredicate
     ;
 
 valueExpression
     : primaryExpression                                      #primaryValueExpression
     | op=unaryOp valueExpression                             #unaryValueExpression
     | left=valueExpression op=arithOp right=valueExpression  #arithValueExpression
-    | valueExpression ':' identifier                         #elementValueExpression
+    | valueExpression ':' identifier                         #colonValueExpression
+    | value=valueExpression '[' index=valueExpression ']'    #brackeetValueExpression
     | valueExpression '::' typeSpec                          #castValueExpression
     ;
 
@@ -260,6 +266,7 @@ unquotedIdentifier
 
 ALL: 'all';
 AND: 'and';
+ANY: 'any';
 AS: 'as';
 ASC: 'asc';
 BETWEEN: 'between';
@@ -315,7 +322,7 @@ WHERE: 'where';
 WITH: 'with';
 
 STRING
-    : '\'' (~'\'' | '\'\'')* '\''
+    : '\'' (~'\'' | '\'\'' | '\\\'')* '\''
     ;
 
 INTEGER_VALUE
