@@ -87,7 +87,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
 
     def visitCteSelect(self, ctx: SnowflakeSqlParser.CteSelectContext):
         ctes = [self.visit(c) for c in ctx.cte()]
-        select = self.visit(ctx.unionSelect())
+        select = self.visit(ctx.setSelect())
         return no.CteSelect(ctes, select) if ctes else select
 
     def visitCurrentRowFrameBound(self, ctx: SnowflakeSqlParser.CurrentRowFrameBoundContext):
@@ -317,6 +317,18 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         select = self.visit(ctx.select())
         return no.SelectRelation(select)
 
+    def visitSetSelect(self, ctx: SnowflakeSqlParser.SetSelectContext):
+        left = self.visit(ctx.primarySelect())
+        items = [self.visit(i) for i in ctx.setSelectItem()]
+        return no.SetSelect(left, items) if items else left
+
+    def visitSetSelectItem(self, ctx: SnowflakeSqlParser.SetSelectItemContext):
+        kind = no.SET_SELECT_KIND_MAP[' '.join(c.getText().lower() for c in ctx.setSelectKind().children)]
+        right = self.visit(ctx.primarySelect())
+        set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
+            if ctx.setQuantifier() is not None else None
+        return no.SetSelectItem(kind, right, set_quantifier)
+
     def visitSetsGrouping(self, ctx: SnowflakeSqlParser.SetsGroupingContext):
         sets = [self.visit(c) for c in ctx.groupingSet()]
         return no.SetsGrouping(sets)
@@ -371,17 +383,6 @@ class _ParseVisitor(SnowflakeSqlVisitor):
     def visitUnboundedFrameBound(self, ctx: SnowflakeSqlParser.UnboundedFrameBoundContext):
         precedence = no.Precedence.PRECEDING if ctx.PRECEDING() is not None else no.Precedence.FOLLOWING
         return no.UnboundedFrameBound(precedence)
-
-    def visitUnionItem(self, ctx: SnowflakeSqlParser.UnionItemContext):
-        right = self.visit(ctx.primarySelect())
-        set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
-            if ctx.setQuantifier() is not None else None
-        return no.UnionItem(right, set_quantifier)
-
-    def visitUnionSelect(self, ctx: SnowflakeSqlParser.UnionSelectContext):
-        left = self.visit(ctx.primarySelect())
-        items = [self.visit(i) for i in ctx.unionItem()]
-        return no.UnionSelect(left, items) if items else left
 
     def visitUnpivotRelation(self, ctx: SnowflakeSqlParser.UnpivotRelationContext):
         relation = self.visit(ctx.relation())

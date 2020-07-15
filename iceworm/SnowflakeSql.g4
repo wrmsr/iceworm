@@ -14,19 +14,26 @@ select
     ;
 
 cteSelect
-    : (WITH cte (',' cte)*)? unionSelect
+    : (WITH cte (',' cte)*)? setSelect
     ;
 
 cte
     : identifier AS '(' select ')'
     ;
 
-unionSelect
-    : (primarySelect | ('(' primarySelect ')')) unionItem*
+setSelect
+    : (primarySelect | ('(' primarySelect ')')) setSelectItem*
     ;
 
-unionItem
-    : UNION setQuantifier? (primarySelect | ('(' primarySelect ')'))
+setSelectItem
+    : setSelectKind setQuantifier? (primarySelect | ('(' primarySelect ')'))
+    ;
+
+setSelectKind
+    : INTERSECT
+    | MINUS
+    | EXCEPT
+    | UNION ALL?
     ;
 
 primarySelect
@@ -307,6 +314,7 @@ DISTINCT: 'distinct';
 ELSE: 'else';
 END: 'end';
 ESCAPE: 'escape';
+EXCEPT: 'except';
 EXTRACT: 'extract';
 FALSE: 'false';
 FIRST: 'first';
@@ -321,6 +329,7 @@ IGNORE: 'ignore';
 ILIKE: 'ilike';
 IN: 'in';
 INNER: 'inner';
+INTERSECT: 'intersect';
 INTERVAL: 'interval';
 IS: 'is';
 JOIN: 'join';
@@ -330,6 +339,7 @@ LATERAL: 'lateral';
 LEFT: 'left';
 LIKE: 'like';
 LIMIT: 'limit';
+MINUS: 'minus';
 NATURAL: 'natural';
 NOT: 'not';
 NULL: 'null';

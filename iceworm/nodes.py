@@ -459,6 +459,7 @@ class ExprSelectItem(Node):
 
 class SetQuantifier(enum.Enum):
     DISTINCT = 'distinct'
+    EXCEPT = 'except'
     ALL = 'all'
 
 
@@ -508,14 +509,26 @@ class CteSelect(Selectable):
     select: Selectable
 
 
-class UnionItem(Node):
+class SetSelectKind(enum.Enum):
+    INTERSECT = 'intersect'
+    MINUS = 'minus'
+    EXCEPT = 'except'
+    UNION = 'union'
+    UNION_ALL = 'union all'
+
+
+SET_SELECT_KIND_MAP: ta.Mapping[str, SetSelectKind] = {v.value: v for v in SetSelectKind.__members__.values()}
+
+
+class SetSelectItem(Node):
+    kind: SetSelectKind
     right: Selectable
     set_quantifier: SetQuantifier = None
 
 
-class UnionSelect(Selectable):
+class SetSelect(Selectable):
     left: Selectable
-    items: ta.Sequence[UnionItem]
+    items: ta.Sequence[SetSelectItem]
 
 
 class SelectExpr(Expr):

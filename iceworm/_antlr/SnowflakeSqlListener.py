@@ -54,21 +54,30 @@ class SnowflakeSqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#unionSelect.
-    def enterUnionSelect(self, ctx:SnowflakeSqlParser.UnionSelectContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#setSelect.
+    def enterSetSelect(self, ctx:SnowflakeSqlParser.SetSelectContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#unionSelect.
-    def exitUnionSelect(self, ctx:SnowflakeSqlParser.UnionSelectContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#setSelect.
+    def exitSetSelect(self, ctx:SnowflakeSqlParser.SetSelectContext):
         pass
 
 
-    # Enter a parse tree produced by SnowflakeSqlParser#unionItem.
-    def enterUnionItem(self, ctx:SnowflakeSqlParser.UnionItemContext):
+    # Enter a parse tree produced by SnowflakeSqlParser#setSelectItem.
+    def enterSetSelectItem(self, ctx:SnowflakeSqlParser.SetSelectItemContext):
         pass
 
-    # Exit a parse tree produced by SnowflakeSqlParser#unionItem.
-    def exitUnionItem(self, ctx:SnowflakeSqlParser.UnionItemContext):
+    # Exit a parse tree produced by SnowflakeSqlParser#setSelectItem.
+    def exitSetSelectItem(self, ctx:SnowflakeSqlParser.SetSelectItemContext):
+        pass
+
+
+    # Enter a parse tree produced by SnowflakeSqlParser#setSelectKind.
+    def enterSetSelectKind(self, ctx:SnowflakeSqlParser.SetSelectKindContext):
+        pass
+
+    # Exit a parse tree produced by SnowflakeSqlParser#setSelectKind.
+    def exitSetSelectKind(self, ctx:SnowflakeSqlParser.SetSelectKindContext):
         pass
 
 

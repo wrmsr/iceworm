@@ -35,13 +35,18 @@ class SnowflakeSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#unionSelect.
-    def visitUnionSelect(self, ctx:SnowflakeSqlParser.UnionSelectContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#setSelect.
+    def visitSetSelect(self, ctx:SnowflakeSqlParser.SetSelectContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by SnowflakeSqlParser#unionItem.
-    def visitUnionItem(self, ctx:SnowflakeSqlParser.UnionItemContext):
+    # Visit a parse tree produced by SnowflakeSqlParser#setSelectItem.
+    def visitSetSelectItem(self, ctx:SnowflakeSqlParser.SetSelectItemContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by SnowflakeSqlParser#setSelectKind.
+    def visitSetSelectKind(self, ctx:SnowflakeSqlParser.SetSelectKindContext):
         return self.visitChildren(ctx)
 
 
