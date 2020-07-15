@@ -122,12 +122,14 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             if ctx.setQuantifier() is not None else None
         nulls = (no.IgnoreOrRespect.IGNORE if ctx.IGNORE() is not None else no.IgnoreOrRespect.RESPECT) \
             if ctx.NULLS() is not None else None
+        within_group = [self.visit(i) for i in ctx.sortItem()]
         over = self.visit(ctx.over()) if ctx.over() is not None else None
         return no.FunctionCall(
             name,
             args=args,
             set_quantifier=set_quantifier,
             nulls=nulls,
+            within_group=within_group,
             over=over,
         )
 
@@ -233,11 +235,13 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         kwargs = [self.visit(a) for a in ctx.kwarg()]
         nulls = (no.IgnoreOrRespect.IGNORE if ctx.IGNORE() is not None else no.IgnoreOrRespect.RESPECT) \
             if ctx.NULLS() is not None else None
+        within_group = [self.visit(i) for i in ctx.sortItem()]
         over = self.visit(ctx.over()) if ctx.over() is not None else None
         return no.FunctionCall(
             name,
             kwargs=kwargs,
             nulls=nulls,
+            within_group=within_group,
             over=over,
         )
 
@@ -298,6 +302,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         where = self.visit(ctx.where) if ctx.where is not None else None
         group_by = self.visit(ctx.groupBy()) if ctx.groupBy() else None
         having = self.visit(ctx.having) if ctx.having is not None else None
+        qualify = self.visit(ctx.qualify) if ctx.qualify is not None else None
         order_by = [self.visit(s) for s in ctx.sortItem()] if ctx.sortItem() is not None else None
         return no.Select(
             items,
@@ -307,6 +312,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             set_quantifier=set_quantifier,
             group_by=group_by,
             having=having,
+            qualify=qualify,
             order_by=order_by,
         )
 

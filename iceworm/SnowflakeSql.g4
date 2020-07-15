@@ -35,6 +35,7 @@ primarySelect
       (WHERE where=booleanExpression)?
       (GROUP BY groupBy)?
       (HAVING having=booleanExpression)?
+      (QUALIFY qualify=booleanExpression)?
       (ORDER BY sortItem (',' sortItem)*)?
     ;
 
@@ -108,9 +109,16 @@ typeSpec
     ;
 
 functionCall
-    : qualifiedName '(' setQuantifier? (expression (',' expression)*)? ')' ((IGNORE | RESPECT) NULLS)? over?  #expressionFunctionCall
-    | qualifiedName '(' kwarg (',' kwarg)* ')' ((IGNORE | RESPECT) NULLS)? over?                              #kwargFunctionCall
-    | qualifiedName '(' '*' ')' over?                                                                         #starFunctionCall
+    : qualifiedName '(' setQuantifier? (expression (',' expression)*)? ')'
+      ((IGNORE | RESPECT) NULLS)?
+      (WITHIN GROUP '(' ORDER BY sortItem (',' sortItem)* ')')?
+      over?                                                                 #expressionFunctionCall
+    | qualifiedName '(' kwarg (',' kwarg)* ')'
+      ((IGNORE | RESPECT) NULLS)?
+      (WITHIN GROUP '(' ORDER BY sortItem (',' sortItem)* ')')?
+      over?                                                                 #kwargFunctionCall
+    | qualifiedName '(' '*' ')'
+      over?                                                                 #starFunctionCall
     ;
 
 kwarg
@@ -315,6 +323,7 @@ OVER: 'over';
 PARTITION: 'partition';
 PIVOT: 'pivot';
 PRECEDING: 'preceding';
+QUALIFY: 'qualify';
 RANGE: 'range';
 RESPECT: 'respect';
 RIGHT: 'right';
@@ -331,6 +340,7 @@ USING: 'using';
 WHEN: 'when';
 WHERE: 'where';
 WITH: 'with';
+WITHIN: 'within';
 
 STRING
     : '\'' (~'\'' | '\'\'' | '\\\'')* '\''

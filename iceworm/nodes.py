@@ -294,6 +294,7 @@ class FunctionCall(Node):
     kwargs: ta.Sequence[Kwarg] = ()
     set_quantifier: ta.Optional['SetQuantifier'] = None
     nulls: ta.Optional[IgnoreOrRespect] = None
+    within_group: ta.Sequence[SortItem] = ()
     over: ta.Optional[Over] = None
 
 
@@ -511,6 +512,7 @@ class Select(Selectable):
     set_quantifier: ta.Optional[SetQuantifier] = None
     group_by: ta.Optional[GroupBy] = None
     having: ta.Optional[Expr] = None
+    qualify: ta.Optional[Expr] = None
     order_by: ta.Optional[ta.Sequence[SortItem]] = None
 
 

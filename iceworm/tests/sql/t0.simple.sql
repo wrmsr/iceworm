@@ -93,3 +93,5 @@ select last_value(0 ignore nulls) over (order by x);
 select * from l join r using (c);
 select * from l join r using (c, d);
 select * from t order by x nulls last;
+select * qualify 1;
+select f() within group (order by x);

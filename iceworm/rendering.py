@@ -112,7 +112,8 @@ class Renderer(dispatch.Class):
                 ((node.set_quantifier.value + ' ') if node.set_quantifier is not None else '') +
                 ', '.join(self.paren_render(a) for a in [*node.args, *node.kwargs]) +
                 ')' +
-                ((node.nulls.value + ' nulls') if node.nulls is not None else '') +
+                ((' ' + node.nulls.value + ' nulls') if node.nulls is not None else '') +
+                ((' within group (order by' + ', '.join(self.render(g) for g in node.within_group) + ')') if node.within_group else '') +  # noqa
                 ((' over ' + paren(self.render(node.over))) if node.over is not None else '')
         )
 
@@ -279,6 +280,7 @@ class Renderer(dispatch.Class):
                 ((' where ' + self.render(node.where)) if node.where is not None else '') +
                 ((' group by ' + self.render(node.group_by)) if node.group_by is not None else '') +
                 ((' having ' + self.render(node.having)) if node.having is not None else '') +
+                ((' qualify ' + self.render(node.qualify)) if node.qualify is not None else '') +
                 ((' order by ' + ', '.join(self.render(e) for e in node.order_by)) if node.order_by else '')
         )
 
