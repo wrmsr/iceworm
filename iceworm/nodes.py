@@ -12,11 +12,11 @@ import typing as ta
 
 from omnibus import check
 from omnibus import dataclasses as dc
-from omnibus import defs
 from omnibus import properties
 from omnibus._vendor import antlr4
 
 from .types import QualifiedName
+from .utils import build_dc_repr
 
 
 SelfNode = ta.TypeVar('SelfNode', bound='Node')
@@ -27,8 +27,7 @@ NodeMapper = ta.Callable[['Node'], 'Node']
 class Node(dc.Enum, sealed=True, reorder=True, repr=False):
     pctx: ta.Optional[antlr4.ParserRuleContext] = dc.field(default=None, kwonly=True, repr=False, hash=False, compare=False)  # noqa
 
-    def __repr__(self) -> str:
-        return defs.build_repr(self, *[f.name for f in dc.fields(self) if f.repr])
+    __repr__ = build_dc_repr
 
     @property
     def children(self) -> NodeGen:

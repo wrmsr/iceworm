@@ -17,26 +17,39 @@ from omnibus import dispatch
 
 from . import nodes as no
 from .types import QualifiedName
+from .utils import build_dc_repr
 
 
 class Symbol(dc.Pure, eq=False):
     name: ta.Optional[str]
     node: no.Node
-    origin: ta.Optional['Symbol']
     scope: 'SymbolScope'
+    origin: ta.Optional['Symbol'] = None
+
+    def __post_init__(self) -> None:
+        self.scope._symbols.add(self)
+
+    __repr__ = build_dc_repr
 
 
 class SymbolRef(dc.Pure, eq=False):
     qualified_name: QualifiedName
     node: no.Node
-    binding: ta.Optional['Symbol']
     scope: 'SymbolScope'
+    binding: ta.Optional['Symbol'] = None
+
+    def __post_init__(self) -> None:
+        self.scope._refs.add(self)
+
+    __repr__ = build_dc_repr
 
 
 class SymbolScope(dc.Data, eq=False, final=True):
     node: no.Node
     parent: ta.Optional['SymbolScope'] = None
     name: ta.Optional[str] = dc.field(default=None, kwonly=True)
+
+    __repr__ = build_dc_repr
 
     def __post_init__(self) -> None:
         self._enclosed_nodes: ta.MutableSet[no.Node] = ocol.IdentitySet()
@@ -126,10 +139,13 @@ class _Analyzer(dispatch.Class):
             self(child, scope)
         return scope
 
-    def __call__(self, node: no.Node, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
+    def add_to(self, node: no.Node, scope: ta.Optional[SymbolScope]) -> None:
         if scope is not None:
             scope._enclosed_nodes.add(node)
         self.add_children(node, scope)
+
+    def __call__(self, node: no.Node, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
+        self.add_to(node, scope)
         return None
 
     def __call__(self, node: no.AliasedRelation, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
@@ -140,10 +156,22 @@ class _Analyzer(dispatch.Class):
         raise NotImplementedError
 
     def __call__(self, node: no.ExprSelectItem, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
-        raise NotImplementedError
+        if node.label is not None:
+            name = node.label.name
+        elif isinstance(node.value, no.QualifiedNameNode):
+            name = node.value.parts[-1]
+        else:
+            name = None
+        Symbol(name, node, scope)
+
+        self.add_to(node, scope)
+        return None
 
     def __call__(self, node: no.QualifiedNameNode, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
-        raise NotImplementedError
+        SymbolRef(node.name, node, scope)
+
+        self.add_to(node, scope)
+        return None
 
     def __call__(self, node: no.Select, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
         scope = SymbolScope(node, scope)
