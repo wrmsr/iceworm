@@ -9,6 +9,7 @@ TODO:
   - refresh interval awareness
  - alchemy reflection bidir adapter
  - serde
+ - external tables from files
  - permanence
   - file? multi-git + merge? db?
   - versioning? hash? dumb autoinc?

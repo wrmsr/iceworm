@@ -1,6 +1,7 @@
 """
 TODO:
  - sqla bidir adapter
+ - 'ANY'? for jinja exprs / externals?
 
 Types:
  - NUMBER
