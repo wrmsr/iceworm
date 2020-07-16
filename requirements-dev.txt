@@ -19,6 +19,7 @@ pytest==5.4.3
 ## useful tools
 
 flake8==3.8.3
+gprof2dot==2019.11.30
 ipdb==0.13.3
 ipython==7.16.1
 mypy==0.782

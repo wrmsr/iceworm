@@ -2,6 +2,7 @@ import argparse
 import glob
 import logging
 import re
+import time
 import typing as ta
 
 from omnibus import collections as ocol
@@ -9,6 +10,7 @@ from omnibus import dataclasses as dc
 from omnibus import logs
 from omnibus import properties
 
+from . import analysis
 from . import parsing
 from . import rendering
 
@@ -60,12 +62,13 @@ class Cli:
         _arg('--glob', action='append'),
         _arg('--not', dest='not_pats', action='append'),
         _arg('--strip-header', action='store_true'),
+        _arg('--rounds', type=int),
     )
     def cmd_run(self) -> None:
-        not_pats = [re.compile(n) for n in self.args.not_pats if self.args.not_pats]
+        not_pats = [re.compile(n) for n in self.args.not_pats] if self.args.not_pats else []
 
         paths = set()
-        for glob_pat in self.args.glob:
+        for glob_pat in self.args.glob or []:
             for path in glob.iglob(glob_pat, recursive=True):
                 skip = False
                 for not_pat in not_pats:
@@ -78,7 +81,7 @@ class Cli:
                 paths.add(path)
         paths = sorted(paths)
 
-        for i, path in enumerate(paths):
+        for i, path in enumerate(paths * (self.args.rounds or 1)):
             log.info(f'Parsing {i} / {len(paths)} ({i * 100. / len(paths):0.02f}%) : {path}')
 
             with open(path, 'r') as f:
@@ -94,11 +97,18 @@ class Cli:
                 txt = '\n'.join(lines)
 
             try:
+                start = time.time()
                 root = parsing.parse_statement(txt)  # noqa
+                end = time.time()
+
+                basic = analysis.basic(root)
+                log.info(f'Parsed {len(basic.nodes)} nodes after {(end - start) * 1000.:0.02f} ms')
+
                 rendered = rendering.render(root)
                 reparsed = parsing.parse_statement(rendered + ';')
                 if reparsed != root:
-                    raise ValueError
+                    raise ValueError('Reparse failed')
+
             except Exception as e:  # noqa
                 log.exception('Parse failure')
 
