@@ -1,7 +1,3 @@
-"""
-TODO:
- - snowflake engine session sharing
-"""
 import textwrap
 
 from omnibus import docker

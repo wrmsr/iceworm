@@ -1,5 +1,8 @@
 """
 TODO:
+ - *load and treat derived tables as table funcs*
+  - transform jinja exprs to params
+   - inJinjaPredicate -> array arg + contains pred
  - pk awareness
  - partition / clustering
  - slow vs fast changing

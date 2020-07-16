@@ -2,6 +2,9 @@
 TODO:
  - double check nullsFunctionCall rewriting is correct
  - fix UNION ALL ALL
+ - params
+ - https://docs.snowflake.com/en/sql-reference/literals-table.html
+ - TABLESAMPLE
  - omni cy
 """
 from omnibus import antlr
