@@ -121,18 +121,36 @@ class SymbolAnalysis:
 class _Analyzer(dispatch.Class):
     __call__ = dispatch.property()
 
-    def __call__(self, node: no.Node, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
-        if scope is not None:
-            scope._enclosed_nodes.add(node)
-        for child in node.children:
-            self(child, scope)
-        return None
-
-    def __call__(self, node: no.Select, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
-        scope = SymbolScope(node, scope)
+    def add_children(self, node: no.Node, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:
         for child in node.children:
             self(child, scope)
         return scope
+
+    def __call__(self, node: no.Node, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
+        if scope is not None:
+            scope._enclosed_nodes.add(node)
+        self.add_children(node, scope)
+        return None
+
+    def __call__(self, node: no.AliasedRelation, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
+        scope = SymbolScope(node, scope, name=node.alias.name)
+        return self.add_children(node, scope)
+
+    def __call__(self, node: no.AllSelectItem, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
+        raise NotImplementedError
+
+    def __call__(self, node: no.ExprSelectItem, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
+        raise NotImplementedError
+
+    def __call__(self, node: no.QualifiedNameNode, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
+        raise NotImplementedError
+
+    def __call__(self, node: no.Select, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
+        scope = SymbolScope(node, scope)
+        return self.add_children(node, scope)
+
+    def __call__(self, node: no.Table, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
+        raise NotImplementedError
 
 
 def analyze(root: no.Node) -> SymbolAnalysis:
