@@ -17,6 +17,7 @@ from omnibus._vendor import antlr4
 
 from .types import QualifiedName
 from .utils import build_dc_repr
+from .utils import build_enum_value_map
 
 
 SelfNode = ta.TypeVar('SelfNode', bound='Node')
@@ -73,7 +74,7 @@ class BinaryOp(enum.Enum):
     CONCAT = '||'
 
 
-BINARY_OP_MAP: ta.Mapping[str, BinaryOp] = {v.value: v for v in BinaryOp.__members__.values()}
+BINARY_OP_MAP: ta.Mapping[str, BinaryOp] = build_enum_value_map(BinaryOp)
 
 
 LOGIC_OPS: ta.AbstractSet[BinaryOp] = frozenset([
@@ -116,7 +117,7 @@ class UnaryOp(enum.Enum):
     MINUS = '-'
 
 
-UNARY_OP_MAP: ta.Mapping[str, UnaryOp] = {v.value: v for v in UnaryOp.__members__.values()}
+UNARY_OP_MAP: ta.Mapping[str, UnaryOp] = build_enum_value_map(UnaryOp)
 
 
 class UnaryExpr(Expr):
@@ -184,7 +185,7 @@ class Direction(enum.Enum):
     DESC = 'desc'
 
 
-DIRECTION_MAP: ta.Mapping[str, Direction] = {v.value: v for v in Direction.__members__.values()}
+DIRECTION_MAP: ta.Mapping[str, Direction] = build_enum_value_map(Direction)
 
 
 class FirstOrLast(enum.Enum):
@@ -332,7 +333,7 @@ class LikeKind(enum.Enum):
     RLIKE = 'rlike'
 
 
-LIKE_KIND_MAP: ta.Mapping[str, LikeKind] = {v.value: v for v in LikeKind.__members__.values()}
+LIKE_KIND_MAP: ta.Mapping[str, LikeKind] = build_enum_value_map(LikeKind)
 
 
 class Like(Expr):
@@ -388,7 +389,7 @@ class JoinType(enum.Enum):
     NATURAL = 'natural'
 
 
-JOIN_TYPE_MAP: ta.Mapping[str, JoinType] = {v.value: v for v in JoinType.__members__.values()}
+JOIN_TYPE_MAP: ta.Mapping[str, JoinType] = build_enum_value_map(JoinType)
 
 
 class Join(Relation):
@@ -455,7 +456,7 @@ class SetQuantifier(enum.Enum):
     ALL = 'all'
 
 
-SET_QUANTIFIER_MAP: ta.Mapping[str, SetQuantifier] = {v.value: v for v in SetQuantifier.__members__.values()}
+SET_QUANTIFIER_MAP: ta.Mapping[str, SetQuantifier] = build_enum_value_map(SetQuantifier)
 
 
 class Grouping(Node, abstract=True):
@@ -509,7 +510,7 @@ class SetSelectKind(enum.Enum):
     UNION_ALL = 'union all'
 
 
-SET_SELECT_KIND_MAP: ta.Mapping[str, SetSelectKind] = {v.value: v for v in SetSelectKind.__members__.values()}
+SET_SELECT_KIND_MAP: ta.Mapping[str, SetSelectKind] = build_enum_value_map(SetSelectKind)
 
 
 class SetSelectItem(Node):
