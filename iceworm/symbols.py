@@ -1,11 +1,13 @@
 """
 TODO:
+ - dc.PrivateVar or per-field frozen
  - all node? just clone tok
  - origins/sym resolution (shallow)
  - types
   - including inferred jinja
    - 'ANY' type?
 """
+import collections
 import typing as ta
 
 from omnibus import check
@@ -42,7 +44,13 @@ class SymbolScope(dc.Data, eq=False, final=True):
         self._symbols: ta.MutableSet['Symbol'] = set()
         self._refs: ta.MutableSet['SymbolRef'] = set()
 
+        if self.parent is not None:
+            self.parent._children.add(self)
         self._enclosed_nodes.add(self.node)
+
+    @property
+    def enclosed_nodes(self) -> ta.AbstractSet[no.Node]:
+        return self._enclosed_nodes
 
     @property
     def children(self) -> ta.AbstractSet['SymbolScope']:
@@ -70,9 +78,29 @@ class SymbolAnalysis:
         self._root = check.isinstance(root, SymbolScope)
 
         self._scopes: ta.MutableSet[SymbolScope] = set()
-        self._scopes_by_node: ta.MutableMapping[no.Node, SymbolScope] = {}
-        self._symbol_sets_by_node: ta.MutableMapping[no.Node, ta.MutableSet[Symbol]] = {}
-        self._refs_by_node: ta.MutableMapping[no.Node, SymbolRef] = {}
+        self._scopes_by_node: ta.MutableMapping[no.Node, SymbolScope] = ocol.IdentityKeyDict()
+        self._symbol_sets_by_node: ta.MutableMapping[no.Node, ta.MutableSet[Symbol]] = ocol.IdentityKeyDict()
+        self._refs_by_node: ta.MutableMapping[no.Node, SymbolRef] = ocol.IdentityKeyDict()
+
+        seen: ta.MutableSet[SymbolScope] = set()
+        queue: ta.Deque[SymbolScope] = collections.deque()
+        queue.append(root)
+        seen.add(root)
+
+        while queue:
+            cur = queue.pop()
+            for n in cur.enclosed_nodes:
+                check.not_in(n, self._scopes_by_node)
+                self._scopes_by_node[n] = cur
+            for s in cur.symbols:
+                self._symbol_sets_by_node.setdefault(s.node, set()).add(s)
+            for r in cur.refs:
+                check.not_in(r.node, self._refs_by_node)
+                self._refs_by_node[r.node] = r
+            for c in cur.children:
+                check.not_in(c, seen)
+                queue.append(c)
+                seen.add(c)
 
     def root(self) -> SymbolScope:
         return self._root
@@ -93,7 +121,20 @@ class SymbolAnalysis:
 class _Analyzer(dispatch.Class):
     __call__ = dispatch.property()
 
-    def __call__(self, node: no.Node, scope: SymbolScope) -> ta.Optional[SymbolScope]:  # noqa
+    def __call__(self, node: no.Node, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
         if scope is not None:
             scope._enclosed_nodes.add(node)
+        for child in node.children:
+            self(child, scope)
         return None
+
+    def __call__(self, node: no.Select, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
+        scope = SymbolScope(node, scope)
+        for child in node.children:
+            self(child, scope)
+        return scope
+
+
+def analyze(root: no.Node) -> SymbolAnalysis:
+    scope = _Analyzer()(root, None)
+    return SymbolAnalysis(scope)

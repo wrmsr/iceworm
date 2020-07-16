@@ -12,6 +12,7 @@ def test_symbols():
             ),
         ),
     ])
+    print(root)
 
-    root_scope = syms.SymbolScope(root)
-    print(syms._Analyzer()(root, root_scope))
+    ana = syms.analyze(root)
+    print(ana)
