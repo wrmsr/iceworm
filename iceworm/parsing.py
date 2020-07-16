@@ -2,10 +2,12 @@
 TODO:
  - double check nullsFunctionCall rewriting is correct
  - fix UNION ALL ALL
+  - ((select 1) union (((select 2)))) ?
  - params
  - https://docs.snowflake.com/en/sql-reference/literals-table.html
  - TABLESAMPLE
  - omni cy
+ - confirm l_v(v ignore nulls) == l_v(v) ignore nulls
 """
 from omnibus import antlr
 from omnibus import check
