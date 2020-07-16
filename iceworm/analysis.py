@@ -1,11 +1,5 @@
 """
 TODO:
- - sym res
-  - all node? just clone tok
-  - origins/sym resolution (shallow)
-  - types
-   - including inferred jinja
-    - 'ANY' type?
  - dom's
  - 'tracebacks'
  - jinja usage
