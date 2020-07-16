@@ -1,11 +1,6 @@
 """
 TODO:
  - dc.PrivateVar or per-field frozen
- - all node? just clone tok
- - origins/sym resolution (shallow)
- - types
-  - including inferred jinja
-   - 'ANY' type?
 """
 import collections
 import typing as ta

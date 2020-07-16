@@ -3,6 +3,8 @@ TODO:
  - dom's
  - 'tracebacks'
  - jinja usage
+ - types
+  - including inferred jinja
 """
 import typing as ta
 
