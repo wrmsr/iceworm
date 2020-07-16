@@ -1,3 +1,8 @@
+"""
+TODO:
+ - postgres, hive, presto
+ - spark? need dialect?
+"""
 from omnibus import dispatch
 import sqlalchemy as sa
 import sqlalchemy.sql.elements

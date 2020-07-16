@@ -1,6 +1,12 @@
 """
 TODO:
- - dom's, origins/sym resolution (shallow), types
+ - sym res
+  - all node? just clone tok
+  - origins/sym resolution (shallow)
+  - types
+ - dom's
+ - 'tracebacks'
+ - jinja usage
 """
 import typing as ta
 

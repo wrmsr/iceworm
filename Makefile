@@ -101,7 +101,13 @@ define do-venv
 endef
 
 define do-deps
-	$(1)/bin/pip install $(PIP_ARGS) -r $(2) ; \
+	(cat requirements.txt ; cat requirements-dev.txt) | \
+		egrep -o '^[^#]+' | \
+		egrep -v '[ ]*-r' | \
+		egrep -v omnibus | \
+		xargs .venv/bin/pip $(PIP_ARGS) install && \
+	\
+	$(1)/bin/pip install $(PIP_ARGS) --upgrade git+https://github.com/wrmsr/omnibus@wrmsr_working ; \
 	\
 	if [ -d "/Applications/PyCharm.app/Contents/helpers/pydev/" ] ; then \
 		if $(1)/bin/python -c 'import sys; exit(0 if sys.version_info < (3, 7) else 1)' ; then \

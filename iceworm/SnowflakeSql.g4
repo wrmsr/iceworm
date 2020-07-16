@@ -1,3 +1,9 @@
+/*
+TODO:
+ - params
+ - https://docs.snowflake.com/en/sql-reference/literals-table.html
+ - TABLESAMPLE
+*/
 grammar SnowflakeSql;
 
 

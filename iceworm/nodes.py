@@ -1,6 +1,10 @@
 """
 TODO:
  - enable type checking
+ - standardize (+in g4): Expr not expression, Stmt not statement, Value not val, Rel not rel?
+
+Visitors / Tools:
+ - graphviz gen
 """
 import collections.abc
 import enum
@@ -9,6 +13,7 @@ import typing as ta
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import properties
+from omnibus._vendor import antlr4
 
 from .types import QualifiedName
 
@@ -18,7 +23,8 @@ NodeGen = ta.Generator['Node', None, None]
 NodeMapper = ta.Callable[['Node'], 'Node']
 
 
-class Node(dc.Enum, sealed=True):
+class Node(dc.Enum, sealed=True, reorder=True):
+    pctx: ta.Optional[antlr4.ParserRuleContext] = dc.field(default=None, kwonly=True, repr=False, hash=False, compare=False)  # noqa
 
     @property
     def children(self) -> NodeGen:

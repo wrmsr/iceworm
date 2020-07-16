@@ -1,3 +1,7 @@
+"""
+TODO:
+ - expanded reflection - partitioning etc
+"""
 import configparser
 import io
 import os

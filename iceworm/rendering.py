@@ -1,6 +1,8 @@
 """
 TODO:
  - only quote when necessary (for extract)
+ - pretty output - no duplication in a pprint.py
+  - include comments (reqs carrying antlr into nodes)
 """
 import typing as ta
 

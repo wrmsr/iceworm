@@ -2,6 +2,7 @@
 TODO:
  - double check nullsFunctionCall rewriting is correct
  - fix UNION ALL ALL
+ - omni cy
 """
 from omnibus import antlr
 from omnibus import check
