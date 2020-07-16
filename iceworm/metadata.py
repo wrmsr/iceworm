@@ -15,3 +15,26 @@ TODO:
   - versioning? hash? dumb autoinc?
  - exfiltration?
 """
+import typing as ta
+
+from omnibus import dataclasses as dc
+
+from .datatypes import Datatype
+from .types import QualifiedName
+
+
+class Column(dc.Pure):
+    name: str
+    type: Datatype
+
+
+class Table(dc.Pure):
+    name: str
+    columns: ta.Sequence[Column]
+
+    schema: ta.Optional[str] = None
+    catalog: ta.Optional[str] = None
+
+    @property
+    def qualified_name(self) -> QualifiedName:
+        return QualifiedName(*filter(None, [self.catalog, self.schema, self.name]))
