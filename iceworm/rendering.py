@@ -158,10 +158,10 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.InSelect) -> str:  # noqa
         return (
-            self.render(node.needle) +
-            (' not' if node.not_ else '') +
-            ' in ' +
-            paren(self.render(node.haystack))
+                self.render(node.needle) +
+                (' not' if node.not_ else '') +
+                ' in ' +
+                paren(self.render(node.haystack))
         )
 
     def render(self, node: no.Integer) -> str:  # noqa
@@ -289,8 +289,8 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.TypeSpec) -> str:  # noqa
         return (
-            self.render(node.name) +
-            (('(' + ', '.join(self.render(a) for a in node.args) + ')') if node.args else '')
+                self.render(node.name) +
+                (('(' + ', '.join(self.render(a) for a in node.args) + ')') if node.args else '')
         )
 
     def render(self, node: no.UnaryExpr) -> str:  # noqa

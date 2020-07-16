@@ -11,6 +11,7 @@ TODO:
 """
 from omnibus import antlr
 from omnibus import check
+from omnibus import dataclasses as dc
 from omnibus._vendor import antlr4
 
 from . import nodes as no
@@ -26,6 +27,15 @@ def strip_jinja(text: str) -> str:
 
 
 class _ParseVisitor(SnowflakeSqlVisitor):
+
+    def visit(self, ctx: antlr4.ParserRuleContext):
+        check.isinstance(ctx, antlr4.ParserRuleContext)
+        node = ctx.accept(self)
+        if node is not None:
+            check.isinstance(node, no.Node)
+            if node.pctx is None:
+                node = dc.replace(node, pctx=ctx)
+        return node
 
     def aggregateResult(self, aggregate, nextResult):
         if aggregate is not None:
