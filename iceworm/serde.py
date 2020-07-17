@@ -70,8 +70,13 @@ def _get_subclass_map(cls: type) -> _SubclassMap:
                 continue
             seen.add(cur)
             n = cur.__name__
-            if n in dct:
-                raise NameError(n)
+            try:
+                existing = dct[n]
+            except KeyError:
+                pass
+            else:
+                if existing is not cur:
+                    raise NameError(n)
             dct[n] = cur
             todo.update(cur.__subclasses__())
         _SUBCLASS_MAPS_BY_CLS[cls] = dct

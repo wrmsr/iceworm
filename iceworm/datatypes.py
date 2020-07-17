@@ -21,6 +21,9 @@ class Number(Datatype):
     }
 
 
+Integer = Number
+
+
 class Decimal(Datatype):
     pass
 
@@ -43,6 +46,10 @@ class Varchar(Datatype):
         'string',
         'text',
     }
+
+
+String = Varchar
+Text = Varchar
 
 
 class Binary(Datatype):

@@ -46,7 +46,7 @@ def test_serde():
 
     with pytest.raises(TypeError):
         serde.serialize(set())
-    with pytest.raises(TypeError):
+    with pytest.raises(serde.DeserializationException):
         serde.deserialize(None, int)
 
     rt(Pt(1, 2))

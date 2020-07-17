@@ -1,6 +1,5 @@
 """
 TODO:
- - dc.PrivateVar or per-field frozen
 """
 import collections
 import typing as ta
