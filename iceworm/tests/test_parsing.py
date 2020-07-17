@@ -74,28 +74,17 @@ def test_comments():
     reparsed = parsing.parse_statement(rendered + ';')
     assert reparsed == node
 
-    import collections.abc
+    class NodePartTransform(rendering.PartTransform):
 
-    def rec(part: rendering.Part):
-        if isinstance(part, str):
-            return part
-        elif isinstance(part, collections.abc.Sequence):
-            return [rec(c) for c in part]
-        elif isinstance(part, rendering.Paren):
-            return rendering.Paren(rec(part.part))
-        elif isinstance(part, rendering.List):
-            return rendering.List([rec(c) for c in part.parts], part.delimiter)
-        elif isinstance(part, rendering.Concat):
-            return rendering.Concat([rec(c) for c in part.parts])
-        elif isinstance(part, rendering.Node):
+        def __call__(self, part: rendering.Node) -> rendering.Part:
+            print(part)
             return []
-        else:
-            raise TypeError(part)
 
-    part = rendering.compact_part(rendering.Renderer()(node))
-    rpart = rec(part)
+    part = rendering.Renderer()(node)
+    part = NodePartTransform()(part)
+    part = rendering.compact_part(part)
 
     import io
     buf = io.StringIO()
-    rendering.render_part(rpart, buf)
+    rendering.render_part(part, buf)
     print(buf.getvalue())
