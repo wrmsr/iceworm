@@ -1,4 +1,5 @@
 import glob
+import json  # noqa
 import os.path
 
 from .. import nodes as no
@@ -38,5 +39,9 @@ def test_parsing():
                 assert reparsed == node
             except Exception:
                 raise
+
+            # parts = rendering.Renderer().render(node)
+            # parts_ser = serde.serialize(parts)
+            # print(json.dumps(parts_ser, indent=4))
 
             print()
