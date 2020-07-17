@@ -385,23 +385,52 @@ def _drop_empties(it: T) -> ta.List[T]:
     )]
 
 
-def compact_part(part: Part) -> Part:
-    if isinstance(part, str):
+class PartTransform(dispatch.Class):
+    __call__ = dispatch.property()
+
+    def __call__(self, part: str) -> Part:  # noqa
         return part
-    elif isinstance(part, collections.abc.Sequence):
-        return _drop_empties(compact_part(c) for c in part)
-    elif isinstance(part, Paren):
-        return Paren(compact_part(part.part))
-    elif isinstance(part, List):
-        parts = _drop_empties(compact_part(c) for c in part.parts)
-        return List(parts, part.delimiter) if parts else []
-    elif isinstance(part, Concat):
-        parts = _drop_empties(compact_part(c) for c in part.parts)
-        return Concat(parts) if parts else []
-    elif isinstance(part, Node):
+
+    def __call__(self, part: collections.abc.Sequence) -> Part:  # noqa
+        return [self(c) for c in part]
+
+    def __call__(self, part: Paren) -> Part:  # noqa
+        return Paren(self(part.part))
+
+    def __call__(self, part: List) -> Part:  # noqa
+        return List([self(c) for c in part.parts], part.delimiter)
+
+    def __call__(self, part: Concat) -> Part:  # noqa
+        return Concat([self(c) for c in part.parts])
+
+    def __call__(self, part: Node) -> Part:  # noqa
+        return part
+
+
+class RemoveNodes(PartTransform):
+
+    def __call__(self, part: Node) -> Part:  # noqa
         return []
-    else:
-        raise TypeError(part)
+
+
+remove_nodes = RemoveNodes()
+
+
+class CompactPart(PartTransform):
+
+    def __call__(self, part: collections.abc.Sequence) -> Part:  # noqa
+        return _drop_empties(self(c) for c in part)
+
+    def __call__(self, part: List) -> Part:  # noqa
+        parts = _drop_empties(self(c) for c in part.parts)
+        return List(parts, part.delimiter) if parts else []
+
+    def __call__(self, part: Concat) -> Part:  # noqa
+        parts = _drop_empties(self(c) for c in part.parts)
+        return Concat(parts) if parts else []
+
+
+compact_part = CompactPart()
 
 
 def render_part(part: Part, buf: io.StringIO) -> None:
@@ -432,7 +461,8 @@ def render_part(part: Part, buf: io.StringIO) -> None:
 
 def render(node: no.Node) -> str:
     part = Renderer()(node)
-    compact = compact_part(part)
+    part = remove_nodes(part)
+    part = compact_part(part)
     buf = io.StringIO()
-    render_part(compact, buf)
+    render_part(part, buf)
     return buf.getvalue()
