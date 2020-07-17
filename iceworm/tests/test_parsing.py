@@ -74,6 +74,20 @@ def test_comments():
     reparsed = parsing.parse_statement(rendered + ';')
     assert reparsed == node
 
+    from omnibus import collections as ocol
+
+    def rec(pctx):
+        pctxs.add(pctx)
+        for cpctx in getattr(pctx, 'children', []):
+            rec(cpctx)
+
+    pctxs = ocol.IdentitySet()
+    rec(node.pctx)
+
+    for pctx in pctxs:
+        print(pctx)
+        print(getattr(pctx, 'start', None))
+
     class NodePartTransform(rendering.PartTransform):
 
         def __call__(self, part: rendering.Node) -> rendering.Part:
