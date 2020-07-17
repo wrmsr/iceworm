@@ -4,7 +4,8 @@ TODO:
  - pretty output - no duplication in a pprint.py
   - include comments (reqs carrying antlr into nodes)
 """
-import types
+import collections.abc
+import io
 import typing as ta
 
 from omnibus import dataclasses as dc
@@ -12,6 +13,9 @@ from omnibus import dispatch
 
 from . import nodes as no
 from .quoting import quote
+
+
+NoneType = type(None)
 
 
 Part = ta.Union[str, ta.Sequence['Part'], 'DataPart']
@@ -48,7 +52,7 @@ def needs_paren(node: no.Node) -> bool:
 class Renderer(dispatch.Class):
     render = dispatch.property()
 
-    def render(self, node: types.NoneType) -> Part:  # noqa
+    def render(self, node: NoneType) -> Part:  # noqa
         return []
 
     def render(self, node: no.Node) -> Part:  # noqa
@@ -153,7 +157,7 @@ class Renderer(dispatch.Class):
                 node.set_quantifier.value if node.set_quantifier is not None else [],
                 List([self.paren_render(a) for a in [*node.args, *node.kwargs]]),
             ]),
-            [node.nulls.value, ' nulls'] if node.nulls is not None else [],
+            [node.nulls.value, 'nulls'] if node.nulls is not None else [],
             [
                 'within', 'group', Paren([
                     'order', 'by',
@@ -251,64 +255,59 @@ class Renderer(dispatch.Class):
     def render(self, node: no.Over) -> Part:  # noqa
         return [
             ['partition', 'by', List([self.render(e) for e in node.partition_by])] if node.partition_by else [],
-            ['order', 'by', List([self.render(e) for e in node.order_by]) if node.order_by else [],
+            ['order', 'by', List([self.render(e) for e in node.order_by])] if node.order_by else [],
             self.render(node.frame),
         ]
 
     def render(self, node: no.Pivot) -> Part:  # noqa
-        return (
+        return [
             self.render(node.relation),
-            'pivot',
-            Paren([
+            Concat(['pivot', Paren([
                 self.render(node.func),
                 Paren(self.render(node.pivot_col)),
                 'for',
                 self.render(node.value_col),
                 'in',
                 Paren(List([self.render(e) for e in node.values])),
-            ]),
-        )
+            ])]),
+        ]
 
     def render(self, node: no.QualifiedNameNode) -> Part:  # noqa
         return '.'.join(self.render(i) for i in node.parts)
 
     def render(self, node: no.Select) -> Part:  # noqa
-        return (
-                'select ' +
-                (('top ' + self.render(node.top_n) + ' ') if node.top_n is not None else '') +
-                ((node.set_quantifier.value + ' ') if node.set_quantifier is not None else '') +
-                ', '.join(self.render(i) for i in node.items) +
-                ((' from ' + ', '.join(self.paren_render(r) for r in node.relations)) if node.relations else '') +
-                ((' where ' + self.render(node.where)) if node.where is not None else '') +
-                ((' group by ' + self.render(node.group_by)) if node.group_by is not None else '') +
-                ((' having ' + self.render(node.having)) if node.having is not None else '') +
-                ((' qualify ' + self.render(node.qualify)) if node.qualify is not None else '') +
-                ((' order by ' + ', '.join(self.render(e) for e in node.order_by)) if node.order_by else '') +
-                ((' limit ' + str(node.limit)) if node.limit is not None else '')
-        )
+        return [
+            'select',
+            ['top', self.render(node.top_n)] if node.top_n is not None else [],
+            node.set_quantifier.value if node.set_quantifier is not None else [],
+            List([self.render(i) for i in node.items]),
+            ['from', List([self.paren_render(r) for r in node.relations])] if node.relations else [],
+            ['where', self.render(node.where)] if node.where is not None else [],
+            ['group', 'by', self.render(node.group_by)] if node.group_by is not None else [],
+            ['having', self.render(node.having)] if node.having is not None else [],
+            ['qualify', self.render(node.qualify)] if node.qualify is not None else [],
+            ['order', 'by', List([self.render(e) for e in node.order_by])] if node.order_by else [],
+            ['limit', str(node.limit)] if node.limit is not None else [],
+        ]
 
     def render(self, node: no.SelectExpr) -> Part:  # noqa
         return self.render(node.select)
 
     def render(self, node: no.SelectRelation) -> Part:  # noqa
-        return paren(self.render(node.select))
+        return Paren(self.render(node.select))
 
     def render(self, node: no.SetsGrouping) -> Part:  # noqa
-        return 'grouping sets ' + paren(', '.join(self.render(i) for i in node.sets))
+        return ['grouping', 'sets', Paren(List([self.render(i) for i in node.sets]))]
 
     def render(self, node: no.SingleFrame) -> Part:  # noqa
-        return (
-                node.rows_or_range.value +
-                ' ' +
-                self.render(node.bound)
-        )
+        return [node.rows_or_range.value, self.render(node.bound)]
 
     def render(self, node: no.SortItem) -> Part:  # noqa
-        return (
-                self.render(node.value) +
-                ((' ' + node.direction.value) if node.direction is not None else '') +
-                ((' nulls ' + node.nulls.value) if node.nulls is not None else '')
-        )
+        return [
+            self.render(node.value),
+            node.direction.value if node.direction is not None else [],
+            ['nulls', node.nulls.value] if node.nulls is not None else [],
+        ]
 
     def render(self, node: no.StarExpr) -> Part:  # noqa
         return '*'
@@ -320,50 +319,71 @@ class Renderer(dispatch.Class):
         return self.render(node.name)
 
     def render(self, node: no.TypeSpec) -> Part:  # noqa
-        return (
-                self.render(node.name) +
-                (('(' + ', '.join(self.render(a) for a in node.args) + ')') if node.args else '')
-        )
+        return [
+            self.render(node.name),
+            Paren(List([self.render(a) for a in node.args])) if node.args else [],
+        ]
 
     def render(self, node: no.UnaryExpr) -> Part:  # noqa
-        return node.op.value + ' ' + self.paren_render(node.value)
+        return [node.op.value, self.paren_render(node.value)]
 
     def render(self, node: no.UnboundedFrameBound) -> Part:  # noqa
-        return 'unbounded ' + node.precedence.value
+        return ['unbounded', node.precedence.value]
 
     def render(self, node: no.SetSelect) -> Part:  # noqa
-        return (
-                self.render(node.left) +
-                ((' ' + ' '.join(self.render(i) for i in node.items)) if node.items else '')
-        )
+        return [
+            self.render(node.left),
+            [self.render(i) for i in node.items] if node.items else [],
+        ]
 
     def render(self, node: no.SetSelectItem) -> Part:  # noqa
-        return (
-                node.kind.value +
-                ' ' +
-                ((node.set_quantifier.value + ' ') if node.set_quantifier is not None else '') +
-                self.render(node.right)
-        )
+        return [
+            node.kind.value,
+            node.set_quantifier.value if node.set_quantifier is not None else [],
+            self.render(node.right),
+        ]
 
     def render(self, node: no.Unpivot) -> Part:  # noqa
-        return (
-                self.render(node.relation) +
-                ' unpivot(' +
-                self.render(node.value_col) +
-                ' for ' +
-                self.render(node.name_col) +
-                ' in (' +
-                ', '.join(self.render(c) for c in node.pivot_cols) +
-                '))'
-        )
+        return [
+            self.render(node.relation),
+            Concat(['unpivot', Paren([
+                self.render(node.value_col),
+                'for',
+                self.render(node.name_col),
+                'in',
+                Paren(List([self.render(c) for c in node.pivot_cols])),
+            ])]),
+        ]
 
     def render(self, node: no.Traversal) -> Part:  # noqa
-        return self.render(node.value) + ':' + ''.join(
-            ('[' + r + ']') if isinstance(k, no.Integer) else (('.' if i else '') + r)
-            for i, k in enumerate(node.keys)
-            for r in [self.render(k)]
-        )
+        return Concat([
+            self.render(node.value),
+            ':',
+            *[
+                ('[' + r + ']') if isinstance(k, no.Integer) else (('.' if i else '') + r)
+                for i, k in enumerate(node.keys)
+                for r in [self.render(k)]
+            ],
+        ])
+
+
+def render_part(part: Part, buf: io.StringIO) -> None:
+    if isinstance(part, str):
+        buf.write(part)
+    elif isinstance(part, collections.abc.Sequence):
+        raise NotImplementedError
+    elif isinstance(part, Paren):
+        raise NotImplementedError
+    elif isinstance(part, List):
+        raise NotImplementedError
+    elif isinstance(part, Concat):
+        raise NotImplementedError
+    else:
+        raise TypeError(part)
 
 
 def render(node: no.Node) -> str:
-    return Renderer().render(node)
+    part = Renderer().render(node)
+    buf = io.StringIO()
+    render_part(part, buf)
+    return buf.getvalue()
