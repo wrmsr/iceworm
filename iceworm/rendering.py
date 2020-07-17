@@ -367,9 +367,9 @@ class Renderer(dispatch.Class):
         ])
 
 
-def render_part(part: Part, buf: io.StringIO) -> None:
+def compact_part(part: Part) -> Part:
     if isinstance(part, str):
-        buf.write(part)
+        return part
     elif isinstance(part, collections.abc.Sequence):
         raise NotImplementedError
     elif isinstance(part, Paren):
@@ -382,8 +382,33 @@ def render_part(part: Part, buf: io.StringIO) -> None:
         raise TypeError(part)
 
 
+def render_part(part: Part, buf: io.StringIO) -> None:
+    if isinstance(part, str):
+        buf.write(part)
+    elif isinstance(part, collections.abc.Sequence):
+        for i, c in enumerate(part):
+            if i:
+                buf.write(' ')
+            render_part(c, buf)
+    elif isinstance(part, Paren):
+        buf.write('(')
+        render_part(part.part)
+        buf.write(')')
+    elif isinstance(part, List):
+        for i, c in enumerate(part.parts):
+            if i:
+                buf.write(part.delimiter + ' ')
+            render_part(c, buf)
+    elif isinstance(part, Concat):
+        for c in part.parts:
+            render_part(c, buf)
+    else:
+        raise TypeError(part)
+
+
 def render(node: no.Node) -> str:
     part = Renderer().render(node)
+    compact = compact_part(part)
     buf = io.StringIO()
-    render_part(part, buf)
+    render_part(compact, buf)
     return buf.getvalue()
