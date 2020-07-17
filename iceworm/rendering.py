@@ -302,6 +302,19 @@ class Renderer(dispatch.Class):
     def __call__(self, node: no.SetsGrouping) -> Part:  # noqa
         return ['grouping', 'sets', Paren(List([self(i) for i in node.sets]))]
 
+    def __call__(self, node: no.SetSelect) -> Part:  # noqa
+        return [
+            self(node.left),
+            [self(i) for i in node.items] if node.items else [],
+        ]
+
+    def __call__(self, node: no.SetSelectItem) -> Part:  # noqa
+        return [
+            node.kind.value,
+            node.set_quantifier.value if node.set_quantifier is not None else [],
+            self(node.right),
+        ]
+
     def __call__(self, node: no.SingleFrame) -> Part:  # noqa
         return [node.rows_or_range.value, self(node.bound)]
 
@@ -321,6 +334,17 @@ class Renderer(dispatch.Class):
     def __call__(self, node: no.Table) -> Part:  # noqa
         return self(node.name)
 
+    def __call__(self, node: no.Traversal) -> Part:  # noqa
+        return Concat([
+            self(node.value),
+            ':',
+            *[
+                Concat(['[', r, ']']) if isinstance(k, no.Integer) else Concat(['.' if i else [], r])
+                for i, k in enumerate(node.keys)
+                for r in [self(k)]
+            ],
+        ])
+
     def __call__(self, node: no.TypeSpec) -> Part:  # noqa
         return [
             self(node.name),
@@ -334,19 +358,6 @@ class Renderer(dispatch.Class):
     def __call__(self, node: no.UnboundedFrameBound) -> Part:  # noqa
         return ['unbounded', node.precedence.value]
 
-    def __call__(self, node: no.SetSelect) -> Part:  # noqa
-        return [
-            self(node.left),
-            [self(i) for i in node.items] if node.items else [],
-        ]
-
-    def __call__(self, node: no.SetSelectItem) -> Part:  # noqa
-        return [
-            node.kind.value,
-            node.set_quantifier.value if node.set_quantifier is not None else [],
-            self(node.right),
-        ]
-
     def __call__(self, node: no.Unpivot) -> Part:  # noqa
         return [
             self(node.relation),
@@ -358,17 +369,6 @@ class Renderer(dispatch.Class):
                 Paren(List([self(c) for c in node.pivot_cols])),
             ])]),
         ]
-
-    def __call__(self, node: no.Traversal) -> Part:  # noqa
-        return Concat([
-            self(node.value),
-            ':',
-            *[
-                ('[' + r + ']') if isinstance(k, no.Integer) else (('.' if i else '') + r)
-                for i, k in enumerate(node.keys)
-                for r in [self(k)]
-            ],
-        ])
 
 
 def _drop_empties(it: T) -> ta.List[T]:
