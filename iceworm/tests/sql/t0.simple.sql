@@ -2,6 +2,7 @@ select 1;
 select 'x';
 select 1 / 0;
 select 1 from x;
+select a.b.c from d.e;
 select x from y;
 select "x" from "y";
 select x, y from z;

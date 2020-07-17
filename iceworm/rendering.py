@@ -39,6 +39,10 @@ class Concat(DataPart):
     parts: ta.Sequence[Part]
 
 
+class Node(DataPart):
+    node: no.Node
+
+
 NEEDS_PAREN_TYPES: ta.AbstractSet[ta.Type[no.Node]] = {
     no.BinaryExpr,
     no.IsNull,
@@ -51,28 +55,30 @@ def needs_paren(node: no.Node) -> bool:
 
 
 class Renderer(dispatch.Class):
-    __call__ = dispatch.property()
+    render = dispatch.property()
 
-    def __call__(self, node: NoneType) -> Part:  # noqa
-        return []
+    def __call__(self, node: ta.Optional[no.Node]) -> Part:
+        if node is None:
+            return []
+        return [Node(node), self.render(node)]
 
-    def __call__(self, node: no.Node) -> Part:  # noqa
+    def render(self, node: no.Node) -> Part:  # noqa
         raise TypeError(node)
 
     def paren(self, node: no.Node) -> Part:  # noqa
         return Paren(self(node)) if needs_paren(node) else self(node)
 
-    def __call__(self, node: no.AliasedRelation) -> Part:  # noqa
+    def render(self, node: no.AliasedRelation) -> Part:  # noqa
         return [
             self.paren(node.relation),
             ['as', self(node.alias)] if node.alias is not None else [],
             Paren(List([self(i) for i in node.columns])) if node.columns else [],
         ]
 
-    def __call__(self, node: no.AllSelectItem) -> Part:  # noqa
+    def render(self, node: no.AllSelectItem) -> Part:  # noqa
         return '*'
 
-    def __call__(self, node: no.Between) -> Part:  # noqa
+    def render(self, node: no.Between) -> Part:  # noqa
         return [
             self(node.value),
             'between',
@@ -81,14 +87,14 @@ class Renderer(dispatch.Class):
             self(node.upper),
         ]
 
-    def __call__(self, node: no.BinaryExpr) -> Part:  # noqa
+    def render(self, node: no.BinaryExpr) -> Part:  # noqa
         return [
             self.paren(node.left),
             node.op.value,
             self.paren(node.right),
         ]
 
-    def __call__(self, node: no.Case) -> Part:  # noqa
+    def render(self, node: no.Case) -> Part:  # noqa
         return [
             'case',
             self(node.value),
@@ -97,31 +103,31 @@ class Renderer(dispatch.Class):
             'end',
         ]
 
-    def __call__(self, node: no.CaseItem) -> Part:  # noqa
+    def render(self, node: no.CaseItem) -> Part:  # noqa
         return ['when', self(node.when), 'then', self(node.then)]
 
-    def __call__(self, node: no.Cast) -> Part:  # noqa
+    def render(self, node: no.Cast) -> Part:  # noqa
         return Concat([self(node.value), '::', self(node.type)])
 
-    def __call__(self, node: no.CastCall) -> Part:  # noqa
+    def render(self, node: no.CastCall) -> Part:  # noqa
         return Concat(['cast', Paren([self(node.value), 'as', self(node.type)])])
 
-    def __call__(self, node: no.Cte) -> Part:  # noqa
+    def render(self, node: no.Cte) -> Part:  # noqa
         return [self(node.name), 'as', Paren(self(node.select))]
 
-    def __call__(self, node: no.CteSelect) -> Part:  # noqa
+    def render(self, node: no.CteSelect) -> Part:  # noqa
         return ['with', List([self(c) for c in node.ctes]), self(node.select)]
 
-    def __call__(self, node: no.CurrentRowFrameBound) -> Part:  # noqa
+    def render(self, node: no.CurrentRowFrameBound) -> Part:  # noqa
         return ['current', 'row']
 
-    def __call__(self, node: no.Date) -> Part:  # noqa
+    def render(self, node: no.Date) -> Part:  # noqa
         return ['date', self(node.value)]
 
-    def __call__(self, node: no.Decimal) -> Part:  # noqa
+    def render(self, node: no.Decimal) -> Part:  # noqa
         return node.value
 
-    def __call__(self, node: no.DoubleFrame) -> Part:  # noqa
+    def render(self, node: no.DoubleFrame) -> Part:  # noqa
         return [
             node.rows_or_range.value,
             'between',
@@ -130,28 +136,28 @@ class Renderer(dispatch.Class):
             self(node.max),
         ]
 
-    def __call__(self, node: no.EFalse) -> Part:  # noqa
+    def render(self, node: no.EFalse) -> Part:  # noqa
         return 'false'
 
-    def __call__(self, node: no.ETrue) -> Part:  # noqa
+    def render(self, node: no.ETrue) -> Part:  # noqa
         return 'true'
 
-    def __call__(self, node: no.ExprSelectItem) -> Part:  # noqa
+    def render(self, node: no.ExprSelectItem) -> Part:  # noqa
         return [
             self.paren(node.value),
             ['as', self(node.label)] if node.label is not None else [],
         ]
 
-    def __call__(self, node: no.Extract) -> Part:  # noqa
+    def render(self, node: no.Extract) -> Part:  # noqa
         return Concat(['extract', Paren([self(node.part), 'from', self(node.value)])])
 
-    def __call__(self, node: no.FlatGrouping) -> Part:  # noqa
+    def render(self, node: no.FlatGrouping) -> Part:  # noqa
         return List([self(i) for i in node.items])
 
-    def __call__(self, node: no.Float) -> Part:  # noqa
+    def render(self, node: no.Float) -> Part:  # noqa
         return node.value
 
-    def __call__(self, node: no.FunctionCall) -> Part:  # noqa
+    def render(self, node: no.FunctionCall) -> Part:  # noqa
         return [
             Concat([
                 self(node.name),
@@ -170,58 +176,58 @@ class Renderer(dispatch.Class):
             ['over', Paren([self(node.over)])] if node.over is not None else [],
         ]
 
-    def __call__(self, node: no.FunctionCallExpr) -> Part:  # noqa
+    def render(self, node: no.FunctionCallExpr) -> Part:  # noqa
         return self(node.call)
 
-    def __call__(self, node: no.FunctionCallRelation) -> Part:  # noqa
+    def render(self, node: no.FunctionCallRelation) -> Part:  # noqa
         return self(node.call)
 
-    def __call__(self, node: no.GroupingSet) -> Part:  # noqa
+    def render(self, node: no.GroupingSet) -> Part:  # noqa
         return Paren(List([self(i) for i in node.items]))
 
-    def __call__(self, node: no.Identifier) -> Part:  # noqa
+    def render(self, node: no.Identifier) -> Part:  # noqa
         return quote(node.name, '"')
 
-    def __call__(self, node: no.IdentifierAllSelectItem) -> Part:  # noqa
+    def render(self, node: no.IdentifierAllSelectItem) -> Part:  # noqa
         return Concat([self(node.identifier), '.*'])
 
-    def __call__(self, node: no.InJinja) -> Part:  # noqa
+    def render(self, node: no.InJinja) -> Part:  # noqa
         return [
             self(node.needle),
             'not' if node.not_ else [], 'in',
             '{{', node.text, '}}',
         ]
 
-    def __call__(self, node: no.InList) -> Part:  # noqa
+    def render(self, node: no.InList) -> Part:  # noqa
         return [
             self(node.needle),
             'not' if node.not_ else [], 'in',
             Paren(List([self.paren(e) for e in node.haystack])),
         ]
 
-    def __call__(self, node: no.InSelect) -> Part:  # noqa
+    def render(self, node: no.InSelect) -> Part:  # noqa
         return [
             self(node.needle),
             'not' if node.not_ else [], 'in',
             Paren(self(node.haystack)),
         ]
 
-    def __call__(self, node: no.Integer) -> Part:  # noqa
+    def render(self, node: no.Integer) -> Part:  # noqa
         return str(node.value)
 
-    def __call__(self, node: no.Interval) -> Part:  # noqa
+    def render(self, node: no.Interval) -> Part:  # noqa
         return ['interval', self(node.value)]
 
-    def __call__(self, node: no.IsNull) -> Part:  # noqa
+    def render(self, node: no.IsNull) -> Part:  # noqa
         return [self(node.value), 'is', 'not' if node.not_ else [], 'null']
 
-    def __call__(self, node: no.JinjaExpr) -> Part:  # noqa
+    def render(self, node: no.JinjaExpr) -> Part:  # noqa
         return ['{{', node.text, '}}']
 
-    def __call__(self, node: no.JinjaRelation) -> Part:  # noqa
+    def render(self, node: no.JinjaRelation) -> Part:  # noqa
         return ['{{', node.text, '}}']
 
-    def __call__(self, node: no.Join) -> Part:  # noqa
+    def render(self, node: no.Join) -> Part:  # noqa
         return [
             self(node.left),
             node.type.value if node.type != no.JoinType.DEFAULT else [],
@@ -233,13 +239,13 @@ class Renderer(dispatch.Class):
             ])
         ]
 
-    def __call__(self, node: no.Kwarg) -> Part:  # noqa
+    def render(self, node: no.Kwarg) -> Part:  # noqa
         return [self(node.name), '=>', self(node.value)]
 
-    def __call__(self, node: no.Lateral) -> Part:  # noqa
+    def render(self, node: no.Lateral) -> Part:  # noqa
         return ['lateral', self(node.relation)]
 
-    def __call__(self, node: no.Like) -> Part:  # noqa
+    def render(self, node: no.Like) -> Part:  # noqa
         return [
             self(node.value),
             'not' if node.not_ else [],
@@ -249,20 +255,20 @@ class Renderer(dispatch.Class):
             ['escape', self(node.escape)] if node.escape is not None else [],
         ]
 
-    def __call__(self, node: no.Null) -> Part:  # noqa
+    def render(self, node: no.Null) -> Part:  # noqa
         return 'null'
 
-    def __call__(self, node: no.NumFrameBound) -> Part:  # noqa
+    def render(self, node: no.NumFrameBound) -> Part:  # noqa
         return [str(node.num), node.precedence.value]
 
-    def __call__(self, node: no.Over) -> Part:  # noqa
+    def render(self, node: no.Over) -> Part:  # noqa
         return [
             ['partition', 'by', List([self(e) for e in node.partition_by])] if node.partition_by else [],
             ['order', 'by', List([self(e) for e in node.order_by])] if node.order_by else [],
             self(node.frame),
         ]
 
-    def __call__(self, node: no.Pivot) -> Part:  # noqa
+    def render(self, node: no.Pivot) -> Part:  # noqa
         return [
             self(node.relation),
             Concat(['pivot', Paren([
@@ -275,10 +281,10 @@ class Renderer(dispatch.Class):
             ])]),
         ]
 
-    def __call__(self, node: no.QualifiedNameNode) -> Part:  # noqa
-        return '.'.join(self(i) for i in node.parts)
+    def render(self, node: no.QualifiedNameNode) -> Part:  # noqa
+        return Concat([Concat(['.' if i else [], self(p)]) for i, p in enumerate(node.parts)])
 
-    def __call__(self, node: no.Select) -> Part:  # noqa
+    def render(self, node: no.Select) -> Part:  # noqa
         return [
             'select',
             ['top', self(node.top_n)] if node.top_n is not None else [],
@@ -293,48 +299,48 @@ class Renderer(dispatch.Class):
             ['limit', str(node.limit)] if node.limit is not None else [],
         ]
 
-    def __call__(self, node: no.SelectExpr) -> Part:  # noqa
+    def render(self, node: no.SelectExpr) -> Part:  # noqa
         return self(node.select)
 
-    def __call__(self, node: no.SelectRelation) -> Part:  # noqa
+    def render(self, node: no.SelectRelation) -> Part:  # noqa
         return Paren(self(node.select))
 
-    def __call__(self, node: no.SetsGrouping) -> Part:  # noqa
+    def render(self, node: no.SetsGrouping) -> Part:  # noqa
         return ['grouping', 'sets', Paren(List([self(i) for i in node.sets]))]
 
-    def __call__(self, node: no.SetSelect) -> Part:  # noqa
+    def render(self, node: no.SetSelect) -> Part:  # noqa
         return [
             self(node.left),
             [self(i) for i in node.items] if node.items else [],
         ]
 
-    def __call__(self, node: no.SetSelectItem) -> Part:  # noqa
+    def render(self, node: no.SetSelectItem) -> Part:  # noqa
         return [
             node.kind.value,
             node.set_quantifier.value if node.set_quantifier is not None else [],
             self(node.right),
         ]
 
-    def __call__(self, node: no.SingleFrame) -> Part:  # noqa
+    def render(self, node: no.SingleFrame) -> Part:  # noqa
         return [node.rows_or_range.value, self(node.bound)]
 
-    def __call__(self, node: no.SortItem) -> Part:  # noqa
+    def render(self, node: no.SortItem) -> Part:  # noqa
         return [
             self(node.value),
             node.direction.value if node.direction is not None else [],
             ['nulls', node.nulls.value] if node.nulls is not None else [],
         ]
 
-    def __call__(self, node: no.StarExpr) -> Part:  # noqa
+    def render(self, node: no.StarExpr) -> Part:  # noqa
         return '*'
 
-    def __call__(self, node: no.String) -> Part:  # noqa
+    def render(self, node: no.String) -> Part:  # noqa
         return quote(node.value, "'")
 
-    def __call__(self, node: no.Table) -> Part:  # noqa
+    def render(self, node: no.Table) -> Part:  # noqa
         return self(node.name)
 
-    def __call__(self, node: no.Traversal) -> Part:  # noqa
+    def render(self, node: no.Traversal) -> Part:  # noqa
         return Concat([
             self(node.value),
             ':',
@@ -345,20 +351,20 @@ class Renderer(dispatch.Class):
             ],
         ])
 
-    def __call__(self, node: no.TypeSpec) -> Part:  # noqa
+    def render(self, node: no.TypeSpec) -> Part:  # noqa
         return [
             self(node.name),
             Paren(List([self(a) for a in node.args])) if node.args else [],
         ]
 
-    def __call__(self, node: no.UnaryExpr) -> Part:  # noqa
+    def render(self, node: no.UnaryExpr) -> Part:  # noqa
         parts = [node.op.value, self.paren(node.value)]
         return Concat(parts) if node.op != no.UnaryOp.NOT else parts
 
-    def __call__(self, node: no.UnboundedFrameBound) -> Part:  # noqa
+    def render(self, node: no.UnboundedFrameBound) -> Part:  # noqa
         return ['unbounded', node.precedence.value]
 
-    def __call__(self, node: no.Unpivot) -> Part:  # noqa
+    def render(self, node: no.Unpivot) -> Part:  # noqa
         return [
             self(node.relation),
             Concat(['unpivot', Paren([
@@ -392,6 +398,8 @@ def compact_part(part: Part) -> Part:
     elif isinstance(part, Concat):
         parts = _drop_empties(compact_part(c) for c in part.parts)
         return Concat(parts) if parts else []
+    elif isinstance(part, Node):
+        return []
     else:
         raise TypeError(part)
 
@@ -416,6 +424,8 @@ def render_part(part: Part, buf: io.StringIO) -> None:
     elif isinstance(part, Concat):
         for c in part.parts:
             render_part(c, buf)
+    elif isinstance(part, Node):
+        pass
     else:
         raise TypeError(part)
 

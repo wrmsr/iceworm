@@ -1,6 +1,7 @@
 import glob
 import json  # noqa
 import os.path
+import textwrap
 
 from .. import nodes as no
 from .. import parsing
@@ -45,3 +46,30 @@ def test_parsing():
             # print(json.dumps(parts_ser, indent=4))
 
             print()
+
+
+def test_comments():
+    sql = textwrap.dedent("""
+    -- before select
+    select
+        a, -- this is a
+        -- this is before b
+        b  -- this is b
+    -- before from
+    from
+        t -- this is t
+    -- end
+    """)
+
+    node = parsing.parse_statement(sql)
+    print(node)
+
+    ser = serde.serialize(node)  # noqa
+    des = serde.deserialize(ser, no.Node)  # noqa
+    # assert des == node
+
+    rendered = rendering.render(node)
+    print(rendered)
+
+    reparsed = parsing.parse_statement(rendered + ';')
+    assert reparsed == node
