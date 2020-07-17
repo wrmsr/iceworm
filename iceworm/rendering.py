@@ -15,6 +15,7 @@ from . import nodes as no
 from .quoting import quote
 
 
+T = ta.TypeVar('T')
 NoneType = type(None)
 
 
@@ -151,11 +152,13 @@ class Renderer(dispatch.Class):
         return node.value
 
     def render(self, node: no.FunctionCall) -> Part:  # noqa
-        return Concat([
-            self.render(node.name),
-            Paren([
-                node.set_quantifier.value if node.set_quantifier is not None else [],
-                List([self.paren_render(a) for a in [*node.args, *node.kwargs]]),
+        return [
+            Concat([
+                self.render(node.name),
+                Paren([
+                    node.set_quantifier.value if node.set_quantifier is not None else [],
+                    List([self.paren_render(a) for a in [*node.args, *node.kwargs]]),
+                ]),
             ]),
             [node.nulls.value, 'nulls'] if node.nulls is not None else [],
             [
@@ -165,7 +168,7 @@ class Renderer(dispatch.Class):
                 ])
             ] if node.within_group else [],
             ['over', Paren([self.render(node.over)])] if node.over is not None else [],
-        ])
+        ]
 
     def render(self, node: no.FunctionCallExpr) -> Part:  # noqa
         return self.render(node.call)
@@ -367,17 +370,27 @@ class Renderer(dispatch.Class):
         ])
 
 
+def _drop_empties(it: T) -> ta.List[T]:
+    return [e for e in it if not (
+        isinstance(e, collections.abc.Sequence) and
+        not e and
+        not isinstance(e, str)
+    )]
+
+
 def compact_part(part: Part) -> Part:
     if isinstance(part, str):
         return part
     elif isinstance(part, collections.abc.Sequence):
-        raise NotImplementedError
+        return _drop_empties(compact_part(c) for c in part)
     elif isinstance(part, Paren):
-        raise NotImplementedError
+        return Paren(compact_part(part.part))
     elif isinstance(part, List):
-        raise NotImplementedError
+        parts = _drop_empties(compact_part(c) for c in part.parts)
+        return List(parts, part.delimiter) if parts else []
     elif isinstance(part, Concat):
-        raise NotImplementedError
+        parts = _drop_empties(compact_part(c) for c in part.parts)
+        return Concat(parts) if parts else []
     else:
         raise TypeError(part)
 
@@ -392,7 +405,7 @@ def render_part(part: Part, buf: io.StringIO) -> None:
             render_part(c, buf)
     elif isinstance(part, Paren):
         buf.write('(')
-        render_part(part.part)
+        render_part(part.part, buf)
         buf.write(')')
     elif isinstance(part, List):
         for i, c in enumerate(part.parts):
