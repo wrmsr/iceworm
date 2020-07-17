@@ -2,6 +2,8 @@
 TODO:
  - enable type checking
  - standardize (+in g4): Expr not expression, Stmt not statement, Value not val, Rel not rel?
+ - coerce sequence
+ - enforce field types
 
 Visitors / Tools:
  - graphviz gen
@@ -15,6 +17,7 @@ from omnibus import dataclasses as dc
 from omnibus import properties
 from omnibus._vendor import antlr4
 
+from . import serde
 from .types import QualifiedName
 from .utils import build_dc_repr
 from .utils import build_enum_value_map
@@ -26,7 +29,14 @@ NodeMapper = ta.Callable[['Node'], 'Node']
 
 
 class Node(dc.Enum, sealed=True, reorder=True, repr=False):
-    pctx: ta.Optional[antlr4.ParserRuleContext] = dc.field(default=None, kwonly=True, repr=False, hash=False, compare=False)  # noqa
+    pctx: ta.Optional[antlr4.ParserRuleContext] = dc.field(
+        default=None,
+        kwonly=True,
+        repr=False,
+        hash=False,
+        compare=False,
+        metadata={serde.Ignore: True},
+    )
 
     __repr__ = build_dc_repr
 
@@ -230,12 +240,12 @@ class RowsOrRange(enum.Enum):
     RANGE = 'range'
 
 
-class SingleFrame(Node):
+class SingleFrame(Frame):
     rows_or_range: RowsOrRange
     bound: FrameBound
 
 
-class DoubleFrame(Node):
+class DoubleFrame(Frame):
     rows_or_range: RowsOrRange
     min: FrameBound
     max: FrameBound
@@ -317,9 +327,9 @@ class CastCall(Expr):
     type: TypeSpec
 
 
-class Traversal(Node):
+class Traversal(Expr):
     value: Expr
-    keys: ta.Sequence[ta.Union[Identifier, Integer]]
+    keys: ta.Sequence[Expr]
 
 
 class IsNull(Expr):
@@ -445,7 +455,7 @@ class IdentifierAllSelectItem(SelectItem):
     identifier: Identifier
 
 
-class ExprSelectItem(Node):
+class ExprSelectItem(SelectItem):
     value: Expr
     label: ta.Optional[Identifier] = None
 
@@ -516,7 +526,7 @@ SET_SELECT_KIND_MAP: ta.Mapping[str, SetSelectKind] = build_enum_value_map(SetSe
 class SetSelectItem(Node):
     kind: SetSelectKind
     right: Selectable
-    set_quantifier: SetQuantifier = None
+    set_quantifier: ta.Optional[SetQuantifier] = None
 
 
 class SetSelect(Selectable):

@@ -1,8 +1,10 @@
 import glob
 import os.path
 
+from .. import nodes as no
 from .. import parsing
 from .. import rendering
+from .. import serde
 
 
 def test_parsing():
@@ -23,6 +25,10 @@ def test_parsing():
 
             node = parsing.parse_statement(line + ';')
             print(node)
+
+            ser = serde.serialize(node)  # noqa
+            des = serde.deserialize(ser, no.Node)  # noqa
+            # assert des == node
 
             rendered = rendering.render(node)
             print(rendered)

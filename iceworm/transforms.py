@@ -5,6 +5,8 @@ TODO:
   - https://docs.snowflake.com/en/sql-reference/sql/create-table.html#syntax
  - *name disambiguator* (powered by sym res)
  - expression inversion / undo queries
+ - selectallexpansion
+ - symbol resolution / namification
  - inlining
   - upstreams
   - (mat)views
