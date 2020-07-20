@@ -45,8 +45,8 @@ class Origin(lang.Marker):
 class Transformer(dispatch.Class, lang.Abstract):
     __call__ = dispatch.property()
 
-    def __call__(self, node: no.Node) -> no.Node:  # noqa
-        res = node.map(self)
+    def __call__(self, node: no.Node, **kwargs) -> no.Node:  # noqa
+        res = node.map(self, **kwargs)
         return dc.replace(res, meta={**res.meta, Origin: node})
 
 
@@ -75,17 +75,17 @@ class ExpandSelectsTransformer(Transformer):
         self._catalog = check.isinstance(catalog, md.Catalog)
 
     def add_relation_aliases(self, relations: ta.Sequence[no.Relation]) -> ta.Sequence[no.Relation]:
-        raise NotImplementedError
+        return relations
 
     def add_item_labels(
             self,
             items: ta.Sequence[no.SelectItem],
             relations: ta.Sequence[no.Relation],
     ) -> ta.Sequence[no.SelectItem]:
-        raise NotImplementedError
+        return items
 
     def __call__(self, node: no.Select) -> no.Node:
-        # relations = self.add_relation_aliases([check.isinstance(self(r), no.Relation) for r in node.relations])
-        # items = self.add_item_labels(node.items, relations)
+        relations = self.add_relation_aliases([check.isinstance(self(r), no.Relation) for r in node.relations])
+        items = self.add_item_labels(node.items, relations)
 
-        return node
+        return super().__call__(node, relations=relations, items=items)

@@ -62,11 +62,16 @@ class Node(dc.Enum, sealed=True, reorder=True, repr=False):
         else:
             return {}
 
-    def map(self: SelfNode, fn: NodeMapper) -> SelfNode:
-        kw = {}
+    def map(self: SelfNode, fn: NodeMapper, **kwargs) -> SelfNode:
+        rpl_kw = {**kwargs}
         for fld in dc.fields(self):
-            kw.update(self.build_field_map_kwargs(fn, fld))
-        return dc.replace(self, **kw)
+            if fld.name in kwargs:
+                continue
+            for k, v in self.build_field_map_kwargs(fn, fld).items():
+                if k in rpl_kw:
+                    raise KeyError(k)
+                rpl_kw[k] = v
+        return dc.replace(self, **rpl_kw)
 
 
 class Expr(Node, abstract=True):
