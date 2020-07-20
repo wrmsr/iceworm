@@ -31,12 +31,12 @@ class Column(dc.Pure):
     type: Datatype
 
 
-class Table(dc.Pure, allow_setattr=True):
+class Table(dc.Pure, allow_setattr=True, reorder=True):
     name: str
-    columns: ta.Sequence[Column]
+    schema: ta.Optional[str] = dc.field(None, kwonly=True)
+    catalog: ta.Optional[str] = dc.field(None, kwonly=True)
 
-    schema: ta.Optional[str] = None
-    catalog: ta.Optional[str] = None
+    columns: ta.Sequence[Column]
 
     def __post_init__(self) -> None:
         self._columns_by_name: ta.Mapping[str, Column] = unique_dict((c.name, c) for c in self.columns)
