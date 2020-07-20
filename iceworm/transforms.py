@@ -28,6 +28,7 @@ TODO:
 """
 import typing as ta
 
+from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import dispatch
 from omnibus import lang
@@ -71,7 +72,20 @@ class ExpandSelectsTransformer(Transformer):
     def __init__(self, catalog: md.Catalog) -> None:
         super().__init__()
 
-        self._catalog = catalog
+        self._catalog = check.isinstance(catalog, md.Catalog)
+
+    def add_relation_aliases(self, relations: ta.Sequence[no.Relation]) -> ta.Sequence[no.Relation]:
+        raise NotImplementedError
+
+    def add_item_labels(
+            self,
+            items: ta.Sequence[no.SelectItem],
+            relations: ta.Sequence[no.Relation],
+    ) -> ta.Sequence[no.SelectItem]:
+        raise NotImplementedError
 
     def __call__(self, node: no.Select) -> no.Node:
+        # relations = self.add_relation_aliases([check.isinstance(self(r), no.Relation) for r in node.relations])
+        # items = self.add_item_labels(node.items, relations)
+
         return node

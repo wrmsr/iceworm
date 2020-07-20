@@ -41,23 +41,31 @@ class Node(dc.Enum, sealed=True, reorder=True, repr=False):
 
     __repr__ = build_dc_repr
 
+    def yield_field_children(self, fld: dc.Field) -> NodeGen:
+        val = getattr(self, fld.name)
+        if isinstance(val, Node):
+            yield val
+        elif isinstance(val, collections.abc.Sequence):
+            yield from (item for item in val if isinstance(item, Node))
+
     @property
     def children(self) -> NodeGen:
         for fld in dc.fields(self):
-            val = getattr(self, fld.name)
-            if isinstance(val, Node):
-                yield val
-            elif isinstance(val, collections.abc.Sequence):
-                yield from (item for item in val if isinstance(item, Node))
+            yield from self.yield_field_children(fld)
+
+    def build_field_map_kwargs(self, fn: NodeMapper, fld: dc.Field) -> ta.Mapping[str, ta.Any]:
+        val = getattr(self, fld.name)
+        if isinstance(val, Node):
+            return {fld.name: fn(val)}
+        elif isinstance(val, collections.abc.Sequence):
+            return {fld.name: [fn(item) if isinstance(item, Node) else item for item in val]}
+        else:
+            return {}
 
     def map(self: SelfNode, fn: NodeMapper) -> SelfNode:
         kw = {}
         for fld in dc.fields(self):
-            val = getattr(self, fld.name)
-            if isinstance(val, Node):
-                kw[fld.name] = fn(val)
-            elif isinstance(val, collections.abc.Sequence):
-                kw[fld.name] = [fn(item) if isinstance(item, Node) else item for item in val]
+            kw.update(self.build_field_map_kwargs(fn, fld))
         return dc.replace(self, **kw)
 
 
