@@ -32,9 +32,9 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         check.isinstance(ctx, antlr4.ParserRuleContext)
         node = ctx.accept(self)
         if node is not None:
-            check.isinstance(node, no.Node)
-            if node.pctx is None:
-                node = dc.replace(node, pctx=ctx)
+            node = check.isinstance(node, no.Node)
+            if antlr4.ParserRuleContext not in node.meta:
+                node = dc.replace(node, meta={**node.meta, antlr4.ParserRuleContext: ctx})
         return node
 
     def aggregateResult(self, aggregate, nextResult):

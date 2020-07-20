@@ -32,18 +32,21 @@ from omnibus import dataclasses as dc
 from omnibus import dispatch
 from omnibus import lang
 
+from . import metadata as md
 from . import nodes as no
 from .types import QualifiedName
 
 
-NodeT = ta.TypeVar('NodeT', bound=no.Node)
+class Origin(lang.Marker):
+    pass
 
 
-class Transformer(dispatch.Class, lang.Abstract, ta.Generic[NodeT]):
+class Transformer(dispatch.Class, lang.Abstract):
     __call__ = dispatch.property()
 
-    def __call__(self, node: no.Node) -> NodeT:  # noqa
-        return node.map(self)
+    def __call__(self, node: no.Node) -> no.Node:  # noqa
+        res = node.map(self)
+        return dc.replace(res, meta={**res.meta, Origin: node})
 
 
 @dc.dataclass(frozen=True)
@@ -61,3 +64,14 @@ class ReplaceNamesTransformer(Transformer):
 
 def replace_names(node: no.Node, dct: ta.Mapping[QualifiedName, QualifiedName]) -> no.Node:
     return ReplaceNamesTransformer(dct)(node)
+
+
+class ExpandSelectsTransformer(Transformer):
+
+    def __init__(self, catalog: md.Catalog) -> None:
+        super().__init__()
+
+        self._catalog = catalog
+
+    def __call__(self, node: no.Select) -> no.Node:
+        return node

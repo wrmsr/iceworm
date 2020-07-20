@@ -3,6 +3,8 @@ import json  # noqa
 import os.path
 import textwrap
 
+from omnibus._vendor import antlr4
+
 from .. import nodes as no
 from .. import parsing
 from .. import rendering
@@ -82,7 +84,7 @@ def test_comments():
             rec(cpctx)
 
     pctxs = ocol.IdentitySet()
-    rec(node.pctx)
+    rec(node.meta[antlr4.ParserRuleContext])
 
     for pctx in pctxs:
         print(pctx)

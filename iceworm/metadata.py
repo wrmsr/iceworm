@@ -48,3 +48,14 @@ class Table(dc.Pure, allow_setattr=True, reorder=True):
     @properties.cached
     def qualified_name(self) -> QualifiedName:
         return QualifiedName(*filter(None, [self.catalog, self.schema, self.name]))
+
+
+class Catalog(dc.Pure, allow_setattr=True):
+    tables: ta.Sequence[Table]
+
+    def __post_init__(self) -> None:
+        self._tables_by_name: ta.Mapping[str, Table] = unique_dict((t.name, t) for t in self.tables)
+
+    @property
+    def tables_by_name(self) -> ta.Mapping[str, Table]:
+        return self._tables_by_name

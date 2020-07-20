@@ -13,9 +13,9 @@ import enum
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import properties
-from omnibus._vendor import antlr4
 
 from . import serde
 from .types import QualifiedName
@@ -29,12 +29,13 @@ NodeMapper = ta.Callable[['Node'], 'Node']
 
 
 class Node(dc.Enum, sealed=True, reorder=True, repr=False):
-    pctx: ta.Optional[antlr4.ParserRuleContext] = dc.field(
-        default=None,
+    meta: ta.Mapping[ta.Any, ta.Any] = dc.field(
+        ocol.frozendict(),
         kwonly=True,
         repr=False,
         hash=False,
         compare=False,
+        # FIXME: coerce=ocol.frozendict,
         metadata={serde.Ignore: True},
     )
 
