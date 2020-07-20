@@ -9,8 +9,8 @@ git+https://github.com/wrmsr/omnibus@wrmsr_working
 
 PyHive==0.6.2
 SQLAlchemy==1.3.18
-pg8000==1.16.0
-snowflake-connector-python==2.2.8
+pg8000==1.16.1
+snowflake-connector-python==2.2.9
 snowflake-sqlalchemy==1.2.3
 
 
@@ -23,4 +23,6 @@ PyYAML==5.3.1
 
 ## transitive deps
 
-docutils==0.15.2
+boto3==1.14.23
+botocore==1.17.23
+docutils==0.16
