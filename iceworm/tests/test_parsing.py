@@ -92,7 +92,7 @@ def test_comments():
 
         def __call__(self, part: rendering.Node) -> rendering.Part:
             print(part)
-            return []
+            return super().__call__(part)
 
     part = rendering.Renderer()(node)
     part = NodePartTransform()(part)
