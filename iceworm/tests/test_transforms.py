@@ -39,5 +39,5 @@ def test_expand_selects():
         ],
     )
 
-    res = tfm.ExpandSelectsTransformer(cat)(root)
+    res = tfm.ExpandSelectsTransformer(root, cat)
     print(res)

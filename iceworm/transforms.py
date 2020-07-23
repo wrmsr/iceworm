@@ -26,6 +26,7 @@ TODO:
  - pk / ds? / 'generic?' propagation?
  - omni.matching?
 """
+import collections
 import typing as ta
 
 from omnibus import check
@@ -33,6 +34,7 @@ from omnibus import dataclasses as dc
 from omnibus import dispatch
 from omnibus import lang
 
+from . import analysis as ana
 from . import metadata as md
 from . import nodes as no
 from .types import QualifiedName
@@ -69,9 +71,10 @@ def replace_names(node: no.Node, dct: ta.Mapping[QualifiedName, QualifiedName]) 
 
 class ExpandSelectsTransformer(Transformer):
 
-    def __init__(self, catalog: md.Catalog) -> None:
+    def __init__(self, root: no.Node, catalog: md.Catalog) -> None:
         super().__init__()
 
+        self._root = check.isinstance(root, no.Node)
         self._catalog = check.isinstance(catalog, md.Catalog)
 
     def add_relation_aliases(self, relations: ta.Sequence[no.Relation]) -> ta.Sequence[no.Relation]:
@@ -82,6 +85,12 @@ class ExpandSelectsTransformer(Transformer):
             items: ta.Sequence[no.SelectItem],
             relations: ta.Sequence[no.Relation],
     ) -> ta.Sequence[no.SelectItem]:
+        # cts = collections.Counter()
+        # for rel in relations:
+        #     for node in ana.basic(rel).nodes:
+        #         if isinstance(node, no.Table):
+        #             cts[node.]
+
         return items
 
     def __call__(self, node: no.Select) -> no.Node:
