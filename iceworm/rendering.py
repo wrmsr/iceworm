@@ -377,14 +377,6 @@ class Renderer(dispatch.Class):
         ]
 
 
-def _drop_empties(it: T) -> ta.List[T]:
-    return [e for e in it if not (
-        isinstance(e, collections.abc.Sequence) and
-        not e and
-        not isinstance(e, str)
-    )]
-
-
 class PartTransform(dispatch.Class):
     __call__ = dispatch.property()
 
@@ -414,6 +406,14 @@ class RemoveNodes(PartTransform):
 
 
 remove_nodes = RemoveNodes()
+
+
+def _drop_empties(it: ta.Iterable[T]) -> ta.List[T]:
+    return [e for e in it if not (
+            isinstance(e, collections.abc.Sequence) and
+            not e and
+            not isinstance(e, str)
+    )]
 
 
 class CompactPart(PartTransform):

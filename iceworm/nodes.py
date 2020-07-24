@@ -4,6 +4,7 @@ TODO:
  - standardize (+in g4): Expr not expression, Stmt not statement, Value not val, Rel not rel?
  - coerce sequence
  - enforce field types
+ - *coerce seqs to frozenlist not tuple*
 
 Visitors / Tools:
  - graphviz gen

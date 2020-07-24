@@ -31,7 +31,7 @@ class Column(dc.Pure):
     type: Datatype
 
 
-class Table(dc.Pure, allow_setattr=True, reorder=True):
+class Table(dc.Frozen, final=True, allow_setattr=True, reorder=True):
     name: str
     schema: ta.Optional[str] = dc.field(None, kwonly=True)
     catalog: ta.Optional[str] = dc.field(None, kwonly=True)
@@ -50,7 +50,7 @@ class Table(dc.Pure, allow_setattr=True, reorder=True):
         return QualifiedName(*filter(None, [self.catalog, self.schema, self.name]))
 
 
-class Catalog(dc.Pure, allow_setattr=True):
+class Catalog(dc.Frozen, final=True, allow_setattr=True):
     tables: ta.Sequence[Table]
 
     def __post_init__(self) -> None:

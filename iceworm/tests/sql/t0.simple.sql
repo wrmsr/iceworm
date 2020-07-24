@@ -115,3 +115,6 @@ select 1 except select 1;
 select * from t(x);
 -- with c as (select 1) (select 1);
 -- with c as (select 1) ((select 1) union (select 2));
+-- select t.{{ a }};
+-- select {{ a.b | c }};
+-- select a_{{ b }}_c;
