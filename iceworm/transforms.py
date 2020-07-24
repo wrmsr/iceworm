@@ -26,7 +26,7 @@ TODO:
  - pk / ds? / 'generic?' propagation?
  - omni.matching?
 """
-import collections
+import collections  # noqa
 import typing as ta
 
 from omnibus import check
@@ -34,7 +34,7 @@ from omnibus import dataclasses as dc
 from omnibus import dispatch
 from omnibus import lang
 
-from . import analysis as ana
+from . import analysis as ana  # noqa
 from . import metadata as md
 from . import nodes as no
 from .types import QualifiedName

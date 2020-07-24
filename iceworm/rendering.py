@@ -410,9 +410,9 @@ remove_nodes = RemoveNodes()
 
 def _drop_empties(it: ta.Iterable[T]) -> ta.List[T]:
     return [e for e in it if not (
-            isinstance(e, collections.abc.Sequence) and
-            not e and
-            not isinstance(e, str)
+        isinstance(e, collections.abc.Sequence) and
+        not e and
+        not isinstance(e, str)
     )]
 
 
