@@ -21,22 +21,32 @@ define do-clean
 	docker-compose rm -fv $1
 endef
 
-.PHONY: clean-services
 clean-services: stop
 	for SVC in $(DOCKER_COMPOSE_SERVICES) ; do \
-		$(call do-clean,$$SVC) ; \
+		docker-compose rm -fv "$$SVC" ; \
 	done
 
 .PHONY: clean
 clean: clean-services
-	$(call do-clean,iceworm-dev)
+	docker-compose rm -fv iceworm-dev
 
 .PHONY: images
 images:
 	for IMG in $(DOCKER_IMAGES) ; do \
-		$(call do-image,$$IMG) ; \
+		(cd .. && docker build --tag "$(DOCKER_USER)/$$IMG" -f "docker/$$IMG/Dockerfile" .) ; \
 	done
-	$(call do-image,iceworm-dev)
+
+.PHONY:
+push:
+	for IMG in $(DOCKER_IMAGES) ; do \
+		docker push "$(DOCKER_USER)/$$IMG" ; \
+	done
+
+.PHONY:
+pull:
+	for IMG in $(DOCKER_IMAGES) ; do \
+		docker pull "$(DOCKER_USER)/$$IMG" ; \
+	done
 
 .PHONY: start
 start:
