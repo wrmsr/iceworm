@@ -30,6 +30,8 @@ def test_parsing():
             node = parsing.parse_statement(line + ';')
             print(node)
 
+            hash(node)
+
             ser = serde.serialize(node)  # noqa
             des = serde.deserialize(ser, no.Node)  # noqa
             # assert des == node
@@ -42,6 +44,8 @@ def test_parsing():
                 assert reparsed == node
             except Exception:
                 raise
+
+            assert hash(reparsed) == hash(node)
 
             # parts = rendering.Renderer().render(node)
             # parts_ser = serde.serialize(parts)
