@@ -4,14 +4,12 @@ TODO:
 """
 import typing as ta
 
+from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 
 
 class QualifiedName(dc.Pure):
-    parts: ta.Sequence[str] = dc.field()
-
-    def __post_init__(self) -> None:
-        hash(self.parts)
+    parts: ta.Sequence[str] = dc.field(coerce=ocol.frozenlist)
 
     @property
     def dotted(self) -> str:

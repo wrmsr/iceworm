@@ -1,10 +1,8 @@
 """
 TODO:
  - enable type checking
- - standardize (+in g4): Expr not expression, Stmt not statement, Value not val, Rel not rel?
- - coerce sequence
- - enforce field types
- - *coerce seqs to frozenlist not tuple*
+ - standardize names (+in g4): Expr not expression, Stmt not statement, Value not val, Rel not rel?
+ - enforce field types (children in seqs only)
 
 Visitors / Tools:
  - graphviz gen
@@ -38,7 +36,7 @@ class Node(dc.Enum, reorder=True, repr=False):
         repr=False,
         hash=False,
         compare=False,
-        # FIXME: coerce=ocol.frozendict,
+        coerce=ocol.frozendict,
         metadata={serde.Ignore: True},
     )
 
@@ -95,7 +93,7 @@ class Identifier(Expr):
 
 
 class QualifiedNameNode(Expr):
-    parts: ta.Sequence[Identifier]
+    parts: ta.Sequence[Identifier] = dc.field(coerce=ocol.frozenlist)
 
     @properties.cached
     def name(self) -> QualifiedName:
@@ -154,7 +152,7 @@ class EFalse(Expr):
 
 class TypeSpec(Node):
     name: Identifier
-    args: ta.Sequence[Expr] = ()
+    args: ta.Sequence[Expr] = dc.field((), coerce=ocol.frozenlist)
 
 
 class Direction(enum.Enum):

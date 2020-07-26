@@ -1,6 +1,9 @@
 import enum
 import typing as ta
 
+from omnibus import collections as ocol
+from omnibus import dataclasses as dc
+
 from .base import Expr
 from .base import Identifier
 from .base import Node
@@ -52,8 +55,8 @@ class DoubleFrame(Frame):
 
 
 class Over(Node):
-    partition_by: ta.Sequence[Expr] = ()
-    order_by: ta.Sequence[SortItem] = ()
+    partition_by: ta.Sequence[Expr] = dc.field((), coerce=ocol.frozenlist)
+    order_by: ta.Sequence[SortItem] = dc.field((), coerce=ocol.frozenlist)
     frame: ta.Optional[Frame] = None
 
 
@@ -69,11 +72,11 @@ class IgnoreOrRespect(enum.Enum):
 
 class FunctionCall(Node):
     name: QualifiedNameNode
-    args: ta.Sequence[Expr] = ()
-    kwargs: ta.Sequence[Kwarg] = ()
+    args: ta.Sequence[Expr] = dc.field((), coerce=ocol.frozenlist)
+    kwargs: ta.Sequence[Kwarg] = dc.field((), coerce=ocol.frozenlist)
     set_quantifier: ta.Optional[SetQuantifier] = None
     nulls: ta.Optional[IgnoreOrRespect] = None
-    within_group: ta.Sequence[SortItem] = ()
+    within_group: ta.Sequence[SortItem] = dc.field((), coerce=ocol.frozenlist)
     over: ta.Optional[Over] = None
 
 

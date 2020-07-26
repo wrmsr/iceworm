@@ -1,6 +1,9 @@
 import enum
 import typing as ta
 
+from omnibus import collections as ocol
+from omnibus import dataclasses as dc
+
 from ..utils import build_enum_value_map
 from .base import Expr
 from .base import Identifier
@@ -91,7 +94,7 @@ class CaseItem(Node):
 
 class Case(Expr):
     value: ta.Optional[Expr]
-    items: ta.Sequence[CaseItem]
+    items: ta.Sequence[CaseItem] = dc.field(coerce=ocol.frozenlist)
     default: ta.Optional[Expr] = None
 
 
@@ -107,7 +110,7 @@ class CastCall(Expr):
 
 class Traversal(Expr):
     value: Expr
-    keys: ta.Sequence[Expr]
+    keys: ta.Sequence[Expr] = dc.field(coerce=ocol.frozenlist)
 
 
 class IsNull(Expr):
@@ -127,7 +130,7 @@ LIKE_KIND_MAP: ta.Mapping[str, LikeKind] = build_enum_value_map(LikeKind)
 class Like(Expr):
     kind: LikeKind
     value: Expr
-    patterns: ta.Sequence[Expr]
+    patterns: ta.Sequence[Expr] = dc.field(coerce=ocol.frozenlist)
     not_: bool = False
     any: bool = False
     escape: ta.Optional[Expr] = None
@@ -144,7 +147,7 @@ class Extract(Expr):
 
 class InList(Expr):
     needle: Expr
-    haystack: ta.Sequence[Expr]
+    haystack: ta.Sequence[Expr] = dc.field(coerce=ocol.frozenlist)
     not_: bool = False
 
 

@@ -1,6 +1,9 @@
 import enum
 import typing as ta
 
+from omnibus import collections as ocol
+from omnibus import dataclasses as dc
+
 from ..utils import build_enum_value_map
 from .base import Expr
 from .base import Identifier
@@ -47,7 +50,7 @@ class Join(Relation):
     type: JoinType
     right: Relation
     condition: ta.Optional[Expr] = None
-    using: ta.Optional[ta.Sequence[Identifier]] = None
+    using: ta.Optional[ta.Sequence[Identifier]] = dc.field(None, coerce=lambda o: ocol.frozenlist(o) if o is not None else None)  # noqa
 
 
 class Pivot(Relation):
@@ -55,14 +58,14 @@ class Pivot(Relation):
     func: QualifiedNameNode
     pivot_col: Identifier
     value_col: Identifier
-    values: ta.Sequence[Expr]
+    values: ta.Sequence[Expr] = dc.field(coerce=ocol.frozenlist)
 
 
 class Unpivot(Relation):
     relation: Relation
     value_col: Identifier
     name_col: Identifier
-    pivot_cols: ta.Sequence[Identifier]
+    pivot_cols: ta.Sequence[Identifier] = dc.field(coerce=ocol.frozenlist)
 
 
 class Lateral(Relation):
@@ -80,7 +83,7 @@ class Table(Relation):
 class AliasedRelation(Relation):
     relation: Relation
     alias: Identifier
-    columns: ta.Sequence[Identifier] = ()
+    columns: ta.Sequence[Identifier] = dc.field((), coerce=ocol.frozenlist)
 
 
 class SelectItem(Node, abstract=True):
@@ -105,27 +108,27 @@ class Grouping(Node, abstract=True):
 
 
 class FlatGrouping(Grouping):
-    items: ta.Sequence[Expr]
+    items: ta.Sequence[Expr] = dc.field(coerce=ocol.frozenlist)
 
 
 class GroupingSet(Node):
-    items: ta.Sequence[Expr]
+    items: ta.Sequence[Expr] = dc.field(coerce=ocol.frozenlist)
 
 
 class SetsGrouping(Grouping):
-    sets: ta.Sequence[GroupingSet]
+    sets: ta.Sequence[GroupingSet] = dc.field(coerce=ocol.frozenlist)
 
 
 class Select(Selectable):
-    items: ta.Sequence[SelectItem]
-    relations: ta.Sequence[Relation] = ()
+    items: ta.Sequence[SelectItem] = dc.field(coerce=ocol.frozenlist)
+    relations: ta.Sequence[Relation] = dc.field((), coerce=ocol.frozenlist)
     where: ta.Optional[Expr] = None
     top_n: ta.Optional[Integer] = None
     set_quantifier: ta.Optional[SetQuantifier] = None
     group_by: ta.Optional[Grouping] = None
     having: ta.Optional[Expr] = None
     qualify: ta.Optional[Expr] = None
-    order_by: ta.Optional[ta.Sequence[SortItem]] = None
+    order_by: ta.Optional[ta.Sequence[SortItem]] = dc.field(None, coerce=lambda o: ocol.frozenlist(o) if o is not None else None)  # noqa
     limit: ta.Optional[int] = None
 
 
@@ -135,7 +138,7 @@ class Cte(Node):
 
 
 class CteSelect(Selectable):
-    ctes: ta.Sequence[Cte]
+    ctes: ta.Sequence[Cte] = dc.field(coerce=ocol.frozenlist)
     select: Selectable
 
 
@@ -158,7 +161,7 @@ class SetSelectItem(Node):
 
 class SetSelect(Selectable):
     left: Selectable
-    items: ta.Sequence[SetSelectItem]
+    items: ta.Sequence[SetSelectItem] = dc.field(coerce=ocol.frozenlist)
 
 
 class SelectExpr(Expr):
