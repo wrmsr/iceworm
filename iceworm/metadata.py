@@ -33,8 +33,8 @@ class Column(dc.Pure):
 
 class Table(dc.Frozen, final=True, allow_setattr=True, reorder=True):
     name: str
-    schema: ta.Optional[str] = dc.field(None, kwonly=True)
-    catalog: ta.Optional[str] = dc.field(None, kwonly=True)
+    schema_name: ta.Optional[str] = dc.field(None, kwonly=True)
+    catalog_name: ta.Optional[str] = dc.field(None, kwonly=True)
 
     columns: ta.Sequence[Column]
 
@@ -47,7 +47,7 @@ class Table(dc.Frozen, final=True, allow_setattr=True, reorder=True):
 
     @properties.cached
     def qualified_name(self) -> QualifiedName:
-        return QualifiedName(*filter(None, [self.catalog, self.schema, self.name]))
+        return QualifiedName(*filter(None, [self.catalog, self.schema_name, self.name_name]))
 
 
 class Catalog(dc.Frozen, final=True, allow_setattr=True):

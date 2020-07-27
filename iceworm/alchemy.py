@@ -50,7 +50,7 @@ class MetadataAdapter(dispatch.Class):
         return md.Table(
             name=sa_tbl.name,
             columns=[self.from_sa(sa_col) for sa_col in sa_tbl.columns],
-            schema=sa_tbl.schema,
+            schema_name=sa_tbl.schema,
         )
 
 
