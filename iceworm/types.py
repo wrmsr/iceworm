@@ -4,12 +4,13 @@ TODO:
 """
 import typing as ta
 
-from omnibus import collections as ocol
 from omnibus import dataclasses as dc
+
+from .utils import seq
 
 
 class QualifiedName(dc.Pure):
-    parts: ta.Sequence[str] = dc.field(coerce=ocol.frozenlist)
+    parts: ta.Sequence[str] = dc.field(coerce=seq)
 
     @property
     def dotted(self) -> str:

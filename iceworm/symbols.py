@@ -30,7 +30,7 @@ class SymbolRef(dc.Pure, eq=False):
     qualified_name: QualifiedName
     node: no.Node
     scope: 'SymbolScope'
-    binding: ta.Optional['Symbol'] = None
+    binding: ta.Optional[Symbol] = None
 
     def __post_init__(self) -> None:
         self.scope._refs.add(self)
@@ -48,8 +48,8 @@ class SymbolScope(dc.Data, eq=False, final=True):
     def __post_init__(self) -> None:
         self._enclosed_nodes: ta.MutableSet[no.Node] = ocol.IdentitySet()
         self._children: ta.MutableSet['SymbolScope'] = set()
-        self._symbols: ta.MutableSet['Symbol'] = set()
-        self._refs: ta.MutableSet['SymbolRef'] = set()
+        self._symbols: ta.MutableSet[Symbol] = set()
+        self._refs: ta.MutableSet[SymbolRef] = set()
 
         if self.parent is not None:
             self.parent._children.add(self)
@@ -64,11 +64,11 @@ class SymbolScope(dc.Data, eq=False, final=True):
         return self._children
 
     @property
-    def symbols(self) -> ta.AbstractSet['Symbol']:
+    def symbols(self) -> ta.AbstractSet[Symbol]:
         return self._symbols
 
     @property
-    def refs(self) -> ta.AbstractSet['SymbolRef']:
+    def refs(self) -> ta.AbstractSet[SymbolRef]:
         return self._refs
 
 
