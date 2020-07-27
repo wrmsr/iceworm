@@ -20,6 +20,7 @@ from .. import serde
 from ..types import QualifiedName
 from ..utils import build_dc_repr
 from ..utils import build_enum_value_map
+from ..utils import seq
 
 
 SelfNode = ta.TypeVar('SelfNode', bound='Node')
@@ -93,7 +94,7 @@ class Identifier(Expr):
 
 
 class QualifiedNameNode(Expr):
-    parts: ta.Sequence[Identifier] = dc.field(coerce=ocol.frozenlist)
+    parts: ta.Sequence[Identifier] = dc.field(coerce=seq)
 
     @properties.cached
     def name(self) -> QualifiedName:
@@ -118,41 +119,49 @@ class QualifiedNameNode(Expr):
             raise TypeError(obj)
 
 
-class Integer(Expr):
+class Primitive(Expr, abstract=True):
+    pass
+
+
+class Number(Expr, abstract=True):
+    pass
+
+
+class Integer(Number):
     value: int
 
 
-class Decimal(Expr):
+class Decimal(Number):
     value: str
 
 
-class Float(Expr):
+class Float(Number):
     value: str
 
 
-class String(Expr):
+class String(Primitive):
     value: str
 
 
-class StarExpr(Expr):
+class StarExpr(Primitive):
     pass
 
 
-class Null(Expr):
+class Null(Primitive):
     pass
 
 
-class ETrue(Expr):
+class ETrue(Primitive):
     pass
 
 
-class EFalse(Expr):
+class EFalse(Primitive):
     pass
 
 
 class TypeSpec(Node):
     name: Identifier
-    args: ta.Sequence[Expr] = dc.field((), coerce=ocol.frozenlist)
+    args: ta.Sequence[Expr] = dc.field((), coerce=seq)
 
 
 class Direction(enum.Enum):

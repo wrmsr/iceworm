@@ -1,5 +1,6 @@
 import typing as ta
 
+from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import defs
 
@@ -30,3 +31,12 @@ def unique_dict(items: ta.Iterable[ta.Tuple[K, V]]) -> ta.Dict[K, V]:
             raise KeyError(k)
         dct[k] = v
     return dct
+
+
+def seq(it: ta.Optional[ta.Iterable[T]]) -> ta.Optional[ta.Sequence[T]]:
+    if it is None:
+        return None
+    elif isinstance(it, str):
+        raise TypeError(it)
+    else:
+        return ocol.frozenlist(it)
