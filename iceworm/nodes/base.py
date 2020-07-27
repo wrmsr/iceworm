@@ -28,8 +28,7 @@ NodeGen = ta.Generator['Node', None, None]
 NodeMapper = ta.Callable[['Node'], 'Node']
 
 
-class Node(dc.Enum, reorder=True, repr=False):
-    # FIXME: sealed='package'
+class Node(dc.Enum, reorder=True, repr=False, sealed='package'):
 
     meta: ta.Mapping[ta.Any, ta.Any] = dc.field(
         ocol.frozendict(),
