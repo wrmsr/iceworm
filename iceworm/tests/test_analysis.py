@@ -15,3 +15,4 @@ def test_names():
 
     basic = ana.basic(root)
     print(basic.get_node_type_set(no.QualifiedNameNode))
+    assert basic.parents_by_node
