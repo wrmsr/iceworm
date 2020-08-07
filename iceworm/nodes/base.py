@@ -58,8 +58,8 @@ class Node(dc.Enum, reorder=True, repr=False, sealed='package'):
         val = getattr(self, fld.name)
         if isinstance(val, Node):
             return {fld.name: fn(val)}
-        elif isinstance(val, collections.abc.Sequence):
-            return {fld.name: [fn(item) if isinstance(item, Node) else item for item in val]}
+        elif isinstance(val, collections.abc.Sequence) and not isinstance(val, str):
+            return {fld.name: ocol.frozenlist([fn(item) if isinstance(item, Node) else item for item in val])}
         else:
             return {}
 

@@ -78,6 +78,15 @@ class ExpandSelectsTransformer(Transformer):
         self._catalog = check.isinstance(catalog, md.Catalog)
 
     def add_relation_aliases(self, relations: ta.Sequence[no.Relation]) -> ta.Sequence[no.Relation]:
+        def rec(n: no.Node) -> None:
+            if isinstance(n, no.Table):
+                tncs[n.name.parts[-1].name] += 1
+            for c in n.children:
+                rec(c)
+        tncs = collections.Counter()
+        for r in relations:
+            rec(r)
+
         return relations
 
     def add_item_labels(
