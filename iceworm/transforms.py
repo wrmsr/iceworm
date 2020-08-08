@@ -138,16 +138,38 @@ class ExpandSelectsTransformer(Transformer):
         self._name_gen = ocode.name_generator(unavailable_names=labels)
 
     def __call__(self, node: no.Select) -> no.Node:  # noqa
-        rels = [check.isinstance(super().__call__(r), no.Relation) for r in node.relations]
+        sup = super().__call__  # FIXME: wut
+        rels = [check.isinstance(sup(r), no.Relation) for r in node.relations]
 
         items = []
         for item in node.items:
-        def rec(rel: no.Relation) -> None:
-            if isinstance(rel, no.Table):
-                raise NotImplementedError
-            else:
-                raise TypeError(rel)
-        for rel in rels:
-            rec(rel)
+            if isinstance(item, no.AllSelectItem):
+                def rec(rel: no.Relation, alias: ta.Optional[str] = None) -> None:
+                    if isinstance(rel, no.Table):
+                        tbl = self._catalog.tables_by_name[check.single(rel.name.parts).name]
+                        for col in tbl.columns:
+                            items.append(
+                                no.ExprSelectItem(
+                                    no.QualifiedNameNode.of([alias or tbl.name, col.name]),
+                                    no.Identifier(self._name_gen())))
 
-        return super().__call__(node, relations=rels)
+                    elif isinstance(rel, no.AliasedRelation):
+                        check.none(alias)
+                        rec(rel.relation, rel.alias.name)
+
+                    else:
+                        raise TypeError(rel)
+
+                for rel in rels:
+                    rec(rel)
+
+            elif isinstance(item, no.IdentifierAllSelectItem):
+                raise NotImplementedError
+
+            elif isinstance(item, no.ExprSelectItem):
+                items.append(self(item))
+
+            else:
+                raise TypeError(item)
+
+        return super().__call__(node, items=items, relations=rels)
