@@ -154,7 +154,7 @@ class _Analyzer(dispatch.Class):
         return self.add_children(node, scope)
 
     def __call__(self, node: no.AllSelectItem, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
-        raise NotImplementedError
+        raise TypeError(node)
 
     def __call__(self, node: no.ExprSelectItem, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
         if node.label is not None:
@@ -179,7 +179,12 @@ class _Analyzer(dispatch.Class):
         return self.add_children(node, scope)
 
     def __call__(self, node: no.Table, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
-        raise NotImplementedError
+        tbl = self._catalog.tables_by_name[check.single(node.name.parts).name]
+        for col in tbl.columns:
+            Symbol(col.name, node, scope)
+
+        self.add_to(node, scope)
+        return None
 
 
 def analyze(root: no.Node, catalog: md.Catalog) -> SymbolAnalysis:

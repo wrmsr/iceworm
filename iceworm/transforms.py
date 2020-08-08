@@ -38,7 +38,6 @@ from omnibus import lang
 from . import analysis as ana  # noqa
 from . import metadata as md
 from . import nodes as no
-from . import symbols as sy
 from .types import QualifiedName
 
 
@@ -132,7 +131,6 @@ class ExpandSelectsTransformer(Transformer):
         self._catalog = check.isinstance(catalog, md.Catalog)
 
         self._basic = ana.basic(root)
-        self._sym_ana = sy.analyze(root, catalog)
 
         labels = set()
         for item in self._basic.get_node_type_set(no.ExprSelectItem):
@@ -140,4 +138,16 @@ class ExpandSelectsTransformer(Transformer):
         self._name_gen = ocode.name_generator(unavailable_names=labels)
 
     def __call__(self, node: no.Select) -> no.Node:  # noqa
-        return super().__call__(node)
+        rels = [check.isinstance(super().__call__(r), no.Relation) for r in node.relations]
+
+        items = []
+        for item in node.items:
+        def rec(rel: no.Relation) -> None:
+            if isinstance(rel, no.Table):
+                raise NotImplementedError
+            else:
+                raise TypeError(rel)
+        for rel in rels:
+            rec(rel)
+
+        return super().__call__(node, relations=rels)
