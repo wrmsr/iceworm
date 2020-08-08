@@ -112,6 +112,8 @@ class QualifiedNameNode(Expr):
             return cls([Identifier.of(p) for p in obj.parts])
         elif isinstance(obj, QualifiedName):
             return cls([Identifier(p) for p in obj])
+        elif isinstance(obj, str):
+            raise TypeError(obj)
         elif isinstance(obj, collections.abc.Iterable):
             return cls([Identifier.of(p) for p in check.not_isinstance(obj, str)])
         else:

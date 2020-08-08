@@ -35,4 +35,4 @@ class QualifiedName(dc.Pure):
 
     @classmethod
     def of_dotted(cls, dotted: str) -> 'QualifiedName':
-        return cls(tuple(dotted.split('.')))
+        return cls(dotted.split('.'))

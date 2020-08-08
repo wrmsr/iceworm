@@ -81,7 +81,7 @@ class Table(Relation):
 
 
 class AliasedRelation(Relation):
-    relation: Relation
+    relation: Relation = dc.field(check=lambda r: not isinstance(r, AliasedRelation))
     alias: Identifier
     columns: ta.Sequence[Identifier] = dc.field((), coerce=seq)
 

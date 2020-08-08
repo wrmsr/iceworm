@@ -10,10 +10,7 @@ def test_replace_names():
         no.ExprSelectItem(
             no.FunctionCallExpr(
                 no.FunctionCall(
-                    no.QualifiedNameNode.of(['a', 'b'])
-                ),
-            ),
-        ),
+                    no.QualifiedNameNode.of(['a', 'b'])))),
     ])
 
     xform = tfm.replace_names(root, {QualifiedName.of_dotted('a.b'): QualifiedName.of_dotted('c.d')})
@@ -34,10 +31,10 @@ def test_expand_selects():
         ],
         [
             no.Table(
-                no.QualifiedNameNode.of(['t']),
-            ),
+                no.QualifiedNameNode.of(['t'])),
         ],
     )
 
-    res = tfm.ExpandSelectsTransformer(root, cat)(root)
-    print(res)
+    root = tfm.AliasRelationsTransformer(root)(root)
+    root = tfm.ExpandSelectsTransformer(root, cat)(root)
+    print(root)

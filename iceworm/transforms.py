@@ -30,6 +30,7 @@ import collections  # noqa
 import typing as ta
 
 from omnibus import check
+from omnibus import code as ocode
 from omnibus import dataclasses as dc
 from omnibus import dispatch
 from omnibus import lang
@@ -67,6 +68,36 @@ class ReplaceNamesTransformer(Transformer):
 
 def replace_names(node: no.Node, dct: ta.Mapping[QualifiedName, QualifiedName]) -> no.Node:
     return ReplaceNamesTransformer(dct)(node)
+
+
+class AliasRelationsTransformer(Transformer):
+
+    def __init__(self, root: no.Node) -> None:
+        super().__init__()
+
+        self._root = check.isinstance(root, no.Node)
+
+        self._basic = ana.basic(root)
+
+        rel_names = set()
+        for ar in self._basic.get_node_type_set(no.AliasedRelation):
+            rel_names.add(ar.alias.name)
+        for tbl in self._basic.get_node_type_set(no.Table):
+            rel_names.add(tbl.name.parts[-1].name)
+        self._name_gen = ocode.name_generator(unavailable_names=rel_names)
+
+    def __call__(self, node: no.AliasedRelation) -> no.Node:  # noqa
+        return super().__call__(node)
+
+    def __call__(self, node: no.Relation) -> no.Node:  # noqa
+        parent = self._basic.parents_by_node[node]
+        node = super().__call__(node)
+        if not isinstance(parent, no.AliasedRelation):
+            name = self._name_gen()
+            node = no.AliasedRelation(
+                node,
+                no.Identifier(name))
+        return node
 
 
 class ExpandSelectsTransformer(Transformer):
