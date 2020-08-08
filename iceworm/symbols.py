@@ -9,6 +9,7 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import dispatch
 
+from . import metadata as md
 from . import nodes as no
 from .types import QualifiedName
 from .utils import build_dc_repr
@@ -126,6 +127,12 @@ class SymbolAnalysis:
 
 
 class _Analyzer(dispatch.Class):
+
+    def __init__(self, catalog: md.Catalog) -> None:
+        super().__init__()
+
+        self._catalog = check.isinstance(catalog, md.Catalog)
+
     __call__ = dispatch.property()
 
     def add_children(self, node: no.Node, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:
@@ -175,6 +182,6 @@ class _Analyzer(dispatch.Class):
         raise NotImplementedError
 
 
-def analyze(root: no.Node) -> SymbolAnalysis:
-    scope = _Analyzer()(root, None)
+def analyze(root: no.Node, catalog: md.Catalog) -> SymbolAnalysis:
+    scope = _Analyzer(catalog)(root, None)
     return SymbolAnalysis(scope)

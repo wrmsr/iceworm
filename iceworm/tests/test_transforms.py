@@ -36,5 +36,6 @@ def test_expand_selects():
     )
 
     root = tfm.AliasRelationsTransformer(root)(root)
+    root = tfm.LabelSelectItemsTransformer(root)(root)
     root = tfm.ExpandSelectsTransformer(root, cat)(root)
     print(root)

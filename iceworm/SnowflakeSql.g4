@@ -173,8 +173,7 @@ sortItem
     ;
 
 relation
-    : relation AS? identifier ('(' identifierList ')')?                 #aliasedRelation
-    | left=relation ty=joinType?
+    : left=relation ty=joinType?
       JOIN right=relation
       (ON cond=booleanExpression)?
       (USING '(' using=identifierList ')')?                             #joinRelation
@@ -189,6 +188,7 @@ relation
     | '(' select ')'                                                    #selectRelation
     | '(' relation ')'                                                  #parenRelation
     | JINJA                                                             #jinjaRelation
+    | relation AS? identifier ('(' identifierList ')')?                 #aliasedRelation
     | qualifiedName                                                     #tableRelation
     ;
 

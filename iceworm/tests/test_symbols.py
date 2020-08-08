@@ -1,3 +1,4 @@
+from .. import metadata as md
 from .. import nodes as no
 from .. import symbols as syms
 
@@ -14,5 +15,5 @@ def test_symbols():
     ])
     print(root)
 
-    ana = syms.analyze(root)
+    ana = syms.analyze(root, md.Catalog([]))
     print(ana)

@@ -38,6 +38,7 @@ from omnibus import lang
 from . import analysis as ana  # noqa
 from . import metadata as md
 from . import nodes as no
+from . import symbols as sy
 from .types import QualifiedName
 
 
@@ -100,6 +101,28 @@ class AliasRelationsTransformer(Transformer):
         return node
 
 
+class LabelSelectItemsTransformer(Transformer):
+
+    def __init__(self, root: no.Node) -> None:
+        super().__init__()
+
+        self._root = check.isinstance(root, no.Node)
+
+        self._basic = ana.basic(root)
+
+        labels = set()
+        for item in self._basic.get_node_type_set(no.ExprSelectItem):
+            if item.label is not None:
+                labels.add(item.label.name)
+        self._name_gen = ocode.name_generator(unavailable_names=labels)
+
+    def __call__(self, node: no.ExprSelectItem) -> no.Node:  # noqa
+        return super().__call__(
+            node,
+            label=self(node.label) if node.label is not None else no.Identifier(self._name_gen()),
+        )
+
+
 class ExpandSelectsTransformer(Transformer):
 
     def __init__(self, root: no.Node, catalog: md.Catalog) -> None:
@@ -108,33 +131,13 @@ class ExpandSelectsTransformer(Transformer):
         self._root = check.isinstance(root, no.Node)
         self._catalog = check.isinstance(catalog, md.Catalog)
 
-    def add_relation_aliases(self, relations: ta.Sequence[no.Relation]) -> ta.Sequence[no.Relation]:
-        def rec(n: no.Node) -> None:
-            if isinstance(n, no.Table):
-                tncs[n.name.parts[-1].name] += 1
-            for c in n.children:
-                rec(c)
-        tncs = collections.Counter()
-        for r in relations:
-            rec(r)
+        self._basic = ana.basic(root)
+        self._sym_ana = sy.analyze(root, catalog)
 
-        return relations
+        labels = set()
+        for item in self._basic.get_node_type_set(no.ExprSelectItem):
+            labels.add(check.not_none(item.label).name)
+        self._name_gen = ocode.name_generator(unavailable_names=labels)
 
-    def add_item_labels(
-            self,
-            items: ta.Sequence[no.SelectItem],
-            relations: ta.Sequence[no.Relation],
-    ) -> ta.Sequence[no.SelectItem]:
-        # cts = collections.Counter()
-        # for rel in relations:
-        #     for node in ana.basic(rel).nodes:
-        #         if isinstance(node, no.Table):
-        #             cts[node.]
-
-        return items
-
-    def __call__(self, node: no.Select) -> no.Node:
-        relations = self.add_relation_aliases([check.isinstance(self(r), no.Relation) for r in node.relations])
-        items = self.add_item_labels(node.items, relations)
-
-        return super().__call__(node, relations=relations, items=items)
+    def __call__(self, node: no.Select) -> no.Node:  # noqa
+        return super().__call__(node)
