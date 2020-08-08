@@ -50,7 +50,7 @@ class Join(Relation):
     type: JoinType
     right: Relation
     condition: ta.Optional[Expr] = None
-    using: ta.Optional[ta.Sequence[Identifier]] = dc.field(None, coerce=seq)  # noqa
+    using: ta.Optional[ta.Sequence[Identifier]] = dc.field(None, coerce=seq)
 
 
 class Pivot(Relation):
