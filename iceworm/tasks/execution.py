@@ -48,5 +48,4 @@ class DropTableExecutor(DbExecutor[DropTable]):
 class CreateTableAsExecutor(DbExecutor[CreateTableAs]):
 
     def execute(self, task: CreateTableAs) -> None:
-        columns = ', '.join(f'{k} {v}' for k, v in task.column_specs_by_name.items())
-        self._conn.execute(sql.CreateTableAs(task.table_name, columns, task.query))
+        self._conn.execute(sql.CreateTableAs(task.table_name, sa.text(task.query)))

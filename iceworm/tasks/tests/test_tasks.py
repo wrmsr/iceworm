@@ -46,7 +46,7 @@ def test_tasks(db_engine):  # noqa
             else:
                 check.none(executor.execute(task))
 
-        t = tasks.CreateTableAs('foo', {'id': 'integer primary key not null'}, 'select 1')
+        t = tasks.CreateTableAs('foo', 'select 1')
         execute(t)
 
         print(list(conn.execute('select * from foo')))

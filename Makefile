@@ -301,3 +301,11 @@ docker-reup:
 .PHONY: docker-invalidate
 docker-invalidate:
 	date +%s > .dockertimestamp
+
+
+### Db
+
+.PHONY: db-repl
+db-repl: venv
+	export PORT=$$(.venv/bin/python -c "import yaml; dct = yaml.safe_load(open('docker/docker-compose.yml', 'r').read()); print(dct['services']['iceworm-postgres']['ports'][0].split(':')[0])") ; \
+	PGPASSWORD=iceworm .venv/bin/pgcli --user iceworm --host localhost --port "$$PORT"

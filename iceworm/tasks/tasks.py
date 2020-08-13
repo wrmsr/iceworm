@@ -61,5 +61,4 @@ class DropTable(Task):
 
 class CreateTableAs(Task):
     table_name: str
-    column_specs_by_name: ta.Mapping[str, str] = dc.field(coerce=mapping)
     query: str
