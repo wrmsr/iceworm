@@ -2,6 +2,18 @@ version: '2'
 
 services:
 
+  iceworm-minio:
+    build: '.'
+    image: 'wrmsr/iceworm-minio:latest'
+    restart: 'unless-stopped'
+    environment:
+      MINIO_ACCESS_KEY: 'AKIAIOSFODNN7EXAMPLE'
+      MINIO_SECRET_KEY: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+    expose:
+      - '9000'
+    ports:
+      - '23120:9000'
+
   iceworm-postgres:
     build: '.'
     image: 'wrmsr/iceworm-postgres:latest'
@@ -13,7 +25,7 @@ services:
     expose:
       - '5432'
     ports:
-      - '23120:5432'
+      - '23121:5432'
 
   iceworm-dev:
     build: '.'
@@ -26,8 +38,10 @@ services:
     volumes:
       - '..:/iceworm'
     depends_on:
+      - 'iceworm-minio'
       - 'iceworm-postgres'
     links:
+      - 'iceworm-minio'
       - 'iceworm-postgres'
     expose:
       - '8000'
