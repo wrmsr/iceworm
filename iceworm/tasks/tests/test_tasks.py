@@ -36,6 +36,8 @@ def test_tasks(db_engine):  # noqa
 
         executors_by_task_cls = {
             tasks.CreateTableAs: execution.CreateTableAsExecutor(conn),
+            tasks.DropTable: execution.DropTableExecutor(conn),
+            tasks.Transaction: execution.TransactionExecutor(conn),
         }
 
         def execute(task: tasks.Task) -> None:
@@ -46,7 +48,13 @@ def test_tasks(db_engine):  # noqa
             else:
                 check.none(executor.execute(task))
 
-        t = tasks.CreateTableAs('foo', 'select 1')
-        execute(t)
+        ts = [
+            tasks.Transaction([
+                tasks.DropTable('foo'),
+                tasks.CreateTableAs('foo', 'select 1'),
+            ]),
+        ]
+        for t in ts:
+            execute(t)
 
         print(list(conn.execute('select * from foo')))

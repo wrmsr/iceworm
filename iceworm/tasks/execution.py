@@ -34,9 +34,14 @@ class DbExecutor(Executor[TaskT], lang.Abstract):
 class TransactionExecutor(DbExecutor[Transaction]):
 
     def execute(self, task: Transaction) -> ta.Generator[Task, None, None]:
-        with self._conn.begin():
-            for child in task.children:
-                yield child
+        with self._conn.begin() as txn:
+            try:
+                for child in task.children:
+                    yield child
+                txn.commit()
+            except Exception:
+                txn.rollback()
+                raise
 
 
 class DropTableExecutor(DbExecutor[DropTable]):
