@@ -14,6 +14,18 @@ services:
     ports:
       - '23120:9000'
 
+  iceworm-mongo:
+    build: '.'
+    image: 'wrmsr/iceworm-mongo:latest'
+    restart: 'unless-stopped'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: 'iceworm'
+    expose:
+      - '27017'
+    ports:
+      - '23121:27017'
+
   iceworm-postgres:
     build: '.'
     image: 'wrmsr/iceworm-postgres:latest'
@@ -25,7 +37,7 @@ services:
     expose:
       - '5432'
     ports:
-      - '23121:5432'
+      - '23122:5432'
 
   iceworm-dev:
     build: '.'
@@ -39,9 +51,11 @@ services:
       - '..:/iceworm'
     depends_on:
       - 'iceworm-minio'
+      - 'iceworm-mongo'
       - 'iceworm-postgres'
     links:
       - 'iceworm-minio'
+      - 'iceworm-mongo'
       - 'iceworm-postgres'
     expose:
       - '8000'

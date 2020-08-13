@@ -3,10 +3,12 @@ DOCKER_USER=wrmsr
 DOCKER_IMAGES:= \
 	iceworm-dev \
 	iceworm-minio \
+	iceworm-mongo \
 	iceworm-postgres \
 
 DOCKER_COMPOSE_DEFAULT_SERVICES:= \
 	iceworm-minio \
+	iceworm-mongo \
 	iceworm-postgres \
 
 DOCKER_COMPOSE_SERVICES:= \
