@@ -12,7 +12,12 @@ from .utils import seq
 class QualifiedName(dc.Pure):
     parts: ta.Sequence[str] = dc.field(coerce=seq)
 
-    dc.validate(lambda parts: parts and len(parts) < 4 and all(parts))
+    dc.validate(lambda parts: (
+            parts and
+            len(parts) < 4 and
+            all(parts) and
+            all(isinstance(p, str) for p in parts)
+    ))
 
     @property
     def object_name(self) -> str:

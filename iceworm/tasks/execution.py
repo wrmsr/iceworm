@@ -3,7 +3,6 @@ import typing as ta
 
 from omnibus import check
 from omnibus import lang
-from omnibus import sql as osql
 import sqlalchemy as sa
 
 from .. import sql
@@ -47,10 +46,10 @@ class TransactionExecutor(DbExecutor[Transaction]):
 class DropTableExecutor(DbExecutor[DropTable]):
 
     def execute(self, task: DropTable) -> None:
-        self._conn.execute(sql.DropTableIfExists(task.table_name))
+        self._conn.execute(sql.DropTableIfExists(sql.QualifiedNameElement(task.name)))
 
 
 class CreateTableAsExecutor(DbExecutor[CreateTableAs]):
 
     def execute(self, task: CreateTableAs) -> None:
-        self._conn.execute(sql.CreateTableAs(task.table_name, sa.text(task.query)))
+        self._conn.execute(sql.CreateTableAs(sql.QualifiedNameElement(task.name), sa.text(task.query)))

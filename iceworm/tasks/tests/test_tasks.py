@@ -8,6 +8,7 @@ import sqlalchemy as sa
 
 from .. import execution
 from .. import tasks
+from ...types import QualifiedName
 
 
 @pytest.yield_fixture()
@@ -50,8 +51,8 @@ def test_tasks(db_engine):  # noqa
 
         ts = [
             tasks.Transaction([
-                tasks.DropTable('foo'),
-                tasks.CreateTableAs('foo', 'select 1'),
+                tasks.DropTable(QualifiedName(['foo'])),
+                tasks.CreateTableAs(QualifiedName(['foo']), 'select 1'),
             ]),
         ]
         for t in ts:

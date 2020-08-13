@@ -4,8 +4,8 @@ import typing as ta
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 
+from ..types import QualifiedName
 from ..utils import build_dc_repr
-from ..utils import mapping
 from ..utils import seq
 
 
@@ -56,9 +56,9 @@ class Transaction(Task):
 
 
 class DropTable(Task):
-    table_name: str
+    name: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
 
 
 class CreateTableAs(Task):
-    table_name: str
+    name: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
     query: str
