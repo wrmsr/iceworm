@@ -7,7 +7,7 @@ import pytest
 import sqlalchemy as sa
 
 from .. import execution
-from .. import tasks
+from .. import ops
 from ...types import QualifiedName
 
 
@@ -30,29 +30,29 @@ def db_engine():
 
 
 @pytest.mark.xfail()
-def test_tasks(db_engine):  # noqa
+def test_ops(db_engine):  # noqa
     conn: sa.engine.Connection
     with db_engine.connect() as conn:
         print(conn.scalar(sa.select([sa.func.version()])))
 
-        executors_by_task_cls = {
-            tasks.CreateTableAs: execution.CreateTableAsExecutor(conn),
-            tasks.DropTable: execution.DropTableExecutor(conn),
-            tasks.Transaction: execution.TransactionExecutor(conn),
+        executors_by_op_cls = {
+            ops.CreateTableAs: execution.CreateTableAsExecutor(conn),
+            ops.DropTable: execution.DropTableExecutor(conn),
+            ops.Transaction: execution.TransactionExecutor(conn),
         }
 
-        def execute(task: tasks.Task) -> None:
-            executor = executors_by_task_cls[type(task)]
+        def execute(op: ops.Op) -> None:
+            executor = executors_by_op_cls[type(op)]
             if inspect.isgeneratorfunction(executor.execute):
-                for child in executor.execute(task):
+                for child in executor.execute(op):
                     execute(child)
             else:
-                check.none(executor.execute(task))
+                check.none(executor.execute(op))
 
         ts = [
-            tasks.Transaction([
-                tasks.DropTable(QualifiedName(['foo'])),
-                tasks.CreateTableAs(QualifiedName(['foo']), 'select 1'),
+            ops.Transaction([
+                ops.DropTable(QualifiedName(['foo'])),
+                ops.CreateTableAs(QualifiedName(['foo']), 'select 1'),
             ]),
         ]
         for t in ts:
