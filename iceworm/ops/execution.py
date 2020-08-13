@@ -9,10 +9,12 @@ from .. import sql
 from .ops import CreateTableAs
 from .ops import DropTable
 from .ops import Op
+from .ops import SqlOp
 from .ops import Transaction
 
 
 OpT = ta.TypeVar('OpT', bound=Op)
+SqlOpT = ta.TypeVar('SqlOpT', bound=SqlOp)
 
 
 class Executor(lang.Abstract, ta.Generic[OpT]):
@@ -22,7 +24,7 @@ class Executor(lang.Abstract, ta.Generic[OpT]):
         raise NotImplementedError
 
 
-class DbExecutor(Executor[OpT], lang.Abstract):
+class SqlExecutor(Executor[SqlOpT], lang.Abstract):
 
     def __init__(self, conn: sa.engine.Connection) -> None:
         super().__init__()
@@ -30,7 +32,7 @@ class DbExecutor(Executor[OpT], lang.Abstract):
         self._conn = check.isinstance(conn, sa.engine.Connection)
 
 
-class TransactionExecutor(DbExecutor[Transaction]):
+class TransactionExecutor(SqlExecutor[Transaction]):
 
     def execute(self, op: Transaction) -> ta.Generator[Op, None, None]:
         with self._conn.begin() as txn:
@@ -43,13 +45,13 @@ class TransactionExecutor(DbExecutor[Transaction]):
                 raise
 
 
-class DropTableExecutor(DbExecutor[DropTable]):
+class DropTableExecutor(SqlExecutor[DropTable]):
 
     def execute(self, op: DropTable) -> None:
         self._conn.execute(sql.DropTableIfExists(sql.QualifiedNameElement(op.name)))
 
 
-class CreateTableAsExecutor(DbExecutor[CreateTableAs]):
+class CreateTableAsExecutor(SqlExecutor[CreateTableAs]):
 
     def execute(self, op: CreateTableAs) -> None:
         self._conn.execute(sql.CreateTableAs(sql.QualifiedNameElement(op.name), sa.text(op.query)))

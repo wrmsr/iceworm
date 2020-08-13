@@ -2,6 +2,15 @@ version: '2'
 
 services:
 
+  iceworm-dynamodb:
+    build: '.'
+    image: 'wrmsr/iceworm-dynamodb:latest'
+    restart: 'unless-stopped'
+    expose:
+      - '8000'
+    ports:
+      - '23120:8000'
+
   iceworm-minio:
     build: '.'
     image: 'wrmsr/iceworm-minio:latest'
@@ -12,7 +21,7 @@ services:
     expose:
       - '9000'
     ports:
-      - '23120:9000'
+      - '23121:9000'
 
   iceworm-mongo:
     build: '.'
@@ -24,7 +33,7 @@ services:
     expose:
       - '27017'
     ports:
-      - '23121:27017'
+      - '23122:27017'
 
   iceworm-postgres:
     build: '.'
@@ -37,7 +46,7 @@ services:
     expose:
       - '5432'
     ports:
-      - '23122:5432'
+      - '23123:5432'
 
   iceworm-dev:
     build: '.'
@@ -50,10 +59,12 @@ services:
     volumes:
       - '..:/iceworm'
     depends_on:
+      - 'iceworm-dynamodb'
       - 'iceworm-minio'
       - 'iceworm-mongo'
       - 'iceworm-postgres'
     links:
+      - 'iceworm-dynamodb'
       - 'iceworm-minio'
       - 'iceworm-mongo'
       - 'iceworm-postgres'

@@ -18,6 +18,7 @@ from omnibus import properties
 
 from .. import serde
 from ..types import QualifiedName
+from ..utils import NodalDataclass
 from ..utils import build_dc_repr
 from ..utils import build_enum_value_map
 from ..utils import seq
@@ -28,7 +29,7 @@ NodeGen = ta.Generator['Node', None, None]
 NodeMapper = ta.Callable[['Node'], 'Node']
 
 
-class Node(dc.Enum, reorder=True, repr=False, sealed='package'):
+class Node(dc.Enum, NodalDataclass['Node'], reorder=True, repr=False, sealed='package'):
 
     meta: ta.Mapping[ta.Any, ta.Any] = dc.field(
         ocol.frozendict(),
@@ -42,37 +43,9 @@ class Node(dc.Enum, reorder=True, repr=False, sealed='package'):
 
     __repr__ = build_dc_repr
 
-    def yield_field_children(self, fld: dc.Field) -> NodeGen:
-        val = getattr(self, fld.name)
-        if isinstance(val, Node):
-            yield val
-        elif isinstance(val, collections.abc.Sequence):
-            yield from (item for item in val if isinstance(item, Node))
-
-    @property
-    def children(self) -> NodeGen:
-        for fld in dc.fields(self):
-            yield from self.yield_field_children(fld)
-
-    def build_field_map_kwargs(self, fn: NodeMapper, fld: dc.Field) -> ta.Mapping[str, ta.Any]:
-        val = getattr(self, fld.name)
-        if isinstance(val, Node):
-            return {fld.name: fn(val)}
-        elif isinstance(val, collections.abc.Sequence) and not isinstance(val, str):
-            return {fld.name: ocol.frozenlist([fn(item) if isinstance(item, Node) else item for item in val])}
-        else:
-            return {}
-
-    def map(self: SelfNode, fn: NodeMapper, **kwargs) -> SelfNode:
-        rpl_kw = {**kwargs}
-        for fld in dc.fields(self):
-            if fld.name in kwargs:
-                continue
-            for k, v in self.build_field_map_kwargs(fn, fld).items():
-                if k in rpl_kw:
-                    raise KeyError(k)
-                rpl_kw[k] = v
-        return dc.replace(self, **rpl_kw)
+    @classmethod
+    def _nodal_cls(cls) -> ta.Type['Node']:
+        return Node
 
 
 class Expr(Node, abstract=True):
