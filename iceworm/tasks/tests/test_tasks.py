@@ -1,7 +1,13 @@
+import inspect
+
+from omnibus import check
 from omnibus import docker
 from omnibus import lang
 import pytest
 import sqlalchemy as sa
+
+from .. import execution
+from .. import tasks
 
 
 @pytest.yield_fixture()
@@ -24,5 +30,23 @@ def db_engine():
 
 @pytest.mark.xfail()
 def test_tasks(db_engine):  # noqa
+    conn: sa.engine.Connection
     with db_engine.connect() as conn:
         print(conn.scalar(sa.select([sa.func.version()])))
+
+        executors_by_task_cls = {
+            tasks.CreateTableAs: execution.CreateTableAsExecutor(conn),
+        }
+
+        def execute(task: tasks.Task) -> None:
+            executor = executors_by_task_cls[type(task)]
+            if inspect.isgeneratorfunction(executor.execute):
+                for child in executor.execute(task):
+                    execute(child)
+            else:
+                check.none(executor.execute(task))
+
+        t = tasks.CreateTableAs('foo', {'id': 'integer primary key not null'}, 'select 1')
+        execute(t)
+
+        print(list(conn.execute('select * from foo')))
