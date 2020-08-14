@@ -9,9 +9,11 @@ import typing as ta
 
 from omnibus import dataclasses as dc
 
+from ..datatypes import Datatype
 from ..types import QualifiedName
 from ..utils import NodalDataclass
 from ..utils import build_dc_repr
+from ..utils import mapping
 from ..utils import seq
 
 
@@ -39,6 +41,11 @@ class Transaction(SqlOp):
 
 class DropTable(SqlOp):
     name: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
+
+
+class CreateTable(SqlOp):
+    name: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
+    columns: ta.Mapping[str, Datatype] = dc.field(coerce=mapping)
 
 
 class CreateTableAs(SqlOp):

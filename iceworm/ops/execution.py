@@ -5,7 +5,9 @@ from omnibus import check
 from omnibus import lang
 import sqlalchemy as sa
 
+from .. import alchemy as alch
 from .. import sql
+from .ops import CreateTable
 from .ops import CreateTableAs
 from .ops import DropTable
 from .ops import Op
@@ -49,6 +51,16 @@ class DropTableExecutor(SqlExecutor[DropTable]):
 
     def execute(self, op: DropTable) -> None:
         self._conn.execute(sql.DropTableIfExists(sql.QualifiedNameElement(op.name)))
+
+
+class CreateTableExecutor(SqlExecutor[CreateTable]):
+
+    def execute(self, op: CreateTable) -> None:
+        table = sa.Table(
+            op.name.parts[-1],
+            [sa.Column(n, alch.from_metadata(dt)) for n, dt in op.columns.items()],
+        )
+        table.create(self._conn)
 
 
 class CreateTableAsExecutor(SqlExecutor[CreateTableAs]):
