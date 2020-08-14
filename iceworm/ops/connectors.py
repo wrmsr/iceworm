@@ -1,6 +1,9 @@
 """
 TODO:
- -
+ - virtual vs physical tables
+ - physical tables requiring refresh
+ - incremental vs total physical tables
+ - materialized vs unmaterialized virtuals
 
 Def conns:
  - kafka

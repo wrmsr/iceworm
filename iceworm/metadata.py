@@ -11,11 +11,14 @@ TODO:
  - serde
  - external tables from files
  - permanence
+  - boostrap / publish / dl slug / refresh
+   - git bot?
   - file? multi-git + merge? db?
   - versioning? hash? dumb autoinc?
  - exfiltration?
  - *record all statements as executed w/ pk/partition ranges -> use interval ops for persisted lineage*
  - no views - nullary table funcs usable without parens
+  - call them 'view's?
 """
 import typing as ta
 

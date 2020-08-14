@@ -3,6 +3,7 @@ TODO:
  - only quote when necessary (for extract)
  - pretty output - no duplication in a pprint.py
   - include comments (reqs carrying antlr into nodes)
+ - custom open/close on paren?
 """
 import collections.abc
 import io

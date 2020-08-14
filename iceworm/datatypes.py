@@ -1,6 +1,6 @@
 """
 TODO:
- - sqla bidir adapter
+ - sqla bidir adapter (postgres specifically)
 """
 import typing as ta
 
