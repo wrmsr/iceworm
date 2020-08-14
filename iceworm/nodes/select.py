@@ -12,6 +12,7 @@ from .base import Node
 from .base import QualifiedNameNode
 from .base import SetQuantifier
 from .base import SortItem
+from .base import Stmt
 from .func import FunctionCall
 
 
@@ -119,7 +120,7 @@ class SetsGrouping(Grouping):
     sets: ta.Sequence[GroupingSet] = dc.field(coerce=seq)
 
 
-class Select(Selectable):
+class Select(Selectable, Stmt):
     items: ta.Sequence[SelectItem] = dc.field(coerce=seq)
     relations: ta.Sequence[Relation] = dc.field((), coerce=seq)
     where: ta.Optional[Expr] = None

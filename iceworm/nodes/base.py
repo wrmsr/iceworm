@@ -7,6 +7,7 @@ TODO:
 Visitors / Tools:
  - graphviz gen
 """
+import abc
 import collections.abc
 import enum
 import typing as ta
@@ -24,9 +25,11 @@ from ..utils import build_enum_value_map
 from ..utils import seq
 
 
+T = ta.TypeVar('T')
 SelfNode = ta.TypeVar('SelfNode', bound='Node')
 NodeGen = ta.Generator['Node', None, None]
 NodeMapper = ta.Callable[['Node'], 'Node']
+NoneType = type(None)
 
 
 class Node(dc.Enum, NodalDataclass['Node'], reorder=True, repr=False, sealed='package'):
@@ -52,6 +55,10 @@ class Expr(Node, abstract=True):
     pass
 
 
+class Stmt(Node, abstract=True):
+    pass
+
+
 class Identifier(Expr):
     name: str
 
@@ -69,6 +76,7 @@ class QualifiedNameNode(Expr):
     parts: ta.Sequence[Identifier] = dc.field(coerce=seq)
 
     @properties.cached
+    @property
     def name(self) -> QualifiedName:
         return QualifiedName(tuple(p.name for p in self.parts))
 
@@ -93,43 +101,46 @@ class QualifiedNameNode(Expr):
             raise TypeError(obj)
 
 
-class Primitive(Expr, abstract=True):
+class Primitive(Expr, ta.Generic[T], abstract=True):
+
+    @abc.abstractproperty
+    def value(self) -> T:
+        raise NotImplementedError
+
+
+class Number(Primitive[T], abstract=True):
     pass
 
 
-class Number(Expr, abstract=True):
-    pass
-
-
-class Integer(Number):
+class Integer(Number[int]):
     value: int
 
 
-class Decimal(Number):
+class Decimal(Number[str]):
     value: str
 
 
-class Float(Number):
+class Float(Number[str]):
     value: str
 
 
-class String(Primitive):
+class String(Primitive[str]):
     value: str
 
 
-class StarExpr(Primitive):
-    pass
+class Null(Primitive[NoneType]):
+    value = None
 
 
-class Null(Primitive):
-    pass
+class ETrue(Primitive[bool]):
+    value = True
 
 
-class ETrue(Primitive):
-    pass
+class EFalse(Primitive[bool]):
+    value = False
 
 
-class EFalse(Primitive):
+class StarExpr(Expr):
     pass
 
 

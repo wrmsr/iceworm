@@ -27,8 +27,8 @@ class SqlConnector(Connector):
 
 class FileConnector(Connector):
     """
-    local/s3/sftp?
-    csv/yaml/parquet
+    local/s3/url/sftp?
+    csv/json/yaml/parquet
     """
 
 

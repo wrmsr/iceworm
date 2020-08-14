@@ -56,7 +56,7 @@ def mapping(obj: ta.Union[ta.Mapping[K, V], ta.Iterable[ta.Tuple[K, V]], None]) 
         return ocol.frozendict(obj)
 
 
-class NodalDataclass(lang.Abstract, ta.Generic[NodalT]):
+class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
 
     @classmethod
     @abc.abstractmethod
