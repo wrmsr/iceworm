@@ -37,6 +37,8 @@ class Column(dc.Pure):
     name: str
     type: Datatype
 
+    primary_key: bool = dc.field(False, kwonly=True)
+
 
 class Table(dc.Frozen, final=True, allow_setattr=True, reorder=True):
     name: str

@@ -3,6 +3,9 @@ TODO:
  - postgres, hive, presto
  - spark? need dialect?
 """
+import typing as ta
+
+from omnibus import check
 from omnibus import dispatch
 import sqlalchemy as sa
 import sqlalchemy.sql.elements
@@ -30,31 +33,56 @@ def transmute(node: no.Node) -> Visitable:
     return Transmuter().transmute(node)
 
 
-class MetadataAdapter(dispatch.Class):
-    from_sa = dispatch.property()
-    to_sa = dispatch.property()
+class FromInternal(dispatch.Class):
 
-    def from_sa(self, sa_type: sa.sql.sqltypes.TypeEngine) -> dt.Datatype:  # noqa
+    def __init__(self, metadata: ta.Optional[sa.MetaData] = None) -> None:
+        super().__init__()
+
+        self._metadata = check.isinstance(metadata, sa.MetaData)
+
+    __call__ = dispatch.property()
+
+    def __call__(self, md_type: dt.Datatype) -> sa.Table:  # noqa
+        if isinstance(md_type, dt.Integer):
+            return sa.Integer()
+        else:
+            raise TypeError(md_type)
+
+    def __call__(self, md_col: md.Column) -> sa.Table:  # noqa
+        return sa.Column(
+            md_col.name,
+            self(md_col.type),
+            primary_key=md_col.primary_key,
+        )
+
+    def __call__(self, md_tbl: md.Table) -> sa.Table:  # noqa
+        return sa.Table(
+            md_tbl.name,
+            self._metadata,
+            *[self(col) for col in md_tbl.columns]
+        )
+
+
+class ToInternal(dispatch.Class):
+
+    __call__ = dispatch.property()
+
+    def __call__(self, sa_type: sa.sql.sqltypes.TypeEngine) -> dt.Datatype:  # noqa
         if isinstance(sa_type, sa.Integer):
             return dt.Integer()
         else:
             raise TypeError(sa_type)
 
-    def from_sa(self, sa_col: sa.Column) -> md.Column:  # noqa
+    def __call__(self, sa_col: sa.Column) -> md.Column:  # noqa
         return md.Column(
             name=sa_col.name,
-            type=self.from_sa(sa_col.type),
+            type=self(sa_col.type),
+            primary_key=sa_col.primary_key,
         )
 
-    def from_sa(self, sa_tbl: sa.Table) -> md.Table:  # noqa
+    def __call__(self, sa_tbl: sa.Table) -> md.Table:  # noqa
         return md.Table(
             name=sa_tbl.name,
-            columns=[self.from_sa(sa_col) for sa_col in sa_tbl.columns],
+            columns=[self(sa_col) for sa_col in sa_tbl.columns],
             schema_name=sa_tbl.schema,
         )
-
-
-METADATA_ADAPTER = MetadataAdapter()
-
-from_metadata = METADATA_ADAPTER.to_sa
-to_metadata = METADATA_ADAPTER.from_sa

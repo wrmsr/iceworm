@@ -1,4 +1,3 @@
-import csv
 import inspect
 import os.path
 
@@ -11,6 +10,9 @@ import sqlalchemy as sa
 from .. import execution
 from .. import ops
 from .. import rows
+from ... import alchemy as alch
+from ... import datatypes as dt
+from ... import metadata as md
 from ...types import QualifiedName
 
 
@@ -66,18 +68,21 @@ def test_ops(db_engine):  # noqa
 
 @pytest.mark.xfail()
 def test_csv(db_engine):  # noqa
+    atbl = md.Table(
+        'a',
+        [
+            md.Column('id', dt.Integer(), primary_key=True),
+            md.Column('a', dt.Integer()),
+            md.Column('b', dt.Integer()),
+        ],
+    )
+    samd = sa.MetaData()
+    a = alch.FromInternal(samd)(atbl)
+
     conn: sa.engine.Connection
     with db_engine.connect() as conn:
         conn.execute('drop table if exists a;')
 
-        samd = sa.MetaData()
-        a = sa.Table(
-            'a',
-            samd,
-            sa.Column('id', sa.Integer, primary_key=True),
-            sa.Column('a', sa.Integer),
-            sa.Column('b', sa.Integer),
-        )
         a.create(conn)
 
         rdr = rows.CsvFileRowSource(os.path.join(os.path.dirname(__file__), 'csv/a.csv'))

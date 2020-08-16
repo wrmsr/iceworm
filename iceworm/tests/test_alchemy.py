@@ -43,5 +43,5 @@ def test_sqlite_metadata(sqlite_engine):
         sa_tbl = sa.Table('test', metadata, autoload=True, autoload_with=sqlite_engine)
         print(sa_tbl)
 
-        tbl = check.isinstance(alch.to_metadata(sa_tbl), md.Table)
+        tbl = check.isinstance(alch.ToInternal()(sa_tbl), md.Table)
         print(tbl)
