@@ -10,6 +10,7 @@ import sqlalchemy as sa
 
 from .. import execution
 from .. import ops
+from .. import rows
 from ...types import QualifiedName
 
 
@@ -27,7 +28,7 @@ def db_engine():
         [(host, port)] = eps.values()
 
     engine: sa.engine.Engine
-    with lang.disposing(sa.create_engine(f'postgresql+pg8000://iceworm:iceworm@{host}:{port}')) as engine:
+    with lang.disposing(sa.create_engine(f'postgresql+psycopg2://iceworm:iceworm@{host}:{port}')) as engine:
         yield engine
 
 
@@ -68,15 +69,20 @@ def test_csv(db_engine):  # noqa
     conn: sa.engine.Connection
     with db_engine.connect() as conn:
         conn.execute('drop table if exists a;')
-        conn.execute('create table a(id integer primary key, a int, b int);')
 
-        with open(os.path.join(os.path.dirname(__file__), 'csv/a.csv'), 'r') as f:
-            reader = csv.reader(f)
-            rows = iter(reader)
-            cols = next(rows)
-            for vals in rows:
-                row = dict(zip(cols, vals))
-                print(row)
-                conn.execute(sa.insert(sa.table('a')).values(row))
+        samd = sa.MetaData()
+        a = sa.Table(
+            'a',
+            samd,
+            sa.Column('id', sa.Integer, primary_key=True),
+            sa.Column('a', sa.Integer),
+            sa.Column('b', sa.Integer),
+        )
+        a.create(conn)
+
+        rdr = rows.CsvFileRowSource(os.path.join(os.path.dirname(__file__), 'csv/a.csv'))
+        for row in rdr.yield_rows():
+            print(row)
+            conn.execute(a.insert(), [row])
 
         print(list(conn.execute('select * from a')))

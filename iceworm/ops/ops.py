@@ -51,3 +51,8 @@ class CreateTable(SqlOp):
 class CreateTableAs(SqlOp):
     name: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
     query: str
+
+
+class LoadTable(SqlOp):
+    src: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
+    dst: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))

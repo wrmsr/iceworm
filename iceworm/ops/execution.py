@@ -10,6 +10,7 @@ from .. import sql
 from .ops import CreateTable
 from .ops import CreateTableAs
 from .ops import DropTable
+from .ops import LoadTable
 from .ops import Op
 from .ops import SqlOp
 from .ops import Transaction
@@ -67,3 +68,9 @@ class CreateTableAsExecutor(SqlExecutor[CreateTableAs]):
 
     def execute(self, op: CreateTableAs) -> None:
         self._conn.execute(sql.CreateTableAs(sql.QualifiedNameElement(op.name), sa.text(op.query)))
+
+
+class LoadTableExecutor(SqlExecutor[LoadTable]):
+
+    def execute(self, op: LoadTable) -> None:
+        raise NotImplementedError
