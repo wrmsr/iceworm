@@ -4,13 +4,14 @@ import os.path
 
 from omnibus import check
 from omnibus import docker
-from omnibus import lang
 import pytest
 import sqlalchemy as sa
 
 from .. import connectors as ctrs
 from .. import execution as exe
+from .. import files
 from .. import ops
+from .. import sql
 from ... import datatypes as dt
 from ... import metadata as md
 from ...types import QualifiedName
@@ -32,13 +33,6 @@ def db_url():
     return f'postgresql+psycopg2://iceworm:iceworm@{host}:{port}'
 
 
-@pytest.yield_fixture()
-def db_engine(db_url):
-    engine: sa.engine.Engine
-    with lang.disposing(sa.create_engine(db_url)) as engine:
-        yield engine
-
-
 @pytest.mark.xfail()
 def test_ops(db_url):  # noqa
     cata = md.Catalog(
@@ -55,21 +49,22 @@ def test_ops(db_url):  # noqa
     )
 
     cs = ctrs.ConnectorSet([
-        ctrs.SqlConnector(
+        sql.SqlConnector(
             'pg',
-            ctrs.SqlConnector.Config(
+            sql.SqlConnector.Config(
                 url=db_url,
             ),
         ),
-        ctrs.FileConnector(
+        files.FileConnector(
             'csv',
-            os.path.join(os.path.dirname(__file__), 'csv/a.csv'),
+            files.FileConnector.Config(
+                file_path=os.path.join(os.path.dirname(__file__), 'csv/a.csv'),
+            ),
         ),
     ])
 
     with contextlib.ExitStack() as es:
-        engine: sa.engine.Engine = es.enter_context(lang.disposing(cs['pg'].create_engine()))
-        conn: sa.engine.Connection = es.enter_context(engine.connect())
+        conn: sa.engine.Connection = es.enter_context(contextlib.closing(cs['pg'].connect())).conn
 
         executors_by_op_cls = {
             ops.CreateTable: exe.CreateTableExecutor(conn),

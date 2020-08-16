@@ -9,24 +9,58 @@ Def conns:
  - kafka
  - dynamo
  - system
+ - mongo
 
 Alt conns:
  - salesforce
  - pagerduty
  - jira
 """
+import abc
 import typing as ta
 
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import defs
 from omnibus import lang
-import sqlalchemy as sa
 
+from ..types import QualifiedName
 from ..utils import unique_dict
 
 
-class Connector(lang.Abstract):
+ConnectorT = ta.TypeVar('ConnectorT')
+
+Row = ta.Mapping[str, ta.Any]
+RowGen = ta.Generator[Row, None, None]
+
+
+class RowSpec(dc.Enum):
+    pass
+
+
+class AllRowSpec(RowSpec):
+    pass
+
+
+class QueryRowSpec(RowSpec):
+    querey: str
+
+
+class RowSource(lang.Abstract):
+
+    @abc.abstractmethod
+    def produce_rows(self) -> RowGen:
+        raise NotImplementedError
+
+
+class RowSink(lang.Abstract):
+
+    @abc.abstractmethod
+    def consume_rows(self, rows: ta.Iterable[Row]) -> None:
+        raise NotImplementedError
+
+
+class Connector(lang.Abstract, ta.Generic[ConnectorT]):
 
     def __init__(self, name: str) -> None:
         super().__init__()
@@ -39,42 +73,35 @@ class Connector(lang.Abstract):
     def name(self) -> str:
         return self._name
 
+    @abc.abstractmethod
+    def connect(self) -> 'Connection[ConnectorT]':
+        raise NotImplementedError
 
-class SqlConnector(Connector):
-    """
-    postgres/mysql/snowflake
-    """
-
-    class Config(dc.Frozen):
-        url: str
-
-    def __init__(self, name: str, config: Config) -> None:
-        super().__init__(name)
-
-        self._config = check.isinstance(config, SqlConnector.Config)
-
-    def create_engine(self, **kwargs) -> sa.engine.Engine:
-        return sa.create_engine(self._config.url, **kwargs)
+    def close(self) -> None:
+        pass
 
 
-class FileConnector(Connector):
-    """
-    local/s3/url/sftp?
-    csv/json/yaml/parquet
-    """
+class Connection(lang.Abstract, ta.Generic[ConnectorT]):
 
-    def __init__(self, name: str, file_path: str) -> None:
-        super().__init__(name)
+    def __init__(self, connector: ConnectorT) -> None:
+        super().__init__()
 
-        self._file_path = file_path
+        self._connector: ConnectorT = check.isinstance(connector, Connector)
 
     @property
-    def file_path(self) -> str:
-        return self._file_path
+    def connector(self) -> ConnectorT:
+        return self._connector
 
+    def close(self) -> None:
+        pass
 
-class MongoConnector(Connector):
-    pass
+    @abc.abstractmethod
+    def create_row_source(self, spec: RowSpec) -> RowSource:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def create_row_sink(self, table: QualifiedName) -> RowSink:
+        raise NotImplementedError
 
 
 class ConnectorSet(ta.Iterable[Connector]):
