@@ -11,4 +11,4 @@ class Epoch(Base):
     id = sa.Column(sa.Integer, primary_key=True)
 
     created_at = sa.Column(sa.DateTime, server_default=sa.func.now())
-    updated_At = sa.Column(sa.DateTime, onupdate=sa.func.now())
+    updated_at = sa.Column(sa.DateTime, onupdate=sa.func.now())

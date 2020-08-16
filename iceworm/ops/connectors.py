@@ -18,6 +18,7 @@ Alt conns:
 import typing as ta
 
 from omnibus import check
+from omnibus import dataclasses as dc
 from omnibus import defs
 from omnibus import lang
 import sqlalchemy as sa
@@ -44,13 +45,16 @@ class SqlConnector(Connector):
     postgres/mysql/snowflake
     """
 
-    def __init__(self, name: str, url: str) -> None:
+    class Config(dc.Frozen):
+        url: str
+
+    def __init__(self, name: str, config: Config) -> None:
         super().__init__(name)
 
-        self._url = check.not_empty(check.isinstance(url, str))
+        self._config = check.isinstance(config, SqlConnector.Config)
 
     def create_engine(self, **kwargs) -> sa.engine.Engine:
-        return sa.create_engine(self._url, **kwargs)
+        return sa.create_engine(self._config.url, **kwargs)
 
 
 class FileConnector(Connector):
@@ -58,6 +62,15 @@ class FileConnector(Connector):
     local/s3/url/sftp?
     csv/json/yaml/parquet
     """
+
+    def __init__(self, name: str, file_path: str) -> None:
+        super().__init__(name)
+
+        self._file_path = file_path
+
+    @property
+    def file_path(self) -> str:
+        return self._file_path
 
 
 class MongoConnector(Connector):

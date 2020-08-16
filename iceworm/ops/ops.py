@@ -9,11 +9,11 @@ import typing as ta
 
 from omnibus import dataclasses as dc
 
-from ..datatypes import Datatype
+from .. import metadata as md
 from ..types import QualifiedName
-from ..utils import NodalDataclass
 from ..utils import build_dc_repr
-from ..utils import mapping
+from ..utils import NodalDataclass
+from ..utils import ReprFn
 from ..utils import seq
 
 
@@ -44,8 +44,7 @@ class DropTable(SqlOp):
 
 
 class CreateTable(SqlOp):
-    name: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
-    columns: ta.Mapping[str, Datatype] = dc.field(coerce=mapping)
+    table: md.Table
 
 
 class CreateTableAs(SqlOp):
@@ -53,6 +52,6 @@ class CreateTableAs(SqlOp):
     query: str
 
 
-class LoadTable(SqlOp):
-    src: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
-    dst: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
+class InsertInto(SqlOp):
+    dst: QualifiedName = dc.field(check=ReprFn(lambda v: isinstance(v, QualifiedName)))
+    src: QualifiedName = dc.field(check=ReprFn(lambda v: isinstance(v, QualifiedName)))

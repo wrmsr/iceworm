@@ -6,11 +6,12 @@ from omnibus import lang
 import sqlalchemy as sa
 
 from .. import alchemy as alch
+from .. import metadata as md
 from .. import sql
 from .ops import CreateTable
 from .ops import CreateTableAs
 from .ops import DropTable
-from .ops import LoadTable
+from .ops import InsertInto
 from .ops import Op
 from .ops import SqlOp
 from .ops import Transaction
@@ -57,10 +58,7 @@ class DropTableExecutor(SqlExecutor[DropTable]):
 class CreateTableExecutor(SqlExecutor[CreateTable]):
 
     def execute(self, op: CreateTable) -> None:
-        table = sa.Table(
-            op.name.parts[-1],
-            [sa.Column(n, alch.from_metadata(dt)) for n, dt in op.columns.items()],
-        )
+        table = alch.FromInternal(sa.MetaData())(op.table)
         table.create(self._conn)
 
 
@@ -70,7 +68,12 @@ class CreateTableAsExecutor(SqlExecutor[CreateTableAs]):
         self._conn.execute(sql.CreateTableAs(sql.QualifiedNameElement(op.name), sa.text(op.query)))
 
 
-class LoadTableExecutor(SqlExecutor[LoadTable]):
+class InsertIntoExecutor(SqlExecutor[InsertInto]):
 
-    def execute(self, op: LoadTable) -> None:
+    def __init__(self, conn: sa.engine.Connection, catalog: md.Catalog) -> None:
+        super().__init__(conn)
+
+        self._catalog = check.isinstance(catalog, md.Catalog)
+
+    def execute(self, op: InsertInto) -> None:
         raise NotImplementedError

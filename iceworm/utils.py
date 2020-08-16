@@ -1,5 +1,6 @@
 import abc
 import collections
+import inspect
 import typing as ta
 
 from omnibus import collections as ocol
@@ -94,3 +95,28 @@ class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
                     raise KeyError(k)
                 rpl_kw[k] = v
         return dc.replace(self, **rpl_kw)
+
+
+class ReprFn:
+
+    def __init__(self, fn: ta.Callable) -> None:
+        super().__init__()
+
+        self._fn = fn
+
+    def __repr__(self) -> str:
+        fn = self._fn
+        file = inspect.getsourcefile(fn)
+        obj = fn
+        if inspect.ismethod(fn):
+            obj = fn.__func__
+        if inspect.isfunction(obj):
+            obj = fn.__code__
+        lnum = obj.co_firstlineno
+        return f'ReprFn(<{file}:{lnum}>)'
+
+    def __get__(self, instance, owner=None):
+        return ReprFn(self._fn.__get__(instance, owner))
+
+    def __call__(self, *args, **kwargs):
+        return self._fn(*args, **kwargs)

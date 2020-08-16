@@ -2,6 +2,7 @@ import abc
 import csv
 import typing as ta
 
+from omnibus import check
 from omnibus import lang
 import sqlalchemy as sa
 
@@ -17,18 +18,38 @@ class RowSource(lang.Abstract):
         raise NotImplementedError
 
 
+class RowSink(lang.Abstract):
+
+    @abc.abstractmethod
+    def consume_rows(self, rows: ta.Iterable[Row]) -> None:
+        raise NotImplementedError
+
+
 class SqlRowSource(RowSource):
 
     def __init__(self, conn: sa.engine.Connection, query: str) -> None:
         super().__init__()
 
-        self._conn = conn
+        self._conn = check.isinstance(conn, sa.engine.Connection)
         self._query = query
 
     def yield_rows(self) -> RowGen:
         rows = self._conn.execute(self._query)
         for row in rows:
             yield row
+
+
+class SqlRowSink(RowSink):
+
+    def __init__(self, conn: sa.engine.Connection, table: sa.Table) -> None:
+        super().__init__()
+
+        self._conn = check.isinstance(conn, sa.engine.Connection)
+        self._table = check.isinstance(table, sa.Table)
+
+    def consume_rows(self, rows: ta.Iterable[Row]) -> None:
+        for row in rows:
+            self._conn.execute(self._table.insert(), [row])
 
 
 class CsvFileRowSource(RowSource):

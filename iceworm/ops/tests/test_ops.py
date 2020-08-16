@@ -1,3 +1,4 @@
+import contextlib
 import inspect
 import os.path
 
@@ -7,17 +8,16 @@ from omnibus import lang
 import pytest
 import sqlalchemy as sa
 
-from .. import execution
+from .. import connectors as ctrs
+from .. import execution as exe
 from .. import ops
-from .. import rows
-from ... import alchemy as alch
 from ... import datatypes as dt
 from ... import metadata as md
 from ...types import QualifiedName
 
 
-@pytest.yield_fixture()
-def db_engine():
+@pytest.fixture()
+def db_url():
     if docker.is_in_docker():
         (host, port) = 'iceworm-postgres', 5432
 
@@ -29,21 +29,54 @@ def db_engine():
 
         [(host, port)] = eps.values()
 
+    return f'postgresql+psycopg2://iceworm:iceworm@{host}:{port}'
+
+
+@pytest.yield_fixture()
+def db_engine(db_url):
     engine: sa.engine.Engine
-    with lang.disposing(sa.create_engine(f'postgresql+psycopg2://iceworm:iceworm@{host}:{port}')) as engine:
+    with lang.disposing(sa.create_engine(db_url)) as engine:
         yield engine
 
 
 @pytest.mark.xfail()
-def test_ops(db_engine):  # noqa
-    conn: sa.engine.Connection
-    with db_engine.connect() as conn:
-        print(conn.scalar(sa.select([sa.func.version()])))
+def test_ops(db_url):  # noqa
+    cata = md.Catalog(
+        [
+            md.Table(
+                'a',
+                [
+                    md.Column('id', dt.Integer(), primary_key=True),
+                    md.Column('a', dt.Integer()),
+                    md.Column('b', dt.Integer()),
+                ],
+            ),
+        ],
+    )
+
+    cs = ctrs.ConnectorSet([
+        ctrs.SqlConnector(
+            'pg',
+            ctrs.SqlConnector.Config(
+                url=db_url,
+            ),
+        ),
+        ctrs.FileConnector(
+            'csv',
+            os.path.join(os.path.dirname(__file__), 'csv/a.csv'),
+        ),
+    ])
+
+    with contextlib.ExitStack() as es:
+        engine: sa.engine.Engine = es.enter_context(lang.disposing(cs['pg'].create_engine()))
+        conn: sa.engine.Connection = es.enter_context(engine.connect())
 
         executors_by_op_cls = {
-            ops.CreateTableAs: execution.CreateTableAsExecutor(conn),
-            ops.DropTable: execution.DropTableExecutor(conn),
-            ops.Transaction: execution.TransactionExecutor(conn),
+            ops.CreateTable: exe.CreateTableExecutor(conn),
+            ops.CreateTableAs: exe.CreateTableAsExecutor(conn),
+            ops.DropTable: exe.DropTableExecutor(conn),
+            ops.InsertInto: exe.InsertIntoExecutor(conn, cata),
+            ops.Transaction: exe.TransactionExecutor(conn),
         }
 
         def execute(op: ops.Op) -> None:
@@ -58,36 +91,14 @@ def test_ops(db_engine):  # noqa
             ops.Transaction([
                 ops.DropTable(QualifiedName(['foo'])),
                 ops.CreateTableAs(QualifiedName(['foo']), 'select 1'),
+
+                ops.DropTable(QualifiedName(['a'])),
+                ops.CreateTable(cata.tables_by_name['a']),
+                ops.InsertInto(QualifiedName(['a']), QualifiedName(['csv'])),
             ]),
         ]
         for t in ts:
             execute(t)
 
         print(list(conn.execute('select * from foo')))
-
-
-@pytest.mark.xfail()
-def test_csv(db_engine):  # noqa
-    atbl = md.Table(
-        'a',
-        [
-            md.Column('id', dt.Integer(), primary_key=True),
-            md.Column('a', dt.Integer()),
-            md.Column('b', dt.Integer()),
-        ],
-    )
-    samd = sa.MetaData()
-    a = alch.FromInternal(samd)(atbl)
-
-    conn: sa.engine.Connection
-    with db_engine.connect() as conn:
-        conn.execute('drop table if exists a;')
-
-        a.create(conn)
-
-        rdr = rows.CsvFileRowSource(os.path.join(os.path.dirname(__file__), 'csv/a.csv'))
-        for row in rdr.yield_rows():
-            print(row)
-            conn.execute(a.insert(), [row])
-
         print(list(conn.execute('select * from a')))
