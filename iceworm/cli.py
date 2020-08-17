@@ -10,9 +10,9 @@ from omnibus import dataclasses as dc
 from omnibus import logs
 from omnibus import properties
 
-from . import analysis
-from . import parsing
-from . import rendering
+from .trees import analysis
+from .trees import parsing
+from .trees import rendering
 
 
 log = logging.getLogger(__name__)

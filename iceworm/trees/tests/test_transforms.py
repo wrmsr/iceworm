@@ -1,8 +1,8 @@
-from .. import datatypes as dt
-from .. import metadata as md
 from .. import nodes as no
 from .. import transforms as tfm
-from ..types import QualifiedName
+from ... import datatypes as dt
+from ... import metadata as md
+from ...types import QualifiedName
 
 
 def test_replace_names():

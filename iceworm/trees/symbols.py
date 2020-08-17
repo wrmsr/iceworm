@@ -9,10 +9,10 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import dispatch
 
-from . import metadata as md
 from . import nodes as no
-from .types import QualifiedName
-from .utils import build_dc_repr
+from .. import metadata as md
+from ..types import QualifiedName
+from ..utils import build_dc_repr
 
 
 class Symbol(dc.Pure, eq=False):

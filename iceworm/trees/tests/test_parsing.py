@@ -8,7 +8,7 @@ from omnibus._vendor import antlr4
 from .. import nodes as no
 from .. import parsing
 from .. import rendering
-from .. import serde
+from ... import serde
 
 
 def test_parsing():

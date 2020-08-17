@@ -3,7 +3,7 @@ from omnibus import dataclasses as dc
 import pytest
 
 from .. import nodes as no
-from .. import types
+from ... import types
 
 
 def test_cache():

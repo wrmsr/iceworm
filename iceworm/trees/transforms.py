@@ -36,9 +36,9 @@ from omnibus import dispatch
 from omnibus import lang
 
 from . import analysis as ana  # noqa
-from . import metadata as md
 from . import nodes as no
-from .types import QualifiedName
+from .. import metadata as md
+from ..types import QualifiedName
 
 
 class Origin(lang.Marker):

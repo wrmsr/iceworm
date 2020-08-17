@@ -17,12 +17,12 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import properties
 
-from .. import serde
-from ..types import QualifiedName
-from ..utils import NodalDataclass
-from ..utils import build_dc_repr
-from ..utils import build_enum_value_map
-from ..utils import seq
+from ... import serde
+from ...types import QualifiedName
+from ...utils import NodalDataclass
+from ...utils import build_dc_repr
+from ...utils import build_enum_value_map
+from ...utils import seq
 
 
 T = ta.TypeVar('T')

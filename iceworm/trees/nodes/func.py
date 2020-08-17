@@ -3,7 +3,7 @@ import typing as ta
 
 from omnibus import dataclasses as dc
 
-from ..utils import seq
+from ...utils import seq
 from .base import Expr
 from .base import Identifier
 from .base import Node

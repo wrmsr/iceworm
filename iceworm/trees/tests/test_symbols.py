@@ -1,6 +1,6 @@
-from .. import metadata as md
 from .. import nodes as no
 from .. import symbols as syms
+from ... import metadata as md
 
 
 def test_symbols():

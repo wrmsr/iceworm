@@ -5,7 +5,7 @@ from omnibus import check
 from omnibus import dispatch
 
 from .. import nodes as no
-from ..types import QualifiedName
+from ...types import QualifiedName
 
 
 StrMap = ta.Mapping[str, ta.Any]
