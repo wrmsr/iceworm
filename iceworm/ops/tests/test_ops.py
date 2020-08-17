@@ -13,7 +13,6 @@ from .. import ops
 from .. import sql
 from ... import datatypes as dt
 from ... import metadata as md
-from ...types import QualifiedName
 
 
 @pytest.fixture()
@@ -88,12 +87,12 @@ def test_ops(db_url):  # noqa
             ops.Transaction(
                 'pg',
                 [
-                    ops.DropTable(QualifiedName(['pg', 'foo'])),
-                    ops.CreateTableAs(QualifiedName(['pg', 'foo']), 'select 1'),
+                    ops.DropTable(['pg', 'foo']),
+                    ops.CreateTableAs(['pg', 'foo'], 'select 1'),
 
-                    ops.DropTable(QualifiedName(['pg', 'a'])),
+                    ops.DropTable(['pg', 'a']),
                     ops.CreateTable('pg', cata.tables_by_name['a']),
-                    ops.InsertInto(QualifiedName(['pg', 'a']), QualifiedName(['csv', 'a'])),
+                    ops.InsertInto(['pg', 'a'], ['csv', 'a']),
                 ],
             ),
         ]

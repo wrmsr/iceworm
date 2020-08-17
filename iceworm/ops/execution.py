@@ -87,6 +87,6 @@ class InsertIntoExecutor(SqlExecutor[InsertInto]):
     def execute(self, op: InsertInto) -> None:
         dst_conn = self._conns[op.dst_table_name.parts[0]]
         src_conn = self._conns[op.src_table_name.parts[0]]
-        dst = dst_conn.create_row_sink(QualifiedName(op.dst_table_name.parts[1:]))
-        src = src_conn.create_row_source(TableRowSpec(QualifiedName(op.src_table_name.parts[1:])))
+        dst = dst_conn.create_row_sink(op.dst_table_name.parts[1:])
+        src = src_conn.create_row_source(TableRowSpec(op.src_table_name.parts[1:]))
         dst.consume_rows(src.produce_rows())
