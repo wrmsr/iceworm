@@ -5,7 +5,6 @@ import os.path
 from omnibus import check
 from omnibus import docker
 import pytest
-import sqlalchemy as sa
 
 from .. import connectors as ctrs
 from .. import execution as exe
@@ -64,14 +63,14 @@ def test_ops(db_url):  # noqa
     ])
 
     with contextlib.ExitStack() as es:
-        conn: sa.engine.Connection = es.enter_context(contextlib.closing(cs['pg'].connect())).conn
+        conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(cs)))
 
         executors_by_op_cls = {
-            ops.CreateTable: exe.CreateTableExecutor(conn),
-            ops.CreateTableAs: exe.CreateTableAsExecutor(conn),
-            ops.DropTable: exe.DropTableExecutor(conn),
-            ops.InsertInto: exe.InsertIntoExecutor(conn, cata),
-            ops.Transaction: exe.TransactionExecutor(conn),
+            ops.CreateTable: exe.CreateTableExecutor(conns),
+            ops.CreateTableAs: exe.CreateTableAsExecutor(conns),
+            ops.DropTable: exe.DropTableExecutor(conns),
+            ops.InsertInto: exe.InsertIntoExecutor(conns),
+            ops.Transaction: exe.TransactionExecutor(conns),
         }
 
         def execute(op: ops.Op) -> None:
@@ -83,17 +82,21 @@ def test_ops(db_url):  # noqa
                 check.none(executor.execute(op))
 
         ts = [
-            ops.Transaction([
-                ops.DropTable(QualifiedName(['foo'])),
-                ops.CreateTableAs(QualifiedName(['foo']), 'select 1'),
+            ops.Transaction(
+                'pg',
+                [
+                    ops.DropTable(QualifiedName(['pg', 'foo'])),
+                    ops.CreateTableAs(QualifiedName(['pg', 'foo']), 'select 1'),
 
-                ops.DropTable(QualifiedName(['a'])),
-                ops.CreateTable(cata.tables_by_name['a']),
-                ops.InsertInto(QualifiedName(['a']), QualifiedName(['csv'])),
-            ]),
+                    ops.DropTable(QualifiedName(['pg', 'a'])),
+                    ops.CreateTable('pg', cata.tables_by_name['a']),
+                    ops.InsertInto(QualifiedName(['pg', 'a']), QualifiedName(['csv', 'a'])),
+                ],
+            ),
         ]
         for t in ts:
             execute(t)
 
-        print(list(conn.execute('select * from foo')))
-        print(list(conn.execute('select * from a')))
+        sa_conn = check.isinstance(conns['pg'], sql.SqlConnection).sa_conn
+        print(list(sa_conn.execute('select * from foo')))
+        print(list(sa_conn.execute('select * from a')))

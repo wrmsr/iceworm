@@ -13,6 +13,7 @@ from .connectors import RowGen
 from .connectors import RowSink
 from .connectors import RowSource
 from .connectors import RowSpec
+from .connectors import TableRowSpec
 
 
 class SqlConnector(Connector['SqlConnector']):
@@ -53,17 +54,23 @@ class SqlConnection(Connection[SqlConnector]):
         self._conn = check.isinstance(conn, sa.engine.Connection)
 
     @property
-    def conn(self) -> sa.engine.Connection:
+    def sa_conn(self) -> sa.engine.Connection:
         return self._conn
 
     def close(self) -> None:
         self._conn.close()
 
     def create_row_source(self, spec: RowSpec) -> RowSource:
-        raise TypeError
+        if isinstance(spec, TableRowSpec):
+            return SqlRowSource(self.sa_conn, f'select * from {spec.table.parts[0]}')
+        else:
+            raise TypeError(spec)
 
     def create_row_sink(self, table: QualifiedName) -> RowSink:
-        raise TypeError
+        md = sa.MetaData()
+        md.reflect(bind=self.sa_conn, only=[table.parts[-1]])
+        tbl = md.tables[table.parts[-1]]
+        return SqlRowSink(self.sa_conn, tbl)
 
 
 class SqlRowSource(RowSource):

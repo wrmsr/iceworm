@@ -20,6 +20,7 @@ import abc
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import defs
 from omnibus import lang
@@ -38,12 +39,12 @@ class RowSpec(dc.Enum):
     pass
 
 
-class AllRowSpec(RowSpec):
-    pass
+class TableRowSpec(RowSpec):
+    table: QualifiedName
 
 
 class QueryRowSpec(RowSpec):
-    querey: str
+    query: str
 
 
 class RowSource(lang.Abstract):
@@ -73,12 +74,12 @@ class Connector(lang.Abstract, ta.Generic[ConnectorT]):
     def name(self) -> str:
         return self._name
 
+    def close(self) -> None:
+        pass
+
     @abc.abstractmethod
     def connect(self) -> 'Connection[ConnectorT]':
         raise NotImplementedError
-
-    def close(self) -> None:
-        pass
 
 
 class Connection(lang.Abstract, ta.Generic[ConnectorT]):
@@ -117,3 +118,31 @@ class ConnectorSet(ta.Iterable[Connector]):
 
     def __getitem__(self, name: str) -> Connector:
         return self._connectors_by_name[name]
+
+    def close(self) -> None:
+        for ctor in self._connectors:
+            ctor.close()
+
+
+class ConnectionSet(ta.Iterable[Connection]):
+
+    def __init__(self, connectors: ConnectorSet) -> None:
+        super().__init__()
+
+        self._connectors = check.isinstance(connectors, ConnectorSet)
+        self._connections_by_connector: ta.MutableMapping[Connector, Connection] = ocol.IdentityKeyDict()
+
+    def __iter__(self) -> ta.Iterator[Connection]:
+        return iter(self._connections_by_connector.values())
+
+    def __getitem__(self, name: str) -> Connection:
+        ctor = self._connectors[name]
+        try:
+            return self._connections_by_connector[ctor]
+        except KeyError:
+            conn = self._connections_by_connector[ctor] = ctor.connect()
+            return conn
+
+    def close(self) -> None:
+        for conn in self._connections_by_connector.values():
+            conn.close()

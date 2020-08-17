@@ -4,13 +4,13 @@ from omnibus import check
 from omnibus import dataclasses as dc
 
 from ..types import QualifiedName
-from .connectors import Connector
-from .connectors import RowSpec
-from .connectors import AllRowSpec
 from .connectors import Connection
-from .connectors import RowSource
-from .connectors import RowSink
+from .connectors import Connector
 from .connectors import RowGen
+from .connectors import RowSink
+from .connectors import RowSource
+from .connectors import RowSpec
+from .connectors import TableRowSpec
 
 
 class FileConnector(Connector['FileConnector']):
@@ -37,7 +37,7 @@ class FileConnection(Connection[FileConnector]):
         super().__init__(connector)
 
     def create_row_source(self, spec: RowSpec) -> RowSource:
-        if isinstance(spec, AllRowSpec):
+        if isinstance(spec, TableRowSpec):
             return CsvFileRowSource(self._connector._config.file_path)
         else:
             raise TypeError(spec)

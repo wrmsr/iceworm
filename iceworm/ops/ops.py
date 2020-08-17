@@ -36,22 +36,24 @@ class SqlOp(Op, abstract=True):
 
 
 class Transaction(SqlOp):
+    conn_name: str
     children: ta.Sequence[Op] = dc.field(coerce=seq)
 
 
 class DropTable(SqlOp):
-    name: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
+    table_name: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
 
 
 class CreateTable(SqlOp):
+    conn_name: str
     table: md.Table
 
 
 class CreateTableAs(SqlOp):
-    name: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
+    table_name: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
     query: str
 
 
 class InsertInto(SqlOp):
-    dst: QualifiedName = dc.field(check=ReprFn(lambda v: isinstance(v, QualifiedName)))
-    src: QualifiedName = dc.field(check=ReprFn(lambda v: isinstance(v, QualifiedName)))
+    dst_table_name: QualifiedName = dc.field(check=ReprFn(lambda v: isinstance(v, QualifiedName)))
+    src_table_name: QualifiedName = dc.field(check=ReprFn(lambda v: isinstance(v, QualifiedName)))
