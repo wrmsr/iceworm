@@ -13,7 +13,6 @@ from .. import metadata as md
 from ..types import QualifiedName
 from ..utils import build_dc_repr
 from ..utils import NodalDataclass
-from ..utils import ReprFn
 from ..utils import seq
 
 
@@ -41,7 +40,7 @@ class Transaction(SqlOp):
 
 
 class DropTable(SqlOp):
-    table_name: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
+    table_name: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
 class CreateTable(SqlOp):
@@ -50,10 +49,10 @@ class CreateTable(SqlOp):
 
 
 class CreateTableAs(SqlOp):
-    table_name: QualifiedName = dc.field(check=lambda v: isinstance(v, QualifiedName))
+    table_name: QualifiedName = dc.field(coerce=QualifiedName.of)
     query: str
 
 
 class InsertInto(SqlOp):
-    dst_table_name: QualifiedName = dc.field(check=ReprFn(lambda v: isinstance(v, QualifiedName)))
-    src_table_name: QualifiedName = dc.field(check=ReprFn(lambda v: isinstance(v, QualifiedName)))
+    dst_table_name: QualifiedName = dc.field(coerce=QualifiedName.of)
+    src_table_name: QualifiedName = dc.field(coerce=QualifiedName.of)

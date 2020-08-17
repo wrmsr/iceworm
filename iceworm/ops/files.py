@@ -1,9 +1,12 @@
 import csv
+import os.path
+import typing as ta
 
 from omnibus import check
 from omnibus import dataclasses as dc
 
 from ..types import QualifiedName
+from ..utils import mapping
 from .connectors import Connection
 from .connectors import Connector
 from .connectors import RowGen
@@ -20,7 +23,8 @@ class FileConnector(Connector['FileConnector']):
     """
 
     class Config(dc.Frozen):
-        file_path: str
+        base_path: str
+        file_names_by_table_name: ta.Mapping[str, str] = dc.field(coerce=mapping)
 
     def __init__(self, name: str, config: Config) -> None:
         super().__init__(name)
@@ -38,7 +42,8 @@ class FileConnection(Connection[FileConnector]):
 
     def create_row_source(self, spec: RowSpec) -> RowSource:
         if isinstance(spec, TableRowSpec):
-            return CsvFileRowSource(self._connector._config.file_path)
+            file_name = self._connector._config.file_names_by_table_name[spec.table.parts[-1]]
+            return CsvFileRowSource(os.path.join(self._connector._config.base_path, file_name))
         else:
             raise TypeError(spec)
 

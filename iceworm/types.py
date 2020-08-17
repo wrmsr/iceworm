@@ -2,6 +2,7 @@
 TODO:
   - quoting
 """
+import collections.abc
 import typing as ta
 
 from omnibus import dataclasses as dc
@@ -41,3 +42,14 @@ class QualifiedName(dc.Pure):
     @classmethod
     def of_dotted(cls, dotted: str) -> 'QualifiedName':
         return cls(dotted.split('.'))
+
+    @classmethod
+    def of(cls, obj: ta.Union['QualifiedName', ta.Iterable[str]]) -> 'QualifiedName':
+        if isinstance(obj, QualifiedName):
+            return obj
+        elif isinstance(obj, str):
+            raise TypeError(obj)
+        elif isinstance(obj, collections.abc.Iterable):
+            return cls(list(obj))
+        else:
+            raise TypeError(obj)

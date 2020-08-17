@@ -57,7 +57,10 @@ def test_ops(db_url):  # noqa
         files.FileConnector(
             'csv',
             files.FileConnector.Config(
-                file_path=os.path.join(os.path.dirname(__file__), 'csv/a.csv'),
+                base_path=os.path.join(os.path.dirname(__file__), 'csv'),
+                file_names_by_table_name={
+                    'a': 'a.csv',
+                },
             ),
         ),
     ])
