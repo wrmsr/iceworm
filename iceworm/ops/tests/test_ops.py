@@ -3,10 +3,12 @@ TODO:
  - hot comments:
   - upstream cfg: select * from v /*+ weak */;
   - col type ann/enforcement: select a /*+ type: char(36) */
+  - catalog chainmap?
 """
 import contextlib
 import inspect
 import os.path
+import typing as ta
 
 from omnibus import check
 from omnibus import dataclasses as dc
@@ -148,6 +150,16 @@ VIEWS = [
         ),
 
     ]
+
+
+class World:
+
+    def __init__(self, connectors: ctrs.ConnectorSet) -> None:
+        super().__init__()
+
+        self._connectors = check.isinstance(connectors, ctrs.ConnectorSet)
+
+        self._views_by_name: ta.MutableMapping[QualifiedName, View] = {}
 
 
 @pytest.mark.xfail()
