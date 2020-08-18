@@ -54,6 +54,7 @@ def test_ops(db_url):  # noqa
                 base_path=os.path.join(os.path.dirname(__file__), 'csv'),
                 file_names_by_table_name={
                     'a': 'a.csv',
+                    'b': 'b.csv',
                 },
             ),
         ),
@@ -76,6 +77,30 @@ def test_ops(db_url):  # noqa
                 ],
             ),
             ['csv', 'a'],
+        ),
+        View(
+            'pg',
+            md.Table(
+                'b',
+                [
+                    md.Column('id', dt.Integer(), primary_key=True),
+                    md.Column('c', dt.Integer()),
+                    md.Column('d', dt.Integer()),
+                ],
+            ),
+            ['csv', 'b'],
+        ),
+        View(
+            'pg',
+            md.Table(
+                'c',
+                [
+                    md.Column('id', dt.Integer(), primary_key=True),
+                    md.Column('c', dt.Integer()),
+                    md.Column('d', dt.Integer()),
+                ],
+            ),
+            ['pg', 'b'],
         ),
     ]
 
@@ -114,3 +139,5 @@ def test_ops(db_url):  # noqa
         sa_conn = check.isinstance(conns['pg'], sql.SqlConnection).sa_conn
         print(list(sa_conn.execute('select * from foo')))
         print(list(sa_conn.execute('select * from a')))
+        print(list(sa_conn.execute('select * from b')))
+        print(list(sa_conn.execute('select * from c')))
