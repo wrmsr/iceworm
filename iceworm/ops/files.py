@@ -101,6 +101,9 @@ class FileConnection(Connection[FileConnector]):
     def create_row_sink(self, table: QualifiedName) -> RowSink:
         raise TypeError
 
+    def reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:
+        pass
+
 
 class CsvFileRowSource(RowSource):
 

@@ -24,6 +24,7 @@ import typing as ta
 
 from omnibus import check
 from omnibus import dataclasses as dc
+from omnibus import lang
 from omnibus import properties
 
 from .datatypes import Datatype
@@ -40,7 +41,11 @@ class Column(dc.Pure):
     primary_key: bool = dc.field(False, kwonly=True)
 
 
-class Table(dc.Frozen, final=True, allow_setattr=True, reorder=True):
+class Object(lang.Abstract):
+    pass
+
+
+class Table(dc.Frozen, Object, final=True, allow_setattr=True, reorder=True):
     name: str
     schema_name: ta.Optional[str] = dc.field(None, kwonly=True)
     catalog_name: ta.Optional[str] = dc.field(None, kwonly=True)
@@ -59,7 +64,7 @@ class Table(dc.Frozen, final=True, allow_setattr=True, reorder=True):
         return QualifiedName(*filter(None, [self.catalog, self.schema_name, self.name_name]))
 
 
-class Function(dc.Frozen, final=True, allow_setattr=True, reorder=True):
+class Function(dc.Frozen, Object, final=True, allow_setattr=True, reorder=True):
     name: str
     type: Datatype
     params: ta.Mapping[str, Datatype] = dc.field(coerce=mapping)

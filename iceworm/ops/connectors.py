@@ -25,6 +25,7 @@ from omnibus import dataclasses as dc
 from omnibus import defs
 from omnibus import lang
 
+from .. import metadata as md
 from ..types import QualifiedName
 from ..utils import unique_dict
 
@@ -102,6 +103,10 @@ class Connection(lang.Abstract, ta.Generic[ConnectorT]):
 
     @abc.abstractmethod
     def create_row_sink(self, table: QualifiedName) -> RowSink:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:
         raise NotImplementedError
 
 
