@@ -15,7 +15,6 @@ class QualifiedName(dc.Pure, ta.Sequence[str]):
 
     dc.check(lambda parts: (
             parts and
-            len(parts) < 4 and
             all(parts) and
             all(isinstance(p, str) for p in parts)
     ))
@@ -35,6 +34,19 @@ class QualifiedName(dc.Pure, ta.Sequence[str]):
     @property
     def dotted(self) -> str:
         return '.'.join(self.parts)
+
+    def prefixed(self, sz: int) -> ta.Sequence[ta.Optional[str]]:
+        if len(self) > sz:
+            raise ValueError(self)
+        return ((None,) * (sz - len(self))) + tuple(self.parts)
+
+    @property
+    def pair(self) -> ta.Tuple[ta.Optional[str], str]:
+        return self.prefixed(2)  # noqa
+
+    @property
+    def triple(self) -> ta.Tuple[ta.Optional[str], ta.Optional[str], str]:
+        return self.prefixed(3)  # noqa
 
     def __iter__(self) -> ta.Iterator[str]:
         return iter(self.parts)

@@ -5,6 +5,7 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 import sqlalchemy as sa
 
+from .. import alchemy as alch
 from .. import metadata as md
 from ..types import QualifiedName
 from .connectors import Connection
@@ -77,7 +78,16 @@ class SqlConnection(Connection[SqlConnector]):
         return SqlRowSink(self.sa_conn, tbl)
 
     def reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:
-        pass
+        if not names:
+            raise TypeError
+
+        ret = {}
+        for name in names:
+            schema, table = name.pair
+            samd = sa.MetaData()
+            samd.reflect(bind=self.sa_conn, only=[table], schema=schema)
+            ret[name] = alch.ToInternal()(samd.tables[table])
+        return ret
 
 
 class SqlRowSource(RowSource):

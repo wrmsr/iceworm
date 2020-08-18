@@ -224,6 +224,9 @@ def test_ops():  # noqa
         for t in ts:
             execute(t)
 
+        with contextlib.closing(CONNECTORS['pg'].connect()) as pconn:
+            print(pconn.reflect([QualifiedName.of(['a'])]))
+
         sa_conn = check.isinstance(conns['pg'], sql.SqlConnection).sa_conn
         print(list(sa_conn.execute('select * from foo')))
         print(list(sa_conn.execute('select * from a')))

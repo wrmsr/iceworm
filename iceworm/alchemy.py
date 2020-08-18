@@ -37,10 +37,12 @@ class FromInternal(dispatch.Class):
         )
 
     def __call__(self, md_tbl: md.Table) -> sa.Table:  # noqa
+        schema, name = md_tbl.name.pair
         return sa.Table(
-            md_tbl.name[-1],  # FIXME: catalog.schema.
+            name,
             self._metadata,
-            *[self(col) for col in md_tbl.columns]
+            *[self(col) for col in md_tbl.columns],
+            schema=schema,
         )
 
 
