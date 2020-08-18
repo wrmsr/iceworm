@@ -94,3 +94,54 @@ select * from monthly_sales
 unpivot(sales for month in (jan, feb, mar, april))
 order by empid;
 
+
+-- https://www.snowflake.com/blog/json-support-with-snowflake/
+
+-- select extract('day',created_at) janday,count(*) cnt
+--   from
+--     twitter.data.tweets t,
+--
+--      -- unnest a tweet on the hashtags of each entities
+--      lateral flatten (input=> t.tweet,'entities.hashtags')tags,
+--      (select distinct ph_hashtag
+--         from
+--           sales.public.producthashtags,
+--           sales.public.product
+--         where p_name ='Blue Sky'
+--         and   p_productkey = ph_productkey) p
+--
+--      where tags.value:text::string = p.ph_hashtag
+--      and   created_at >= '2014-01-01 00:00:00'
+--      and   created_at >= '2014-02-01 00:00:00'
+--
+--     group by 1
+--     order by 1
+
+
+-- https://docs.snowflake.com/en/user-guide/queries-cte.html#recursive-cte-with-indented-output
+
+-- with recursive managers
+--       -- Column names for the "view"/CTE
+--       (indent, employee_id, manager_id, employee_title)
+--     as
+--       -- Common Table Expression
+--       (
+--
+--         -- Anchor Clause
+--         select '' as indent, employee_id, manager_id, title as employee_title
+--           from employees
+--           where title = 'President'
+--
+--         union all
+--
+--         -- Recursive Clause
+--         select indent || '--- ',
+--             employees.employee_id, employees.manager_id, employees.title
+--           from employees join managers
+--             on employees.manager_id = managers.employee_id
+--       )
+--
+--   -- This is the "main select".
+--   select indent || employee_title as title, employee_id, manager_id
+--     from managers
+--   ;

@@ -58,6 +58,10 @@ def mapping(obj: ta.Union[ta.Mapping[K, V], ta.Iterable[ta.Tuple[K, V]], None]) 
 
 
 class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
+    """
+    TODO:
+     - explicit subclass registration for serde
+    """
 
     @classmethod
     @abc.abstractmethod
