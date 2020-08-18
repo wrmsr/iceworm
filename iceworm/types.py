@@ -10,7 +10,7 @@ from omnibus import dataclasses as dc
 from .utils import seq
 
 
-class QualifiedName(dc.Pure):
+class QualifiedName(dc.Pure, ta.Sequence[str]):
     parts: ta.Sequence[str] = dc.field(coerce=seq)
 
     dc.check(lambda parts: (
@@ -38,6 +38,12 @@ class QualifiedName(dc.Pure):
 
     def __iter__(self) -> ta.Iterator[str]:
         return iter(self.parts)
+
+    def __len__(self) -> int:
+        return len(self.parts)
+
+    def __getitem__(self, idx: int) -> str:
+        return self.parts[idx]
 
     @classmethod
     def of_dotted(cls, dotted: str) -> 'QualifiedName':

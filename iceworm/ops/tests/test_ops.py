@@ -68,6 +68,10 @@ def test_ops(db_url):  # noqa
         ),
     ])
 
+    with contextlib.closing(cs['csv'].connect()) as fconn:
+        print(fconn.reflect())
+        print(fconn.reflect([QualifiedName.of(['a'])]))
+
     plan = [
         ops.DropTable(['pg', 'foo']),
         ops.CreateTableAs(['pg', 'foo'], 'select 1'),

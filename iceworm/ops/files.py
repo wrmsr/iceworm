@@ -93,7 +93,7 @@ class FileConnection(Connection[FileConnector]):
 
     def create_row_source(self, spec: RowSpec) -> RowSource:
         if isinstance(spec, TableRowSpec):
-            table = self._connector.tables_by_name[spec.table.parts[-1]]
+            table = self._connector.tables_by_name[spec.table[-1]]
             return CsvFileRowSource(table)
         else:
             raise TypeError(spec)
@@ -102,7 +102,18 @@ class FileConnection(Connection[FileConnector]):
         raise TypeError
 
     def reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:
-        pass
+        if names:
+            ret = {}
+            for name in names:
+                if len(name) == 1:
+                    try:
+                        ret[QualifiedName.of([name[0]])] = self._connector.tables_by_name[name[0]]
+                    except KeyError:
+                        pass
+            return ret
+
+        else:
+            return {QualifiedName.of([n]): t for n, t in self._connector.tables_by_name.items()}
 
 
 class CsvFileRowSource(RowSource):

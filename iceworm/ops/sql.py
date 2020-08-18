@@ -63,14 +63,14 @@ class SqlConnection(Connection[SqlConnector]):
 
     def create_row_source(self, spec: RowSpec) -> RowSource:
         if isinstance(spec, TableRowSpec):
-            return SqlRowSource(self.sa_conn, f'select * from {spec.table.parts[0]}')
+            return SqlRowSource(self.sa_conn, f'select * from {spec.table[0]}')
         else:
             raise TypeError(spec)
 
     def create_row_sink(self, table: QualifiedName) -> RowSink:
         md = sa.MetaData()
-        md.reflect(bind=self.sa_conn, only=[table.parts[-1]])
-        tbl = md.tables[table.parts[-1]]
+        md.reflect(bind=self.sa_conn, only=[table[-1]])
+        tbl = md.tables[table[-1]]
         return SqlRowSink(self.sa_conn, tbl)
 
     def reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:

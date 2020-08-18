@@ -61,11 +61,11 @@ class TransactionExecutor(SqlExecutor[Transaction]):
 class DropTableExecutor(SqlExecutor[DropTable]):
 
     def execute(self, op: DropTable) -> None:
-        sa_conn = check.isinstance(self._conns[op.table_name.parts[0]], SqlConnection).sa_conn
+        sa_conn = check.isinstance(self._conns[op.table_name[0]], SqlConnection).sa_conn
         sa_conn.execute(
             sql.DropTableIfExists(
                 sql.QualifiedNameElement(
-                    QualifiedName(op.table_name.parts[1:]))))
+                    QualifiedName(op.table_name[1:]))))
 
 
 class CreateTableExecutor(SqlExecutor[CreateTable]):
@@ -79,19 +79,19 @@ class CreateTableExecutor(SqlExecutor[CreateTable]):
 class CreateTableAsExecutor(SqlExecutor[CreateTableAs]):
 
     def execute(self, op: CreateTableAs) -> None:
-        sa_conn = check.isinstance(self._conns[op.table_name.parts[0]], SqlConnection).sa_conn
+        sa_conn = check.isinstance(self._conns[op.table_name[0]], SqlConnection).sa_conn
         sa_conn.execute(
             sql.CreateTableAs(
                 sql.QualifiedNameElement(
-                    QualifiedName(op.table_name.parts[1:])),
+                    QualifiedName(op.table_name[1:])),
                 sa.text(op.query)))
 
 
 class InsertIntoExecutor(SqlExecutor[InsertInto]):
 
     def execute(self, op: InsertInto) -> None:
-        dst_conn = self._conns[op.dst_table_name.parts[0]]
-        src_conn = self._conns[op.src_table_name.parts[0]]
-        dst = dst_conn.create_row_sink(QualifiedName(op.dst_table_name.parts[1:]))
-        src = src_conn.create_row_source(TableRowSpec(op.src_table_name.parts[1:]))
+        dst_conn = self._conns[op.dst_table_name[0]]
+        src_conn = self._conns[op.src_table_name[0]]
+        dst = dst_conn.create_row_sink(QualifiedName(op.dst_table_name[1:]))
+        src = src_conn.create_row_source(TableRowSpec(op.src_table_name[1:]))
         dst.consume_rows(src.produce_rows())
