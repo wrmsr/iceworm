@@ -1,4 +1,4 @@
-grammar SnowflakeSql;
+grammar IceSql;
 
 
 singleStatement

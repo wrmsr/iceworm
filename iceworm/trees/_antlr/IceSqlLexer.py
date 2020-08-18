@@ -1,5 +1,5 @@
 # flake8: noqa
-# Generated from SnowflakeSql.g4 by ANTLR 4.8
+# Generated from IceSql.g4 by ANTLR 4.8
 from omnibus._vendor.antlr4 import *
 from io import StringIO
 from typing.io import TextIO
@@ -380,7 +380,7 @@ def serializedATN():
         return buf.getvalue()
 
 
-class SnowflakeSqlLexer(Lexer):
+class IceSqlLexer(Lexer):
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
@@ -549,7 +549,7 @@ class SnowflakeSqlLexer(Lexer):
                   "QUOTED_IDENTIFIER", "JINJA", "EXPONENT", "DIGIT", "LETTER", 
                   "COMMENT", "BLOCK_COMMENT", "WS" ]
 
-    grammarFileName = "SnowflakeSql.g4"
+    grammarFileName = "IceSql.g4"
 
     def __init__(self, input=None, output:TextIO = sys.stdout):
         super().__init__(input, output)

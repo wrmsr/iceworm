@@ -15,9 +15,9 @@ from omnibus import dataclasses as dc
 from omnibus._vendor import antlr4
 
 from . import nodes as no
-from ._antlr.SnowflakeSqlLexer import SnowflakeSqlLexer
-from ._antlr.SnowflakeSqlParser import SnowflakeSqlParser
-from ._antlr.SnowflakeSqlVisitor import SnowflakeSqlVisitor
+from ._antlr.IceSqlLexer import IceSqlLexer
+from ._antlr.IceSqlParser import IceSqlParser
+from ._antlr.IceSqlVisitor import IceSqlVisitor
 from .quoting import unquote
 
 
@@ -26,7 +26,7 @@ def strip_jinja(text: str) -> str:
     return text[2:-2].strip()
 
 
-class _ParseVisitor(SnowflakeSqlVisitor):
+class _ParseVisitor(IceSqlVisitor):
 
     def visit(self, ctx: antlr4.ParserRuleContext):
         check.isinstance(ctx, antlr4.ParserRuleContext)
@@ -45,83 +45,83 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             check.none(aggregate)
             return nextResult
 
-    def visitAliasedRelation(self, ctx: SnowflakeSqlParser.AliasedRelationContext):
+    def visitAliasedRelation(self, ctx: IceSqlParser.AliasedRelationContext):
         relation = self.visit(ctx.relation())
         alias = self.visit(ctx.identifier())
         columns = [self.visit(i) for i in ctx.identifierList().identifier()] if ctx.identifierList() is not None else []
         return no.AliasedRelation(relation, alias, columns)
 
-    def visitAllSelectItem(self, ctx: SnowflakeSqlParser.AllSelectItemContext):
+    def visitAllSelectItem(self, ctx: IceSqlParser.AllSelectItemContext):
         return no.AllSelectItem()
 
-    def visitArithValueExpression(self, ctx: SnowflakeSqlParser.ArithValueExpressionContext):
+    def visitArithValueExpression(self, ctx: IceSqlParser.ArithValueExpressionContext):
         left, right = [self.visit(e) for e in ctx.valueExpression()]
         op = no.BINARY_OP_MAP[ctx.op.getText().lower()]
         return no.BinaryExpr(left, op, right)
 
-    def visitBetweenPredicate(self, ctx: SnowflakeSqlParser.BetweenPredicateContext):
+    def visitBetweenPredicate(self, ctx: IceSqlParser.BetweenPredicateContext):
         value = self.visit(ctx.value)
         lower = self.visit(ctx.lower)
         upper = self.visit(ctx.upper)
         return no.Between(value, lower, upper)
 
-    def visitBinaryBooleanExpression(self, ctx: SnowflakeSqlParser.BinaryBooleanExpressionContext):
+    def visitBinaryBooleanExpression(self, ctx: IceSqlParser.BinaryBooleanExpressionContext):
         left, right = [self.visit(e) for e in ctx.booleanExpression()]
         op = no.BINARY_OP_MAP[ctx.op.text.lower()]
         return no.BinaryExpr(left, op, right)
 
-    def visitDoubleFrame(self, ctx: SnowflakeSqlParser.DoubleFrameContext):
+    def visitDoubleFrame(self, ctx: IceSqlParser.DoubleFrameContext):
         rows_or_range = no.RowsOrRange.ROWS if ctx.ROWS() is not None else no.RowsOrRange.RANGE
         min, max = [self.visit(e) for e in ctx.frameBound()]
         return no.DoubleFrame(rows_or_range, min, max)
 
-    def visitCaseItem(self, ctx: SnowflakeSqlParser.CaseItemContext):
+    def visitCaseItem(self, ctx: IceSqlParser.CaseItemContext):
         when, then = [self.visit(e) for e in ctx.expression()]
         return no.CaseItem(when, then)
 
-    def visitCaseExpression(self, ctx: SnowflakeSqlParser.CaseExpressionContext):
+    def visitCaseExpression(self, ctx: IceSqlParser.CaseExpressionContext):
         value = self.visit(ctx.val) if ctx.val is not None else None
         items = [self.visit(i) for i in ctx.caseItem()]
         default = self.visit(ctx.default) if ctx.default is not None else None
         return no.Case(value, items, default)
 
-    def visitCastCallExpression(self, ctx: SnowflakeSqlParser.CastCallExpressionContext):
+    def visitCastCallExpression(self, ctx: IceSqlParser.CastCallExpressionContext):
         value = self.visit(ctx.expression())
         type = self.visit(ctx.typeSpec())
         return no.CastCall(value, type)
 
-    def visitCastValueExpression(self, ctx: SnowflakeSqlParser.CastValueExpressionContext):
+    def visitCastValueExpression(self, ctx: IceSqlParser.CastValueExpressionContext):
         value = self.visit(ctx.valueExpression())
         type = self.visit(ctx.typeSpec())
         return no.Cast(value, type)
 
-    def visitCmpPredicate(self, ctx: SnowflakeSqlParser.CmpPredicateContext):
+    def visitCmpPredicate(self, ctx: IceSqlParser.CmpPredicateContext):
         left = self.visit(ctx.value)
         op = no.BINARY_OP_MAP[ctx.cmpOp().getText().lower()]
         right = self.visit(ctx.valueExpression())
         return no.BinaryExpr(left, op, right)
 
-    def visitCte(self, ctx: SnowflakeSqlParser.CteContext):
+    def visitCte(self, ctx: IceSqlParser.CteContext):
         name = self.visit(ctx.identifier())
         select = self.visit(ctx.select())
         return no.Cte(name, select)
 
-    def visitCteSelect(self, ctx: SnowflakeSqlParser.CteSelectContext):
+    def visitCteSelect(self, ctx: IceSqlParser.CteSelectContext):
         ctes = [self.visit(c) for c in ctx.cte()]
         select = self.visit(ctx.setSelect())
         return no.CteSelect(ctes, select) if ctes else select
 
-    def visitCurrentRowFrameBound(self, ctx: SnowflakeSqlParser.CurrentRowFrameBoundContext):
+    def visitCurrentRowFrameBound(self, ctx: IceSqlParser.CurrentRowFrameBoundContext):
         return no.CurrentRowFrameBound()
 
-    def visitDateExpression(self, ctx: SnowflakeSqlParser.DateExpressionContext):
+    def visitDateExpression(self, ctx: IceSqlParser.DateExpressionContext):
         value = self.visit(ctx.string())
         return no.Date(value)
 
-    def visitDecimalNumber(self, ctx: SnowflakeSqlParser.DecimalNumberContext):
+    def visitDecimalNumber(self, ctx: IceSqlParser.DecimalNumberContext):
         return no.Decimal(ctx.DECIMAL_VALUE().getText())
 
-    def visitExpressionFunctionCall(self, ctx:SnowflakeSqlParser.ExpressionFunctionCallContext):
+    def visitExpressionFunctionCall(self, ctx:IceSqlParser.ExpressionFunctionCallContext):
         name = self.visit(ctx.qualifiedName())
         args = [self.visit(a) for a in ctx.expression()]
         set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
@@ -139,81 +139,81 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             over=over,
         )
 
-    def visitExpressionSelectItem(self, ctx: SnowflakeSqlParser.ExpressionSelectItemContext):
+    def visitExpressionSelectItem(self, ctx: IceSqlParser.ExpressionSelectItemContext):
         value = self.visit(ctx.expression())
         label = self.visit(ctx.identifier()) if ctx.identifier() is not None else None
         return no.ExprSelectItem(value, label)
 
-    def visitExtractExpression(self, ctx: SnowflakeSqlParser.ExtractExpressionContext):
+    def visitExtractExpression(self, ctx: IceSqlParser.ExtractExpressionContext):
         part = self.visit(ctx.part)
         value = self.visit(ctx.value)
         return no.Extract(part, value)
 
-    def visitFalse(self, ctx: SnowflakeSqlParser.FalseContext):
+    def visitFalse(self, ctx: IceSqlParser.FalseContext):
         return no.EFalse()
 
-    def visitFlatGrouping(self, ctx: SnowflakeSqlParser.FlatGroupingContext):
+    def visitFlatGrouping(self, ctx: IceSqlParser.FlatGroupingContext):
         items = [self.visit(e) for e in ctx.expression()]
         return no.FlatGrouping(items)
 
-    def visitFloatNumber(self, ctx: SnowflakeSqlParser.FloatNumberContext):
+    def visitFloatNumber(self, ctx: IceSqlParser.FloatNumberContext):
         return no.Float(ctx.FLOAT_VALUE().getText())
 
-    def visitFunctionCallExpression(self, ctx: SnowflakeSqlParser.FunctionCallExpressionContext):
+    def visitFunctionCallExpression(self, ctx: IceSqlParser.FunctionCallExpressionContext):
         call = self.visit(ctx.functionCall())
         return no.FunctionCallExpr(call)
 
-    def visitFunctionCallRelation(self, ctx: SnowflakeSqlParser.FunctionCallRelationContext):
+    def visitFunctionCallRelation(self, ctx: IceSqlParser.FunctionCallRelationContext):
         call = self.visit(ctx.functionCall())
         return no.FunctionCallRelation(call)
 
-    def visitGroupingSet(self, ctx: SnowflakeSqlParser.GroupingSetContext):
+    def visitGroupingSet(self, ctx: IceSqlParser.GroupingSetContext):
         items = [self.visit(e) for e in ctx.expression()]
         return no.GroupingSet(items)
 
-    def visitIdentifierAllSelectItem(self, ctx: SnowflakeSqlParser.IdentifierAllSelectItemContext):
+    def visitIdentifierAllSelectItem(self, ctx: IceSqlParser.IdentifierAllSelectItemContext):
         identifier = self.visit(ctx.identifier())
         return no.IdentifierAllSelectItem(identifier)
 
-    def visitInJinjaPredicate(self, ctx: SnowflakeSqlParser.InJinjaPredicateContext):
+    def visitInJinjaPredicate(self, ctx: IceSqlParser.InJinjaPredicateContext):
         needle = self.visit(ctx.value)
         text = strip_jinja(ctx.JINJA().getText())
         not_ = ctx.NOT() is not None
         return no.InJinja(needle, text, not_=not_)
 
-    def visitInListPredicate(self, ctx: SnowflakeSqlParser.InListPredicateContext):
+    def visitInListPredicate(self, ctx: IceSqlParser.InListPredicateContext):
         needle = self.visit(ctx.value)
         haystack = [self.visit(e) for e in ctx.expression()]
         not_ = ctx.NOT() is not None
         return no.InList(needle, haystack, not_=not_)
 
-    def visitInSelectPredicate(self, ctx: SnowflakeSqlParser.InSelectPredicateContext):
+    def visitInSelectPredicate(self, ctx: IceSqlParser.InSelectPredicateContext):
         needle = self.visit(ctx.value)
         haystack = self.visit(ctx.select())
         not_ = ctx.NOT() is not None
         return no.InSelect(needle, haystack, not_=not_)
 
-    def visitInteger(self, ctx: SnowflakeSqlParser.IntegerContext):
+    def visitInteger(self, ctx: IceSqlParser.IntegerContext):
         return no.Integer(int(ctx.INTEGER_VALUE().getText()))
 
-    def visitIntervalExpression(self, ctx: SnowflakeSqlParser.IntervalExpressionContext):
+    def visitIntervalExpression(self, ctx: IceSqlParser.IntervalExpressionContext):
         value = self.visit(ctx.expression())
         return no.Interval(value)
 
-    def visitIsNullPredicate(self, ctx: SnowflakeSqlParser.IsNullPredicateContext):
+    def visitIsNullPredicate(self, ctx: IceSqlParser.IsNullPredicateContext):
         value = self.visit(ctx.value)
         not_ = ctx.NOT() is not None
         return no.IsNull(value, not_=not_)
 
-    def visitJinjaExpression(self, ctx: SnowflakeSqlParser.JinjaExpressionContext):
+    def visitJinjaExpression(self, ctx: IceSqlParser.JinjaExpressionContext):
         text = strip_jinja(ctx.getText())
         return no.JinjaExpr(text)
 
-    def visitJinjaRelation(self, ctx: SnowflakeSqlParser.JinjaRelationContext):
+    def visitJinjaRelation(self, ctx: IceSqlParser.JinjaRelationContext):
         text = strip_jinja(ctx.getText())
         return no.JinjaRelation(text)
 
-    def visitJoinRelation(self, ctx: SnowflakeSqlParser.JoinRelationContext):
+    def visitJoinRelation(self, ctx: IceSqlParser.JoinRelationContext):
         left = self.visit(ctx.left)
         type_ = no.JOIN_TYPE_MAP[' '.join(c.getText().lower() for c in ctx.joinType().children)] \
             if ctx.joinType() is not None else no.JoinType.DEFAULT
@@ -228,12 +228,12 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             using=using,
         )
 
-    def visitKwarg(self, ctx: SnowflakeSqlParser.KwargContext):
+    def visitKwarg(self, ctx: IceSqlParser.KwargContext):
         name = self.visit(ctx.identifier())
         value = self.visit(ctx.expression())
         return no.Kwarg(name, value)
 
-    def visitKwargFunctionCall(self, ctx: SnowflakeSqlParser.KwargFunctionCallContext):
+    def visitKwargFunctionCall(self, ctx: IceSqlParser.KwargFunctionCallContext):
         name = self.visit(ctx.qualifiedName())
         kwargs = [self.visit(a) for a in ctx.kwarg()]
         nulls = (no.IgnoreOrRespect.IGNORE if ctx.IGNORE() is not None else no.IgnoreOrRespect.RESPECT) \
@@ -248,7 +248,7 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             over=over,
         )
 
-    def visitLikePredicate(self, ctx: SnowflakeSqlParser.LikePredicateContext):
+    def visitLikePredicate(self, ctx: IceSqlParser.LikePredicateContext):
         kind = no.LIKE_KIND_MAP[ctx.kind.text.lower()]
         value = self.visit(ctx.value)
         patterns = [self.visit(e) for e in ctx.expression()]
@@ -256,10 +256,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
         escape = self.visit(ctx.esc) if ctx.esc is not None else None
         return no.Like(kind, value, patterns, not_=not_, escape=escape)
 
-    def visitNull(self, ctx: SnowflakeSqlParser.NullContext):
+    def visitNull(self, ctx: IceSqlParser.NullContext):
         return no.Null()
 
-    def visitNullsFunctionCall(self, ctx: SnowflakeSqlParser.NullsFunctionCallContext):
+    def visitNullsFunctionCall(self, ctx: IceSqlParser.NullsFunctionCallContext):
         name = self.visit(ctx.qualifiedName())
         arg = self.visit(ctx.expression())
         set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
@@ -276,21 +276,21 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             over=over,
         )
 
-    def visitNumFrameBound(self, ctx: SnowflakeSqlParser.NumFrameBoundContext):
+    def visitNumFrameBound(self, ctx: IceSqlParser.NumFrameBoundContext):
         num = int(ctx.INTEGER_VALUE().getText())
         precedence = no.Precedence.PRECEDING if ctx.PRECEDING() is not None else no.Precedence.FOLLOWING
         return no.NumFrameBound(num, precedence)
 
-    def visitOver(self, ctx: SnowflakeSqlParser.OverContext):
+    def visitOver(self, ctx: IceSqlParser.OverContext):
         partition_by = [self.visit(p) for p in ctx.expression()]
         order_by = [self.visit(s) for s in ctx.sortItem()]
         frame = self.visit(ctx.frame()) if ctx.frame() is not None else None
         return no.Over(partition_by=partition_by, order_by=order_by, frame=frame)
 
-    def visitParenRelation(self, ctx: SnowflakeSqlParser.ParenRelationContext):
+    def visitParenRelation(self, ctx: IceSqlParser.ParenRelationContext):
         return self.visit(ctx.relation())
 
-    def visitPivotRelation(self, ctx: SnowflakeSqlParser.PivotRelationContext):
+    def visitPivotRelation(self, ctx: IceSqlParser.PivotRelationContext):
         relation = self.visit(ctx.relation())
         func = self.visit(ctx.func)
         pivot_col = self.visit(ctx.pc)
@@ -304,10 +304,10 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             values,
         )
 
-    def visitPredicatedBooleanExpression(self, ctx: SnowflakeSqlParser.PredicatedBooleanExpressionContext):
+    def visitPredicatedBooleanExpression(self, ctx: IceSqlParser.PredicatedBooleanExpressionContext):
         return self.visit(ctx.predicate()) if ctx.predicate() is not None else self.visit(ctx.valueExpression())
 
-    def visitPrimarySelect(self, ctx: SnowflakeSqlParser.PrimarySelectContext):
+    def visitPrimarySelect(self, ctx: IceSqlParser.PrimarySelectContext):
         items = [self.visit(i) for i in ctx.selectItem()]
         relations = [self.visit(r) for r in ctx.relation()]
         top_n = self.visit(ctx.topN()) if ctx.topN() is not None else None
@@ -332,90 +332,90 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             limit=limit,
         )
 
-    def visitQualifiedName(self, ctx: SnowflakeSqlParser.QualifiedNameContext):
+    def visitQualifiedName(self, ctx: IceSqlParser.QualifiedNameContext):
         parts = [self.visit(i) for i in ctx.identifier()]
         return no.QualifiedNameNode(parts)
 
-    def visitQuotedIdentifier(self, ctx: SnowflakeSqlParser.QuotedIdentifierContext):
+    def visitQuotedIdentifier(self, ctx: IceSqlParser.QuotedIdentifierContext):
         name = unquote(ctx.QUOTED_IDENTIFIER().getText(), '"')
         return no.Identifier(name)
 
-    def visitSelectExpression(self, ctx: SnowflakeSqlParser.SelectExpressionContext):
+    def visitSelectExpression(self, ctx: IceSqlParser.SelectExpressionContext):
         select = self.visit(ctx.select())
         return no.SelectExpr(select)
 
-    def visitSelectRelation(self, ctx: SnowflakeSqlParser.SelectRelationContext):
+    def visitSelectRelation(self, ctx: IceSqlParser.SelectRelationContext):
         select = self.visit(ctx.select())
         return no.SelectRelation(select)
 
-    def visitSetSelect(self, ctx: SnowflakeSqlParser.SetSelectContext):
+    def visitSetSelect(self, ctx: IceSqlParser.SetSelectContext):
         left = self.visit(ctx.parenSelect())
         items = [self.visit(i) for i in ctx.setSelectItem()]
         return no.SetSelect(left, items) if items else left
 
-    def visitSetSelectItem(self, ctx: SnowflakeSqlParser.SetSelectItemContext):
+    def visitSetSelectItem(self, ctx: IceSqlParser.SetSelectItemContext):
         kind = no.SET_SELECT_KIND_MAP[' '.join(c.getText().lower() for c in ctx.setSelectKind().children)]
         right = self.visit(ctx.parenSelect())
         set_quantifier = no.SET_QUANTIFIER_MAP[ctx.setQuantifier().getText().lower()] \
             if ctx.setQuantifier() is not None else None
         return no.SetSelectItem(kind, right, set_quantifier)
 
-    def visitSetsGrouping(self, ctx: SnowflakeSqlParser.SetsGroupingContext):
+    def visitSetsGrouping(self, ctx: IceSqlParser.SetsGroupingContext):
         sets = [self.visit(c) for c in ctx.groupingSet()]
         return no.SetsGrouping(sets)
 
-    def visitSingleFrame(self, ctx: SnowflakeSqlParser.SingleFrameContext):
+    def visitSingleFrame(self, ctx: IceSqlParser.SingleFrameContext):
         rows_or_range = no.RowsOrRange.ROWS if ctx.ROWS() is not None else no.RowsOrRange.RANGE
         bound = self.visit(ctx.frameBound())
         return no.SingleFrame(rows_or_range, bound)
 
-    def visitSortItem(self, ctx: SnowflakeSqlParser.SortItemContext):
+    def visitSortItem(self, ctx: IceSqlParser.SortItemContext):
         value = self.visit(ctx.expression())
         direction = no.DIRECTION_MAP[ctx.direction.text.lower()] if ctx.direction is not None else None
         nulls = (no.FirstOrLast.FIRST if ctx.FIRST() is not None else no.FirstOrLast.LAST) \
             if ctx.NULLS() is not None else None
         return no.SortItem(value, direction, nulls)
 
-    def visitStarFunctionCall(self, ctx:SnowflakeSqlParser.StarFunctionCallContext):
+    def visitStarFunctionCall(self, ctx:IceSqlParser.StarFunctionCallContext):
         name = self.visit(ctx.qualifiedName())
         over = self.visit(ctx.over()) if ctx.over() is not None else None
         return no.FunctionCall(name, args=[no.StarExpr()], over=over)
 
-    def visitString(self, ctx: SnowflakeSqlParser.StringContext):
+    def visitString(self, ctx: IceSqlParser.StringContext):
         value = unquote(ctx.STRING().getText(), "'")
         return no.String(value)
 
-    def visitTableRelation(self, ctx: SnowflakeSqlParser.TableRelationContext):
+    def visitTableRelation(self, ctx: IceSqlParser.TableRelationContext):
         return no.Table(self.visit(ctx.qualifiedName()))
 
-    def visitTrue(self, ctx: SnowflakeSqlParser.TrueContext):
+    def visitTrue(self, ctx: IceSqlParser.TrueContext):
         return no.ETrue()
 
-    def visitTraversalValueExpression(self, ctx: SnowflakeSqlParser.TraversalValueExpressionContext):
+    def visitTraversalValueExpression(self, ctx: IceSqlParser.TraversalValueExpressionContext):
         value = self.visit(ctx.valueExpression())
         keys = [self.visit(k) for k in ctx.traversalKey()]
         return no.Traversal(value, keys)
 
-    def visitTypeSpec(self, ctx: SnowflakeSqlParser.TypeSpecContext):
+    def visitTypeSpec(self, ctx: IceSqlParser.TypeSpecContext):
         name = self.visit(ctx.identifier())
         args = [self.visit(a) for a in ctx.simpleExpression()]
         return no.TypeSpec(name, args)
 
-    def visitUnaryValueExpression(self, ctx: SnowflakeSqlParser.UnaryValueExpressionContext):
+    def visitUnaryValueExpression(self, ctx: IceSqlParser.UnaryValueExpressionContext):
         op = no.UNARY_OP_MAP[ctx.op.getText().lower()]
         value = self.visit(ctx.valueExpression())
         return no.UnaryExpr(op, value)
 
-    def visitUnaryBooleanExpression(self, ctx: SnowflakeSqlParser.UnaryBooleanExpressionContext):
+    def visitUnaryBooleanExpression(self, ctx: IceSqlParser.UnaryBooleanExpressionContext):
         op = no.UNARY_OP_MAP[ctx.op.text.lower()]
         value = self.visit(ctx.booleanExpression())
         return no.UnaryExpr(op, value)
 
-    def visitUnboundedFrameBound(self, ctx: SnowflakeSqlParser.UnboundedFrameBoundContext):
+    def visitUnboundedFrameBound(self, ctx: IceSqlParser.UnboundedFrameBoundContext):
         precedence = no.Precedence.PRECEDING if ctx.PRECEDING() is not None else no.Precedence.FOLLOWING
         return no.UnboundedFrameBound(precedence)
 
-    def visitUnpivotRelation(self, ctx: SnowflakeSqlParser.UnpivotRelationContext):
+    def visitUnpivotRelation(self, ctx: IceSqlParser.UnpivotRelationContext):
         relation = self.visit(ctx.relation())
         name_col = self.visit(ctx.nc)
         value_col = self.visit(ctx.vc)
@@ -427,19 +427,19 @@ class _ParseVisitor(SnowflakeSqlVisitor):
             pivot_cols,
         )
 
-    def visitUnquotedIdentifier(self, ctx: SnowflakeSqlParser.UnquotedIdentifierContext):
+    def visitUnquotedIdentifier(self, ctx: IceSqlParser.UnquotedIdentifierContext):
         return no.Identifier(ctx.getText())
 
 
 def parse_statement(buf: str) -> no.Node:
-    lexer = SnowflakeSqlLexer(antlr4.InputStream(buf))
+    lexer = IceSqlLexer(antlr4.InputStream(buf))
     lexer.removeErrorListeners()
     lexer.addErrorListener(antlr.SilentRaisingErrorListener())
 
     stream = antlr4.CommonTokenStream(lexer)
     stream.fill()
 
-    parser = SnowflakeSqlParser(stream)
+    parser = IceSqlParser(stream)
     parser.removeErrorListeners()
     parser.addErrorListener(antlr.SilentRaisingErrorListener())
 
