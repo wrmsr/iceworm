@@ -51,11 +51,19 @@ def test_ops(db_url):  # noqa
         files.FileConnector(
             'csv',
             files.FileConnector.Config(
-                base_path=os.path.join(os.path.dirname(__file__), 'csv'),
-                file_names_by_table_name={
-                    'a': 'a.csv',
-                    'b': 'b.csv',
-                },
+                mounts=[
+                    files.Mount(
+                        os.path.join(os.path.dirname(__file__), 'csv'),
+                        files.ProvidedSchemaPolicy([
+                            md.Column('id', dt.Integer(), primary_key=True),
+                            md.Column('a', dt.Integer()),
+                            md.Column('b', dt.Integer()),
+                        ]),
+                        [
+                            '*.csv',
+                        ],
+                    ),
+                ],
             ),
         ),
     ])

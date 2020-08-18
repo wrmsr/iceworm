@@ -1,12 +1,22 @@
+"""
+TODO:
+ - deal w csv header
+ - NamePolicy - <schema>.<table>(.csv)?
+ - local/s3/url/sftp?
+ - csv/json/yaml/parquet
+"""
 import csv
+import glob
 import os.path
 import typing as ta
 
 from omnibus import check
 from omnibus import dataclasses as dc
+from omnibus import properties
 
+from .. import metadata as md
 from ..types import QualifiedName
-from ..utils import mapping
+from ..utils import seq
 from .connectors import Connection
 from .connectors import Connector
 from .connectors import RowGen
@@ -16,20 +26,61 @@ from .connectors import RowSpec
 from .connectors import TableRowSpec
 
 
+class SchemaPolicy(dc.Enum):
+    pass
+
+
+class YamlHeaderSchemaPolicy(SchemaPolicy):
+    pass
+
+
+class ProvidedSchemaPolicy(SchemaPolicy):
+    columns: ta.Sequence[md.Column] = dc.field(coerce=seq)
+
+
+class Mount(dc.Pure):
+    path: str = dc.field(check=lambda o: isinstance(o, str))
+    schema: SchemaPolicy = dc.field(check=lambda o: isinstance(o, SchemaPolicy))
+    globs: ta.Sequence[str] = dc.field(coerce=seq)
+
+
+class Table(dc.Pure):
+    md_table: md.Table
+    path: str
+
+
 class FileConnector(Connector['FileConnector']):
-    """
-    local/s3/url/sftp?
-    csv/json/yaml/parquet
-    """
 
     class Config(dc.Frozen):
-        base_path: str
-        file_names_by_table_name: ta.Mapping[str, str] = dc.field(coerce=mapping)
+        mounts: ta.Sequence[Mount] = dc.field(coerce=seq, check=lambda l: all(isinstance(e, Mount) for e in l))
 
     def __init__(self, name: str, config: Config) -> None:
         super().__init__(name)
 
         self._config = check.isinstance(config, FileConnector.Config)
+
+    @properties.cached
+    def tables_by_name(self) -> ta.Mapping[str, Table]:
+        tables_by_name = {}
+
+        for mnt in self._config.mounts:
+            for glb in mnt.globs:
+                for fp in glob.iglob(os.path.join(mnt.path, glb)):
+                    if isinstance(mnt.schema, ProvidedSchemaPolicy):
+                        cols = mnt.schema.columns
+                    else:
+                        raise TypeError(mnt.schema)
+
+                    name = os.path.basename(fp).rpartition('.')[0]
+                    table = Table(
+                        md.Table(name, cols),
+                        fp,
+                    )
+
+                    check.not_in(name, tables_by_name)
+                    tables_by_name[name] = table
+
+        return tables_by_name
 
     def connect(self) -> 'FileConnection':
         return FileConnection(self)
@@ -42,8 +93,8 @@ class FileConnection(Connection[FileConnector]):
 
     def create_row_source(self, spec: RowSpec) -> RowSource:
         if isinstance(spec, TableRowSpec):
-            file_name = self._connector._config.file_names_by_table_name[spec.table.parts[-1]]
-            return CsvFileRowSource(os.path.join(self._connector._config.base_path, file_name))
+            table = self._connector.tables_by_name[spec.table.parts[-1]]
+            return CsvFileRowSource(table)
         else:
             raise TypeError(spec)
 
@@ -53,13 +104,13 @@ class FileConnection(Connection[FileConnector]):
 
 class CsvFileRowSource(RowSource):
 
-    def __init__(self, file_path: str) -> None:
+    def __init__(self, table: Table) -> None:
         super().__init__()
 
-        self._file_path = file_path
+        self._table = table
 
     def produce_rows(self) -> RowGen:
-        with open(self._file_path, 'r') as f:
+        with open(self._table.path, 'r') as f:
             reader = csv.reader(f)
             rows = iter(reader)
             cols = next(rows)
