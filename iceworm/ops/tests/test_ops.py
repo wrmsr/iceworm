@@ -1,3 +1,9 @@
+"""
+TODO:
+ - hot comments:
+  - upstream cfg: select * from v /*+ weak */;
+  - col type ann/enforcement: select a /*+ type: char(36) */
+"""
 import contextlib
 import inspect
 import os.path
@@ -7,6 +13,7 @@ from omnibus import dataclasses as dc
 from omnibus import docker
 import pytest
 
+from .. import computed as cmp
 from .. import connectors as ctrs
 from .. import execution as exe
 from .. import files
@@ -42,12 +49,14 @@ class View(dc.Pure):
 @pytest.mark.xfail()
 def test_ops(db_url):  # noqa
     cs = ctrs.ConnectorSet([
+
         sql.SqlConnector(
             'pg',
             sql.SqlConnector.Config(
                 url=db_url,
             ),
         ),
+
         files.FileConnector(
             'csv',
             files.FileConnector.Config(
@@ -66,6 +75,24 @@ def test_ops(db_url):  # noqa
                 ],
             ),
         ),
+
+        cmp.ComputedConnector(
+            'cmp',
+            cmp.ComputedConnector.Config(
+                tables=[
+                    cmp.Table(
+                        md.Table(
+                            'nums',
+                            [
+                                md.Column('num', dt.Integer()),
+                            ],
+                        ),
+                        lambda: [{'num': i} for i in range(10)],
+                    ),
+                ],
+            ),
+        ),
+
     ])
 
     with contextlib.closing(cs['csv'].connect()) as fconn:
@@ -114,6 +141,16 @@ def test_ops(db_url):  # noqa
             ),
             ['pg', 'b'],
         ),
+        View(
+            'pg',
+            md.Table(
+                'nums',
+                [
+                    md.Column('num', dt.Integer(), primary_key=True),
+                ]
+            ),
+            ['cmp', 'nums'],
+        )
     ]
 
     for view in views:
@@ -153,3 +190,4 @@ def test_ops(db_url):  # noqa
         print(list(sa_conn.execute('select * from a')))
         print(list(sa_conn.execute('select * from b')))
         print(list(sa_conn.execute('select * from c')))
+        print(list(sa_conn.execute('select * from nums')))

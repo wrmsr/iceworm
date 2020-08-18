@@ -46,11 +46,11 @@ class Object(lang.Abstract):
 
 
 class Table(dc.Frozen, Object, final=True, allow_setattr=True, reorder=True):
-    name: str
-    schema_name: ta.Optional[str] = dc.field(None, kwonly=True)
-    catalog_name: ta.Optional[str] = dc.field(None, kwonly=True)
+    name: str = dc.field(check=lambda o: isinstance(o, str))
+    schema_name: ta.Optional[str] = dc.field(None, kwonly=True, check=lambda o: isinstance(o, (str, type(None))))
+    catalog_name: ta.Optional[str] = dc.field(None, kwonly=True, check=lambda o: isinstance(o, (str, type(None))))
 
-    columns: ta.Sequence[Column]
+    columns: ta.Sequence[Column] = dc.field(coerce=seq)
 
     def __post_init__(self) -> None:
         self._columns_by_name: ta.Mapping[str, Column] = unique_dict((c.name, c) for c in self.columns)
