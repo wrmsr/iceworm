@@ -113,6 +113,7 @@ select sum(v) over (order by d rows between 2 preceding and current row);
 select coalesce(p:q.q.m, p:q.q[0].m) as i_a;
 select 1 except select 1;
 select * from t(x);
+/* 0 */ select /* 1 */ a /* 2 */, /* 3 */ b /* 4 */ from /* 5 */ t /* 6 */ where /* 7 */ x /* 8 */ = /* 9 */ 1 /* 10 */;
 -- with c as (select 1) (select 1);
 -- with c as (select 1) ((select 1) union (select 2));
 -- select t.{{ a }};

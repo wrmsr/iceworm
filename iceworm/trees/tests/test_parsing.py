@@ -55,56 +55,62 @@ def test_parsing():
 
 
 def test_comments():
-    sql = textwrap.dedent("""
-    -- before select
-    select
-        a, -- this is a
-        -- this is before b
-        b  -- this is b
-    -- before from
-    from
-        t -- this is t
-    -- end
-    """)
+    for sql in [
+        (
+            '/* 0 */ select /* 1 */ a /* 2 */, /* 3 */ b '
+            '/* 4 */ from /* 5 */ t '
+            '/* 6 */ where /* 7 */ x /* 8 */ = /* 9 */ 1 /* 10 */'
+        ),
+        textwrap.dedent("""
+        -- before select
+        select
+            a, -- this is a
+            -- this is before b
+            b  -- this is b
+        -- before from
+        from
+            t -- this is t
+        -- end
+       """),
+    ]:
+        node = parsing.parse_statement(sql)
+        print(node)
 
-    node = parsing.parse_statement(sql)
-    print(node)
+        ser = serde.serialize(node)  # noqa
+        des = serde.deserialize(ser, no.Node)  # noqa
+        # assert des == node
 
-    ser = serde.serialize(node)  # noqa
-    des = serde.deserialize(ser, no.Node)  # noqa
-    # assert des == node
+        rendered = rendering.render(node)
+        print(rendered)
 
-    rendered = rendering.render(node)
-    print(rendered)
+        reparsed = parsing.parse_statement(rendered + ';')
+        assert reparsed == node
 
-    reparsed = parsing.parse_statement(rendered + ';')
-    assert reparsed == node
+        from omnibus import collections as ocol
 
-    from omnibus import collections as ocol
+        def rec(pctx):
+            pctxs.add(pctx)
+            for cpctx in getattr(pctx, 'children', []):
+                rec(cpctx)
 
-    def rec(pctx):
-        pctxs.add(pctx)
-        for cpctx in getattr(pctx, 'children', []):
-            rec(cpctx)
+        pctxs = ocol.IdentitySet()
+        rec(node.meta[antlr4.ParserRuleContext])
 
-    pctxs = ocol.IdentitySet()
-    rec(node.meta[antlr4.ParserRuleContext])
+        for pctx in pctxs:
+            print(pctx)
+            print(getattr(pctx, 'start', None))
 
-    for pctx in pctxs:
-        print(pctx)
-        print(getattr(pctx, 'start', None))
+        class NodePartTransform(rendering.PartTransform):
 
-    class NodePartTransform(rendering.PartTransform):
+            def __call__(self, part: rendering.Node) -> rendering.Part:
+                print(part)
+                return super().__call__(part)
 
-        def __call__(self, part: rendering.Node) -> rendering.Part:
-            print(part)
-            return super().__call__(part)
+        part = rendering.Renderer()(node)
+        part = NodePartTransform()(part)
+        part = rendering.compact_part(part)
 
-    part = rendering.Renderer()(node)
-    part = NodePartTransform()(part)
-    part = rendering.compact_part(part)
-
-    import io
-    buf = io.StringIO()
-    rendering.render_part(part, buf)
-    print(buf.getvalue())
+        import io
+        buf = io.StringIO()
+        rendering.render_part(part, buf)
+        print(buf.getvalue())
