@@ -1,3 +1,16 @@
+"""
+TODO:
+ - decimal
+ - quotes optional - underscores and hyphens valid
+ - hex ints 0xabc
+ - single or double quotes (we are a sql)
+ - comments.. # line-comments, blocks how? can't nest /* */
+ - multiline (triplequote) strings
+ - bare keys in mappings get a True value
+ - https://golang.org/pkg/reflect/#StructTag lol
+
+/*+ materialization: {wait_time_s: 3600} */
+"""
 import typing as ta
 
 from omnibus import antlr

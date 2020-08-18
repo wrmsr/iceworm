@@ -119,3 +119,5 @@ select * from t(x);
 -- select t.{{ a }};
 -- select {{ a.b | c }};
 -- select a_{{ b }}_c;
+
+-- NOPE: select /* /* f */ */ 1;
