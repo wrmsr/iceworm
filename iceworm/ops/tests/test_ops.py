@@ -165,7 +165,7 @@ class World:
     def resolve(self, name: QualifiedName) -> ta.Sequence:
         objs = []
 
-        if name[0] in self._connectors:
+        if len(name) > 1 and name[0] in self._connectors:
             ctor = self._connectors[name[0]]
             with contextlib.closing(ctor.connect()) as conn:
                 connobjs = conn.reflect([QualifiedName(name[1:])])
@@ -174,7 +174,7 @@ class World:
 
         for ctor in self._connectors:
             with contextlib.closing(ctor.connect()) as conn:
-                connobjs = conn.reflect([QualifiedName(name)])
+                connobjs = conn.reflect([name])
                 if connobjs:
                     objs.extend(connobjs.values())
 
@@ -182,7 +182,7 @@ class World:
 
 
 @pytest.mark.xfail()
-def test_ops():  # noqa
+def test_ops():
     with contextlib.closing(CONNECTORS['csv'].connect()) as fconn:
         print(fconn.reflect())
         print(fconn.reflect([QualifiedName.of(['a'])]))
