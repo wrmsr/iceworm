@@ -13,7 +13,7 @@ from .utils import seq
 class QualifiedName(dc.Pure):
     parts: ta.Sequence[str] = dc.field(coerce=seq)
 
-    dc.validate(lambda parts: (
+    dc.check(lambda parts: (
             parts and
             len(parts) < 4 and
             all(parts) and

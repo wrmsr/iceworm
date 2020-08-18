@@ -40,7 +40,7 @@ class RowSpec(dc.Enum):
 
 
 class TableRowSpec(RowSpec):
-    table: QualifiedName
+    table: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
 class QueryRowSpec(RowSpec):
