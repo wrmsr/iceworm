@@ -23,7 +23,7 @@ class SqlConnector(Connector['SqlConnector']):
     """
 
     class Config(dc.Frozen):
-        url: str
+        url: ta.Union[str, ta.Callable[[], str]]
         kwargs: ta.Mapping[str, ta.Any] = dc.field(ocol.frozendict(), coerce=ocol.frozendict)
 
     def __init__(self, name: str, config: Config) -> None:
@@ -39,7 +39,10 @@ class SqlConnector(Connector['SqlConnector']):
     @property
     def engine(self) -> sa.engine.Engine:
         if self._engine is None:
-            self._engine = sa.create_engine(self._config.url)
+            url = self._config.url
+            if callable(url):
+                url = url()
+            self._engine = sa.create_engine(url)
         return self._engine
 
     def close(self) -> None:

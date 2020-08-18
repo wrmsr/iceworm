@@ -11,6 +11,7 @@ import os.path
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import docker
+from omnibus import lang
 import pytest
 
 from .. import computed as cmp
@@ -24,7 +25,7 @@ from ... import metadata as md
 from ...types import QualifiedName
 
 
-@pytest.fixture()
+@lang.cached_nullary
 def db_url():
     if docker.is_in_docker():
         (host, port) = 'iceworm-postgres', 5432
@@ -40,71 +41,62 @@ def db_url():
     return f'postgresql+psycopg2://iceworm:iceworm@{host}:{port}'
 
 
+CONNECTORS = ctrs.ConnectorSet([
+
+    sql.SqlConnector(
+        'pg',
+        sql.SqlConnector.Config(
+            url=db_url,
+        ),
+    ),
+
+    files.FileConnector(
+        'csv',
+        files.FileConnector.Config(
+            mounts=[
+                files.Mount(
+                    os.path.join(os.path.dirname(__file__), 'csv'),
+                    files.ProvidedSchemaPolicy([
+                        md.Column('id', dt.Integer(), primary_key=True),
+                        md.Column('a', dt.Integer()),
+                        md.Column('b', dt.Integer()),
+                    ]),
+                    [
+                        '*.csv',
+                    ],
+                ),
+            ],
+        ),
+    ),
+
+    cmp.ComputedConnector(
+        'cmp',
+        cmp.ComputedConnector.Config(
+            tables=[
+                cmp.Table(
+                    md.Table(
+                        'nums',
+                        [
+                            md.Column('num', dt.Integer()),
+                        ],
+                    ),
+                    lambda: [{'num': i} for i in range(10)],
+                ),
+            ],
+        ),
+    ),
+
+])
+
+
 class View(dc.Pure):
     conn_name: str
     table: md.Table = dc.field(check=lambda o: isinstance(o, md.Table))
     src: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
-@pytest.mark.xfail()
-def test_ops(db_url):  # noqa
-    cs = ctrs.ConnectorSet([
+VIEWS = [
 
-        sql.SqlConnector(
-            'pg',
-            sql.SqlConnector.Config(
-                url=db_url,
-            ),
-        ),
-
-        files.FileConnector(
-            'csv',
-            files.FileConnector.Config(
-                mounts=[
-                    files.Mount(
-                        os.path.join(os.path.dirname(__file__), 'csv'),
-                        files.ProvidedSchemaPolicy([
-                            md.Column('id', dt.Integer(), primary_key=True),
-                            md.Column('a', dt.Integer()),
-                            md.Column('b', dt.Integer()),
-                        ]),
-                        [
-                            '*.csv',
-                        ],
-                    ),
-                ],
-            ),
-        ),
-
-        cmp.ComputedConnector(
-            'cmp',
-            cmp.ComputedConnector.Config(
-                tables=[
-                    cmp.Table(
-                        md.Table(
-                            'nums',
-                            [
-                                md.Column('num', dt.Integer()),
-                            ],
-                        ),
-                        lambda: [{'num': i} for i in range(10)],
-                    ),
-                ],
-            ),
-        ),
-
-    ])
-
-    with contextlib.closing(cs['csv'].connect()) as fconn:
-        print(fconn.reflect())
-        print(fconn.reflect([QualifiedName.of(['a'])]))
-
-    plan = [
-        ops.DropTable(['pg', 'foo']),
-        ops.CreateTableAs(['pg', 'foo'], 'select 1'),
-    ]
-
-    views = [
         View(
             'pg',
             md.Table(
@@ -117,6 +109,7 @@ def test_ops(db_url):  # noqa
             ),
             ['csv', 'a'],
         ),
+
         View(
             'pg',
             md.Table(
@@ -129,6 +122,7 @@ def test_ops(db_url):  # noqa
             ),
             ['csv', 'b'],
         ),
+
         View(
             'pg',
             md.Table(
@@ -141,6 +135,7 @@ def test_ops(db_url):  # noqa
             ),
             ['pg', 'b'],
         ),
+
         View(
             'pg',
             md.Table(
@@ -150,10 +145,23 @@ def test_ops(db_url):  # noqa
                 ]
             ),
             ['cmp', 'nums'],
-        )
+        ),
+
     ]
 
-    for view in views:
+
+@pytest.mark.xfail()
+def test_ops():  # noqa
+    with contextlib.closing(CONNECTORS['csv'].connect()) as fconn:
+        print(fconn.reflect())
+        print(fconn.reflect([QualifiedName.of(['a'])]))
+
+    plan = [
+        ops.DropTable(['pg', 'foo']),
+        ops.CreateTableAs(['pg', 'foo'], 'select 1'),
+    ]
+
+    for view in VIEWS:
         plan.extend([
             ops.DropTable([view.conn_name, view.table.name]),
             ops.CreateTable(view.conn_name, view.table),
@@ -161,7 +169,7 @@ def test_ops(db_url):  # noqa
         ])
 
     with contextlib.ExitStack() as es:
-        conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(cs)))
+        conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(CONNECTORS)))
 
         executors_by_op_cls = {
             ops.CreateTable: exe.CreateTableExecutor(conns),
