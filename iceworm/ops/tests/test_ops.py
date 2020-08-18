@@ -3,6 +3,7 @@ import inspect
 import os.path
 
 from omnibus import check
+from omnibus import dataclasses as dc
 from omnibus import docker
 import pytest
 
@@ -13,6 +14,7 @@ from .. import ops
 from .. import sql
 from ... import datatypes as dt
 from ... import metadata as md
+from ...types import QualifiedName
 
 
 @pytest.fixture()
@@ -29,6 +31,11 @@ def db_url():
         [(host, port)] = eps.values()
 
     return f'postgresql+psycopg2://iceworm:iceworm@{host}:{port}'
+
+
+class View(dc.Pure):
+    name: QualifiedName = dc.field(coerce=QualifiedName.of)
+    src: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
 @pytest.mark.xfail()
@@ -64,6 +71,22 @@ def test_ops(db_url):  # noqa
         ),
     ])
 
+    plan = [
+        ops.DropTable(['pg', 'foo']),
+        ops.CreateTableAs(['pg', 'foo'], 'select 1'),
+    ]
+
+    views = [
+        View(['pg', 'a'], ['csv', 'a']),
+    ]
+
+    for view in views:
+        plan.extend([
+            ops.DropTable(view.name),
+            ops.CreateTable(view.name.parts[0], cata.tables_by_name[view.name.parts[-1]]),
+            ops.InsertInto(view.name, view.src),
+        ])
+
     with contextlib.ExitStack() as es:
         conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(cs)))
 
@@ -84,17 +107,7 @@ def test_ops(db_url):  # noqa
                 check.none(executor.execute(op))
 
         ts = [
-            ops.Transaction(
-                'pg',
-                [
-                    ops.DropTable(['pg', 'foo']),
-                    ops.CreateTableAs(['pg', 'foo'], 'select 1'),
-
-                    ops.DropTable(['pg', 'a']),
-                    ops.CreateTable('pg', cata.tables_by_name['a']),
-                    ops.InsertInto(['pg', 'a'], ['csv', 'a']),
-                ],
-            ),
+            ops.Transaction('pg', plan),
         ]
         for t in ts:
             execute(t)
