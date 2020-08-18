@@ -119,7 +119,7 @@ class ExprEvaluator(dispatch.Class):
         return ns[node.name.dotted]
 
     def eval(self, node: no.UnaryOp, ns: StrMap) -> ta.Any:  # noqa
-        op = OPS_BY_BINARY_OP[node.op]
+        op = OPS_BY_UNARY_OP[node.op]
         value = self.eval(node.value, ns)
         return op(value)
 

@@ -72,9 +72,10 @@ class SqlConnection(Connection[SqlConnector]):
             raise TypeError(spec)
 
     def create_row_sink(self, table: QualifiedName) -> RowSink:
+        schema, name = table.pair
         md = sa.MetaData()
-        md.reflect(bind=self.sa_conn, only=[table[-1]])
-        tbl = md.tables[table[-1]]
+        md.reflect(bind=self.sa_conn, only=[name], schema=schema)
+        tbl = md.tables[name]
         return SqlRowSink(self.sa_conn, tbl)
 
     def reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:

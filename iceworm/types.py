@@ -71,3 +71,10 @@ class QualifiedName(dc.Pure, ta.Sequence[str]):
             return cls(list(obj))
         else:
             raise TypeError(obj)
+
+    @classmethod
+    def of_optional(cls, obj: ta.Union[None, 'QualifiedName', ta.Iterable[str]]) -> ta.Optional['QualifiedName']:
+        if obj is None:
+            return None
+        else:
+            return cls.of(obj)

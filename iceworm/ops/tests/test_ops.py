@@ -4,6 +4,7 @@ TODO:
   - upstream cfg: select * from v /*+ weak */;
   - col type ann/enforcement: select a /*+ type: char(36) */
   - catalog chainmap?
+ - db_url -> 'secrets' abstraction? serialize whole world but ref secrets by key
 """
 import contextlib
 import inspect
@@ -25,6 +26,7 @@ from .. import sql
 from ... import datatypes as dt
 from ... import metadata as md
 from ...types import QualifiedName
+from ...utils import seq
 
 
 @lang.cached_nullary
@@ -91,17 +93,19 @@ CONNECTORS = ctrs.ConnectorSet([
 ])
 
 
+class Materialization(dc.Pure):
+    name: ta.Optional[QualifiedName] = dc.field(coerce=QualifiedName.of)
+
+
 class View(dc.Pure):
-    conn_name: str
     table: md.Table = dc.field(check=lambda o: isinstance(o, md.Table))
-    src: QualifiedName = dc.field(coerce=QualifiedName.of)
-    materialized: bool = False
+    src: ctrs.RowSpec
+    materializations: ta.Sequence[Materialization] = dc.field((), coerce=seq)
 
 
 VIEWS = [
 
         View(
-            'pg',
             md.Table(
                 ['a'],
                 [
@@ -110,11 +114,11 @@ VIEWS = [
                     md.Column('b', dt.Integer()),
                 ],
             ),
-            ['csv', 'a'],
+            ctrs.TableRowSpec(['csv', 'a']),
+            [Materialization(['pg', 'a'])],
         ),
 
         View(
-            'pg',
             md.Table(
                 ['b'],
                 [
@@ -123,11 +127,11 @@ VIEWS = [
                     md.Column('d', dt.Integer()),
                 ],
             ),
-            ['csv', 'b'],
+            ctrs.TableRowSpec(['csv', 'b']),
+            [Materialization(['pg', 'b'])],
         ),
 
         View(
-            'pg',
             md.Table(
                 ['c'],
                 [
@@ -136,18 +140,19 @@ VIEWS = [
                     md.Column('d', dt.Integer()),
                 ],
             ),
-            ['pg', 'b'],
+            ctrs.TableRowSpec(['pg', 'b']),
+            [Materialization(['pg', 'c'])],
         ),
 
         View(
-            'pg',
             md.Table(
                 ['nums'],
                 [
                     md.Column('num', dt.Integer(), primary_key=True),
                 ]
             ),
-            ['cmp', 'nums'],
+            ctrs.TableRowSpec(['csv', 'nums']),
+            [Materialization(['pg', 'nums'])],
         ),
 
     ]
