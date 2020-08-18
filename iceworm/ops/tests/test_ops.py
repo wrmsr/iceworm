@@ -34,25 +34,13 @@ def db_url():
 
 
 class View(dc.Pure):
-    name: QualifiedName = dc.field(coerce=QualifiedName.of)
+    conn_name: str
+    table: md.Table = dc.field(check=lambda o: isinstance(o, md.Table))
     src: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
 @pytest.mark.xfail()
 def test_ops(db_url):  # noqa
-    cata = md.Catalog(
-        [
-            md.Table(
-                'a',
-                [
-                    md.Column('id', dt.Integer(), primary_key=True),
-                    md.Column('a', dt.Integer()),
-                    md.Column('b', dt.Integer()),
-                ],
-            ),
-        ],
-    )
-
     cs = ctrs.ConnectorSet([
         sql.SqlConnector(
             'pg',
@@ -77,14 +65,25 @@ def test_ops(db_url):  # noqa
     ]
 
     views = [
-        View(['pg', 'a'], ['csv', 'a']),
+        View(
+            'pg',
+            md.Table(
+                'a',
+                [
+                    md.Column('id', dt.Integer(), primary_key=True),
+                    md.Column('a', dt.Integer()),
+                    md.Column('b', dt.Integer()),
+                ],
+            ),
+            ['csv', 'a'],
+        ),
     ]
 
     for view in views:
         plan.extend([
-            ops.DropTable(view.name),
-            ops.CreateTable(view.name.parts[0], cata.tables_by_name[view.name.parts[-1]]),
-            ops.InsertInto(view.name, view.src),
+            ops.DropTable([view.conn_name, view.table.name]),
+            ops.CreateTable(view.conn_name, view.table),
+            ops.InsertInto([view.conn_name, view.table.name], view.src),
         ])
 
     with contextlib.ExitStack() as es:
