@@ -25,7 +25,6 @@ import typing as ta
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
-from omnibus import properties
 
 from .datatypes import Datatype
 from .types import QualifiedName
@@ -46,9 +45,7 @@ class Object(lang.Abstract):
 
 
 class Table(dc.Frozen, Object, final=True, allow_setattr=True, reorder=True):
-    name: str = dc.field(check=lambda o: isinstance(o, str))
-    schema_name: ta.Optional[str] = dc.field(None, kwonly=True, check=lambda o: isinstance(o, (str, type(None))))
-    catalog_name: ta.Optional[str] = dc.field(None, kwonly=True, check=lambda o: isinstance(o, (str, type(None))))
+    name: QualifiedName = dc.field(coerce=QualifiedName.of)
 
     columns: ta.Sequence[Column] = dc.field(coerce=seq)
 
@@ -59,13 +56,9 @@ class Table(dc.Frozen, Object, final=True, allow_setattr=True, reorder=True):
     def columns_by_name(self) -> ta.Mapping[str, Column]:
         return self._columns_by_name
 
-    @properties.cached
-    def qualified_name(self) -> QualifiedName:
-        return QualifiedName(*filter(None, [self.catalog, self.schema_name, self.name_name]))
-
 
 class Function(dc.Frozen, Object, final=True, allow_setattr=True, reorder=True):
-    name: str
+    name: QualifiedName = dc.field(coerce=QualifiedName.of)
     type: Datatype
     params: ta.Mapping[str, Datatype] = dc.field(coerce=mapping)
 
@@ -75,13 +68,15 @@ class Catalog(dc.Frozen, final=True, allow_setattr=True):
     functions: ta.Sequence[Function] = dc.field((), coerce=seq)
 
     def __post_init__(self) -> None:
-        self._tables_by_name: ta.Mapping[str, Table] = unique_dict((t.name, check.isinstance(t, Table)) for t in self.tables)  # noqa
-        self._functions_by_name: ta.Mapping[str, Function] = unique_dict((f.name, check.isinstance(f, Function)) for f in self.functions)  # noqa
+        self._tables_by_name: ta.Mapping[QualifiedName, Table] = unique_dict(
+            (t.name, check.isinstance(t, Table)) for t in self.tables)
+        self._functions_by_name: ta.Mapping[QualifiedName, Function] = unique_dict(
+            (f.name, check.isinstance(f, Function)) for f in self.functions)
 
     @property
-    def tables_by_name(self) -> ta.Mapping[str, Table]:
+    def tables_by_name(self) -> ta.Mapping[QualifiedName, Table]:
         return self._tables_by_name
 
     @property
-    def functions_by_name(self) -> ta.Mapping[str, Function]:
+    def functions_by_name(self) -> ta.Mapping[QualifiedName, Function]:
         return self._functions_by_name

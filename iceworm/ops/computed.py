@@ -30,7 +30,7 @@ class ComputedConnector(Connector['ComputedConnector']):
 
         self._config = check.isinstance(config, ComputedConnector.Config)
 
-        self._tables_by_name: ta.Mapping[str, Table] = {t.md_table.name: t for t in self._config.tables}
+        self._tables_by_name: ta.Mapping[QualifiedName, Table] = {t.md_table.name: t for t in self._config.tables}
 
     def connect(self) -> 'ComputedConnection':
         return ComputedConnection(self)
@@ -43,7 +43,7 @@ class ComputedConnection(Connection[ComputedConnector]):
 
     def create_row_source(self, spec: RowSpec) -> RowSource:
         if isinstance(spec, TableRowSpec):
-            table = self._connector._tables_by_name[spec.table[-1]]
+            table = self._connector._tables_by_name[spec.name]
             return ComputedRowSource(table)
         else:
             raise TypeError(spec)
@@ -56,13 +56,13 @@ class ComputedConnection(Connection[ComputedConnector]):
             ret = {}
             for name in names:
                 try:
-                    ret[name] = self._connector._tables_by_name[name]
+                    ret[name] = self._connector._tables_by_name[name].md_table
                 except KeyError:
                     pass
             return ret
 
         else:
-            return self._connector._tables_by_name
+            return {n: t.md_table for n, t in self._connector._tables_by_name.items()}
 
 
 class ComputedRowSource(RowSource):

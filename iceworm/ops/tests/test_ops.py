@@ -77,7 +77,7 @@ CONNECTORS = ctrs.ConnectorSet([
             tables=[
                 cmp.Table(
                     md.Table(
-                        'nums',
+                        ['nums'],
                         [
                             md.Column('num', dt.Integer()),
                         ],
@@ -95,6 +95,7 @@ class View(dc.Pure):
     conn_name: str
     table: md.Table = dc.field(check=lambda o: isinstance(o, md.Table))
     src: QualifiedName = dc.field(coerce=QualifiedName.of)
+    materialized: bool = False
 
 
 VIEWS = [
@@ -102,7 +103,7 @@ VIEWS = [
         View(
             'pg',
             md.Table(
-                'a',
+                ['a'],
                 [
                     md.Column('id', dt.Integer(), primary_key=True),
                     md.Column('a', dt.Integer()),
@@ -115,7 +116,7 @@ VIEWS = [
         View(
             'pg',
             md.Table(
-                'b',
+                ['b'],
                 [
                     md.Column('id', dt.Integer(), primary_key=True),
                     md.Column('c', dt.Integer()),
@@ -128,7 +129,7 @@ VIEWS = [
         View(
             'pg',
             md.Table(
-                'c',
+                ['c'],
                 [
                     md.Column('id', dt.Integer(), primary_key=True),
                     md.Column('c', dt.Integer()),
@@ -141,7 +142,7 @@ VIEWS = [
         View(
             'pg',
             md.Table(
-                'nums',
+                ['nums'],
                 [
                     md.Column('num', dt.Integer(), primary_key=True),
                 ]
@@ -161,6 +162,24 @@ class World:
 
         self._views_by_name: ta.MutableMapping[QualifiedName, View] = {}
 
+    def resolve(self, name: QualifiedName) -> ta.Sequence:
+        objs = []
+
+        if name[0] in self._connectors:
+            ctor = self._connectors[name[0]]
+            with contextlib.closing(ctor.connect()) as conn:
+                connobjs = conn.reflect([QualifiedName(name[1:])])
+                if connobjs:
+                    objs.append(check.single(connobjs.values()))
+
+        for ctor in self._connectors:
+            with contextlib.closing(ctor.connect()) as conn:
+                connobjs = conn.reflect([QualifiedName(name)])
+                if connobjs:
+                    objs.extend(connobjs.values())
+
+        return objs
+
 
 @pytest.mark.xfail()
 def test_ops():  # noqa
@@ -175,9 +194,9 @@ def test_ops():  # noqa
 
     for view in VIEWS:
         plan.extend([
-            ops.DropTable([view.conn_name, view.table.name]),
+            ops.DropTable([view.conn_name, *view.table.name]),
             ops.CreateTable(view.conn_name, view.table),
-            ops.InsertInto([view.conn_name, view.table.name], view.src),
+            ops.InsertInto([view.conn_name, *view.table.name], view.src),
         ])
 
     with contextlib.ExitStack() as es:

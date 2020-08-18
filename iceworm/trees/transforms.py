@@ -146,7 +146,7 @@ class ExpandSelectsTransformer(Transformer):
             if isinstance(item, no.AllSelectItem):
                 def rec(rel: no.Relation, alias: ta.Optional[str] = None) -> None:
                     if isinstance(rel, no.Table):
-                        tbl = self._catalog.tables_by_name[check.single(rel.name.parts).name]
+                        tbl = self._catalog.tables_by_name[rel.name.name]
                         for col in tbl.columns:
                             items.append(
                                 no.ExprSelectItem(

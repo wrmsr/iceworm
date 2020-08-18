@@ -66,7 +66,7 @@ class SqlConnection(Connection[SqlConnector]):
 
     def create_row_source(self, spec: RowSpec) -> RowSource:
         if isinstance(spec, TableRowSpec):
-            return SqlRowSource(self.sa_conn, f'select * from {spec.table[0]}')
+            return SqlRowSource(self.sa_conn, f'select * from {spec.name.dotted}')
         else:
             raise TypeError(spec)
 

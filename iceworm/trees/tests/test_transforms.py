@@ -19,7 +19,7 @@ def test_replace_names():
 
 def test_expand_selects():
     cat = md.Catalog([
-        md.Table('t', [
+        md.Table(['t'], [
             md.Column('a', dt.Integer()),
             md.Column('b', dt.Integer()),
         ])

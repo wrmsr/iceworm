@@ -38,7 +38,7 @@ class FromInternal(dispatch.Class):
 
     def __call__(self, md_tbl: md.Table) -> sa.Table:  # noqa
         return sa.Table(
-            md_tbl.name,
+            md_tbl.name[-1],  # FIXME: catalog.schema.
             self._metadata,
             *[self(col) for col in md_tbl.columns]
         )
@@ -63,7 +63,6 @@ class ToInternal(dispatch.Class):
 
     def __call__(self, sa_tbl: sa.Table) -> md.Table:  # noqa
         return md.Table(
-            name=sa_tbl.name,
-            columns=[self(sa_col) for sa_col in sa_tbl.columns],
-            schema_name=sa_tbl.schema,
+            list(filter(None, [sa_tbl.schema, sa_tbl.name])),
+            [self(sa_col) for sa_col in sa_tbl.columns],
         )

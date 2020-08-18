@@ -60,7 +60,8 @@ class FileConnector(Connector['FileConnector']):
         self._config = check.isinstance(config, FileConnector.Config)
 
     @properties.cached
-    def tables_by_name(self) -> ta.Mapping[str, Table]:
+    @property
+    def tables_by_name(self) -> ta.Mapping[QualifiedName, Table]:
         tables_by_name = {}
 
         for mnt in self._config.mounts:
@@ -71,7 +72,7 @@ class FileConnector(Connector['FileConnector']):
                     else:
                         raise TypeError(mnt.schema)
 
-                    name = os.path.basename(fp).rpartition('.')[0]
+                    name = QualifiedName(os.path.basename(fp).split('.')[:-1])
                     table = Table(
                         md.Table(name, cols),
                         fp,
@@ -93,7 +94,7 @@ class FileConnection(Connection[FileConnector]):
 
     def create_row_source(self, spec: RowSpec) -> RowSource:
         if isinstance(spec, TableRowSpec):
-            table = self._connector.tables_by_name[spec.table[-1]]
+            table = self._connector.tables_by_name[spec.name]
             return CsvFileRowSource(table)
         else:
             raise TypeError(spec)
@@ -105,15 +106,14 @@ class FileConnection(Connection[FileConnector]):
         if names:
             ret = {}
             for name in names:
-                if len(name) == 1:
-                    try:
-                        ret[QualifiedName.of([name[0]])] = self._connector.tables_by_name[name[0]]
-                    except KeyError:
-                        pass
+                try:
+                    ret[name] = self._connector.tables_by_name[name].md_table
+                except KeyError:
+                    pass
             return ret
 
         else:
-            return {QualifiedName.of([n]): t for n, t in self._connector.tables_by_name.items()}
+            return {n: t.md_table for n, t in self._connector.tables_by_name.items()}
 
 
 class CsvFileRowSource(RowSource):

@@ -41,7 +41,7 @@ class RowSpec(dc.Enum):
 
 
 class TableRowSpec(RowSpec):
-    table: QualifiedName = dc.field(coerce=QualifiedName.of)
+    name: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
 class QueryRowSpec(RowSpec):
@@ -89,6 +89,8 @@ class Connection(lang.Abstract, ta.Generic[ConnectorT]):
         super().__init__()
 
         self._connector: ConnectorT = check.isinstance(connector, Connector)
+
+    defs.repr('connector')
 
     @property
     def connector(self) -> ConnectorT:
