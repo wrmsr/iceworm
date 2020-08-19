@@ -1,5 +1,7 @@
 SHELL:=/bin/bash
 
+PROJECT:=iceworm
+
 PYTHON_VERSION:=3.7.8
 
 PYENV_ROOT:=$(shell if [ -z "$${PYENV_ROOT}" ]; then echo "$${HOME}/.pyenv" ; else echo "$${PYENV_ROOT%/}" ; fi)
@@ -34,9 +36,9 @@ clean:
 	-rm -rf .venv*
 	-rm -rf build
 	-rm -rf dist
-	-rm -rf iceworm.egg-info
+	-rm -rf $(PROJECT).egg-info
 
-	find iceworm \
+	find $(PROJECT) \
 		-name '*.pyc' -delete -or \
 		-name '*.pyo' -delete -or \
 		-name '__pycache__' -delete -or \
@@ -144,9 +146,9 @@ antlr:
 	\
 	java -version ; \
 	\
-	find iceworm -name _antlr -type d | xargs -n 1 rm -rf ; \
+	find $(PROJECT) -name _antlr -type d | xargs -n 1 rm -rf ; \
 	\
-	for D in $$(find iceworm -name '*.g4' | xargs -n1 dirname | sort | uniq) ; do \
+	for D in $$(find $(PROJECT) -name '*.g4' | xargs -n1 dirname | sort | uniq) ; do \
 		echo "$$D" ; \
 		\
 		mkdir "$$D/_antlr" ; \
@@ -181,10 +183,6 @@ antlr:
 		done ; \
 	done
 
-.PHONY: stl
-stl: venv
-	(. .venv/bin/activate && cd iceworm/_ext/cy/stl && $(MAKE) render)
-
 
 ### Build
 
@@ -201,26 +199,26 @@ build: venv
 
 .PHONY: flake
 flake: venv
-	.venv/bin/flake8 iceworm
+	.venv/bin/flake8 $(PROJECT)
 
 .PHONY: typecheck
 typecheck: venv
-	.venv/bin/mypy --ignore-missing-imports iceworm | awk '{c+=1;print $$0}END{print c}'
+	.venv/bin/mypy --ignore-missing-imports $(PROJECT) | awk '{c+=1;print $$0}END{print c}'
 
 
 ### Test
 
 .PHONY: test
 test: build
-	.venv/bin/pytest -v iceworm
+	.venv/bin/pytest -v $(PROJECT)
 
 .PHONY: test-parallel
 test-parallel: build
-	.venv/bin/pytest -v -n auto iceworm
+	.venv/bin/pytest -v -n auto $(PROJECT)
 
 .PHONY: test-verbose
 test-verbose: build
-	.venv/bin/pytest -svvv iceworm
+	.venv/bin/pytest -svvv $(PROJECT)
 
 
 ### Deps
@@ -247,7 +245,7 @@ define do-dist
 
 	cp -rv \
 		LICENSE \
-		iceworm \
+		$(PROJECT) \
 		README.md \
 	\
 		build/
@@ -261,7 +259,7 @@ define do-dist
 
 	cd build && "$(DIST_BUILD_PYTHON)" setup.py clean
 
-	git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty > "build/iceworm/.revision"
+	git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty > "build/$(PROJECT)/.revision"
 
 	if [ "$(1)" = ".venv" ] ; then \
 		cd build && "$(DIST_BUILD_PYTHON)" setup.py sdist --formats=zip ; \

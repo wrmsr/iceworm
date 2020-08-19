@@ -5,12 +5,14 @@ import sys
 import setuptools.command.build_ext
 
 
+PROJECT = 'iceworm'
+
 BASE_DIR = os.path.dirname(__file__)
 ABOUT = {}
 
 
 def _read_about():
-    with open(os.path.join(BASE_DIR, 'iceworm', '__about__.py'), 'rb') as f:
+    with open(os.path.join(BASE_DIR, PROJECT, '__about__.py'), 'rb') as f:
         src = f.read()
         if sys.version_info[0] > 2:
             src = src.decode('UTF-8')
@@ -38,7 +40,7 @@ def _get_static_files(path):
 
 
 PACKAGE_DATA = [
-] + _get_static_files('iceworm')
+] + _get_static_files(PROJECT)
 
 
 INSTALL_REQUIRES = [
@@ -65,12 +67,12 @@ if __name__ == '__main__':
         setup_requires=['setuptools'],
 
         packages=setuptools.find_packages(
-            include=['iceworm', 'iceworm.*'],
+            include=[PROJECT, PROJECT + '.*'],
             exclude=['tests', '*.tests', '*.tests.*'],
         ),
-        py_modules=['iceworm'],
+        py_modules=[PROJECT],
 
-        package_data={'iceworm': PACKAGE_DATA},
+        package_data={PROJECT: PACKAGE_DATA},
         include_package_data=True,
 
         entry_points={},
