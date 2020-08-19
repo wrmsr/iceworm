@@ -103,7 +103,7 @@ define do-venv
 endef
 
 define do-deps
-	(cat requirements.txt ; cat requirements-dev.txt) | \
+	(cat requirements.txt ; cat requirements-dev.txt ; echo) | \
 		egrep -o '^[^#]+' | \
 		egrep -v '[ ]*-r' | \
 		egrep -v omnibus | \
