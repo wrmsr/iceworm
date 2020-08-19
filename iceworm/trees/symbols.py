@@ -110,18 +110,23 @@ class SymbolAnalysis:
                 queue.append(c)
                 seen.add(c)
 
+    @property
     def root(self) -> SymbolScope:
         return self._root
 
+    @property
     def scopes(self) -> ta.AbstractSet[SymbolScope]:
         return self._scopes
 
+    @property
     def scopes_by_node(self) -> ta.Mapping[no.Node, SymbolScope]:
         return self._scopes_by_node
 
+    @property
     def symbol_sets_by_node(self) -> ta.Mapping[no.Node, ta.AbstractSet[Symbol]]:
         return self._symbol_sets_by_node
 
+    @property
     def refs_by_node(self) -> ta.Mapping[no.Node, SymbolRef]:
         return self._refs_by_node
 
@@ -179,7 +184,7 @@ class _Analyzer(dispatch.Class):
         return self.add_children(node, scope)
 
     def __call__(self, node: no.Table, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
-        tbl = self._catalog.tables_by_name[check.single(node.name.parts).name]
+        tbl = self._catalog.tables_by_name[node.name.name]
         for col in tbl.columns:
             Symbol(col.name, node, scope)
 

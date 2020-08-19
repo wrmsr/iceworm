@@ -6,6 +6,7 @@ TODO:
  - single or double quotes (we are a sql)
  - comments.. # line-comments, blocks how? can't nest /* */
  - multiline (triplequote) strings
+ - non-str keys
  - bare keys in mappings get a True value
  - https://golang.org/pkg/reflect/#StructTag lol
 

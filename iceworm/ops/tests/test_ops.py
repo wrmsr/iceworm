@@ -114,7 +114,7 @@ VIEWS = [
                     md.Column('b', dt.Integer()),
                 ],
             ),
-            ctrs.TableRowSpec(['csv', 'a']),
+            ctrs.TableRowSpec(['csv', 'a']),  # select * from csv.a
             [Materialization(['pg', 'a'])],
         ),
 
@@ -127,7 +127,7 @@ VIEWS = [
                     md.Column('d', dt.Integer()),
                 ],
             ),
-            ctrs.TableRowSpec(['csv', 'b']),
+            ctrs.TableRowSpec(['csv', 'b']),  # select * from csv.b
             [Materialization(['pg', 'b'])],
         ),
 
@@ -140,7 +140,7 @@ VIEWS = [
                     md.Column('d', dt.Integer()),
                 ],
             ),
-            ctrs.TableRowSpec(['pg', 'b']),
+            ctrs.TableRowSpec(['pg', 'b']),  # select * from pg.b
             [Materialization(['pg', 'c'])],
         ),
 
@@ -151,7 +151,7 @@ VIEWS = [
                     md.Column('num', dt.Integer(), primary_key=True),
                 ]
             ),
-            ctrs.TableRowSpec(['csv', 'nums']),
+            ctrs.TableRowSpec(['csv', 'nums']),  # select * from csv.nums
             [Materialization(['pg', 'nums'])],
         ),
 

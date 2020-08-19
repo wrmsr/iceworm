@@ -1,4 +1,7 @@
 from .. import nodes as no
+from .. import parsing
+from .. import rendering
+from .. import symbols
 from .. import transforms as tfm
 from ... import datatypes as dt
 from ... import metadata as md
@@ -19,23 +22,32 @@ def test_replace_names():
 
 def test_expand_selects():
     cat = md.Catalog([
-        md.Table(['t'], [
+        md.Table(['t0'], [
             md.Column('a', dt.Integer()),
             md.Column('b', dt.Integer()),
-        ])
+        ]),
+        md.Table(['t1'], [
+            md.Column('a', dt.Integer()),
+            md.Column('c', dt.Integer()),
+        ]),
     ])
 
-    root = no.Select(
-        [
-            no.AllSelectItem(),
-        ],
-        [
-            no.Table(
-                no.QualifiedNameNode.of(['t'])),
-        ],
-    )
+    for s in [
+        'select * from t0',
+        'select * from t1',
+        'select * from t0, t1',
+    ]:
+        root = parsing.parse_statement(s)
 
-    root = tfm.AliasRelationsTransformer(root)(root)
-    root = tfm.LabelSelectItemsTransformer(root)(root)
-    root = tfm.ExpandSelectsTransformer(root, cat)(root)
-    print(root)
+        print(rendering.render(root))
+
+        root = tfm.AliasRelationsTransformer(root)(root)
+        root = tfm.LabelSelectItemsTransformer(root)(root)
+        root = tfm.ExpandSelectsTransformer(root, cat)(root)
+        print(root)
+
+        print(rendering.render(root))
+
+        syms = symbols.analyze(root, cat)
+        print(syms)
+        # print(syms.symbol_sets_by_node[root])
