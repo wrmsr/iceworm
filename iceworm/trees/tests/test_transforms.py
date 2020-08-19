@@ -50,4 +50,4 @@ def test_expand_selects():
 
         syms = symbols.analyze(root, cat)
         print(syms)
-        # print(syms.symbol_sets_by_node[root])
+        print(syms.resolutions)
