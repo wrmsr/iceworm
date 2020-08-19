@@ -7,6 +7,7 @@ import abc
 import typing as ta
 
 from omnibus import check
+from omnibus import dataclasses as dc
 from omnibus import lang
 import sqlalchemy as sa
 
@@ -71,8 +72,8 @@ class DropTableExecutor(SqlExecutor[DropTable]):
 class CreateTableExecutor(SqlExecutor[CreateTable]):
 
     def execute(self, op: CreateTable) -> None:
-        sa_conn = check.isinstance(self._conns[op.conn_name], SqlConnection).sa_conn
-        table = alch.FromInternal(sa.MetaData())(op.table)
+        sa_conn = check.isinstance(self._conns[op.table.name[0]], SqlConnection).sa_conn
+        table = alch.FromInternal(sa.MetaData())(dc.replace(op.table, name=op.table.name[1:]))
         table.create(sa_conn)
 
 
@@ -90,8 +91,10 @@ class CreateTableAsExecutor(SqlExecutor[CreateTableAs]):
 class InsertIntoExecutor(SqlExecutor[InsertInto]):
 
     def execute(self, op: InsertInto) -> None:
+        if not isinstance(op.src_row_spec, TableRowSpec):
+            raise TypeError(op.src_row_spec)
         dst_conn = self._conns[op.dst_table_name[0]]
-        src_conn = self._conns[op.src_table_name[0]]
+        src_conn = self._conns[op.src_row_spec.name[0]]
         dst = dst_conn.create_row_sink(QualifiedName(op.dst_table_name[1:]))
-        src = src_conn.create_row_source(TableRowSpec(op.src_table_name[1:]))
+        src = src_conn.create_row_source(TableRowSpec(op.src_row_spec.name[1:]))
         dst.consume_rows(src.produce_rows())

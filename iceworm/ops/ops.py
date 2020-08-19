@@ -14,6 +14,7 @@ from ..types import QualifiedName
 from ..utils import build_dc_repr
 from ..utils import NodalDataclass
 from ..utils import seq
+from .connectors import RowSpec
 
 
 SelfOp = ta.TypeVar('SelfOp', bound='Op')
@@ -44,7 +45,6 @@ class DropTable(SqlOp):
 
 
 class CreateTable(SqlOp):
-    conn_name: str
     table: md.Table
 
 
@@ -55,4 +55,4 @@ class CreateTableAs(SqlOp):
 
 class InsertInto(SqlOp):
     dst_table_name: QualifiedName = dc.field(coerce=QualifiedName.of)
-    src_table_name: QualifiedName = dc.field(coerce=QualifiedName.of)
+    src_row_spec: RowSpec = dc.field(check=lambda o: isinstance(o, RowSpec))

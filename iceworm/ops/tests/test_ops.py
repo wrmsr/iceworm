@@ -99,7 +99,7 @@ class Materialization(dc.Pure):
 
 class View(dc.Pure):
     table: md.Table = dc.field(check=lambda o: isinstance(o, md.Table))
-    src: ctrs.RowSpec
+    src: ctrs.RowSpec = dc.field(check=lambda o: isinstance(o, ctrs.RowSpec))
     materializations: ta.Sequence[Materialization] = dc.field((), coerce=seq)
 
 
@@ -151,7 +151,7 @@ VIEWS = [
                     md.Column('num', dt.Integer(), primary_key=True),
                 ]
             ),
-            ctrs.TableRowSpec(['csv', 'nums']),  # select * from csv.nums
+            ctrs.TableRowSpec(['cmp', 'nums']),  # select * from csv.nums
             [Materialization(['pg', 'nums'])],
         ),
 
@@ -198,11 +198,12 @@ def test_ops():
     ]
 
     for view in VIEWS:
-        plan.extend([
-            ops.DropTable([view.conn_name, *view.table.name]),
-            ops.CreateTable(view.conn_name, view.table),
-            ops.InsertInto([view.conn_name, *view.table.name], view.src),
-        ])
+        for mat in view.materializations:
+            plan.extend([
+                ops.DropTable(mat.name),
+                ops.CreateTable(dc.replace(view.table, name=mat.name)),
+                ops.InsertInto(mat.name, view.src),
+            ])
 
     with contextlib.ExitStack() as es:
         conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(CONNECTORS)))
