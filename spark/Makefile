@@ -1,10 +1,14 @@
-SHELL=/bin/bash
+SHELL:=/bin/bash
+
 UNAME:=$(shell uname)
+
+
+### Toplevel
 
 all: clean package test
 
 
-# Java
+### Java
 
 .PHONY: java-home
 java-home:

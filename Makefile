@@ -48,6 +48,8 @@ clean:
 		-name '*.exe' -delete -or \
 		-name '.revision' -delete
 
+	(cd spark && make clean)
+
 
 ### Venvs
 
