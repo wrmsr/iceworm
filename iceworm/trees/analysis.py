@@ -89,3 +89,9 @@ class Analyzer(dispatch.Class, lang.Abstract, ta.Generic[T]):
 
     def __call__(self, node: no.Node) -> T:  # noqa
         raise TypeError(node)
+
+
+class SourceAnalyzer(Analyzer[ta.AbstractSet[no.Node]]):
+
+    def __call__(self, node: no.Node) -> ta.AbstractSet[no.Node]:
+        return ocol.IdentitySet()

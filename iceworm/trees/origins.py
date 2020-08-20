@@ -1,10 +1,13 @@
 import typing as ta
 
+from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import dispatch
 
 from . import nodes as no
+from .symbols import analyze as sym_analyze
 from .symbols import Symbol
+from .symbols import SymbolAnalysis
 
 
 class Genesis(dc.Enum):
@@ -115,12 +118,29 @@ class OriginAnalysis:
 
 class _Analyzer(dispatch.Class):
 
-    def __init__(self) -> None:
+    def __init__(self, sym_ana: SymbolAnalysis) -> None:
         super().__init__()
+
+        self._sym_ana = check.isinstance(sym_ana, SymbolAnalysis)
+
+        self._originations: ta.List[Origination] = []
 
     __call__ = dispatch.property()
 
+    def _add_direct_single_source(self, node: no.Node, src: no.Node) -> None:
+        """
+        node.getFields().getNames().forEach(f ->
+            originations.add(new Origination(
+                PNodeField.of(node, f), PNodeField.of(node.getSource(), f), ImmutableSet.of(OriginGenesis.direct()))));
+        """
+        for sym in self._sym_ana.sym_sets_by_node.get(node, []):
+            self._originations.append(
+                Origination(
 
-def analyze(root: no.Node) -> OriginAnalysis:
-    _Analyzer()(root)
+                )
+            )
+
+
+def analyze(root: no.Node, sym_ana: SymbolAnalysis) -> OriginAnalysis:
+    _Analyzer(sym_ana)(root)
     raise NotImplementedError
