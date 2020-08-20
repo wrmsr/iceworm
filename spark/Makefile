@@ -43,10 +43,10 @@ install: java-home
 uninstall: java-home
 	JAVA_HOME=$(JAVA_HOME) ./mvnw dependency:purge-local-repository -DmanualInclude="com.wrmsr.iceworm"
 
-.PHONY: dependency-tree
+.PHONY: dep-tree
 dep-tree: java-home
 	JAVA_HOME=$(JAVA_HOME) ./mvnw dependency:tree
 
-.PHONY: dependency-updates
+.PHONY: dep-updates
 dep-updates: java-home
 	JAVA_HOME=$(JAVA_HOME) ./mvnw -N versions:display-dependency-updates
