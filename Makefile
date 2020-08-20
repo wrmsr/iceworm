@@ -30,6 +30,7 @@ all: venv gen build flake test
 
 .PHONY: clean
 clean:
+	-rm -rf .benchmarks
 	-rm -rf .cache
 	-rm -rf .mypy_cache
 	-rm -rf .pytest_cache
