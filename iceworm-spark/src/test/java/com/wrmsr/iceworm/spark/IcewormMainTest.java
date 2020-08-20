@@ -2,7 +2,7 @@ package com.wrmsr.iceworm.spark;
 
 import org.junit.Test;
 
-public class TestIcewormMain
+public class IcewormMainTest
 {
     @Test
     public void testHello()
