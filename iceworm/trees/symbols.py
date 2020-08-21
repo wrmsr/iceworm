@@ -17,10 +17,9 @@ class Symbol(dc.Pure, eq=False):
     name: ta.Optional[str]
     node: no.Node
     scope: 'SymbolScope'
-    origin: ta.Optional['Symbol'] = None
 
     def __post_init__(self) -> None:
-        self.scope._syms.add(self)
+        self.scope._add_sym(self)
 
     __repr__ = build_dc_repr
 
@@ -29,10 +28,9 @@ class SymbolRef(dc.Pure, eq=False):
     name: QualifiedName
     node: no.Node
     scope: 'SymbolScope'
-    binding: ta.Optional[Symbol] = None
 
     def __post_init__(self) -> None:
-        self.scope._refs.add(self)
+        self.scope._add_ref(self)
 
     __repr__ = build_dc_repr
 
@@ -49,10 +47,22 @@ class SymbolScope(dc.Data, eq=False, final=True):
         self._children: ta.MutableSet['SymbolScope'] = set()
         self._syms: ta.MutableSet[Symbol] = set()
         self._refs: ta.MutableSet[SymbolRef] = set()
+        self._sealed = False
 
         if self.parent is not None:
             self.parent._children.add(self)
         self._enclosed_nodes.add(self.node)
+
+    def _add_sym(self, sym: Symbol) -> None:
+        check.state(not self._sealed)
+        self._syms.add(sym)
+
+    def _add_ref(self, ref: SymbolRef) -> None:
+        check.state(not self._sealed)
+        self._refs.add(ref)
+
+    def _seal(self) -> None:
+        self._sealed = True
 
     @property
     def enclosed_nodes(self) -> ta.AbstractSet[no.Node]:
@@ -96,6 +106,7 @@ class SymbolAnalysis:
         while queue:
             cur = queue.pop()
             check.not_in(cur, self._scopes)
+            cur._seal()
             self._scopes.add(cur)
             for n in cur.enclosed_nodes:
                 check.not_in(n, self._scopes_by_node)
@@ -205,11 +216,7 @@ class _Analyzer(dispatch.Class):
     def __call__(self, node: no.AliasedRelation, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
         scope = SymbolScope(node, scope, name=node.alias.name)
 
-        rel_scope = check.isinstance(self(node.relation, scope), SymbolScope)
-        for rel_sym in rel_scope.syms:
-
-
-        self.visit_children(node, scope, exclude=[node.relation])
+        self.visit_children(node, scope)
         return scope
 
     def __call__(self, node: no.AllSelectItem, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
@@ -240,14 +247,12 @@ class _Analyzer(dispatch.Class):
         return scope
 
     def __call__(self, node: no.Table, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
-        scope = SymbolScope(node, scope)
-
         tbl = self._catalog.tables_by_name[node.name.name]
         for col in tbl.columns:
             Symbol(col.name, node, scope)
 
-        self.visit_children(node, scope)
-        return scope
+        self.add_to(node, scope)
+        return None
 
 
 def analyze(root: no.Node, catalog: md.Catalog) -> SymbolAnalysis:

@@ -55,3 +55,16 @@ def test_expand_selects():
 
         oris = origins.analyze(root, syms)
         print(oris)
+
+        print()
+
+        for k, v in oris.exports_by_node_by_name[root].items():
+            print(k)
+            while True:
+                print(v)
+                if isinstance(v, origins.Leaf):
+                    break
+                v = v.src
+            print()
+
+        print()
