@@ -1,3 +1,4 @@
+import abc
 import typing as ta
 
 from omnibus import check
@@ -6,6 +7,7 @@ from omnibus import dataclasses as dc
 from omnibus import dispatch
 
 from . import nodes as no
+from ..utils import seq
 from .symbols import Symbol
 from .symbols import SymbolAnalysis
 from .symbols import SymbolRef
@@ -14,13 +16,28 @@ from .symbols import SymbolRef
 class Origin(dc.Enum, eq=False):
     node: no.Node = dc.field(check=lambda o: isinstance(o, no.Node))
 
+    @abc.abstractproperty
+    def srcs(self) -> ta.Collection['Origin']:
+        raise NotImplementedError
+
+
+class Derived(Origin):
+    srcs: ta.Sequence[Origin] = dc.field(coerce=seq, check=lambda l: all(isinstance(e, Origin) for e in l))
+
 
 class Link(Origin, abstract=True):
     src: Origin = dc.field(check=lambda o: isinstance(o, Origin))
 
+    @property
+    def srcs(self) -> ta.Collection[Origin]:
+        return [self.src]
+
 
 class Leaf(Origin, abstract=True):
-    pass
+
+    @property
+    def srcs(self) -> ta.Collection[Origin]:
+        return []
 
 
 class Direct(Link):
@@ -133,12 +150,21 @@ class _Analyzer(dispatch.Class):
     def __call__(self, node: no.AllSelectItem) -> Context:  # noqa
         raise TypeError(node)
 
-    def __call__(self, node: no.BinaryExpr) -> Context:  # noqa
-        raise TypeError(node)
+    def __call__(self, node: no.Expr) -> Context:  # noqa
+        check.not_empty(list(node.children))
+        srcs = [check.isinstance(self(check.isinstance(n, no.Expr)), self.Value).ori for n in node.children]
+        return self.Value(self._add(Derived(node, srcs)))
 
     def __call__(self, node: no.ExprSelectItem) -> Context:  # noqa
         src = check.isinstance(self(node.value), self.Value).ori
         return self.Value(self._add(Direct(node, src)))
+
+    def __call__(self, node: no.FunctionCallExpr) -> Context:  # noqa
+        srcs = [check.isinstance(self(n), self.Value).ori for n in node.call.args]
+        return self.Value(self._add(Derived(node, srcs)))
+
+    def __call__(self, node: no.Primitive) -> Context:  # noqa
+        return self.Value(self._add(Constant(node)))
 
     def __call__(self, node: no.QualifiedNameNode) -> Context:  # noqa
         ref = self._sym_ana.refs_by_node[node]

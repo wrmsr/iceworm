@@ -21,6 +21,11 @@ def test_origins():
 
     for s in [
         'select t0.a from t0',
+        'select 5',
+        'select t0.a + 5 from t0',
+        'select t0.a + t0.b from t0',
+        'select t0.a + t0.b + 5 from t0',
+        'select f(t0.a + 1) + t0.b + 2 from t0',
     ]:
         root = parsing.parse_statement(s)
         print(rendering.render(root))
@@ -32,4 +37,17 @@ def test_origins():
 
         syms = symbols.analyze(root, cat)
         oris = origins.analyze(root, syms)
-        print(oris)
+
+        print()
+
+        def rec(v, p):
+            print(p + str(v))
+            for s in v.srcs:
+                rec(s, p + '  ')
+
+        for k, v in oris.exports_by_node_by_name[root].items():
+            print(k)
+            rec(v, '')
+
+        print()
+        print()
