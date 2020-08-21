@@ -4,6 +4,7 @@ TODO:
  - quotes optional - underscores and hyphens valid
  - hex ints 0xabc
  - single or double quotes (we are a sql)
+ - trailing commas
  - comments.. # line-comments, blocks how? can't nest /* */
  - multiline (triplequote) strings
  - non-str keys
