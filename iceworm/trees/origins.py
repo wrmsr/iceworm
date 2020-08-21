@@ -86,30 +86,40 @@ class Scope(Context):
 
 class OriginAnalysis:
 
-    def __init__(self, origins: ta.Iterable[Origin]) -> None:
+    def __init__(self, ctxs: ta.Iterable[Context]) -> None:
         super().__init__()
 
-        self._oris = list(origins)
+        self._ctxs = list(ctxs)
 
+        self._ctxs_by_node: ta.MutableMapping[no.Node, Context] = ocol.IdentityKeyDict()
         self._ori_sets_by_node: ta.Mapping[no.Node, ta.AbstractSet[Origin]] = ocol.IdentityKeyDict()
         self._exports_by_sym: ta.MutableMapping[Symbol, Export] = {}
         self._exports_by_node_by_name: ta.MutableMapping[no.Node, ta.MutableMapping[str, Export]] = ocol.IdentityKeyDict()  # noqa
 
-        for ori in self._oris:
-            self._ori_sets_by_node.setdefault(ori.node, set()).add(ori)
+        for ctx in self._ctxs:
+            check.isinstance(ctx, Context)
+            check.not_in(ctx.node, self._ctxs_by_node)
+            self._ctxs_by_node[ctx.node] = ctx
 
-            if isinstance(ori, Export):
-                check.not_in(ori.sym, self._exports_by_sym)
-                self._exports_by_sym[ori.sym] = ori
+            for ori in ctx:
+                self._ori_sets_by_node.setdefault(ori.node, set()).add(ori)
 
-                if ori.sym.name is not None:
-                    dct = self._exports_by_node_by_name.setdefault(ori.node, {})
-                    check.not_in(ori.sym.name, dct)
-                    dct[ori.sym.name] = ori
+                if isinstance(ori, Export):
+                    check.not_in(ori.sym, self._exports_by_sym)
+                    self._exports_by_sym[ori.sym] = ori
+
+                    if ori.sym.name is not None:
+                        dct = self._exports_by_node_by_name.setdefault(ori.node, {})
+                        check.not_in(ori.sym.name, dct)
+                        dct[ori.sym.name] = ori
 
     @property
-    def origins(self) -> ta.List[Origin]:
-        return self._oris
+    def ctxs(self) -> ta.Sequence[Context]:
+        return self._ctxs
+
+    @property
+    def ctxs_by_node(self) -> ta.Mapping[no.Node, Context]:
+        return self._ctxs_by_node
 
     @property
     def ori_sets_by_node(self) -> ta.Mapping[no.Node, ta.AbstractSet[Origin]]:
@@ -131,17 +141,16 @@ class _Analyzer(dispatch.Class):
 
         self._sym_ana = check.isinstance(sym_ana, SymbolAnalysis)
 
-        self._oris: ta.List[Origin] = []
-        self._ori_sets_by_node: ta.MutableMapping[no.Node, ta.MutableSet[Origin]] = ocol.IdentityKeyDict()
+        self._ctxs_by_node: ta.MutableMapping[no.Node, Context] = ocol.IdentityKeyDict()
         self._exports_by_sym: ta.MutableMapping[Symbol, Export] = {}
 
     def _add(self, ctx: Context) -> Context:
         check.isinstance(ctx, Context)
+        check.not_in(ctx.node, self._ctxs_by_node)
+        self._ctxs_by_node[ctx.node] = ctx
 
         for ori in ctx:
             check.isinstance(ori, Origin)
-            self._oris.append(ori)
-            self._ori_sets_by_node.setdefault(ori.node, set()).add(ori)
 
             if isinstance(ori, Export):
                 check.not_in(ori.sym, self._exports_by_sym)
@@ -207,4 +216,4 @@ class _Analyzer(dispatch.Class):
 def analyze(root: no.Node, sym_ana: SymbolAnalysis) -> OriginAnalysis:
     ana = _Analyzer(sym_ana)
     ana(root)
-    return OriginAnalysis(ana._oris)
+    return OriginAnalysis(ana._ctxs_by_node.values())
