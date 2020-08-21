@@ -93,7 +93,10 @@ class AliasRelationsTransformer(Transformer):
         parent = self._basic.parents_by_node[node]
         node = super().__call__(node)
         if not isinstance(parent, no.AliasedRelation):
-            name = self._name_gen()
+            if isinstance(node, no.Table):
+                name = node.name.parts[-1].name  # FIXME: lame
+            else:
+                name = self._name_gen()
             node = no.AliasedRelation(
                 node,
                 no.Identifier(name))
