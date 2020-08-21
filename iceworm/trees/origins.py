@@ -1,119 +1,58 @@
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import dispatch
 
 from . import nodes as no
-from .symbols import analyze as sym_analyze
 from .symbols import Symbol
 from .symbols import SymbolAnalysis
+from .symbols import SymbolRef
 
 
-class Genesis(dc.Enum):
-
-    @property
-    def is_leaf(self) -> bool:
-        return False
+class Origin(dc.Enum, eq=False):
+    node: no.Node
 
 
-class Direct(Genesis):
+class Link(Origin, abstract=True):
+    src: Origin
+
+
+class Leaf(Origin, abstract=True):
     pass
 
 
-class Constant(Genesis):
-
-    @property
-    def is_leaf(self) -> bool:
-        return True
+class Direct(Link):
+    pass
 
 
-class Scan(Genesis):
-
-    @property
-    def is_leaf(self) -> bool:
-        return True
+class Derive(Link):
+    pass
 
 
-class Origination(dc.Pure):
+class Ref(Link):
+    ref: SymbolRef
+
+
+class Constant(Leaf):
+    pass
+
+
+class Scan(Leaf):
     sym: Symbol
-    src: ta.Optional[Symbol]
-    genesis: Genesis
-
-    @staticmethod
-    def merge(originations: ta.Iterable['Origination']) -> ta.Sequence['Origination']:
-        raise NotImplementedError
-
-
-class OriginationLink(dc.Pure, eq=False):
-    sink: Origination
-    next: ta.AbstractSet['OriginationLink']
-
-
-class OriginChainAnalysis:
-
-    def should_split(self, ori: Origination) -> bool:
-        raise NotImplementedError
-
-    @property
-    def first_oris(self) -> ta.Set[Origination]:
-        raise NotImplementedError
-
-    @property
-    def first_ori_sets_by_sink(self) -> ta.Mapping[Symbol, ta.Set[Origination]]:
-        raise NotImplementedError
-
-    @property
-    def first_ori_sets_by_ori(self) -> ta.Mapping[Origination, ta.Set[Origination]]:
-        raise NotImplementedError
-
-    @property
-    def ori_link_sets_by_sink(self) -> ta.Mapping[Symbol, ta.Set[OriginationLink]]:
-        raise NotImplementedError
-
-    @property
-    def sink_sets_by_first_source(self) -> ta.Mapping[Symbol, ta.Set[Symbol]]:
-        raise NotImplementedError
-
-    def yield_paths(self, sink: Symbol, source: Symbol) -> ta.Generator[ta.Sequence[OriginationLink], None, None]:
-        raise NotImplementedError
 
 
 class OriginAnalysis:
 
-    def __init__(
-            self,
-            originations: ta.List[Origination],
-            toposort_indices_by_node: ta.Mapping[no.Node, int],
-    ) -> None:
+    def __init__(self, origins: ta.Iterable[Origin]) -> None:
         super().__init__()
 
-    @property
-    def originations(self) -> ta.List[Origination]:
-        raise NotImplementedError
+        self._oris = list(origins)
 
     @property
-    def origination_sets_by_sink(self) -> ta.Mapping[Symbol, ta.Set[Origination]]:
-        raise NotImplementedError
-
-    @property
-    def origination_sets_by_source(self) -> ta.Mapping[Symbol, ta.Set[Origination]]:
-        raise NotImplementedError
-
-    @property
-    def origination_sets_by_sink_node_by_sink_sym(self) -> ta.Mapping[no.Node, ta.Mapping[Symbol, ta.Set[Origination]]]:  # noqa
-        raise NotImplementedError
-
-    @property
-    def origination_sets_by_source_node_by_source_sym(self) -> ta.Mapping[no.Node, ta.Mapping[Symbol, ta.Set[Origination]]]:  # noqa
-        raise NotImplementedError
-
-    def _build_chain_analysis(self, split_predicate: ta.Callable[[Origination], bool]) -> OriginChainAnalysis:
-        raise NotImplementedError
-
-    @property
-    def leaf_chain_analysis(self) -> OriginChainAnalysis:
-        raise NotImplementedError
+    def origins(self) -> ta.List[Origin]:
+        return self._oris
 
 
 class _Analyzer(dispatch.Class):
@@ -123,24 +62,60 @@ class _Analyzer(dispatch.Class):
 
         self._sym_ana = check.isinstance(sym_ana, SymbolAnalysis)
 
-        self._originations: ta.List[Origination] = []
+        self._oris: ta.List[Origin] = []
+        self._ori_sets_by_node: ta.MutableMapping[no.Node, ta.MutableSet[Origin]] = ocol.IdentityKeyDict()
+
+    def _add(self, ori: Origin) -> Origin:
+        check.isinstance(ori, Origin)
+        self._oris.append(ori)
+        self._ori_sets_by_node.setdefault(ori.node, set()).add(ori)
+        return ori
+
+    class Context(dc.Enum):
+        pass
+
+    class Value(Context):
+        value: Origin
+
+    class Scope(Context):
+        oris_by_sym: ta.Mapping[Symbol, Origin]
 
     __call__ = dispatch.property()
 
-    def _add_direct_single_source(self, node: no.Node, src: no.Node) -> None:
-        """
-        node.getFields().getNames().forEach(f ->
-            originations.add(new Origination(
-                PNodeField.of(node, f), PNodeField.of(node.getSource(), f), ImmutableSet.of(OriginGenesis.direct()))));
-        """
-        for sym in self._sym_ana.sym_sets_by_node.get(node, []):
-            self._originations.append(
-                Origination(
+    def __call__(self, node: no.Node) -> Context:  # noqa
+        raise TypeError(node)
 
-                )
-            )
+    def __call__(self, node: no.AliasedRelation) -> Context:  # noqa
+        scope = self._sym_ana.scopes_by_node[node]
+        check.state(scope.node is node)
+        src = check.isinstance(self(node.relation), self.Scope)
+        return self.Scope({0: 0 for src_sym, src_ori in src.oris_by_sym.items()})
+
+    def __call__(self, node: no.AllSelectItem) -> Context:  # noqa
+        raise TypeError(node)
+
+    def __call__(self, node: no.BinaryExpr) -> Context:  # noqa
+        raise TypeError(node)
+
+    def __call__(self, node: no.ExprSelectItem) -> Context:  # noqa
+        raise NotImplementedError
+
+    def __call__(self, node: no.QualifiedNameNode) -> Context:  # noqa
+        raise NotImplementedError
+
+    def __call__(self, node: no.Select) -> Context:  # noqa
+        for rel in node.relations:
+            self(rel)
+        for item in node.items:
+            self(item)
+
+    def __call__(self, node: no.Table) -> Context:  # noqa
+        scope = self._sym_ana.scopes_by_node[node]
+        check.state(scope.node is node)
+        return self.Scope({sym: self._add(Scan(node, sym)) for sym in scope.syms})
 
 
 def analyze(root: no.Node, sym_ana: SymbolAnalysis) -> OriginAnalysis:
-    _Analyzer(sym_ana)(root)
-    raise NotImplementedError
+    ana = _Analyzer(sym_ana)
+    ana(root)
+    return SymbolAnalysis(ana._oris)  # noqa

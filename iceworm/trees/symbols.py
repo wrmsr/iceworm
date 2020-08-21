@@ -178,15 +178,25 @@ class _Analyzer(dispatch.Class):
 
     __call__ = dispatch.property()
 
-    def add_children(self, node: no.Node, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:
+    def visit_children(
+            self,
+            node: no.Node,
+            scope: ta.Optional[SymbolScope],
+            *,
+            exclude: ta.Iterable[no.Node] = (),
+    ) -> None:
+        # FIXME: cached visitor already
         for child in node.children:
-            self(child, scope)
-        return scope
+            for exc in exclude:
+                if child is exc:
+                    break
+            else:
+                self(child, scope)
 
     def add_to(self, node: no.Node, scope: ta.Optional[SymbolScope]) -> None:
         if scope is not None:
             scope._enclosed_nodes.add(node)
-        self.add_children(node, scope)
+        self.visit_children(node, scope)
 
     def __call__(self, node: no.Node, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
         self.add_to(node, scope)
@@ -194,7 +204,13 @@ class _Analyzer(dispatch.Class):
 
     def __call__(self, node: no.AliasedRelation, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
         scope = SymbolScope(node, scope, name=node.alias.name)
-        return self.add_children(node, scope)
+
+        rel_scope = check.isinstance(self(node.relation, scope), SymbolScope)
+        for rel_sym in rel_scope.syms:
+
+
+        self.visit_children(node, scope, exclude=[node.relation])
+        return scope
 
     def __call__(self, node: no.AllSelectItem, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
         raise TypeError(node)
@@ -219,15 +235,19 @@ class _Analyzer(dispatch.Class):
 
     def __call__(self, node: no.Select, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
         scope = SymbolScope(node, scope)
-        return self.add_children(node, scope)
+
+        self.visit_children(node, scope)
+        return scope
 
     def __call__(self, node: no.Table, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
+        scope = SymbolScope(node, scope)
+
         tbl = self._catalog.tables_by_name[node.name.name]
         for col in tbl.columns:
             Symbol(col.name, node, scope)
 
-        self.add_to(node, scope)
-        return None
+        self.visit_children(node, scope)
+        return scope
 
 
 def analyze(root: no.Node, catalog: md.Catalog) -> SymbolAnalysis:

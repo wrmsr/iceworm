@@ -1,4 +1,5 @@
 from .. import nodes as no
+from .. import origins
 from .. import parsing
 from .. import rendering
 from .. import symbols
@@ -51,3 +52,6 @@ def test_expand_selects():
         syms = symbols.analyze(root, cat)
         print(syms)
         print(syms.resolutions)
+
+        oris = origins.analyze(root, syms)
+        print(oris)
