@@ -7,6 +7,7 @@ from omnibus import dataclasses as dc
 from omnibus import dispatch
 
 from . import nodes as no
+from ..utils import mapping
 from ..utils import seq
 from .symbols import Symbol
 from .symbols import SymbolAnalysis
@@ -52,7 +53,7 @@ class Export(Link):
     sym: Symbol = dc.field(check=lambda o: isinstance(o, Symbol))
 
 
-class Ref(Link):
+class Import(Link):
     ref: SymbolRef = dc.field(check=lambda o: isinstance(o, SymbolRef))
 
 
@@ -62,6 +63,25 @@ class Constant(Leaf):
 
 class Scan(Leaf):
     sym: Symbol = dc.field(check=lambda o: isinstance(o, Symbol))
+
+
+class Context(dc.Enum, ta.Iterable[Origin]):
+    node: no.Node = dc.field(check=lambda o: isinstance(o, no.Node))
+
+
+class Value(Context):
+    ori: Origin = dc.field(check=lambda o: isinstance(o, Origin))
+
+    def __iter__(self) -> ta.Iterator[Origin]:
+        yield self.ori
+
+
+class Scope(Context):
+    oris_by_sym: ta.Mapping[Symbol, Origin] = dc.field(
+        coerce=mapping, check=lambda dct: all(isinstance(k, Symbol) and isinstance(v, Origin) for k, v in dct.items()))
+
+    def __iter__(self) -> ta.Iterator[Origin]:
+        yield from self.oris_by_sym.values()
 
 
 class OriginAnalysis:
@@ -115,25 +135,19 @@ class _Analyzer(dispatch.Class):
         self._ori_sets_by_node: ta.MutableMapping[no.Node, ta.MutableSet[Origin]] = ocol.IdentityKeyDict()
         self._exports_by_sym: ta.MutableMapping[Symbol, Export] = {}
 
-    def _add(self, ori: Origin) -> Origin:
-        check.isinstance(ori, Origin)
-        self._oris.append(ori)
-        self._ori_sets_by_node.setdefault(ori.node, set()).add(ori)
+    def _add(self, ctx: Context) -> Context:
+        check.isinstance(ctx, Context)
 
-        if isinstance(ori, Export):
-            check.not_in(ori.sym, self._exports_by_sym)
-            self._exports_by_sym[ori.sym] = ori
+        for ori in ctx:
+            check.isinstance(ori, Origin)
+            self._oris.append(ori)
+            self._ori_sets_by_node.setdefault(ori.node, set()).add(ori)
 
-        return ori
+            if isinstance(ori, Export):
+                check.not_in(ori.sym, self._exports_by_sym)
+                self._exports_by_sym[ori.sym] = ori
 
-    class Context(dc.Enum):
-        pass
-
-    class Value(Context):
-        ori: Origin
-
-    class Scope(Context):
-        oris_by_sym: ta.Mapping[Symbol, Origin]
+        return ctx
 
     __call__ = dispatch.property()
 
@@ -141,36 +155,36 @@ class _Analyzer(dispatch.Class):
         raise TypeError(node)
 
     def __call__(self, node: no.AliasedRelation) -> Context:  # noqa
-        src_scope = check.isinstance(self(node.relation), self.Scope)
+        src_scope = check.isinstance(self(node.relation), Scope)
         scope = {}
         for sym, src in src_scope.oris_by_sym.items():
-            scope[sym] = self._add(Export(node, src, sym))
-        return self.Scope(scope)
+            scope[sym] = Export(node, src, sym)
+        return self._add(Scope(node, scope))
 
     def __call__(self, node: no.AllSelectItem) -> Context:  # noqa
         raise TypeError(node)
 
     def __call__(self, node: no.Expr) -> Context:  # noqa
         check.not_empty(list(node.children))
-        srcs = [check.isinstance(self(check.isinstance(n, no.Expr)), self.Value).ori for n in node.children]
-        return self.Value(self._add(Derived(node, srcs)))
+        srcs = [check.isinstance(self(check.isinstance(n, no.Expr)), Value).ori for n in node.children]
+        return self._add(Value(node, Derived(node, srcs)))
 
     def __call__(self, node: no.ExprSelectItem) -> Context:  # noqa
-        src = check.isinstance(self(node.value), self.Value).ori
-        return self.Value(self._add(Direct(node, src)))
+        src = check.isinstance(self(node.value), Value).ori
+        return self._add(Value(node, Direct(node, src)))
 
     def __call__(self, node: no.FunctionCallExpr) -> Context:  # noqa
-        srcs = [check.isinstance(self(n), self.Value).ori for n in node.call.args]
-        return self.Value(self._add(Derived(node, srcs)))
+        srcs = [check.isinstance(self(n), Value).ori for n in node.call.args]
+        return self._add(Value(node, Derived(node, srcs)))
 
     def __call__(self, node: no.Primitive) -> Context:  # noqa
-        return self.Value(self._add(Constant(node)))
+        return self._add(Value(node, Constant(node)))
 
     def __call__(self, node: no.QualifiedNameNode) -> Context:  # noqa
         ref = self._sym_ana.refs_by_node[node]
         sym = self._sym_ana.resolutions.syms[ref]
         src = self._exports_by_sym[sym]
-        return self.Value(self._add(Ref(node, src, ref)))
+        return self._add(Value(node, Import(node, src, ref)))
 
     def __call__(self, node: no.Select) -> Context:  # noqa
         for rel in node.relations:
@@ -178,16 +192,16 @@ class _Analyzer(dispatch.Class):
         scope = {}
         for item in node.items:
             sym = check.single(self._sym_ana.sym_sets_by_node[item])
-            src = check.isinstance(self(item), self.Value).ori
-            scope[sym] = self._add(Export(node, src, sym))
-        return self.Scope(scope)
+            src = check.isinstance(self(item), Value).ori
+            scope[sym] = Export(node, src, sym)
+        return self._add(Scope(node, scope))
 
     def __call__(self, node: no.Table) -> Context:  # noqa
-        return self.Scope({
-            sym: self._add(Scan(node, sym))
+        return self._add(Scope(node, {
+            sym: Scan(node, sym)
             for sym in self._sym_ana.sym_sets_by_node.get(node, [])
-            if check.state(sym.node is node) or True
-        })
+            for _ in [check.state(sym.node is node)]
+        }))
 
 
 def analyze(root: no.Node, sym_ana: SymbolAnalysis) -> OriginAnalysis:
