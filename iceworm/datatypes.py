@@ -2,12 +2,12 @@
 TODO:
  - sqla bidir adapter (postgres specifically)
  - bottom type for null const?
- - table types?? Select, Table, ...
-  - growing distinction between scalars (representable) and 'virtual' / internal
 """
 import typing as ta
 
 from omnibus import dataclasses as dc
+
+from .utils import seq
 
 
 class Datatype(dc.Enum):
@@ -24,7 +24,11 @@ class Number(Datatype):
     }
 
 
+Bigint = Number
+Int = Number
 Integer = Number
+Numeric = Number
+Smallint = Number
 
 
 class Decimal(Datatype):
@@ -51,6 +55,8 @@ class Varchar(Datatype):
     }
 
 
+Char = Varchar
+Character = Varchar
 String = Varchar
 Text = Varchar
 
@@ -79,6 +85,9 @@ class TimestampNtz(Datatype):
     }
 
 
+Datetime = TimestampNtz
+
+
 class TimestampLtz(Datatype):
     pass
 
@@ -101,3 +110,7 @@ class Array(Datatype):
 
 class Geography(Datatype):
     pass
+
+
+class Table(Datatype):
+    columns: ta.Sequence[ta.Tuple[str, Datatype]] = dc.field(coerce=seq)
