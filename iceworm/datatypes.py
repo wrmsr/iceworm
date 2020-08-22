@@ -113,4 +113,5 @@ class Geography(Datatype):
 
 
 class Table(Datatype):
-    columns: ta.Sequence[ta.Tuple[str, Datatype]] = dc.field(coerce=seq)
+    columns: ta.Sequence[ta.Tuple[str, Datatype]] = dc.field(
+        coerce=seq, check=lambda l: all(isinstance(k, str) and isinstance(v, Datatype) for k, v in l))

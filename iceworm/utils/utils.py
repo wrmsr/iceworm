@@ -157,6 +157,11 @@ class MemoizedUnary(ta.Generic[T, U]):
         return self._dct
 
     def __get__(self, instance, owner=None):
+        if self._name:
+            try:
+                return instance.__dict__[self._name]  # FIXME: why
+            except KeyError:
+                pass
         obj = type(self)(
             self._fn.__get__(instance, owner),
             identity=self._identity,
@@ -165,7 +170,6 @@ class MemoizedUnary(ta.Generic[T, U]):
         )
         if instance is not None:
             check.not_empty(self._name)
-            check.not_in(self._name, instance.__dict__)
             instance.__dict__[self._name] = obj
         return obj
 

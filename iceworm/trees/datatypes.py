@@ -47,10 +47,11 @@ class _Analyzer(dispatch.Class):
         return dt.Integer()
 
     def _process(self, node: no.Select) -> dt.Datatype:  # noqa
-        return dt.Integer()
+        cols = [(k, self(v)) for k, v in self._ori_ana.exports_by_node_by_name.get(node, {}).items()]
+        return dt.Table(cols)
 
     def _process(self, node: no.String) -> dt.Datatype:  # noqa
-        return dt.Varchar()
+        return dt.String()
 
 
 def analyze(root: no.Node, ori_ana: OriginAnalysis, catalog: md.Catalog) -> TypeAnalysis:
