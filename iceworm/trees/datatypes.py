@@ -37,8 +37,20 @@ class _Analyzer(dispatch.Class):
     def _process(self, node: no.Node) -> dt.Datatype:  # noqa
         raise TypeError(node)
 
+    def _process(self, node: no.EFalse) -> dt.Datatype:  # noqa
+        return dt.Boolean()
+
+    def _process(self, node: no.ETrue) -> dt.Datatype:  # noqa
+        return dt.Boolean()
+
+    def _process(self, node: no.Integer) -> dt.Datatype:  # noqa
+        return dt.Integer()
+
     def _process(self, node: no.Select) -> dt.Datatype:  # noqa
         return dt.Integer()
+
+    def _process(self, node: no.String) -> dt.Datatype:  # noqa
+        return dt.Varchar()
 
 
 def analyze(root: no.Node, ori_ana: OriginAnalysis, catalog: md.Catalog) -> TypeAnalysis:

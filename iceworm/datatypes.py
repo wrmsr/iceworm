@@ -1,6 +1,9 @@
 """
 TODO:
  - sqla bidir adapter (postgres specifically)
+ - bottom type for null const?
+ - table types?? Select, Table, ...
+  - growing distinction between scalars (representable) and 'virtual' / internal
 """
 import typing as ta
 
