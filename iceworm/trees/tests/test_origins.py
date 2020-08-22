@@ -1,3 +1,4 @@
+from .. import datatypes
 from .. import origins
 from .. import parsing
 from .. import rendering
@@ -26,6 +27,7 @@ def test_origins():
         'select t0.a + t0.b from t0',
         'select t0.a + t0.b + 5 from t0',
         'select f(t0.a + 1) + t0.b + 2 from t0',
+        'select 5 v',
     ]:
         root = parsing.parse_statement(s)
         print(rendering.render(root))
@@ -37,6 +39,7 @@ def test_origins():
 
         syms = symbols.analyze(root, cat)
         oris = origins.analyze(root, syms)
+        dts = datatypes.analyze(root, oris, cat)  # noqa
 
         print()
 

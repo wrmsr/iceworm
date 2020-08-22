@@ -187,8 +187,6 @@ class _Analyzer(dispatch.Class):
 
         self._catalog = check.isinstance(catalog, md.Catalog)
 
-    __call__ = dispatch.property()
-
     def visit_children(
             self,
             node: no.Node,
@@ -196,7 +194,6 @@ class _Analyzer(dispatch.Class):
             *,
             exclude: ta.Iterable[no.Node] = (),
     ) -> None:
-        # FIXME: cached visitor already
         for child in node.children:
             for exc in exclude:
                 if child is exc:
@@ -208,6 +205,8 @@ class _Analyzer(dispatch.Class):
         if scope is not None:
             scope._enclosed_nodes.add(node)
         self.visit_children(node, scope)
+
+    __call__ = dispatch.property()
 
     def __call__(self, node: no.Node, scope: ta.Optional[SymbolScope]) -> ta.Optional[SymbolScope]:  # noqa
         self.add_to(node, scope)
