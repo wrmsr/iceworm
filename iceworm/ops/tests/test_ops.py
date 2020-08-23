@@ -151,9 +151,20 @@ VIEWS = [
                     md.Column('num', dt.Integer(), primary_key=True),
                 ]
             ),
-            ctrs.TableRowSpec(['cmp', 'nums']),  # select * from csv.nums
+            ctrs.TableRowSpec(['cmp', 'nums']),  # select * from cmp.nums
             [Materialization(['pg', 'nums'])],
         ),
+
+        # View(
+        #     md.Table(
+        #         ['qnums'],
+        #         [
+        #             md.Column('num', dt.Integer(), primary_key=True),
+        #         ]
+        #     ),
+        #     ctrs.QueryRowSpec('select * from cmp.nums'),
+        #     [Materialization(['pg', 'nums'])],
+        # ),
 
     ]
 
@@ -239,3 +250,8 @@ def test_ops():
         print(list(sa_conn.execute('select * from b')))
         print(list(sa_conn.execute('select * from c')))
         print(list(sa_conn.execute('select * from nums')))
+
+
+@pytest.mark.xfail()
+def test_queries():
+    q = 'select * from cmp.nums'
