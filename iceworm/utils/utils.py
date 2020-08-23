@@ -136,6 +136,7 @@ class MemoizedUnary(ta.Generic[T, U]):
             identity: bool = False,
             on_compute: ta.Optional[ta.Callable[[T], U]] = None,
             name: ta.Optional[str] = None,
+            max_recursion: ta.Optional[int] = None,
     ) -> None:
         super().__init__()
 
@@ -143,8 +144,10 @@ class MemoizedUnary(ta.Generic[T, U]):
         self._identity = identity
         self._on_compute = on_compute
         self._name = name
+        self._max_recursion = max_recursion
 
         self._dct: ta.MutableMapping[T, U] = ocol.IdentityKeyDict() if identity else {}
+        self._recursion = 0
 
     def __set_name__(self, owner, name):
         if self._name is not None:
@@ -167,6 +170,7 @@ class MemoizedUnary(ta.Generic[T, U]):
             identity=self._identity,
             on_compute=self._on_compute,
             name=self._name,
+            max_recursion=self._max_recursion,
         )
         if instance is not None:
             check.not_empty(self._name)
@@ -177,7 +181,13 @@ class MemoizedUnary(ta.Generic[T, U]):
         try:
             return self._dct[arg]
         except KeyError:
-            v = self._dct[arg] = self._fn(arg)
+            try:
+                self._recursion += 1
+                if self._max_recursion is not None:
+                    check.state(self._recursion < self._max_recursion)
+                v = self._dct[arg] = self._fn(arg)
+            finally:
+                self._recursion -= 1
             if self._on_compute is not None:
                 self._on_compute(arg, v)
             return v

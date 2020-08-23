@@ -18,6 +18,10 @@ class TypeAnalysis:
 
         self._dts_by_node = dts_by_node
 
+    @property
+    def dts_by_node(self) -> ta.Mapping[no.Node, dt.Datatype]:
+        return self._dts_by_node
+
 
 class _Analyzer(dispatch.Class):
 
@@ -41,7 +45,13 @@ class _Analyzer(dispatch.Class):
     def _process(self, ori: oris.Origin) -> dt.Datatype:  # noqa
         raise TypeError(ori)
 
+    def _process(self, node: no.Node) -> dt.Datatype:  # noqa
+        raise TypeError(node)
+
     def _process(self, ori: oris.Constant) -> dt.Datatype:  # noqa
+        return self(ori.node)
+
+    def _process(self, ori: oris.Derived) -> dt.Datatype:  # noqa
         return self(ori.node)
 
     def _process(self, ori: oris.Direct) -> dt.Datatype:  # noqa
@@ -58,8 +68,11 @@ class _Analyzer(dispatch.Class):
         col = tbl.columns_by_name[ori.sym.name]
         return col.type
 
-    def _process(self, node: no.Node) -> dt.Datatype:  # noqa
-        raise TypeError(node)
+    def _process(self, node: no.BinaryExpr) -> dt.Datatype:  # noqa
+        left = self(node.left)
+        right = self(node.right)
+        check.state(left == right)
+        return left
 
     def _process(self, node: no.EFalse) -> dt.Datatype:  # noqa
         return dt.Boolean()
@@ -69,6 +82,9 @@ class _Analyzer(dispatch.Class):
 
     def _process(self, node: no.Integer) -> dt.Datatype:  # noqa
         return dt.Integer()
+
+    def _process(self, node: no.QualifiedNameNode) -> dt.Datatype:  # noqa
+        return self(check.single(self._ori_ana.ori_sets_by_node[node]))
 
     def _process(self, node: no.Select) -> dt.Datatype:  # noqa
         cols = [(k, self(v)) for k, v in self._ori_ana.exports_by_node_by_name.get(node, {}).items()]
