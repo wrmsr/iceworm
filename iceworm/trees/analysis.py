@@ -53,7 +53,7 @@ class BasicAnalysis:
     def node_set(self) -> ta.AbstractSet[no.Node]:
         return self._node_set
 
-    def get_node_type_set(self, ty: type) -> ta.AbstractSet[no.Node]:
+    def get_node_type_set(self, ty: ta.Type[T]) -> ta.AbstractSet[T]:
         try:
             return self._node_sets_by_type[ty]
         except KeyError:

@@ -237,7 +237,7 @@ class World:
 
         self._views_by_name: ta.MutableMapping[QualifiedName, View] = {}
 
-    def resolve(self, name: QualifiedName) -> ta.Sequence:
+    def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
         objs = []
 
         if len(name) > 1 and name[0] in self._connectors:
@@ -258,17 +258,17 @@ class World:
 
 @pytest.mark.xfail()
 def test_queries():
-    # with contextlib.closing(CONNECTORS['pg'].connect()) as fconn:
-    #     fconn.sa_conn.execute('create table test (id integer primary key, a integer)')
-
     world = World(CONNECTORS)
-
-    print(world.resolve(QualifiedName.of(['test'])))
 
     query = 'select * from cmp.nums'
     root = par.parse_statement(query)
 
-    tn: no.Table
-    for tn in ana.basic(root).get_node_type_set(no.Table):
-        print(tn.name.name)
-        print(world.resolve(tn.name.name))
+    table_names = {
+        tn.name.name
+        for tn in ana.basic(root).get_node_type_set(no.Table)
+    }
+
+    for tn in table_names:
+        print(tn)
+        obj = check.single(world.reflect(tn))
+        print(obj)
