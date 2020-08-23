@@ -11,6 +11,7 @@ def test_minml():
         '{"b": null, "c": 420}',
         '{a: b}',
         '{a: b,}',
+        '{a: b, c}',
     ]:
         if not s.startswith('{') and s.startswith('}'):
             s = '{' + s + '}'

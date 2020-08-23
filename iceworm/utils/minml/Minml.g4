@@ -22,7 +22,7 @@ obj
     ;
 
 pair
-    : key ':' value
+    : key (':' value)?
     ;
 
 key

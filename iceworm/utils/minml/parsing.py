@@ -1,9 +1,7 @@
 """
 TODO:
- - decimal
- - hex ints 0xabc
+ - decimal, hex
  - multiline (triplequote) strings
- - bare keys in mappings get a True value
  - https://golang.org/pkg/reflect/#StructTag lol
 
 /*+ materialization: {wait_time_s: 3600} */
@@ -58,7 +56,9 @@ class _ParseVisitor(MinmlVisitor):
         return dict(map(self.visit, ctx.pair()))
 
     def visitPair(self, ctx: MinmlParser.PairContext):
-        return self.visit(ctx.key()), self.visit(ctx.value())
+        key = self.visit(ctx.key())
+        value = self.visit(ctx.value()) if ctx.value() is not None else True
+        return key, value
 
     def visitTrue(self, ctx: MinmlParser.TrueContext):
         return True
