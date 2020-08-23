@@ -100,15 +100,16 @@ class SqlConnection(Connection[SqlConnector]):
                 continue
 
             reflect_opts = {
-                "autoload": True,
-                "autoload_with": self.sa_conn,
-                "extend_existing": False,
-                "autoload_replace": True,
-                "resolve_fks": True,
-                "_extend_on": set(),
+                'schema': schema,
+                'autoload': True,
+                'autoload_with': self.sa_conn,
+                'extend_existing': False,
+                'autoload_replace': True,
+                'resolve_fks': True,
+                '_extend_on': set(),
             }
 
-            satbl = sa.Table(name, samd, **reflect_opts)
+            satbl = sa.Table(table, samd, **reflect_opts)
             ret[name] = alch.ToInternal()(satbl)
 
         return ret
