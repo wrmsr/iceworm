@@ -25,6 +25,9 @@ from .. import ops
 from .. import sql
 from ... import datatypes as dt
 from ... import metadata as md
+from ...trees import analysis as ana
+from ...trees import nodes as no
+from ...trees import parsing as par
 from ...types import QualifiedName
 from ...utils import seq
 
@@ -255,3 +258,7 @@ def test_ops():
 @pytest.mark.xfail()
 def test_queries():
     q = 'select * from cmp.nums'
+    t = par.parse_statement(q)
+    for tn in ana.basic(t).get_node_type_set(no.Table):
+
+
