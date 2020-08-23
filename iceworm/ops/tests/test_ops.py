@@ -268,6 +268,7 @@ def test_queries():
         for tn in ana.basic(root).get_node_type_set(no.Table)
     }
 
+    cat = md.Catalog()
     for tn in table_names:
         print(tn)
         obj = check.single(world.reflect(tn))

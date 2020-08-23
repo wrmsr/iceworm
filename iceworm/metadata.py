@@ -1,5 +1,6 @@
 """
 TODO:
+ - aliases? reflected tables do not have maes as asked
  - *load and treat derived tables as table funcs*
   - transform jinja exprs to params
    - inJinjaPredicate -> array arg + contains pred
