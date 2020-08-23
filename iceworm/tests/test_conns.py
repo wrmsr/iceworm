@@ -17,3 +17,9 @@ def test_conns():
             metadata = sa.MetaData()
             tbl = sa.Table('test', metadata, autoload=True, autoload_with=conn)
             print(tbl)
+
+            # conn.engine.table_names(schema, connection=conn)
+
+            metadata = sa.MetaData()
+            metadata.reflect(bind=conn, only=['test'])
+            print(metadata.tables['test'])

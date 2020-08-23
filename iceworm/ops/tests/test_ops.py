@@ -1,5 +1,6 @@
 """
 TODO:
+ - db nuke fixture
  - hot comments:
   - upstream cfg: select * from v /*+ weak */;
   - col type ann/enforcement: select a /*+ type: char(36) */
@@ -172,34 +173,6 @@ VIEWS = [
     ]
 
 
-class World:
-
-    def __init__(self, connectors: ctrs.ConnectorSet) -> None:
-        super().__init__()
-
-        self._connectors = check.isinstance(connectors, ctrs.ConnectorSet)
-
-        self._views_by_name: ta.MutableMapping[QualifiedName, View] = {}
-
-    def resolve(self, name: QualifiedName) -> ta.Sequence:
-        objs = []
-
-        if len(name) > 1 and name[0] in self._connectors:
-            ctor = self._connectors[name[0]]
-            with contextlib.closing(ctor.connect()) as conn:
-                connobjs = conn.reflect([QualifiedName(name[1:])])
-                if connobjs:
-                    objs.append(check.single(connobjs.values()))
-
-        for ctor in self._connectors:
-            with contextlib.closing(ctor.connect()) as conn:
-                connobjs = conn.reflect([name])
-                if connobjs:
-                    objs.extend(connobjs.values())
-
-        return objs
-
-
 @pytest.mark.xfail()
 def test_ops():
     with contextlib.closing(CONNECTORS['csv'].connect()) as fconn:
@@ -255,10 +228,47 @@ def test_ops():
         print(list(sa_conn.execute('select * from nums')))
 
 
+class World:
+
+    def __init__(self, connectors: ctrs.ConnectorSet) -> None:
+        super().__init__()
+
+        self._connectors = check.isinstance(connectors, ctrs.ConnectorSet)
+
+        self._views_by_name: ta.MutableMapping[QualifiedName, View] = {}
+
+    def resolve(self, name: QualifiedName) -> ta.Sequence:
+        objs = []
+
+        if len(name) > 1 and name[0] in self._connectors:
+            ctor = self._connectors[name[0]]
+            with contextlib.closing(ctor.connect()) as conn:
+                connobjs = conn.reflect([QualifiedName(name[1:])])
+                if connobjs:
+                    objs.append(check.single(connobjs.values()))
+
+        for ctor in self._connectors:
+            with contextlib.closing(ctor.connect()) as conn:
+                connobjs = conn.reflect([name])
+                if connobjs:
+                    objs.extend(connobjs.values())
+
+        return objs
+
+
 @pytest.mark.xfail()
 def test_queries():
-    q = 'select * from cmp.nums'
-    t = par.parse_statement(q)
-    for tn in ana.basic(t).get_node_type_set(no.Table):
+    # with contextlib.closing(CONNECTORS['pg'].connect()) as fconn:
+    #     fconn.sa_conn.execute('create table test (id integer primary key, a integer)')
 
+    world = World(CONNECTORS)
 
+    print(world.resolve(QualifiedName.of(['test'])))
+
+    query = 'select * from cmp.nums'
+    root = par.parse_statement(query)
+
+    tn: no.Table
+    for tn in ana.basic(root).get_node_type_set(no.Table):
+        print(tn.name.name)
+        print(world.resolve(tn.name.name))

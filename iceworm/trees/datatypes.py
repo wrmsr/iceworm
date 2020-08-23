@@ -36,7 +36,7 @@ class _Analyzer(dispatch.Class):
 
     _process = dispatch.property()
 
-    __call__ = memoized_unary(_process, identity=True)
+    __call__ = memoized_unary(_process, identity=True, max_recursion=100)
 
     @property
     def dts_by_node(self) -> ta.Mapping[no.Node, dt.Datatype]:

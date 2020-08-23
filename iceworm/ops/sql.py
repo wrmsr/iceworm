@@ -4,6 +4,7 @@ from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 import sqlalchemy as sa
+import sqlalchemy.exc  # noqa
 
 from .. import alchemy as alch
 from .. import metadata as md
@@ -82,12 +83,34 @@ class SqlConnection(Connection[SqlConnector]):
         if not names:
             raise TypeError
 
+        samd = sa.MetaData()
+        available_by_schema = {}
+
         ret = {}
         for name in names:
             schema, table = name.pair
-            samd = sa.MetaData()
-            samd.reflect(bind=self.sa_conn, only=[table], schema=schema)
-            ret[name] = alch.ToInternal()(samd.tables[table])
+
+            try:
+                available = available_by_schema[schema]
+            except KeyError:
+                available = available_by_schema[schema] = \
+                    set(self.sa_conn.engine.table_names(schema, connection=self.sa_conn))
+
+            if table not in available:
+                continue
+
+            reflect_opts = {
+                "autoload": True,
+                "autoload_with": self.sa_conn,
+                "extend_existing": False,
+                "autoload_replace": True,
+                "resolve_fks": True,
+                "_extend_on": set(),
+            }
+
+            satbl = sa.Table(name, samd, **reflect_opts)
+            ret[name] = alch.ToInternal()(satbl)
+
         return ret
 
 
