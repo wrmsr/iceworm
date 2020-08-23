@@ -12,7 +12,7 @@ else:
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\21")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\23")
         buf.write("`\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b")
         buf.write("\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4\f\t\f\4\r\t\r\3\2\3\2")
         buf.write("\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3%\n\3\3\4\3\4\3\4")
@@ -21,7 +21,7 @@ def serializedATN():
         buf.write("\6\3\7\3\7\3\7\3\7\7\7F\n\7\f\7\16\7I\13\7\3\7\5\7L\n")
         buf.write("\7\3\7\3\7\3\7\3\7\5\7R\n\7\3\b\3\b\3\t\3\t\3\n\3\n\3")
         buf.write("\13\3\13\3\f\3\f\3\r\3\r\3\r\2\2\16\2\4\6\b\n\f\16\20")
-        buf.write("\22\24\26\30\2\3\3\2\f\r\2b\2\32\3\2\2\2\4$\3\2\2\2\6")
+        buf.write("\22\24\26\30\2\3\3\2\f\17\2b\2\32\3\2\2\2\4$\3\2\2\2\6")
         buf.write("\66\3\2\2\2\b8\3\2\2\2\n?\3\2\2\2\fQ\3\2\2\2\16S\3\2\2")
         buf.write("\2\20U\3\2\2\2\22W\3\2\2\2\24Y\3\2\2\2\26[\3\2\2\2\30")
         buf.write("]\3\2\2\2\32\33\5\4\3\2\33\3\3\2\2\2\34%\5\6\4\2\35%\5")
@@ -39,8 +39,8 @@ def serializedATN():
         buf.write("\3\2\2\2FI\3\2\2\2GE\3\2\2\2GH\3\2\2\2HK\3\2\2\2IG\3\2")
         buf.write("\2\2JL\7\4\2\2KJ\3\2\2\2KL\3\2\2\2LM\3\2\2\2MN\7\b\2\2")
         buf.write("NR\3\2\2\2OP\7\7\2\2PR\7\b\2\2QA\3\2\2\2QO\3\2\2\2R\r")
-        buf.write("\3\2\2\2ST\7\16\2\2T\17\3\2\2\2UV\t\2\2\2V\21\3\2\2\2")
-        buf.write("WX\7\17\2\2X\23\3\2\2\2YZ\7\13\2\2Z\25\3\2\2\2[\\\7\t")
+        buf.write("\3\2\2\2ST\7\20\2\2T\17\3\2\2\2UV\t\2\2\2V\21\3\2\2\2")
+        buf.write("WX\7\21\2\2X\23\3\2\2\2YZ\7\13\2\2Z\25\3\2\2\2[\\\7\t")
         buf.write("\2\2\\\27\3\2\2\2]^\7\n\2\2^\31\3\2\2\2\13$,\60\66;?G")
         buf.write("KQ")
         return buf.getvalue()
@@ -61,8 +61,9 @@ class MinmlParser ( Parser ):
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "FALSE", "NULL", 
-                      "TRUE", "DQ_STRING", "SQ_STRING", "IDENTIFIER", "NUMBER", 
-                      "COMMENT", "WS" ]
+                      "TRUE", "DQ_STRING", "SQ_STRING", "TRI_DQ_STRING", 
+                      "TRI_SQ_STRING", "IDENTIFIER", "NUMBER", "COMMENT", 
+                      "WS" ]
 
     RULE_root = 0
     RULE_value = 1
@@ -92,10 +93,12 @@ class MinmlParser ( Parser ):
     TRUE=9
     DQ_STRING=10
     SQ_STRING=11
-    IDENTIFIER=12
-    NUMBER=13
-    COMMENT=14
-    WS=15
+    TRI_DQ_STRING=12
+    TRI_SQ_STRING=13
+    IDENTIFIER=14
+    NUMBER=15
+    COMMENT=16
+    WS=17
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -234,7 +237,7 @@ class MinmlParser ( Parser ):
                 self.state = 28
                 self.identifier()
                 pass
-            elif token in [MinmlParser.DQ_STRING, MinmlParser.SQ_STRING]:
+            elif token in [MinmlParser.DQ_STRING, MinmlParser.SQ_STRING, MinmlParser.TRI_DQ_STRING, MinmlParser.TRI_SQ_STRING]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 29
                 self.string()
@@ -471,7 +474,7 @@ class MinmlParser ( Parser ):
                 self.state = 59
                 self.identifier()
                 pass
-            elif token in [MinmlParser.DQ_STRING, MinmlParser.SQ_STRING]:
+            elif token in [MinmlParser.DQ_STRING, MinmlParser.SQ_STRING, MinmlParser.TRI_DQ_STRING, MinmlParser.TRI_SQ_STRING]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 60
                 self.string()
@@ -631,6 +634,12 @@ class MinmlParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
+        def TRI_DQ_STRING(self):
+            return self.getToken(MinmlParser.TRI_DQ_STRING, 0)
+
+        def TRI_SQ_STRING(self):
+            return self.getToken(MinmlParser.TRI_SQ_STRING, 0)
+
         def DQ_STRING(self):
             return self.getToken(MinmlParser.DQ_STRING, 0)
 
@@ -666,7 +675,7 @@ class MinmlParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 83
             _la = self._input.LA(1)
-            if not(_la==MinmlParser.DQ_STRING or _la==MinmlParser.SQ_STRING):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << MinmlParser.DQ_STRING) | (1 << MinmlParser.SQ_STRING) | (1 << MinmlParser.TRI_DQ_STRING) | (1 << MinmlParser.TRI_SQ_STRING))) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)

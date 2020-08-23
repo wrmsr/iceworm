@@ -1,7 +1,6 @@
 """
 TODO:
  - decimal, hex
- - multiline (triplequote) strings
  - https://golang.org/pkg/reflect/#StructTag lol
 
 /*+ materialization: {wait_time_s: 3600} */

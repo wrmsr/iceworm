@@ -40,7 +40,9 @@ identifier
     ;
 
 string
-    : DQ_STRING
+    : TRI_DQ_STRING
+    | TRI_SQ_STRING
+    | DQ_STRING
     | SQ_STRING
     ;
 
@@ -70,6 +72,14 @@ DQ_STRING
 
 SQ_STRING
     : '\'' (ESC | SAFECODEPOINT)* '\''
+    ;
+
+TRI_DQ_STRING
+    : '"""' (~'"' | '\\"' | ('"' ~'"') | ('""' ~'"'))* '"""'
+    ;
+
+TRI_SQ_STRING
+    : '\'\'\'' (~'\'' | '\\\'' | ('\'' ~'\'') | ('\'\'' ~'\''))* '\'\'\''
     ;
 
 IDENTIFIER
