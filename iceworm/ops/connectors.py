@@ -85,16 +85,16 @@ class Connector(lang.Abstract, ta.Generic[ConnectorT]):
 
 class Connection(lang.Abstract, ta.Generic[ConnectorT]):
 
-    def __init__(self, connector: ConnectorT) -> None:
+    def __init__(self, ctor: ConnectorT) -> None:
         super().__init__()
 
-        self._connector: ConnectorT = check.isinstance(connector, Connector)
+        self._ctor: ConnectorT = check.isinstance(ctor, Connector)
 
-    defs.repr('connector')
+    defs.repr('ctor')
 
     @property
-    def connector(self) -> ConnectorT:
-        return self._connector
+    def ctor(self) -> ConnectorT:
+        return self._ctor
 
     def close(self) -> None:
         pass
@@ -114,42 +114,52 @@ class Connection(lang.Abstract, ta.Generic[ConnectorT]):
 
 class ConnectorSet(ta.Iterable[Connector]):
 
-    def __init__(self, connectors: ta.Iterable[Connector]) -> None:
+    def __init__(self, ctors: ta.Iterable[Connector]) -> None:
         super().__init__()
 
-        self._connectors = list(connectors)
-        self._connectors_by_name = unique_dict((c.name, c) for c in self._connectors)
+        self._ctors = list(ctors)
+        self._ctors_by_name = unique_dict((c.name, c) for c in self._ctors)
 
     def __iter__(self) -> ta.Iterator[Connector]:
-        return iter(self._connectors)
+        return iter(self._ctors)
+
+    def __contains__(self, name: str) -> bool:
+        return name in self._ctors_by_name
 
     def __getitem__(self, name: str) -> Connector:
-        return self._connectors_by_name[name]
+        return self._ctors_by_name[name]
 
     def close(self) -> None:
-        for ctor in self._connectors:
+        for ctor in self._ctors:
             ctor.close()
 
 
 class ConnectionSet(ta.Iterable[Connection]):
 
-    def __init__(self, connectors: ConnectorSet) -> None:
+    def __init__(self, ctors: ConnectorSet) -> None:
         super().__init__()
 
-        self._connectors = check.isinstance(connectors, ConnectorSet)
-        self._connections_by_connector: ta.MutableMapping[Connector, Connection] = ocol.IdentityKeyDict()
+        self._ctors = check.isinstance(ctors, ConnectorSet)
+        self._conns_by_ctor: ta.MutableMapping[Connector, Connection] = ocol.IdentityKeyDict()
 
     def __iter__(self) -> ta.Iterator[Connection]:
-        return iter(self._connections_by_connector.values())
+        return iter(self._conns_by_ctor.values())
+
+    def __contains__(self, name: str) -> bool:
+        try:
+            ctor = self._ctors[name]
+        except KeyError:
+            return False
+        return ctor in self._conns_by_ctor
 
     def __getitem__(self, name: str) -> Connection:
-        ctor = self._connectors[name]
+        ctor = self._ctors[name]
         try:
-            return self._connections_by_connector[ctor]
+            return self._conns_by_ctor[ctor]
         except KeyError:
-            conn = self._connections_by_connector[ctor] = ctor.connect()
+            conn = self._conns_by_ctor[ctor] = ctor.connect()
             return conn
 
     def close(self) -> None:
-        for conn in self._connections_by_connector.values():
+        for conn in self._conns_by_ctor.values():
             conn.close()

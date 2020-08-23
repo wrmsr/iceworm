@@ -94,7 +94,7 @@ class FileConnection(Connection[FileConnector]):
 
     def create_row_source(self, spec: RowSpec) -> RowSource:
         if isinstance(spec, TableRowSpec):
-            table = self._connector.tables_by_name[spec.name]
+            table = self._ctor.tables_by_name[spec.name]
             return CsvFileRowSource(table)
         else:
             raise TypeError(spec)
@@ -107,13 +107,13 @@ class FileConnection(Connection[FileConnector]):
             ret = {}
             for name in names:
                 try:
-                    ret[name] = self._connector.tables_by_name[name].md_table
+                    ret[name] = self._ctor.tables_by_name[name].md_table
                 except KeyError:
                     pass
             return ret
 
         else:
-            return {n: t.md_table for n, t in self._connector.tables_by_name.items()}
+            return {n: t.md_table for n, t in self._ctor.tables_by_name.items()}
 
 
 class CsvFileRowSource(RowSource):

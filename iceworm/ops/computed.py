@@ -43,7 +43,7 @@ class ComputedConnection(Connection[ComputedConnector]):
 
     def create_row_source(self, spec: RowSpec) -> RowSource:
         if isinstance(spec, TableRowSpec):
-            table = self._connector._tables_by_name[spec.name]
+            table = self._ctor._tables_by_name[spec.name]
             return ComputedRowSource(table)
         else:
             raise TypeError(spec)
@@ -56,13 +56,13 @@ class ComputedConnection(Connection[ComputedConnector]):
             ret = {}
             for name in names:
                 try:
-                    ret[name] = self._connector._tables_by_name[name].md_table
+                    ret[name] = self._ctor._tables_by_name[name].md_table
                 except KeyError:
                     pass
             return ret
 
         else:
-            return {n: t.md_table for n, t in self._connector._tables_by_name.items()}
+            return {n: t.md_table for n, t in self._ctor._tables_by_name.items()}
 
 
 class ComputedRowSource(RowSource):
