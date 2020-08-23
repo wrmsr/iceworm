@@ -4,10 +4,11 @@ from omnibus import check
 from omnibus import dispatch
 
 from . import nodes as no
+from . import origins as oris
 from .. import datatypes as dt
 from .. import metadata as md
 from ..utils import memoized_unary
-from .origins import OriginAnalysis
+from .analysis import basic
 
 
 class TypeAnalysis:
@@ -20,11 +21,14 @@ class TypeAnalysis:
 
 class _Analyzer(dispatch.Class):
 
-    def __init__(self, ori_ana: OriginAnalysis, catalog: md.Catalog) -> None:
+    def __init__(self, root: no.Node, ori_ana: oris.OriginAnalysis, catalog: md.Catalog) -> None:
         super().__init__()
 
-        self._ori_ana = check.isinstance(ori_ana, OriginAnalysis)
+        self._root = check.isinstance(root, no.Node)
+        self._ori_ana = check.isinstance(ori_ana, oris.OriginAnalysis)
         self._catalog = check.isinstance(catalog, md.Catalog)
+
+        self._basic = basic(root)
 
     _process = dispatch.property()
 
@@ -33,6 +37,26 @@ class _Analyzer(dispatch.Class):
     @property
     def dts_by_node(self) -> ta.Mapping[no.Node, dt.Datatype]:
         return self.__call__.dct
+
+    def _process(self, ori: oris.Origin) -> dt.Datatype:  # noqa
+        raise TypeError(ori)
+
+    def _process(self, ori: oris.Constant) -> dt.Datatype:  # noqa
+        return self(ori.node)
+
+    def _process(self, ori: oris.Direct) -> dt.Datatype:  # noqa
+        return self(ori.src)
+
+    def _process(self, ori: oris.Export) -> dt.Datatype:  # noqa
+        return self(ori.src)
+
+    def _process(self, ori: oris.Import) -> dt.Datatype:  # noqa
+        return self(ori.src)
+
+    def _process(self, ori: oris.Scan) -> dt.Datatype:  # noqa
+        tbl = self._catalog.tables_by_name[check.isinstance(ori.node, no.Table).name.name]
+        col = tbl.columns_by_name[ori.sym.name]
+        return col.type
 
     def _process(self, node: no.Node) -> dt.Datatype:  # noqa
         raise TypeError(node)
@@ -54,7 +78,7 @@ class _Analyzer(dispatch.Class):
         return dt.String()
 
 
-def analyze(root: no.Node, ori_ana: OriginAnalysis, catalog: md.Catalog) -> TypeAnalysis:
-    ana = _Analyzer(ori_ana, catalog)
+def analyze(root: no.Node, ori_ana: oris.OriginAnalysis, catalog: md.Catalog) -> TypeAnalysis:
+    ana = _Analyzer(root, ori_ana, catalog)
     ana(root)
     return TypeAnalysis(check.not_empty(ana.dts_by_node))
