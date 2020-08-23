@@ -67,11 +67,11 @@ NULL: 'null';
 TRUE: 'true';
 
 DQ_STRING
-    : '"' (ESC | SAFECODEPOINT)* '"'
+    : '"' (ESC | CP)* '"'
     ;
 
 SQ_STRING
-    : '\'' (ESC | SAFECODEPOINT)* '\''
+    : '\'' (ESC | CP)* '\''
     ;
 
 TRI_DQ_STRING
@@ -83,7 +83,7 @@ TRI_SQ_STRING
     ;
 
 IDENTIFIER
-    : [A-Za-z_]
+    : [A-Za-z_] [A-Za-z_0-9\-]*
     ;
 
 fragment ESC
@@ -98,21 +98,22 @@ fragment HEX
     : [0-9a-fA-F]
     ;
 
-fragment SAFECODEPOINT
-    : ~ ["\\\u0000-\u001F]
+fragment CP
+    : ~["\\\u0000-\u001F]
     ;
 
 NUMBER
-    : '-'? INT ('.' [0-9] +)? EXP?
+    : [+\-]? INT ('.' [0-9]+)? EXP?
+    | [+\-]? '0x' HEX+
+    ;
+
+fragment EXP
+    : [Ee] [+\-]? INT
     ;
 
 fragment INT
     : '0'
     | [1-9] [0-9]*
-    ;
-
-fragment EXP
-    : [Ee] [+\-]? INT
     ;
 
 COMMENT

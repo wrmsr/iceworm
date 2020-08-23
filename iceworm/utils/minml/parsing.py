@@ -1,8 +1,5 @@
 """
-TODO:
- - decimal, hex
- - https://golang.org/pkg/reflect/#StructTag lol
-
+https://golang.org/pkg/reflect/#StructTag lol
 /*+ materialization: {wait_time_s: 3600} */
 """
 import typing as ta
@@ -49,7 +46,12 @@ class _ParseVisitor(MinmlVisitor):
 
     def visitNumber(self, ctx: MinmlParser.NumberContext):
         txt = ctx.getText()
-        return float(txt) if '.' in txt else int(txt)
+        if txt.startswith('0x'):
+            return int(txt, 16)
+        elif '.' in txt:
+            return float(txt)
+        else:
+            return int(txt)
 
     def visitObj(self, ctx: MinmlParser.ObjContext):
         return dict(map(self.visit, ctx.pair()))

@@ -6,6 +6,10 @@ def test_minml():
 
     for s in [
         '1',
+        '0x1a',
+        'ab-c',
+        'a0_c',
+        '-4.20e8',
         '"a": null',
         '"b": null, \n "c": 420',
         '{"b": null, "c": 420}',
@@ -16,4 +20,4 @@ def test_minml():
     ]:
         if not s.startswith('{') and s.startswith('}'):
             s = '{' + s + '}'
-        print(parsing.parse(s))
+        print(repr(parsing.parse(s)))
