@@ -230,6 +230,10 @@ test-verbose: build
 deps: venv
 	$(call do-deps,.venv,$(REQUIREMENTS_TXT))
 
+.PHONY: dep-freze
+dep-freeze: venv
+	.venv/bin/pip freeze > requirements-frz.txt
+
 .PHONY: dep-tree
 dep-tree: venv
 	.venv/bin/pipdeptree
