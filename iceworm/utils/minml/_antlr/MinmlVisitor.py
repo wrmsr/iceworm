@@ -15,6 +15,11 @@ class MinmlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MinmlParser#value.
+    def visitValue(self, ctx:MinmlParser.ValueContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MinmlParser#obj.
     def visitObj(self, ctx:MinmlParser.ObjContext):
         return self.visitChildren(ctx)
@@ -25,13 +30,18 @@ class MinmlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MinmlParser#key.
+    def visitKey(self, ctx:MinmlParser.KeyContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MinmlParser#array.
     def visitArray(self, ctx:MinmlParser.ArrayContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MinmlParser#value.
-    def visitValue(self, ctx:MinmlParser.ValueContext):
+    # Visit a parse tree produced by MinmlParser#identifier.
+    def visitIdentifier(self, ctx:MinmlParser.IdentifierContext):
         return self.visitChildren(ctx)
 
 

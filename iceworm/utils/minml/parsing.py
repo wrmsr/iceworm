@@ -1,13 +1,8 @@
 """
 TODO:
  - decimal
- - quotes optional - underscores and hyphens valid
  - hex ints 0xabc
- - single or double quotes (we are a sql)
- - trailing commas
- - comments.. # line-comments, blocks how? can't nest /* */
  - multiline (triplequote) strings
- - non-str keys
  - bare keys in mappings get a True value
  - https://golang.org/pkg/reflect/#StructTag lol
 
@@ -43,32 +38,37 @@ class _ParseVisitor(MinmlVisitor):
             check.none(aggregate)
             return nextResult
 
-    def visitObj(self, ctx: MinmlParser.ObjContext):
-        return dict(map(self.visit, ctx.pair()))
-
-    def visitPair(self, ctx: MinmlParser.PairContext):
-        return self.visit(ctx.key), self.visit(ctx.value())
-
     def visitArray(self, ctx: MinmlParser.ArrayContext):
         return [self.visit(e) for e in ctx.value()]
 
-    def visitString(self, ctx: MinmlParser.StringContext):
-        txt = ctx.getText()
-        check.state(txt.startswith('"') and txt.endswith('"'))
-        return txt[1:-1]
+    def visitFalse(self, ctx: MinmlParser.FalseContext):
+        return False
+
+    def visitIdentifier(self, ctx:MinmlParser.IdentifierContext):
+        return ctx.IDENTIFIER().getText()
+
+    def visitNull(self, ctx: MinmlParser.NullContext):
+        return NULL
 
     def visitNumber(self, ctx: MinmlParser.NumberContext):
         txt = ctx.getText()
         return float(txt) if '.' in txt else int(txt)
 
+    def visitObj(self, ctx: MinmlParser.ObjContext):
+        return dict(map(self.visit, ctx.pair()))
+
+    def visitPair(self, ctx: MinmlParser.PairContext):
+        return self.visit(ctx.key()), self.visit(ctx.value())
+
     def visitTrue(self, ctx: MinmlParser.TrueContext):
         return True
 
-    def visitFalse(self, ctx: MinmlParser.FalseContext):
-        return False
-
-    def visitNull(self, ctx: MinmlParser.NullContext):
-        return NULL
+    def visitString(self, ctx: MinmlParser.StringContext):
+        txt = ctx.getText()
+        check.state(
+            (txt.startswith('"') and txt.endswith('"')) or
+            (txt.startswith("'") and txt.endswith("'")))
+        return txt[1:-1]
 
 
 def parse(buf: str) -> ta.Any:

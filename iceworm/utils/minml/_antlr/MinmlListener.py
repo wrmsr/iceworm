@@ -18,6 +18,15 @@ class MinmlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MinmlParser#value.
+    def enterValue(self, ctx:MinmlParser.ValueContext):
+        pass
+
+    # Exit a parse tree produced by MinmlParser#value.
+    def exitValue(self, ctx:MinmlParser.ValueContext):
+        pass
+
+
     # Enter a parse tree produced by MinmlParser#obj.
     def enterObj(self, ctx:MinmlParser.ObjContext):
         pass
@@ -36,6 +45,15 @@ class MinmlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MinmlParser#key.
+    def enterKey(self, ctx:MinmlParser.KeyContext):
+        pass
+
+    # Exit a parse tree produced by MinmlParser#key.
+    def exitKey(self, ctx:MinmlParser.KeyContext):
+        pass
+
+
     # Enter a parse tree produced by MinmlParser#array.
     def enterArray(self, ctx:MinmlParser.ArrayContext):
         pass
@@ -45,12 +63,12 @@ class MinmlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MinmlParser#value.
-    def enterValue(self, ctx:MinmlParser.ValueContext):
+    # Enter a parse tree produced by MinmlParser#identifier.
+    def enterIdentifier(self, ctx:MinmlParser.IdentifierContext):
         pass
 
-    # Exit a parse tree produced by MinmlParser#value.
-    def exitValue(self, ctx:MinmlParser.ValueContext):
+    # Exit a parse tree produced by MinmlParser#identifier.
+    def exitIdentifier(self, ctx:MinmlParser.IdentifierContext):
         pass
 
 

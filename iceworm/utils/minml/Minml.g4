@@ -5,23 +5,10 @@ root
     : value
     ;
 
-obj
-    : '{' pair (',' pair)* '}'
-    | '{' '}'
-    ;
-
-pair
-    : key=string ':' value
-    ;
-
-array
-    : '[' value (',' value)* ']'
-    | '[' ']'
-    ;
-
 value
     : obj
     | array
+    | identifier
     | string
     | number
     | true
@@ -29,8 +16,32 @@ value
     | null
     ;
 
+obj
+    : '{' pair (',' pair)* ','? '}'
+    | '{' '}'
+    ;
+
+pair
+    : key ':' value
+    ;
+
+key
+    : identifier
+    | string
+    ;
+
+array
+    : '[' value (',' value)*  ','? ']'
+    | '[' ']'
+    ;
+
+identifier
+    : IDENTIFIER
+    ;
+
 string
-    : STRING
+    : DQ_STRING
+    | SQ_STRING
     ;
 
 number
@@ -53,8 +64,16 @@ FALSE: 'false';
 NULL: 'null';
 TRUE: 'true';
 
-STRING
+DQ_STRING
     : '"' (ESC | SAFECODEPOINT)* '"'
+    ;
+
+SQ_STRING
+    : '\'' (ESC | SAFECODEPOINT)* '\''
+    ;
+
+IDENTIFIER
+    : [A-Za-z_]
     ;
 
 fragment ESC
@@ -84,6 +103,10 @@ fragment INT
 
 fragment EXP
     : [Ee] [+\-]? INT
+    ;
+
+COMMENT
+    : '#' ~[\r\n]* '\r'? '\n'? -> channel(HIDDEN)
     ;
 
 WS
