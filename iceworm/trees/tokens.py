@@ -1,3 +1,11 @@
+"""
+TODO:
+ - hints:
+  - build full node -> comments map without dumb scans
+  - comma etc. as terminators
+  - detect orphan hot comments
+  - enforce unique binding
+"""
 import typing as ta
 
 from omnibus import check
@@ -59,3 +67,6 @@ class TokenAnalysis:
         except StopIteration:
             r = -1
         return self.toks[l:r]
+
+    def get_node_comments(self, node: no.Node) -> ta.Sequence[str]:
+        return [t.text for t in self.get_node_toks(node) if t.channel == 1]

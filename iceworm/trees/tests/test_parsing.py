@@ -86,7 +86,7 @@ def test_comments():
         assert reparsed == root
 
         tok_ana = toks.TokenAnalysis(root)
-        print(tok_ana.get_node_toks(root))
+        print(tok_ana.get_node_comments(root))
 
         class NodePartTransform(rendering.PartTransform):
 
