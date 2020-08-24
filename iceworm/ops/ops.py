@@ -1,5 +1,6 @@
 """
 TODO:
+ - Sequence? Block?
  - 'merge'? refresh?
 
 Op families:
@@ -55,16 +56,6 @@ class CreateTableAs(Op):
     query: str = dc.field(check=lambda o: isinstance(o, str))
 
 
-class InsertIntoSelect(Op):
-    dst: QualifiedName = dc.field(coerce=QualifiedName.of)
-    query: str = dc.field(check=lambda o: isinstance(o, str))
-
-
-class CopyTable(Op):
-    dst: QualifiedName = dc.field(coerce=QualifiedName.of)
-    src: QualifiedName = dc.field(coerce=QualifiedName.of)
-
-
 class AtomicCreateTableAs(Atomic):
     name: QualifiedName = dc.field(coerce=QualifiedName.of, check=lambda n: len(n) > 1)
     query: str = dc.field(check=lambda o: isinstance(o, str))
@@ -74,6 +65,11 @@ class AtomicCreateTableAs(Atomic):
         return self.name[0]
 
 
+class InsertIntoSelect(Op):
+    dst: QualifiedName = dc.field(coerce=QualifiedName.of)
+    query: str = dc.field(check=lambda o: isinstance(o, str))
+
+
 class AtomicInsertIntoSelect(Atomic):
     dst: QualifiedName = dc.field(coerce=QualifiedName.of, check=lambda n: len(n) > 1)
     query: str = dc.field(check=lambda o: isinstance(o, str))
@@ -81,6 +77,11 @@ class AtomicInsertIntoSelect(Atomic):
     @property
     def conn(self) -> str:
         return self.dst[0]
+
+
+class CopyTable(Op):
+    dst: QualifiedName = dc.field(coerce=QualifiedName.of)
+    src: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
 class AtomicCopyTable(Atomic):

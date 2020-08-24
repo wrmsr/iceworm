@@ -14,7 +14,7 @@ from .connectors import Row
 from .connectors import RowGen
 from .connectors import RowSink
 from .connectors import RowSource
-from .utils import parse_simple_select_star_table
+from .utils import parse_simple_select_table
 
 
 class SqlConnector(Connector['SqlConnector']):
@@ -65,7 +65,7 @@ class SqlConnection(Connection[SqlConnector]):
         self._conn.close()
 
     def create_row_source(self, query: str) -> RowSource:
-        table_name = parse_simple_select_star_table(query)
+        table_name = parse_simple_select_table(query, star=True)
         return SqlRowSource(self.sa_conn, f'select * from {table_name.dotted}')
 
     def create_row_sink(self, table: QualifiedName) -> RowSink:

@@ -11,7 +11,7 @@ from .connectors import Connector
 from .connectors import RowGen
 from .connectors import RowSink
 from .connectors import RowSource
-from .utils import parse_simple_select_star_table
+from .utils import parse_simple_select_table
 
 
 class Table(dc.Pure):
@@ -41,7 +41,7 @@ class ComputedConnection(Connection[ComputedConnector]):
         super().__init__(connector)
 
     def create_row_source(self, query: str) -> RowSource:
-        table_name = parse_simple_select_star_table(query)
+        table_name = parse_simple_select_table(query, star=True)
         table = self._ctor._tables_by_name[table_name]
         return ComputedRowSource(table)
 

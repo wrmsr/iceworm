@@ -22,7 +22,7 @@ from .ops import DropTable
 from .ops import Op
 from .ops import Transaction
 from .sql import SqlConnection
-from .utils import parse_simple_select_star_table
+from .utils import parse_simple_select_table
 
 
 OpT = ta.TypeVar('OpT', bound=Op)
@@ -88,7 +88,7 @@ class InsertIntoSelectExecutor(Executor[InsertIntoSelect]):
     def execute(self, op: InsertIntoSelect) -> None:
         dst_conn = self._conns[op.dst[0]]
 
-        src_name = parse_simple_select_star_table(op.query)
+        src_name = parse_simple_select_table(op.query, star=True)
         src_conn = self._conns[src_name[0]]
         src_query = f"select * from {'.'.join(src_name[1:])}"
 

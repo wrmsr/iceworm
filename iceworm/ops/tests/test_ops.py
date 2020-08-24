@@ -25,6 +25,7 @@ from .. import execution as exe
 from .. import files
 from .. import ops
 from .. import sql
+from .. import transforms as tfm
 from .. import worlds as wo
 from ... import datatypes as dt
 from ... import metadata as md
@@ -35,7 +36,7 @@ from ...trees import origins
 from ...trees import parsing as par
 from ...trees import rendering
 from ...trees import symbols
-from ...trees import transforms as tfm
+from ...trees import transforms as ttfm
 from ...types import QualifiedName
 from ...utils import secrets as sec
 from ..base import Op
@@ -179,7 +180,7 @@ def test_ops():
 
     plan = [
         ops.DropTable(['pg', 'foo']),
-        ops.AtomicCreateTableAs(['pg', 'foo'], 'select 1'),
+        ops.CreateTableAs(['pg', 'foo'], 'select 1'),
     ]
 
     for view in VIEWS:
@@ -209,11 +210,11 @@ def test_ops():
             else:
                 check.none(executor.execute(op))
 
-        ts = [
-            ops.Transaction({'pg'}, plan),
-        ]
-        for t in ts:
-            execute(t)
+        root = ops.Transaction({'pg'}, plan)
+
+        root = tfm.CreateTableAsAtomizer()(root)
+
+        execute(root)
 
         with contextlib.closing(CONNECTORS['pg'].connect()) as pconn:
             print(pconn.reflect([QualifiedName.of(['a'])]))
@@ -268,9 +269,9 @@ def test_queries():
 
         print(cat)
 
-        root = tfm.AliasRelationsTransformer(root)(root)
-        root = tfm.LabelSelectItemsTransformer(root)(root)
-        root = tfm.ExpandSelectsTransformer(root, cat)(root)
+        root = ttfm.AliasRelationsTransformer(root)(root)
+        root = ttfm.LabelSelectItemsTransformer(root)(root)
+        root = ttfm.ExpandSelectsTransformer(root, cat)(root)
         print(rendering.render(root))
 
         syms = symbols.analyze(root, cat)
