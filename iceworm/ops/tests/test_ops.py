@@ -276,4 +276,5 @@ def test_queries():
         if tn != obj.name:
             aset.add(tn)
 
-    print(alias_sets_by_tbl)
+    cat = md.Catalog(tables=[dc.replace(t, aliases=aset) if aset else t for t, aset in alias_sets_by_tbl.items()])
+    print(cat)

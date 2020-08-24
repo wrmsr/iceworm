@@ -39,10 +39,10 @@ ObjectT = ta.TypeVar('ObjectT', bound='Object')
 
 class Object(dc.Enum, allow_setattr=True, reorder=True):
     name: QualifiedName = dc.field(coerce=QualifiedName.of)
-    aliases: ta.Optional[ta.AbstractSet[QualifiedName]] = dc.field(
-        None, kwonly=True, coerce=abs_set, check=lambda l: l is None or all(isinstance(o, QualifiedName) for o in l))
+    aliases: ta.AbstractSet[QualifiedName] = dc.field(
+        (), kwonly=True, coerce=abs_set, check=lambda l: all(isinstance(o, QualifiedName) for o in l))
 
-    dc.check(lambda name, aliases: not (aliases and name in aliases))
+    dc.check(lambda name, aliases: name not in aliases)
 
     @abc.abstractproperty
     def type(self) -> dt.Datatype:

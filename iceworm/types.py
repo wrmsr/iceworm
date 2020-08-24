@@ -19,6 +19,9 @@ class QualifiedName(dc.Pure, ta.Sequence[str]):
             all(isinstance(p, str) for p in parts)
     ))
 
+    def __repr__(self) -> str:
+        return 'QualifiedName([%s])' % (', '.join(map(repr, self.parts)),)
+
     @property
     def object_name(self) -> str:
         return self.parts[-1]
