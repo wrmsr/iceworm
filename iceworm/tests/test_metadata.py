@@ -2,6 +2,7 @@ import pytest
 
 from .. import datatypes as dt
 from .. import metadata as md
+from ..utils import serde
 
 
 def test_metadata():
@@ -10,3 +11,10 @@ def test_metadata():
 
     with pytest.raises(KeyError):
         md.Table(['t'], [md.Column('a', dt.Integer()), md.Column('a', dt.Integer())])
+
+
+def test_serde():
+    t = md.Table(['t'], [md.Column('a', dt.Integer()), md.Column('b', dt.String())])
+    s = serde.serialize(t)
+    d = serde.deserialize(s, md.Object)
+    assert t == d

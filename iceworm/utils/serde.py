@@ -40,6 +40,7 @@ Serializable = ta.Union[
     enum.Enum,
     ta.Optional['Serializable'],
     ta.Sequence['Serializable'],
+    ta.AbstractSet['Serializable'],
     ta.Mapping[MappingKey, 'Serializable'],
 ]
 
@@ -103,15 +104,15 @@ def _get_dataclass_field_type_map(dcls: type) -> _DataclassFieldTypeMap:
 
 
 def serialize(obj: T) -> Serialized:
-    if isinstance(obj, collections.abc.Mapping):
-        return [[serialize(k), serialize(v)] for k, v in obj.items()]
-
-    elif isinstance(obj, collections.abc.Sequence) and not isinstance(obj, str):
-        return [serialize(e) for e in obj]
-
-    elif dc.is_dataclass(obj):
+    if dc.is_dataclass(obj):
         dct = {fn: serialize(getattr(obj, fn)) for fn in _get_dataclass_field_type_map(type(obj))}
         return {type(obj).__name__: dct}
+
+    elif isinstance(obj, collections.abc.Mapping):
+        return [[serialize(k), serialize(v)] for k, v in obj.items()]
+
+    elif isinstance(obj, (collections.abc.Sequence, collections.abc.Set)) and not isinstance(obj, str):
+        return [serialize(e) for e in obj]
 
     elif isinstance(obj, enum.Enum):
         return obj.name
@@ -147,6 +148,12 @@ def _deserialize(ser: Serialized, cls: ta.Type[T]) -> T:
                 raise KeyError(k)
             dct[k] = v
         return dct
+
+    elif rfl.is_generic(cls) and cls.__origin__ is collections.abc.Set:
+        [ecls] = cls.__args__
+        if not isinstance(ser, collections.abc.Sequence):
+            raise TypeError(ser)
+        return {deserialize(e, ecls) for e in ser}
 
     elif rfl.is_generic(cls) and cls.__origin__ is collections.abc.Sequence:
         [ecls] = cls.__args__

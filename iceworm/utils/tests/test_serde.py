@@ -44,8 +44,8 @@ def test_serde():
     rt({0: 1}, ta.Mapping[int, int])
     rt({0: None}, ta.Mapping[int, ta.Optional[int]])
 
-    with pytest.raises(TypeError):
-        serde.serialize(set())
+    rt({1, 2}, ta.AbstractSet[int])
+
     with pytest.raises(serde.DeserializationException):
         serde.deserialize(None, int)
 
