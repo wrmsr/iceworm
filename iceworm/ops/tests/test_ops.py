@@ -5,7 +5,6 @@ TODO:
   - upstream cfg: select * from v /*+ weak */;
   - col type ann/enforcement: select a /*+ type: char(36) */
   - catalog chainmap?
- - db_url -> 'secrets' abstraction? serialize whole world but ref secrets by key
 """
 import contextlib
 import inspect

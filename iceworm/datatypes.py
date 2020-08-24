@@ -2,6 +2,8 @@
 TODO:
  - sqla bidir adapter (postgres specifically)
  - bottom type for null const?
+ - annotations?
+  - NonNull? Nullable?
 """
 import typing as ta
 
