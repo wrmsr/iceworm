@@ -65,6 +65,6 @@ class ToInternal(dispatch.Class):
 
     def __call__(self, sa_tbl: sa.Table) -> md.Table:  # noqa
         return md.Table(
-            list(filter(None, [sa_tbl.schema, sa_tbl.name])),
+            filter(None, [sa_tbl.schema, sa_tbl.name]),
             [self(sa_col) for sa_col in sa_tbl.columns],
         )
