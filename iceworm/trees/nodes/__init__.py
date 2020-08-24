@@ -1,3 +1,5 @@
+from .base import Annotation  # noqa
+from .base import Annotations  # noqa
 from .base import DIRECTION_MAP  # noqa
 from .base import Decimal  # noqa
 from .base import Direction  # noqa

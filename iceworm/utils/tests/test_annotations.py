@@ -43,3 +43,6 @@ def test_annotations():
     anns2 = TestAnns({**anns, B: B(3)})
     assert anns[A] is anns2[A]
     assert anns2[B].v == 3
+
+    anns2 = TestAnns(anns)
+    assert anns == anns2

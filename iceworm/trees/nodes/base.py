@@ -10,6 +10,7 @@ Visitors / Tools:
 import abc
 import collections.abc
 import enum
+import operator
 import typing as ta
 
 from omnibus import check
@@ -18,6 +19,7 @@ from omnibus import dataclasses as dc
 from omnibus import properties
 
 from ...types import QualifiedName
+from ...utils import annotations as anns
 from ...utils import build_dc_repr
 from ...utils import build_enum_value_map
 from ...utils import seq
@@ -32,7 +34,28 @@ NodeMapper = ta.Callable[['Node'], 'Node']
 NoneType = type(None)
 
 
+class Annotation(anns.Annotation, abstract=True):
+    pass
+
+
+class Annotations(anns.Annotations[Annotation]):
+
+    @classmethod
+    def _ann_cls(cls) -> ta.Type[Annotation]:
+        return Annotation
+
+
 class Node(dc.Enum, NodalDataclass['Node'], reorder=True, repr=False, sealed='package'):
+
+    anns: Annotations = dc.field(
+        (),
+        kwonly=True,
+        repr=False,
+        hash=False,
+        compare=False,
+        coerce=Annotations,
+        metadata={serde.Ignore: operator.not_},
+    )
 
     meta: ta.Mapping[ta.Any, ta.Any] = dc.field(
         ocol.frozendict(),
