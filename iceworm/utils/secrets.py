@@ -11,21 +11,32 @@ class SecretKey(dc.Pure):
     key: str
 
 
-class SecretValue(dc.Enum):
+class Secret(dc.Enum):
 
     @abc.abstractproperty
     def value(self) -> str:
         raise NotImplementedError
 
-
-class KeyedSecretValue(SecretValue):
-    key: str
-    value: str = dc.field(repr=False)
+    def __call__(self) -> str:
+        return self.value
 
 
-class ProvidedSecretValue(SecretValue):
-    value: str = dc.field(repr=False)
+class KeyedSecret(Secret):
+    key: str = dc.field(check=lambda o: isinstance(o, str))
+    value: str = dc.field(repr=False, check=lambda o: isinstance(o, str))
+
+
+class ProvidedSecret(Secret):
+    value: str = dc.field(repr=False, check=lambda o: isinstance(o, str))
     src: ta.Any = dc.field(None)
+
+
+class ComputedSecret(Secret):
+    fn: ta.Callable[[], str] = dc.field(check=callable)
+
+    @property
+    def value(self) -> str:
+        return self.fn()
 
 
 class Secrets:
@@ -35,8 +46,8 @@ class Secrets:
 
         self._dct = unique_dict((check.isinstance(k, str), check.isinstance(v, str)) for k, v in dct.items())
 
-    def __getitem__(self, key: ta.Union[SecretValue, SecretKey, str]) -> SecretValue:
-        if isinstance(key, SecretValue):
+    def __getitem__(self, key: ta.Union[Secret, SecretKey, str]) -> Secret:
+        if isinstance(key, Secret):
             return key
         elif isinstance(key, SecretKey):
             try:
@@ -44,8 +55,8 @@ class Secrets:
             except KeyError:
                 raise
             else:
-                return KeyedSecretValue(key.key, value)
+                return KeyedSecret(key.key, value)
         elif isinstance(key, str):
-            return ProvidedSecretValue(key)
+            return ProvidedSecret(key)
         else:
             raise TypeError(key)

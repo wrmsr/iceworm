@@ -24,6 +24,7 @@ from .. import execution as exe
 from .. import files
 from .. import ops
 from .. import sql
+from .. import worlds as wo
 from ... import datatypes as dt
 from ... import metadata as md
 from ...trees import analysis as ana
@@ -35,7 +36,7 @@ from ...trees import rendering
 from ...trees import symbols
 from ...trees import transforms as tfm
 from ...types import QualifiedName
-from ...utils import seq
+from ...utils import secrets as sec
 
 
 @lang.cached_nullary
@@ -59,7 +60,7 @@ CONNECTORS = ctrs.ConnectorSet([
     sql.SqlConnector(
         'pg',
         sql.SqlConnector.Config(
-            url=db_url,
+            url=sec.ComputedSecret(db_url),
         ),
     ),
 
@@ -102,19 +103,9 @@ CONNECTORS = ctrs.ConnectorSet([
 ])
 
 
-class Materialization(dc.Pure):
-    name: ta.Optional[QualifiedName] = dc.field(coerce=QualifiedName.of)
-
-
-class View(dc.Pure):
-    table: md.Table = dc.field(check=lambda o: isinstance(o, md.Table))
-    query: str = dc.field(check=lambda o: isinstance(o, str))
-    materializations: ta.Sequence[Materialization] = dc.field((), coerce=seq)
-
-
 VIEWS = [
 
-        View(
+        wo.View(
             md.Table(
                 ['a'],
                 [
@@ -124,10 +115,10 @@ VIEWS = [
                 ],
             ),
             'select * from csv.a',
-            [Materialization(['pg', 'a'])],
+            [wo.Materialization(['pg', 'a'])],
         ),
 
-        View(
+        wo.View(
             md.Table(
                 ['b'],
                 [
@@ -137,10 +128,10 @@ VIEWS = [
                 ],
             ),
             'select * from csv.b',
-            [Materialization(['pg', 'b'])],
+            [wo.Materialization(['pg', 'b'])],
         ),
 
-        View(
+        wo.View(
             md.Table(
                 ['c'],
                 [
@@ -150,10 +141,10 @@ VIEWS = [
                 ],
             ),
             'select * from pg.b',
-            [Materialization(['pg', 'c'])],
+            [wo.Materialization(['pg', 'c'])],
         ),
 
-        View(
+        wo.View(
             md.Table(
                 ['nums'],
                 [
@@ -161,10 +152,10 @@ VIEWS = [
                 ]
             ),
             'select * from cmp.nums',
-            [Materialization(['pg', 'nums'])],
+            [wo.Materialization(['pg', 'nums'])],
         ),
 
-        # View(
+        # wo.View(
         #     md.Table(
         #         ['qnums'],
         #         [
@@ -172,7 +163,7 @@ VIEWS = [
         #         ]
         #     ),
         #     'select * from cmp.nums',
-        #     [Materialization(['pg', 'nums'])],
+        #     [wo.Materialization(['pg', 'nums'])],
         # ),
 
     ]
@@ -233,37 +224,9 @@ def test_ops():
         print(list(sa_conn.execute('select * from nums')))
 
 
-class World:
-
-    def __init__(self, connectors: ctrs.ConnectorSet) -> None:
-        super().__init__()
-
-        self._ctors = check.isinstance(connectors, ctrs.ConnectorSet)
-
-        self._views_by_name: ta.MutableMapping[QualifiedName, View] = {}
-
-    def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
-        objs = []
-
-        if len(name) > 1 and name[0] in self._ctors:
-            ctor = self._ctors[name[0]]
-            with contextlib.closing(ctor.connect()) as conn:
-                connobjs = conn.reflect([QualifiedName(name[1:])])
-                if connobjs:
-                    objs.append(check.single(connobjs.values()))
-
-        for ctor in self._ctors:
-            with contextlib.closing(ctor.connect()) as conn:
-                connobjs = conn.reflect([name])
-                if connobjs:
-                    objs.extend(connobjs.values())
-
-        return objs
-
-
 @pytest.mark.xfail()
 def test_queries():
-    world = World(CONNECTORS)
+    world = wo.World(CONNECTORS)
 
     for query in [
         'select * from cmp.nums',
