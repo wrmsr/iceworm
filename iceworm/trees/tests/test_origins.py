@@ -40,7 +40,7 @@ def test_origins():
         syms = symbols.analyze(root, cat)
         oris = origins.analyze(root, syms)
 
-        dts = datatypes.analyze(root, oris, cat)  # noqa
+        dts = datatypes.analyze(root, oris, cat)
         print(dts.dts_by_node[root])
 
         print()

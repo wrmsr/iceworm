@@ -83,7 +83,7 @@ def _build_obj_map(objs: ta.Iterable[ObjectT], cls: ta.Type[ObjectT]) -> ta.Mapp
         (n, o)
         for o in objs
         for _ in [check.isinstance(o, cls)]
-        for n in [o.name, *(o.aliases or [])]
+        for n in [o.name, *o.aliases]
     )
 
 

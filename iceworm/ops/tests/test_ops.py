@@ -28,8 +28,13 @@ from .. import sql
 from ... import datatypes as dt
 from ... import metadata as md
 from ...trees import analysis as ana
+from ...trees import datatypes as tdatatypes
 from ...trees import nodes as no
+from ...trees import origins
 from ...trees import parsing as par
+from ...trees import rendering
+from ...trees import symbols
+from ...trees import transforms as tfm
 from ...types import QualifiedName
 from ...utils import seq
 
@@ -276,5 +281,22 @@ def test_queries():
         if tn != obj.name:
             aset.add(tn)
 
-    cat = md.Catalog(tables=[dc.replace(t, aliases=aset) if aset else t for t, aset in alias_sets_by_tbl.items()])
+    cat = md.Catalog(
+        tables=[
+            dc.replace(t, aliases={*t.aliases, *aset}) if aset else t
+            for t, aset in alias_sets_by_tbl.items()
+        ],
+    )
+
     print(cat)
+
+    root = tfm.AliasRelationsTransformer(root)(root)
+    root = tfm.LabelSelectItemsTransformer(root)(root)
+    root = tfm.ExpandSelectsTransformer(root, cat)(root)
+    print(rendering.render(root))
+
+    syms = symbols.analyze(root, cat)
+    oris = origins.analyze(root, syms)
+
+    dts = tdatatypes.analyze(root, oris, cat)
+    print(dts.dts_by_node[root])
