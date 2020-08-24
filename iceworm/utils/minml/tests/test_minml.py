@@ -17,6 +17,7 @@ def test_minml():
         '{a: b,}',
         '{a: b, c}',
         '[a, """hi\nthere""", 5]',
+        "{0: 'a'}",
     ]:
         if not s.startswith('{') and s.startswith('}'):
             s = '{' + s + '}'

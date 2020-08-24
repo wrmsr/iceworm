@@ -45,15 +45,6 @@ class MinmlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MinmlParser#key.
-    def enterKey(self, ctx:MinmlParser.KeyContext):
-        pass
-
-    # Exit a parse tree produced by MinmlParser#key.
-    def exitKey(self, ctx:MinmlParser.KeyContext):
-        pass
-
-
     # Enter a parse tree produced by MinmlParser#array.
     def enterArray(self, ctx:MinmlParser.ArrayContext):
         pass

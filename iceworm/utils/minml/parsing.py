@@ -57,8 +57,8 @@ class _ParseVisitor(MinmlVisitor):
         return dict(map(self.visit, ctx.pair()))
 
     def visitPair(self, ctx: MinmlParser.PairContext):
-        key = self.visit(ctx.key())
-        value = self.visit(ctx.value()) if ctx.value() is not None else True
+        key = self.visit(ctx.k)
+        value = self.visit(ctx.v) if ctx.v is not None else True
         return key, value
 
     def visitTrue(self, ctx: MinmlParser.TrueContext):

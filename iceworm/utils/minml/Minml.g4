@@ -8,12 +8,12 @@ root
 value
     : obj
     | array
-    | identifier
     | string
     | number
     | true
     | false
     | null
+    | identifier
     ;
 
 obj
@@ -22,12 +22,7 @@ obj
     ;
 
 pair
-    : key (':' value)?
-    ;
-
-key
-    : identifier
-    | string
+    : k=value (':' v=value)?
     ;
 
 array
