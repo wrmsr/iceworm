@@ -17,7 +17,8 @@ class Materialization(dc.Pure):
 class View(dc.Pure):
     table: md.Table = dc.field(check=lambda o: isinstance(o, md.Table))
     query: str = dc.field(check=lambda o: isinstance(o, str))
-    materializations: ta.Sequence[Materialization] = dc.field((), coerce=seq)
+    materializations: ta.Sequence[Materialization] = dc.field(
+        (), coerce=seq, check=lambda l: all(isinstance(o, Materialization) for o in l))
 
 
 class World:
