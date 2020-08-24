@@ -5,6 +5,8 @@ TODO:
  - jinja usage
  - types
   - including inferred jinja
+ - * min/max/expected rowcounts *
+  - if using insert into pagerduty/jira/slack/email/etc enforce bounds
 """
 import typing as ta
 

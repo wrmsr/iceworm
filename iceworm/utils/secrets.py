@@ -4,7 +4,7 @@ import typing as ta
 from omnibus import check
 from omnibus import dataclasses as dc
 
-from .utils import unique_dict
+from .collections import unique_dict
 
 
 class SecretKey(dc.Pure):

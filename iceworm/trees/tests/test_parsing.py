@@ -3,11 +3,10 @@ import json  # noqa
 import os.path
 import textwrap
 
-from omnibus._vendor import antlr4
-
 from .. import nodes as no
 from .. import parsing
 from .. import rendering
+from .. import tokens as toks
 from ...utils import serde
 
 
@@ -73,32 +72,21 @@ def test_comments():
         -- end
        """),
     ]:
-        node = parsing.parse_statement(sql)
-        print(node)
+        root = parsing.parse_statement(sql)
+        print(root)
 
-        ser = serde.serialize(node)  # noqa
+        ser = serde.serialize(root)  # noqa
         des = serde.deserialize(ser, no.Node)  # noqa
         # assert des == node
 
-        rendered = rendering.render(node)
+        rendered = rendering.render(root)
         print(rendered)
 
         reparsed = parsing.parse_statement(rendered + ';')
-        assert reparsed == node
+        assert reparsed == root
 
-        from omnibus import collections as ocol
-
-        def rec(pctx):
-            pctxs.add(pctx)
-            for cpctx in getattr(pctx, 'children', []):
-                rec(cpctx)
-
-        pctxs = ocol.IdentitySet()
-        rec(node.meta[antlr4.ParserRuleContext])
-
-        for pctx in pctxs:
-            print(pctx)
-            print(getattr(pctx, 'start', None))
+        tok_ana = toks.TokenAnalysis(root)
+        print(tok_ana.get_node_toks(root))
 
         class NodePartTransform(rendering.PartTransform):
 
@@ -106,7 +94,7 @@ def test_comments():
                 print(part)
                 return super().__call__(part)
 
-        part = rendering.Renderer()(node)
+        part = rendering.Renderer()(root)
         part = NodePartTransform()(part)
         part = rendering.compact_part(part)
 

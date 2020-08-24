@@ -2,6 +2,11 @@
 TODO:
  - Sequence? Block?
  - 'merge'? refresh?
+ - from alerts:
+  - conditional? takes query?
+   - contextual? context?
+    - state as tables? garbage collection? static lifetime analysis? kinda btree blackboard style
+  - again w/ the 'insert into slack' thing: slack/pd/email
 
 Op families:
  - spark?

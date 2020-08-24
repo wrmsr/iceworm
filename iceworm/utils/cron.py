@@ -7,7 +7,7 @@ from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 
-from .utils import seq
+from .collections import seq
 
 
 T = ta.TypeVar('T')
