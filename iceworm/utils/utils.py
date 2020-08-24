@@ -58,6 +58,15 @@ def mapping(obj: ta.Union[ta.Mapping[K, V], ta.Iterable[ta.Tuple[K, V]], None]) 
         return ocol.frozendict(obj)
 
 
+def abs_set(it: ta.Optional[ta.Iterable[T]]) -> ta.Optional[ta.AbstractSet[T]]:
+    if it is None:
+        return None
+    elif isinstance(it, frozenset):
+        return it
+    else:
+        return frozenset(it)
+
+
 class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
     """
     TODO:

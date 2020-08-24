@@ -26,7 +26,7 @@ def test_origins():
         'select t0.a + 5 from t0',
         'select t0.a + t0.b from t0',
         'select t0.a + t0.b + 5 from t0',
-        'select f(t0.a + 1) + t0.b + 2 from t0',
+        # 'select f(t0.a + 1) + t0.b + 2 from t0',
         'select 5 v',
     ]:
         root = parsing.parse_statement(s)
