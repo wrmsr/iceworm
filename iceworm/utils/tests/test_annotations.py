@@ -24,6 +24,12 @@ class B(TestAnn):
 
 
 def test_annotations():
+    anns = TestAnns()
+    s = serde.serialize(anns)
+    assert s == {'TestAnns': {}}
+    d = serde.deserialize(s, TestAnns)
+    assert anns == d
+
     anns = TestAnns([A(), B(1)])
     assert anns[B].v == 1
 
@@ -34,6 +40,6 @@ def test_annotations():
     anns = TestAnns({**{A: A(), B: B(1)}, B: B(2)})
     assert anns[B].v == 2
 
-    anns2 = TestAnns({**anns.dct, B: B(3)})
+    anns2 = TestAnns({**anns, B: B(3)})
     assert anns[A] is anns2[A]
     assert anns2[B].v == 3

@@ -1,5 +1,6 @@
 import abc
 import collections.abc
+import operator
 import typing as ta
 
 from omnibus import check
@@ -42,7 +43,13 @@ class Annotations(
     allow_setattr=True,
 ):
     anns: ta.Sequence[AnnotationT] = dc.field(
-        (), coerce=_coerce_anns, metadata={serde.GetType: lambda cls: ta.Sequence[cls._ann_cls()]})
+        (),
+        coerce=_coerce_anns,
+        metadata={
+            serde.GetType: lambda cls: ta.Sequence[cls._ann_cls()],
+            serde.Ignore: operator.not_,
+        },
+    )
 
     @abc.abstractclassmethod
     def _ann_cls(cls) -> ta.Type[Annotation]:
@@ -64,9 +71,14 @@ class Annotations(
             dct[type(ann)] = ann
         self._anns_by_cls: ta.Mapping[ta.Type[AnnotationT], AnnotationT] = dct
 
-    @property
-    def dct(self) -> ta.Mapping[ta.Type[AnnotationT], AnnotationT]:
-        return self._anns_by_cls
+    def __bool__(self) -> bool:
+        return bool(self.anns)
+
+    def keys(self) -> ta.Iterator[ta.Type[AnnotationT]]:
+        # The presence of this method enables use in splatting: {**anns, ...}:
+        #   https://github.com/python/cpython/blob/4e02981de0952f54bf87967f8e10d169d6946b40/Objects/dictobject.c#L2451
+        #   https://github.com/python/cpython/blob/4e02981de0952f54bf87967f8e10d169d6946b40/Objects/abstract.c#L2195
+        return iter(self._anns_by_cls.keys())
 
     def __getitem__(self, cls: ta.Type[AnnotationT]) -> AnnotationT:
         check.issubclass(cls, self._ann_cls())

@@ -88,28 +88,50 @@ def _get_subclass_map(cls: type) -> _SubclassMap:
         return dct
 
 
-_DataclassFieldTypeMap = ta.Mapping[str, ta.Any]
-_FIELD_TYPE_MAPS_BY_DATACLASS: ta.MutableMapping[type, _DataclassFieldTypeMap] = weakref.WeakKeyDictionary()
+class _DataclassFieldSerde(dc.Pure):
+    cls: ta.Any
+    ignore_if: ta.Optional[ta.Callable[[ta.Any], bool]] = dc.field(None, kwonly=True)
 
 
-def _get_dataclass_field_type_map(dcls: type) -> _DataclassFieldTypeMap:
+_DataclassFieldSerdeMap = ta.Mapping[str, _DataclassFieldSerde]
+_FIELD_TYPE_MAPS_BY_DATACLASS: ta.MutableMapping[type, _DataclassFieldSerdeMap] = weakref.WeakKeyDictionary()
+
+
+def _get_dataclass_field_type_map(dcls: type) -> _DataclassFieldSerdeMap:
     if not isinstance(dcls, type) or not dc.is_dataclass(dcls):
         raise TypeError(dcls)
     try:
         return _FIELD_TYPE_MAPS_BY_DATACLASS[dcls]
     except KeyError:
         th = ta.get_type_hints(dcls)
-        dct = _FIELD_TYPE_MAPS_BY_DATACLASS[dcls] = {
-            f.name: th[f.name] if GetType not in f.metadata else f.metadata[GetType](dcls)
-            for f in dc.fields(dcls)
-            if not f.metadata.get(Ignore)
-        }
+        dct = {}
+        for f in dc.fields(dcls):
+            try:
+                ig = f.metadata[Ignore]
+            except KeyError:
+                ignore_if = None
+            else:
+                if callable(ig):
+                    ignore_if = ig
+                elif ig:
+                    continue
+            if GetType in f.metadata:
+                fcls = f.metadata[GetType](dcls)
+            else:
+                fcls = th[f.name]
+            dct[f.name] = _DataclassFieldSerde(fcls, ignore_if=ignore_if)
+        _FIELD_TYPE_MAPS_BY_DATACLASS[dcls] = dct
         return dct
 
 
 def serialize(obj: T) -> Serialized:
     if dc.is_dataclass(obj):
-        dct = {fn: serialize(getattr(obj, fn)) for fn in _get_dataclass_field_type_map(type(obj))}
+        dct = {}
+        for fn, fs in _get_dataclass_field_type_map(type(obj)).items():
+            v = getattr(obj, fn)
+            if fs.ignore_if is not None and fs.ignore_if(v):
+                continue
+            dct[fn] = serialize(v)
         return {type(obj).__name__: dct}
 
     elif isinstance(obj, collections.abc.Mapping):
@@ -176,8 +198,8 @@ def _deserialize(ser: Serialized, cls: ta.Type[T]) -> T:
         fdct = _get_dataclass_field_type_map(dcls)
         kw = {}
         for k, v in dct.items():
-            fcls = fdct[k]
-            kw[k] = deserialize(v, fcls)
+            fs = fdct[k]
+            kw[k] = deserialize(v, fs.cls)
         return dcls(**kw)
 
     elif issubclass(cls, enum.Enum):
