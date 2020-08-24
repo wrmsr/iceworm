@@ -18,11 +18,11 @@ from omnibus import dataclasses as dc
 from omnibus import properties
 
 from ...types import QualifiedName
-from ...utils import NodalDataclass
 from ...utils import build_dc_repr
 from ...utils import build_enum_value_map
 from ...utils import seq
 from ...utils import serde
+from ...utils.nodal import NodalDataclass
 
 
 T = ta.TypeVar('T')
