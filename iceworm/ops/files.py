@@ -22,8 +22,7 @@ from .connectors import Connector
 from .connectors import RowGen
 from .connectors import RowSink
 from .connectors import RowSource
-from .connectors import RowSpec
-from .connectors import TableRowSpec
+from .utils import parse_simple_select_star_table
 
 
 class SchemaPolicy(dc.Enum):
@@ -92,12 +91,10 @@ class FileConnection(Connection[FileConnector]):
     def __init__(self, connector: FileConnector) -> None:
         super().__init__(connector)
 
-    def create_row_source(self, spec: RowSpec) -> RowSource:
-        if isinstance(spec, TableRowSpec):
-            table = self._ctor.tables_by_name[spec.name]
-            return CsvFileRowSource(table)
-        else:
-            raise TypeError(spec)
+    def create_row_source(self, query: str) -> RowSource:
+        table_name = parse_simple_select_star_table(query)
+        table = self._ctor.tables_by_name[table_name]
+        return CsvFileRowSource(table)
 
     def create_row_sink(self, table: QualifiedName) -> RowSink:
         raise TypeError

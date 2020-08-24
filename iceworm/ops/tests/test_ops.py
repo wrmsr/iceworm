@@ -36,6 +36,7 @@ from ...trees import symbols
 from ...trees import transforms as tfm
 from ...types import QualifiedName
 from ...utils import seq
+from ..utils import parse_simple_select_star_table
 
 
 @lang.cached_nullary
@@ -108,7 +109,7 @@ class Materialization(dc.Pure):
 
 class View(dc.Pure):
     table: md.Table = dc.field(check=lambda o: isinstance(o, md.Table))
-    src: ctrs.RowSpec = dc.field(check=lambda o: isinstance(o, ctrs.RowSpec))
+    query: str = dc.field(check=lambda o: isinstance(o, str))
     materializations: ta.Sequence[Materialization] = dc.field((), coerce=seq)
 
 
@@ -123,7 +124,7 @@ VIEWS = [
                     md.Column('b', dt.Integer()),
                 ],
             ),
-            ctrs.TableRowSpec(['csv', 'a']),  # select * from csv.a
+            'select * from csv.a',
             [Materialization(['pg', 'a'])],
         ),
 
@@ -136,7 +137,7 @@ VIEWS = [
                     md.Column('d', dt.Integer()),
                 ],
             ),
-            ctrs.TableRowSpec(['csv', 'b']),  # select * from csv.b
+            'select * from csv.b',
             [Materialization(['pg', 'b'])],
         ),
 
@@ -149,7 +150,7 @@ VIEWS = [
                     md.Column('d', dt.Integer()),
                 ],
             ),
-            ctrs.TableRowSpec(['pg', 'b']),  # select * from pg.b
+            'select * from pg.b',
             [Materialization(['pg', 'c'])],
         ),
 
@@ -160,7 +161,7 @@ VIEWS = [
                     md.Column('num', dt.Integer(), primary_key=True),
                 ]
             ),
-            ctrs.TableRowSpec(['cmp', 'nums']),  # select * from cmp.nums
+            'select * from cmp.nums',
             [Materialization(['pg', 'nums'])],
         ),
 
@@ -171,7 +172,7 @@ VIEWS = [
         #             md.Column('num', dt.Integer(), primary_key=True),
         #         ]
         #     ),
-        #     ctrs.QueryRowSpec('select * from cmp.nums'),
+        #     'select * from cmp.nums',
         #     [Materialization(['pg', 'nums'])],
         # ),
 
