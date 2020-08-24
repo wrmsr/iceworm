@@ -64,6 +64,10 @@ class Annotations(
             dct[type(ann)] = ann
         self._anns_by_cls: ta.Mapping[ta.Type[AnnotationT], AnnotationT] = dct
 
+    @property
+    def dct(self) -> ta.Mapping[ta.Type[AnnotationT], AnnotationT]:
+        return self._anns_by_cls
+
     def __getitem__(self, cls: ta.Type[AnnotationT]) -> AnnotationT:
         check.issubclass(cls, self._ann_cls())
         return self._anns_by_cls[cls]
