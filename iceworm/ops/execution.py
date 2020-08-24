@@ -15,37 +15,32 @@ from .. import alchemy as alch
 from .. import sql
 from ..types import QualifiedName
 from .connectors import ConnectionSet
-from .connectors import TableRowSpec
 from .ops import CreateTable
 from .ops import CreateTableAs
 from .ops import DropTable
-from .ops import InsertInto
+from .ops import InsertIntoSelect
 from .ops import Op
-from .ops import SqlOp
 from .ops import Transaction
 from .sql import SqlConnection
+from .utils import parse_simple_select_star_table
 
 
 OpT = ta.TypeVar('OpT', bound=Op)
-SqlOpT = ta.TypeVar('SqlOpT', bound=SqlOp)
 
 
 class Executor(lang.Abstract, ta.Generic[OpT]):
-
-    @abc.abstractmethod
-    def execute(self, op: OpT) -> ta.Union[None, ta.Generator[Op, None, None]]:
-        raise NotImplementedError
-
-
-class SqlExecutor(Executor[SqlOpT], lang.Abstract):
 
     def __init__(self, conns: ConnectionSet) -> None:
         super().__init__()
 
         self._conns = check.isinstance(conns, ConnectionSet)
 
+    @abc.abstractmethod
+    def execute(self, op: OpT) -> ta.Union[None, ta.Generator[Op, None, None]]:
+        raise NotImplementedError
 
-class TransactionExecutor(SqlExecutor[Transaction]):
+
+class TransactionExecutor(Executor[Transaction]):
 
     def execute(self, op: Transaction) -> ta.Generator[Op, None, None]:
         sa_conn = check.isinstance(self._conns[op.conn_name], SqlConnection).sa_conn
@@ -59,7 +54,7 @@ class TransactionExecutor(SqlExecutor[Transaction]):
                 raise
 
 
-class DropTableExecutor(SqlExecutor[DropTable]):
+class DropTableExecutor(Executor[DropTable]):
 
     def execute(self, op: DropTable) -> None:
         sa_conn = check.isinstance(self._conns[op.table_name[0]], SqlConnection).sa_conn
@@ -69,7 +64,7 @@ class DropTableExecutor(SqlExecutor[DropTable]):
                     QualifiedName(op.table_name[1:]))))
 
 
-class CreateTableExecutor(SqlExecutor[CreateTable]):
+class CreateTableExecutor(Executor[CreateTable]):
 
     def execute(self, op: CreateTable) -> None:
         sa_conn = check.isinstance(self._conns[op.table.name[0]], SqlConnection).sa_conn
@@ -77,7 +72,7 @@ class CreateTableExecutor(SqlExecutor[CreateTable]):
         table.create(sa_conn)
 
 
-class CreateTableAsExecutor(SqlExecutor[CreateTableAs]):
+class CreateTableAsExecutor(Executor[CreateTableAs]):
 
     def execute(self, op: CreateTableAs) -> None:
         sa_conn = check.isinstance(self._conns[op.table_name[0]], SqlConnection).sa_conn
@@ -88,13 +83,16 @@ class CreateTableAsExecutor(SqlExecutor[CreateTableAs]):
                 sa.text(op.query)))
 
 
-class InsertIntoExecutor(SqlExecutor[InsertInto]):
+class InsertIntoSelectExecutor(Executor[InsertIntoSelect]):
 
-    def execute(self, op: InsertInto) -> None:
-        if not isinstance(op.src_row_spec, TableRowSpec):
-            raise TypeError(op.src_row_spec)
-        dst_conn = self._conns[op.dst_table_name[0]]
-        src_conn = self._conns[op.src_row_spec.name[0]]
+    def execute(self, op: InsertIntoSelect) -> None:
+        dst_conn = self._conns[op.dst[0]]
+
+        src_name = parse_simple_select_star_table(op.query)
+        src_conn = self._conns[src_name[0]]
+        src_query = f"select * from {'.'.join(src_name[1:])}"
+
         dst = dst_conn.create_row_sink(QualifiedName(op.dst_table_name[1:]))
-        src = src_conn.create_row_source(TableRowSpec(op.src_row_spec.name[1:]))
+        src = src_conn.create_row_source(src_query)
+
         dst.consume_rows(src.produce_rows())

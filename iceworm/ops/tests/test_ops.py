@@ -36,7 +36,6 @@ from ...trees import symbols
 from ...trees import transforms as tfm
 from ...types import QualifiedName
 from ...utils import seq
-from ..utils import parse_simple_select_star_table
 
 
 @lang.cached_nullary
@@ -195,7 +194,7 @@ def test_ops():
             plan.extend([
                 ops.DropTable(mat.name),
                 ops.CreateTable(dc.replace(view.table, name=mat.name)),
-                ops.InsertInto(mat.name, view.src),
+                ops.InsertIntoSelect(mat.name, view.query),
             ])
 
     with contextlib.ExitStack() as es:
@@ -205,7 +204,7 @@ def test_ops():
             ops.CreateTable: exe.CreateTableExecutor(conns),
             ops.CreateTableAs: exe.CreateTableAsExecutor(conns),
             ops.DropTable: exe.DropTableExecutor(conns),
-            ops.InsertInto: exe.InsertIntoExecutor(conns),
+            ops.InsertIntoSelect: exe.InsertIntoSelectExecutor(conns),
             ops.Transaction: exe.TransactionExecutor(conns),
         }
 
