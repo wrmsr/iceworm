@@ -76,12 +76,19 @@ class Field(dc.Pure):
     enum: ta.Optional[Enum] = None
 
 
+MINUTE = Field('minute', 0, Range(0, 59))
+HOUR = Field('hour', 1, Range(0, 23))
+DAY = Field('day', 2, Range(1, 31))
+MONTH = Field('month', 3, Range(1, 12), MONTHS)
+WEEKDAY = Field('weekday', 4, Range(0, 6), WEEKDAYS)
+
+
 FIELDS = [
-    Field('minute', 0, Range(0, 59)),
-    Field('hour', 1, Range(0, 23)),
-    Field('day', 2, Range(1, 31)),
-    Field('month', 3, Range(1, 12), MONTHS),
-    Field('weekday', 4, Range(0, 6), WEEKDAYS),
+    MINUTE,
+    HOUR,
+    DAY,
+    MONTH,
+    WEEKDAY,
 ]
 
 
@@ -110,23 +117,29 @@ def parse(s: str) -> Entry:
     parts = s.strip().split()
     check.arg(len(parts) == 5)
     kw = {}
+
     for p, f in zip(parts, FIELDS):
         check.not_empty(p)
         if p == '*':
             continue
+
         rs = []
         for sp in p.split(','):
             if '-' in sp:
-                bs = sp.split('-')
+                bs = _, _ = sp.split('-')
             else:
                 bs = [sp, sp]
+
             if f.enum is not None:
                 bs = [f.enum.dct.get(b, b) for b in bs]
+
             l, r = map(int, bs)
             r = Range(l, r)
             check.arg(r in f.rng)
             rs.append(r)
+
         kw[f.name] = Item(rs)
+
     return Entry(**kw)
 
 
