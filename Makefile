@@ -30,6 +30,7 @@ all: venv gen build flake test
 
 .PHONY: clean
 clean:
+	-rm -rf $(PROJECT).egg-info
 	-rm -rf .benchmarks
 	-rm -rf .cache
 	-rm -rf .mypy_cache
@@ -37,16 +38,15 @@ clean:
 	-rm -rf .venv*
 	-rm -rf build
 	-rm -rf dist
-	-rm -rf $(PROJECT).egg-info
 
 	find $(PROJECT) \
-		-name '*.pyc' -delete -or \
-		-name '*.pyo' -delete -or \
-		-name '__pycache__' -delete -or \
-		-name '*.so' -delete -or \
 		-name '*.dylib' -delete -or \
 		-name '*.exe' -delete -or \
+		-name '*.pyc' -delete -or \
+		-name '*.pyo' -delete -or \
+		-name '*.so' -delete -or \
 		-name '.revision' -delete
+		-name '__pycache__' -delete -or \
 
 	(cd iceworm-spark && make clean)
 

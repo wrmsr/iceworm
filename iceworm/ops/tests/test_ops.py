@@ -15,6 +15,7 @@ from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import docker
+from omnibus import inject as inj
 from omnibus import lang
 import pytest
 
@@ -226,7 +227,14 @@ def test_ops():
 
 @pytest.mark.xfail()
 def test_queries():
-    world = wo.World(CONNECTORS)
+    binder = inj.create_binder()
+
+    binder.bind(CONNECTORS)
+    binder.bind(wo.World, as_singleton=True)
+
+    injector = inj.create_injector(binder)
+
+    world = injector.get_instance(wo.World)
 
     for query in [
         'select * from cmp.nums',
