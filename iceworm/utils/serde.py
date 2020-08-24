@@ -1,5 +1,10 @@
 """
 TODO:
+ - custom + more builtin types:
+  - datetime.*
+  - uuid
+  - bytes
+ - strict mode
  - replace with builtin omni generic impl
 """
 import collections.abc
