@@ -17,6 +17,10 @@ class Ignore(lang.Marker):
     pass
 
 
+class GetType(lang.Marker):
+    pass
+
+
 T = ta.TypeVar('T')
 
 
@@ -96,7 +100,7 @@ def _get_dataclass_field_type_map(dcls: type) -> _DataclassFieldTypeMap:
     except KeyError:
         th = ta.get_type_hints(dcls)
         dct = _FIELD_TYPE_MAPS_BY_DATACLASS[dcls] = {
-            f.name: th[f.name]
+            f.name: th[f.name] if GetType not in f.metadata else f.metadata[GetType](dcls)
             for f in dc.fields(dcls)
             if not f.metadata.get(Ignore)
         }
