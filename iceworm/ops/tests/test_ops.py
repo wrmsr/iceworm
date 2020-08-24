@@ -266,37 +266,46 @@ class World:
 def test_queries():
     world = World(CONNECTORS)
 
-    query = 'select * from cmp.nums'
-    root = par.parse_statement(query)
+    for query in [
+        'select * from cmp.nums',
+        'select * from csv.a',
+        'select * from pg.test',
+        'select * from cmp.nums, csv.a, pg.test',
+    ]:
+        print(query)
 
-    table_names = {
-        tn.name.name
-        for tn in ana.basic(root).get_node_type_set(no.Table)
-    }
+        root = par.parse_statement(query)
 
-    alias_sets_by_tbl: ta.MutableMapping[md.Object, ta.Set[QualifiedName]] = ocol.IdentityKeyDict()
-    for tn in table_names:
-        obj = check.single(world.reflect(tn))
-        aset = alias_sets_by_tbl.setdefault(obj, set())
-        if tn != obj.name:
-            aset.add(tn)
+        table_names = {
+            tn.name.name
+            for tn in ana.basic(root).get_node_type_set(no.Table)
+        }
 
-    cat = md.Catalog(
-        tables=[
-            dc.replace(t, aliases={*t.aliases, *aset}) if aset else t
-            for t, aset in alias_sets_by_tbl.items()
-        ],
-    )
+        alias_sets_by_tbl: ta.MutableMapping[md.Object, ta.Set[QualifiedName]] = ocol.IdentityKeyDict()
+        for tn in table_names:
+            obj = check.single(world.reflect(tn))
+            aset = alias_sets_by_tbl.setdefault(obj, set())
+            if tn != obj.name:
+                aset.add(tn)
 
-    print(cat)
+        cat = md.Catalog(
+            tables=[
+                dc.replace(t, aliases={*t.aliases, *aset}) if aset else t
+                for t, aset in alias_sets_by_tbl.items()
+            ],
+        )
 
-    root = tfm.AliasRelationsTransformer(root)(root)
-    root = tfm.LabelSelectItemsTransformer(root)(root)
-    root = tfm.ExpandSelectsTransformer(root, cat)(root)
-    print(rendering.render(root))
+        print(cat)
 
-    syms = symbols.analyze(root, cat)
-    oris = origins.analyze(root, syms)
+        root = tfm.AliasRelationsTransformer(root)(root)
+        root = tfm.LabelSelectItemsTransformer(root)(root)
+        root = tfm.ExpandSelectsTransformer(root, cat)(root)
+        print(rendering.render(root))
 
-    dts = tdatatypes.analyze(root, oris, cat)
-    print(dts.dts_by_node[root])
+        syms = symbols.analyze(root, cat)
+        oris = origins.analyze(root, syms)
+
+        dts = tdatatypes.analyze(root, oris, cat)
+        print(dts.dts_by_node[root])
+
+        print()
