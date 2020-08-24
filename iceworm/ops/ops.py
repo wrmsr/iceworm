@@ -2,8 +2,7 @@
 TODO:
  - 'merge'? refresh?
  - opaque / marking purely-internal ops
-  - annotations? meta?
-   - yeah, meta time
+  - annotation?
 
 Op families:
  - spark?
