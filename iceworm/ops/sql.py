@@ -4,7 +4,6 @@ from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 import sqlalchemy as sa
-import sqlalchemy.exc  # noqa
 
 from .. import alchemy as alch
 from .. import metadata as md

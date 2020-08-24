@@ -2,7 +2,7 @@
 TODO:
  - deal w csv header
  - NamePolicy - <schema>.<table>(.csv)?
- - local/s3/url/sftp?
+ - local/pkg/s3/url/sftp?
  - csv/json/yaml/parquet
 """
 import csv
