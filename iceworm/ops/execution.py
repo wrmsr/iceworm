@@ -43,7 +43,7 @@ class Executor(lang.Abstract, ta.Generic[OpT]):
 class TransactionExecutor(Executor[Transaction]):
 
     def execute(self, op: Transaction) -> ta.Generator[Op, None, None]:
-        sa_conn = check.isinstance(self._conns[op.conn_name], SqlConnection).sa_conn
+        sa_conn = check.isinstance(self._conns[check.single(op.conns)], SqlConnection).sa_conn
         with sa_conn.begin() as txn:
             try:
                 for child in op.children:
@@ -57,11 +57,11 @@ class TransactionExecutor(Executor[Transaction]):
 class DropTableExecutor(Executor[DropTable]):
 
     def execute(self, op: DropTable) -> None:
-        sa_conn = check.isinstance(self._conns[op.table_name[0]], SqlConnection).sa_conn
+        sa_conn = check.isinstance(self._conns[op.name[0]], SqlConnection).sa_conn
         sa_conn.execute(
             sql.DropTableIfExists(
                 sql.QualifiedNameElement(
-                    QualifiedName(op.table_name[1:]))))
+                    QualifiedName(op.name[1:]))))
 
 
 class CreateTableExecutor(Executor[CreateTable]):
@@ -75,11 +75,11 @@ class CreateTableExecutor(Executor[CreateTable]):
 class CreateTableAsExecutor(Executor[CreateTableAs]):
 
     def execute(self, op: CreateTableAs) -> None:
-        sa_conn = check.isinstance(self._conns[op.table_name[0]], SqlConnection).sa_conn
+        sa_conn = check.isinstance(self._conns[op.name[0]], SqlConnection).sa_conn
         sa_conn.execute(
             sql.CreateTableAs(
                 sql.QualifiedNameElement(
-                    QualifiedName(op.table_name[1:])),
+                    QualifiedName(op.name[1:])),
                 sa.text(op.query)))
 
 
@@ -92,7 +92,7 @@ class InsertIntoSelectExecutor(Executor[InsertIntoSelect]):
         src_conn = self._conns[src_name[0]]
         src_query = f"select * from {'.'.join(src_name[1:])}"
 
-        dst = dst_conn.create_row_sink(QualifiedName(op.dst_table_name[1:]))
+        dst = dst_conn.create_row_sink(QualifiedName(op.dst[1:]))
         src = src_conn.create_row_source(src_query)
 
         dst.consume_rows(src.produce_rows())

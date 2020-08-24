@@ -181,7 +181,7 @@ VIEWS = [
 @pytest.mark.xfail()
 def test_ops():
     with contextlib.closing(CONNECTORS['csv'].connect()) as fconn:
-        print(fconn.reflect())
+        # print(fconn.reflect())
         print(fconn.reflect([QualifiedName.of(['a'])]))
 
     plan = [
@@ -217,7 +217,7 @@ def test_ops():
                 check.none(executor.execute(op))
 
         ts = [
-            ops.Transaction('pg', plan),
+            ops.Transaction({'pg'}, plan),
         ]
         for t in ts:
             execute(t)
