@@ -37,7 +37,7 @@ class SqlOp(Op, abstract=True):
 
 class Transaction(SqlOp):
     conn_name: str
-    children: ta.Sequence[Op] = dc.field(coerce=seq)
+    children: ta.Sequence[Op] = dc.field(coerce=seq, check=lambda l: all(isinstance(o, Op) for o in l))
 
 
 class DropTable(SqlOp):
@@ -45,14 +45,19 @@ class DropTable(SqlOp):
 
 
 class CreateTable(SqlOp):
-    table: md.Table
+    table: md.Table = dc.field(check=lambda o: isinstance(o, md.Table))
 
 
 class CreateTableAs(SqlOp):
     table_name: QualifiedName = dc.field(coerce=QualifiedName.of)
-    query: str
+    query: str = dc.field(check=lambda o: isinstance(o, str))
 
 
-class InsertInto(SqlOp):
-    dst_table_name: QualifiedName = dc.field(coerce=QualifiedName.of)
-    src_row_spec: RowSpec = dc.field(check=lambda o: isinstance(o, RowSpec))
+class InsertIntoSelect(SqlOp):
+    dst: QualifiedName = dc.field(coerce=QualifiedName.of)
+    query: str = dc.field(check=lambda o: isinstance(o, str))
+
+
+class CopyTable(SqlOp):
+    dst: QualifiedName = dc.field(coerce=QualifiedName.of)
+    src: QualifiedName = dc.field(coerce=QualifiedName.of)
