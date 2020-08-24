@@ -15,10 +15,10 @@ from .. import alchemy as alch
 from .. import sql
 from ..types import QualifiedName
 from .connectors import ConnectionSet
-from .ops import CreateTable
-from .ops import CreateTableAs
-from .ops import DropTable
+from .ops import AtomicCreateTableAs
 from .ops import InsertIntoSelect
+from .ops import CreateTable
+from .ops import DropTable
 from .ops import Op
 from .ops import Transaction
 from .sql import SqlConnection
@@ -72,9 +72,9 @@ class CreateTableExecutor(Executor[CreateTable]):
         table.create(sa_conn)
 
 
-class CreateTableAsExecutor(Executor[CreateTableAs]):
+class AtomicCreateTableAsExecutor(Executor[AtomicCreateTableAs]):
 
-    def execute(self, op: CreateTableAs) -> None:
+    def execute(self, op: AtomicCreateTableAs) -> None:
         sa_conn = check.isinstance(self._conns[op.name[0]], SqlConnection).sa_conn
         sa_conn.execute(
             sql.CreateTableAs(

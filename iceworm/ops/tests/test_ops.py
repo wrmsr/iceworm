@@ -178,7 +178,7 @@ def test_ops():
 
     plan = [
         ops.DropTable(['pg', 'foo']),
-        ops.CreateTableAs(['pg', 'foo'], 'select 1'),
+        ops.AtomicCreateTableAs(['pg', 'foo'], 'select 1'),
     ]
 
     for view in VIEWS:
@@ -193,8 +193,8 @@ def test_ops():
         conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(CONNECTORS)))
 
         executors_by_op_cls = {
+            ops.AtomicCreateTableAs: exe.AtomicCreateTableAsExecutor(conns),
             ops.CreateTable: exe.CreateTableExecutor(conns),
-            ops.CreateTableAs: exe.CreateTableAsExecutor(conns),
             ops.DropTable: exe.DropTableExecutor(conns),
             ops.InsertIntoSelect: exe.InsertIntoSelectExecutor(conns),
             ops.Transaction: exe.TransactionExecutor(conns),

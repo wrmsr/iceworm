@@ -23,18 +23,6 @@ class QualifiedName(dc.Pure, ta.Sequence[str]):
         return 'QualifiedName([%s])' % (', '.join(map(repr, self.parts)),)
 
     @property
-    def object_name(self) -> str:
-        return self.parts[-1]
-
-    @property
-    def schema_name(self) -> ta.Optional[str]:
-        return self.parts[-2] if len(self.parts) > 1 else None
-
-    @property
-    def catalog_name(self) -> ta.Optional[str]:
-        return self.parts[-3] if len(self.parts) > 2 else None
-
-    @property
     def dotted(self) -> str:
         return '.'.join(self.parts)
 
@@ -50,6 +38,10 @@ class QualifiedName(dc.Pure, ta.Sequence[str]):
     @property
     def triple(self) -> ta.Tuple[ta.Optional[str], ta.Optional[str], str]:
         return self.prefixed(3)  # noqa
+
+    @property
+    def quad(self) -> ta.Tuple[ta.Optional[str], ta.Optional[str], ta.Optional[str], str]:
+        return self.prefixed(4)  # noqa
 
     def __iter__(self) -> ta.Iterator[str]:
         return iter(self.parts)
