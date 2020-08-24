@@ -114,7 +114,7 @@ select coalesce(p:q.q.m, p:q.q[0].m) as i_a;
 select 1 except select 1;
 select * from t(x);
 /* 0 */ select /* 1 */ a /* 2 */, /* 3 */ b /* 4 */ from /* 5 */ t /* 6 */ where /* 7 */ x /* 8 */ = /* 9 */ 1 /* 10 */;
-select seq4(), uniform(1, 10, random(12)) from table (generator(rowcount => 10)) v order by 1;
+select seq4(), uniform(1, 10, random(12)) from table (generator(rowcount => 10)) v order by 1; -- FIXME
 -- with c as (select 1) (select 1);
 -- with c as (select 1) ((select 1) union (select 2));
 -- select t.{{ a }};

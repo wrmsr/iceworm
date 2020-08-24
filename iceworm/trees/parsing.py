@@ -1,5 +1,6 @@
 """
 TODO:
+ - select * from table (f()) - currently parses table as ident?
  - double check nullsFunctionCall rewriting is correct
  - fix UNION ALL ALL
   - ((select 1) union (((select 2)))) ?
