@@ -60,8 +60,13 @@ class Range(dc.Pure):
     def __str__(self) -> str:
         return f'[{self.min}, {self.max}]' if self.min != self.max else str(self.min)
 
-    def __contains__(self, i: int) -> bool:
-        return self.min <= check.isinstance(i, int) <= self.max
+    def __contains__(self, o: ta.Union['Range', int]) -> bool:
+        if isinstance(o, Range):
+            return self.min <= o.min and o.max <= self.max
+        elif isinstance(o, int):
+            return self.min <= o <= self.max
+        else:
+            raise TypeError(o)
 
 
 class Field(dc.Pure):
@@ -106,15 +111,26 @@ def parse(s: str) -> Entry:
     check.arg(len(parts) == 5)
     kw = {}
     for p, f in zip(parts, FIELDS):
+        check.not_empty(p)
         if p == '*':
             continue
-        n = int(p)
-        check.arg(n in f.rng)
-        kw[f.name] = Item([Range(n, n)])
+        rs = []
+        for sp in p.split(','):
+            if '-' in sp:
+                bs = sp.split('-')
+            else:
+                bs = [sp, sp]
+            if f.enum is not None:
+                bs = [f.enum.dct.get(b, b) for b in bs]
+            l, r = map(int, bs)
+            r = Range(l, r)
+            check.arg(r in f.rng)
+            rs.append(r)
+        kw[f.name] = Item(rs)
     return Entry(**kw)
 
 
-SPECIALS = {
+SPECIALS = {k: parse(s) for k, s in {
     'hourly': '0 * * * *',
     'daily': '0 0 * * *',
     'weekly': '0 0 * * 0',
@@ -122,4 +138,4 @@ SPECIALS = {
     'yearly': '0 0 1 1 *',
     'annually': '0 0 1 1 *',
     'midnight': '0 0 * * *',
-}
+}.items()}
