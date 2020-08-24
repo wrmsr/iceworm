@@ -13,23 +13,13 @@ from omnibus import dataclasses as dc
 from .. import metadata as md
 from ..types import QualifiedName
 from ..utils import abs_set
-from ..utils import build_dc_repr
 from ..utils import seq
-from ..utils.nodal import NodalDataclass
+from .base import Op
 
 
 SelfOp = ta.TypeVar('SelfOp', bound='Op')
 OpGen = ta.Generator['Op', None, None]
 OpMapper = ta.Callable[['Op'], 'Op']
-
-
-class Op(dc.Enum, NodalDataclass['Op']):
-
-    __repr__ = build_dc_repr
-
-    @classmethod
-    def _nodal_cls(cls) -> ta.Type['Op']:
-        return Op
 
 
 class Transaction(Op):

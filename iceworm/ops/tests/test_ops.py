@@ -38,6 +38,7 @@ from ...trees import symbols
 from ...trees import transforms as tfm
 from ...types import QualifiedName
 from ...utils import secrets as sec
+from ..base import Op
 
 
 @lang.cached_nullary
@@ -200,7 +201,7 @@ def test_ops():
             ops.Transaction: exe.TransactionExecutor(conns),
         }
 
-        def execute(op: ops.Op) -> None:
+        def execute(op: Op) -> None:
             executor = executors_by_op_cls[type(op)]
             if inspect.isgeneratorfunction(executor.execute):
                 for child in executor.execute(op):
@@ -234,7 +235,7 @@ def test_queries():
 
     injector = inj.create_injector(binder)
 
-    world = injector.get_instance(wo.World)
+    world = injector[wo.World]
 
     for query in [
         'select * from cmp.nums',
