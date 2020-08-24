@@ -42,6 +42,8 @@ class Object(dc.Enum, allow_setattr=True, reorder=True):
     aliases: ta.Optional[ta.AbstractSet[QualifiedName]] = dc.field(
         None, kwonly=True, coerce=abs_set, check=lambda l: l is None or all(isinstance(o, QualifiedName) for o in l))
 
+    dc.check(lambda name, aliases: not (aliases and name in aliases))
+
     @abc.abstractproperty
     def type(self) -> dt.Datatype:
         raise NotImplementedError

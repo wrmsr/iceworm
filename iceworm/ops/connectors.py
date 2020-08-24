@@ -90,6 +90,8 @@ class Connection(lang.Abstract, ta.Generic[ConnectorT]):
 
         self._ctor: ConnectorT = check.isinstance(ctor, Connector)
 
+        self._reflect_cache: ta.MutableMapping[QualifiedName, ta.Optional[md.Object]] = {}
+
     defs.repr('ctor')
 
     @property
@@ -107,8 +109,34 @@ class Connection(lang.Abstract, ta.Generic[ConnectorT]):
     def create_row_sink(self, table: QualifiedName) -> RowSink:
         raise NotImplementedError
 
-    @abc.abstractmethod
     def reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:
+        if names is not None:
+            ret = {}
+            missing = set()
+
+            for name in names:
+                try:
+                    obj = self._reflect_cache[name]
+                except KeyError:
+                    missing.add(name)
+                else:
+                    if obj is not None:
+                        ret[name] = obj
+
+            if missing:
+                new = self._reflect(missing)
+                for name, obj in new.items():
+                    check.not_in(name, ret)
+                    check.not_in(name, self._reflect_cache)
+                    ret[name] = self._reflect_cache[name] = obj
+
+            return ret
+
+        else:
+            raise NotImplementedError
+
+    @abc.abstractmethod
+    def _reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:
         raise NotImplementedError
 
 

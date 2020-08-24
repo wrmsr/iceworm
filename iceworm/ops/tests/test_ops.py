@@ -13,6 +13,7 @@ import os.path
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import docker
 from omnibus import lang
@@ -268,8 +269,11 @@ def test_queries():
         for tn in ana.basic(root).get_node_type_set(no.Table)
     }
 
-    # cat = md.Catalog()
+    alias_sets_by_tbl: ta.MutableMapping[md.Object, ta.Set[QualifiedName]] = ocol.IdentityKeyDict()
     for tn in table_names:
-        print(tn)
         obj = check.single(world.reflect(tn))
-        print(obj)
+        aset = alias_sets_by_tbl.setdefault(obj, set())
+        if tn != obj.name:
+            aset.add(tn)
+
+    print(alias_sets_by_tbl)

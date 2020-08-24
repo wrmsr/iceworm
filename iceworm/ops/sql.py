@@ -79,7 +79,7 @@ class SqlConnection(Connection[SqlConnector]):
         tbl = md.tables[name]
         return SqlRowSink(self.sa_conn, tbl)
 
-    def reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:
+    def _reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:
         if not names:
             raise TypeError
 
