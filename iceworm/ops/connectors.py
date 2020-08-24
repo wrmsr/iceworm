@@ -21,7 +21,6 @@ import typing as ta
 
 from omnibus import check
 from omnibus import collections as ocol
-from omnibus import dataclasses as dc
 from omnibus import defs
 from omnibus import lang
 
@@ -34,18 +33,6 @@ ConnectorT = ta.TypeVar('ConnectorT')
 
 Row = ta.Mapping[str, ta.Any]
 RowGen = ta.Generator[Row, None, None]
-
-
-class RowSpec(dc.Enum):
-    pass
-
-
-class TableRowSpec(RowSpec):
-    name: QualifiedName = dc.field(coerce=QualifiedName.of)
-
-
-class QueryRowSpec(RowSpec):
-    query: str
 
 
 class RowSource(lang.Abstract):
@@ -102,7 +89,7 @@ class Connection(lang.Abstract, ta.Generic[ConnectorT]):
         pass
 
     @abc.abstractmethod
-    def create_row_source(self, spec: RowSpec) -> RowSource:
+    def create_row_source(self, query: str) -> RowSource:
         raise NotImplementedError
 
     @abc.abstractmethod

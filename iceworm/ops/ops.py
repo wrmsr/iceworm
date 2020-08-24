@@ -14,7 +14,6 @@ from ..types import QualifiedName
 from ..utils import build_dc_repr
 from ..utils import NodalDataclass
 from ..utils import seq
-from .connectors import RowSpec
 
 
 SelfOp = ta.TypeVar('SelfOp', bound='Op')
@@ -41,7 +40,7 @@ class Transaction(SqlOp):
 
 
 class DropTable(SqlOp):
-    table_name: QualifiedName = dc.field(coerce=QualifiedName.of)
+    name: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
 class CreateTable(SqlOp):
@@ -49,7 +48,7 @@ class CreateTable(SqlOp):
 
 
 class CreateTableAs(SqlOp):
-    table_name: QualifiedName = dc.field(coerce=QualifiedName.of)
+    name: QualifiedName = dc.field(coerce=QualifiedName.of)
     query: str = dc.field(check=lambda o: isinstance(o, str))
 
 
