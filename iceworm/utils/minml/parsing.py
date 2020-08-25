@@ -1,4 +1,7 @@
 """
+TODO:
+ - newlines delimiting? only one deep
+
 https://golang.org/pkg/reflect/#StructTag lol
 /*+ materialization: {wait_time_s: 3600} */
 """

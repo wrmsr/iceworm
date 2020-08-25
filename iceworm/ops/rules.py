@@ -27,6 +27,8 @@ no:
  - def query(now: iwa.now) -> str: …
  - setup.py entrypoint format - default 'query' or 'foo.py:q1'
 """
+
+
 class Macro:
     pass
 
@@ -37,3 +39,7 @@ class Rule:
 
 class Target:
     pass
+
+
+class Goal:
+    """all, backfill, ddl, check, ..."""
