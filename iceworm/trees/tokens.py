@@ -5,6 +5,7 @@ TODO:
   - comma etc. as terminators
   - detect orphan hot comments
   - enforce unique binding
+  - hints.py?
 """
 import typing as ta
 

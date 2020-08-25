@@ -1,6 +1,8 @@
 """
 TODO:
  - Sequence? Block?
+  - ** distinction between ordered (opaque) blocks and unordered sets? **
+   - is *anything* opaque?
  - 'merge'? refresh?
  - from alerts:
   - conditional? takes query?
