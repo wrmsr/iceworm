@@ -1,5 +1,6 @@
 import concurrent.futures as cf
 import contextlib
+import functools
 import multiprocessing as mp
 
 
@@ -34,9 +35,16 @@ class _PendingWorkItems:
     def __setitem__(self, k, v):
         if not isinstance(v, cf.process._WorkItem):  # noqa
             raise TypeError(v)
-        if v.fn is not self._fn:
-            raise ValueError(v.fn)
-        self._dct[k] = cf.process._WorkItem(v.future, None, v.args, v.kwargs)  # noqa
+        fn = v.fn
+        args = list(v.args or [])
+        kwargs = dict(v.kwargs or {})
+        if isinstance(fn, functools.partial):
+            args = [*fn.args, *args]
+            kwargs = {**fn.keywords, **kwargs}
+            fn = fn.func
+        if fn is not self._fn:
+            raise ValueError(fn)
+        self._dct[k] = cf.process._WorkItem(v.future, None, args, kwargs)  # noqa
 
     def __delitem__(self, k):
         del self._dct[k]

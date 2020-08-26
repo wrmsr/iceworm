@@ -1,4 +1,3 @@
-import concurrent.futures as cf
 import glob
 import logging
 import re
@@ -75,29 +74,22 @@ class Cli(oap.Cli):
                 log.exception('Parse failure')
 
         if self.args.parallelism:
-            exe = cf.ProcessPoolExecutor(self.args.parallelism)
+            exe = imp.forking_process_pool(process, self.args.parallelism)
         else:
             exe = oas.ImmediateExecutor()
 
-        oas.await_futures([
-            exe.submit(process, i, path)
-            for i, path in enumerate(paths * (self.args.rounds or 1))
-        ])
+        with exe as exe:
+            oas.await_futures(
+                [
+                    exe.submit(process, i, path)
+                    for i, path in enumerate(sorted(paths) * (self.args.rounds or 1))
+                ],
+                raise_exceptions=True,
+            )
 
 
 def main():
     logs.configure_standard_logging(logging.INFO)
-
-    def fn(i):
-        print(i)
-        pass
-
-    with imp.forking_process_pool(fn, 1) as exe:
-        oas.await_futures([exe.submit(fn, i) for i in range(10)])
-        # oas.await_dependent_futures(exe, {functools.partial(f, i): {} for i in range(10)})
-
-    exit(0)
-
     Cli()()
 
 
