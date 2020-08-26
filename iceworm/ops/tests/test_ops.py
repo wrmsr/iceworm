@@ -199,6 +199,7 @@ def test_ops():
             ops.CreateTable: exe.CreateTableExecutor(conns),
             ops.DropTable: exe.DropTableExecutor(conns),
             ops.InsertIntoSelect: exe.InsertIntoSelectExecutor(conns),
+            ops.List: exe.ListExecutor(),
             ops.Transaction: exe.TransactionExecutor(conns),
         }
 
@@ -210,7 +211,7 @@ def test_ops():
             else:
                 check.none(executor.execute(op))
 
-        root = ops.Transaction({'pg'}, plan)
+        root = ops.Transaction({'pg'}, ops.List(plan))
 
         root = tfm.CreateTableAsAtomizer()(root)
 

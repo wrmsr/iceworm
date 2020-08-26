@@ -1,8 +1,6 @@
 """
 TODO:
  - ** blurs line between task and target **
- - ** distinction between ordered (opaque) blocks and unordered sets? **
-  - is *anything* opaque?
  - 'merge'? refresh?
  - from alerts:
   - conditional? takes query?
@@ -31,16 +29,16 @@ OpMapper = ta.Callable[['Op'], 'Op']
 
 
 class List(Op):
-    ops: ta.Sequence[Op] = dc.field(coerce=seq, check=lambda l: all(isinstance(o, Op) for o in l))
+    ops: ta.Sequence[Op] = dc.field(coerce=seq)
 
 
 class Set(Op):
-    ops: ta.Sequence[Op] = dc.field(coerce=seq, check=lambda l: all(isinstance(o, Op) for o in l))
+    ops: ta.Sequence[Op] = dc.field(coerce=seq)
 
 
 class Transaction(Op):
     conns: ta.AbstractSet[str] = dc.field(coerce=abs_set, check=lambda l: all(isinstance(o, str) for o in l))
-    op: Op = dc.field(coerce=seq, check=lambda o: isinstance(o, Op))
+    op: Op
 
 
 class Atomic(Op, abstract=True):

@@ -20,7 +20,7 @@ from .sql import SqlConnection
 from .utils import parse_simple_select_table
 
 
-OpT = ta.TypeVar('OpT', bound=Op)
+OpT = ta.TypeVar('OpT', bound=ops.Op)
 OpGen = ta.Generator[ops.Op, None, None]
 
 
