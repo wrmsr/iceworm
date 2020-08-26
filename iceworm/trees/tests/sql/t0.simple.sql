@@ -114,6 +114,10 @@ select coalesce(p:q.q.m, p:q.q[0].m) as i_a;
 select 1 except select 1;
 select * from t(x);
 /* 0 */ select /* 1 */ a /* 2 */, /* 3 */ b /* 4 */ from /* 5 */ t /* 6 */ where /* 7 */ x /* 8 */ = /* 9 */ 1 /* 10 */;
+create table t as select 1, 2;
+create table t (a int, b int) as select 1, 2;
+insert into t select 1, 2;
+delete from t where c = 3;
 -- select seq4(), uniform(1, 10, random(12)) from table (generator(rowcount => 10)) v order by 1; -- FIXME
 -- with c as (select 1) (select 1);
 -- with c as (select 1) ((select 1) union (select 2));

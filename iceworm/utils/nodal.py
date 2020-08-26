@@ -1,7 +1,6 @@
 """
 TODO:
  - explicit subclass registration for serde
- - typecheck child fields
 """
 import abc
 import collections
@@ -18,10 +17,14 @@ Self = ta.TypeVar('Self')
 NodalT = ta.TypeVar('NodalT', bound='Nodal')
 
 
+class _FieldInfo(dc.Pure):
+    cls: ta.Type['Noda']
+    opt: bool = False
+    seq: bool = False
+
+
 class _FieldsInfo(dc.Pure):
-    flds: ta.Mapping[str, ta.Type['Nodal']]
-    opt_flds: ta.Mapping[str, ta.Type['Nodal']]
-    seq_flds: ta.Mapping[str, ta.Type['Nodal']]
+    flds: ta.Mapping[str, _FieldInfo]
 
 
 class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
@@ -35,24 +38,22 @@ class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
     def _build_fields_info(cls) -> _FieldsInfo:
         th = ta.get_type_hints(cls)
         flds = {}
-        opt_flds = {}
-        seq_flds = {}
         for f in dc.fields(cls):
             fcls = th[f.name]
+            opt = False
+            seq = False
             if rfl.is_generic(fcls) and fcls.__origin__ is ta.Union:
                 args = fcls.__args__
                 if len(args) != 2 or type(None) not in args:
                     raise TypeError(fcls)
-                [ecls] = [a for a in args if a not in (None, type(None))]
-                if isinstance(ecls, type) and issubclass(ecls, NodalDataclass):
-                    opt_flds[f.name] = ecls
-            elif rfl.is_generic(fcls) and fcls.__origin__ is collections.abc.Sequence:
-                [ecls] = fcls.__args__
-                if isinstance(ecls, type) and issubclass(ecls, NodalDataclass):
-                    seq_flds[f.name] = ecls
-            elif isinstance(fcls, type) and issubclass(fcls, NodalDataclass):
-                flds[f.name] = fcls
-        return _FieldsInfo(flds, opt_flds, seq_flds)
+                [fcls] = [a for a in args if a not in (None, type(None))]
+                opt = True
+            if rfl.is_generic(fcls) and fcls.__origin__ is collections.abc.Sequence:
+                [fcls] = fcls.__args__
+                seq = True
+            if isinstance(fcls, type) and issubclass(fcls, NodalDataclass):
+                flds[f.name] = _FieldInfo(fcls, opt, seq)
+        return _FieldsInfo(flds)
 
     def __post_init__(self) -> None:
         cls = type(self)
@@ -62,21 +63,21 @@ class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
             fi = cls._build_fields_info()
             setattr(cls, '_fields_info', fi)
 
-        for a, t in fi.flds.items():
+        for a, f in fi.flds.items():
             v = getattr(self, a)
-            if not isinstance(v, t):
-                raise TypeError(v, t, a)
-        for a, t in fi.opt_flds.items():
-            v = getattr(self, a)
-            if v is not None and not isinstance(v, t):
-                raise TypeError(v, t, a)
-        for a, t in fi.seq_flds.items():
-            vs = getattr(self, a)
-            if isinstance(vs, types.GeneratorType):
-                raise TypeError(vs, t, a)
-            for v in vs:
-                if v is not None and not isinstance(v, t):
-                    raise TypeError(v, t, a)
+            if f.opt and v is None:
+                continue
+            elif v is None:
+                raise TypeError(v, f, a)
+            if f.seq:
+                if isinstance(v, types.GeneratorType):
+                    raise TypeError(v, f, a)
+                for e in v:
+                    if not isinstance(e, f.cls):
+                        raise TypeError(e, f, a)
+            else:
+                if not isinstance(v, f.cls):
+                    raise TypeError(v, f, a)
 
         try:
             sup = super().__post_init__

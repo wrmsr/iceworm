@@ -30,4 +30,4 @@ class Insert(Stmt):
 
 class Delete(Stmt):
     name: QualifiedNameNode
-    where: ta.Optonal[Expr] = None
+    where: ta.Optional[Expr] = None

@@ -105,6 +105,17 @@ class _ParseVisitor(IceSqlVisitor):
         right = self.visit(ctx.valueExpression())
         return no.BinaryExpr(left, op, right)
 
+    def visitColSpec(self, ctx: IceSqlParser.ColSpecContext):
+        name = self.visit(ctx.identifier())
+        type = self.visit(ctx.typeSpec())
+        return no.ColSpec(name, type)
+
+    def visitCreateTable(self, ctx: IceSqlParser.CreateTableContext):
+        name = self.visit(ctx.qualifiedName())
+        cols = [self.visit(c) for c in ctx.colSpec()]
+        select = self.visit(ctx.select()) if ctx.select() is not None else None
+        return no.CreateTable(name, cols, select)
+
     def visitCte(self, ctx: IceSqlParser.CteContext):
         name = self.visit(ctx.identifier())
         select = self.visit(ctx.select())
@@ -124,6 +135,11 @@ class _ParseVisitor(IceSqlVisitor):
 
     def visitDecimalNumber(self, ctx: IceSqlParser.DecimalNumberContext):
         return no.Decimal(ctx.DECIMAL_VALUE().getText())
+
+    def visitDelete(self, ctx: IceSqlParser.DeleteContext):
+        name = self.visit(ctx.qualifiedName())
+        where = self.visit(ctx.where) if ctx.where is not None else None
+        return no.Delete(name, where)
 
     def visitExpressionFunctionCall(self, ctx:IceSqlParser.ExpressionFunctionCallContext):
         name = self.visit(ctx.qualifiedName())
@@ -196,6 +212,11 @@ class _ParseVisitor(IceSqlVisitor):
         haystack = self.visit(ctx.select())
         not_ = ctx.NOT() is not None
         return no.InSelect(needle, haystack, not_=not_)
+
+    def visitInsert(self, ctx: IceSqlParser.InsertContext):
+        name = self.visit(ctx.qualifiedName())
+        select = self.visit(ctx.select()) if ctx.select() is not None else None
+        return no.Insert(name, select)
 
     def visitInteger(self, ctx: IceSqlParser.IntegerContext):
         return no.Integer(int(ctx.INTEGER_VALUE().getText()))

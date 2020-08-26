@@ -13,11 +13,11 @@ statement
     ;
 
 createTable
-    : CREATE (OR REPLACE)? TABLE qualifiedName ('(' colSpec (',' colSpec)*)? (AS select)?
+    : CREATE (OR REPLACE)? TABLE qualifiedName ('(' colSpec (',' colSpec)* ')')? (AS select)?
     ;
 
 colSpec
-    : IDENTIFIER typeSpec?
+    : identifier typeSpec?
     ;
 
 insert
@@ -25,7 +25,7 @@ insert
     ;
 
 delete
-    : DELETE FROM qualifiedName (where=booleanExpression)?
+    : DELETE FROM qualifiedName (WHERE where=booleanExpression)?
     ;
 
 select

@@ -116,6 +116,18 @@ class Renderer(dispatch.Class):
     def render(self, node: no.CastCall) -> Part:  # noqa
         return Concat(['cast', Paren([self(node.value), 'as', self(node.type)])])
 
+    def render(self, node: no.ColSpec) -> Part:  # noqa
+        return [self(node.name), self(node.type)]
+
+    def render(self, node: no.CreateTable) -> Part:  # noqa
+        return [
+            'create',
+            'table',
+            self(node.name),
+            Paren(List([self(c) for c in node.cols])) if node.cols else [],
+            ['as', self(node.select)] if node.select is not None else [],
+        ]
+
     def render(self, node: no.Cte) -> Part:  # noqa
         return [self(node.name), 'as', Paren(self(node.select))]
 
@@ -130,6 +142,14 @@ class Renderer(dispatch.Class):
 
     def render(self, node: no.Decimal) -> Part:  # noqa
         return node.value
+
+    def render(self, node: no.Delete) -> Part:  # noqa
+        return [
+            'delete',
+            'from',
+            self(node.name),
+            ['where', self(node.where)] if node.where is not None else [],
+        ]
 
     def render(self, node: no.DoubleFrame) -> Part:  # noqa
         return [
@@ -215,6 +235,9 @@ class Renderer(dispatch.Class):
             'not' if node.not_ else [], 'in',
             Paren(self(node.haystack)),
         ]
+
+    def render(self, node: no.Insert) -> Part:  # noqa
+        return ['insert', 'into', self(node.name), self(node.select) if node.select is not None else []]
 
     def render(self, node: no.Integer) -> Part:  # noqa
         return str(node.value)
