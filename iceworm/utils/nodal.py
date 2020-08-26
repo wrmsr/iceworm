@@ -1,3 +1,8 @@
+"""
+TODO:
+ - explicit subclass registration for serde
+ - typecheck child fields
+"""
 import abc
 import collections
 import typing as ta
@@ -12,10 +17,6 @@ NodalT = ta.TypeVar('NodalT', bound='Nodal')
 
 
 class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
-    """
-    TODO:
-     - explicit subclass registration for serde
-    """
 
     @classmethod
     @abc.abstractmethod

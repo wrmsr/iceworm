@@ -7,6 +7,25 @@ singleStatement
 
 statement
     : select
+    | createTable
+    | insert
+    | delete
+    ;
+
+createTable
+    : CREATE TABLE qualifiedName ('(' colSpec (',' colSpec)*)? (AS select)?
+    ;
+
+colSpec
+    : IDENTIFIER typeSpec?
+    ;
+
+insert
+    : INSERT INTO qualifiedName select
+    ;
+
+delete
+    : DELETE FROM qualifiedName (where=booleanExpression)?
     ;
 
 select
@@ -313,11 +332,14 @@ BETWEEN: 'between';
 BY: 'by';
 CASE: 'case';
 CAST: 'cast';
+CREATE: 'create';
 CROSS: 'cross';
 CURRENT: 'current';
 DATE: 'date';
+DELETE: 'delete';
 DESC: 'desc';
 DISTINCT: 'distinct';
+DROP: 'drop';
 ELSE: 'else';
 END: 'end';
 ESCAPE: 'escape';
@@ -329,6 +351,7 @@ FOLLOWING: 'following';
 FOR: 'for';
 FROM: 'from';
 FULL: 'full';
+FUNCTION: 'function';
 GROUP: 'group';
 GROUPING: 'grouping';
 HAVING: 'having';
@@ -336,8 +359,10 @@ IGNORE: 'ignore';
 ILIKE: 'ilike';
 IN: 'in';
 INNER: 'inner';
+INSERT: 'insert';
 INTERSECT: 'intersect';
 INTERVAL: 'interval';
+INTO: 'into';
 IS: 'is';
 JOIN: 'join';
 LAST: 'last';
@@ -367,6 +392,7 @@ ROW: 'row';
 ROWS: 'rows';
 SELECT: 'select';
 SETS: 'sets';
+TABLE: 'table';
 THEN: 'then';
 TOP: 'top';
 TRUE: 'true';
