@@ -7,11 +7,11 @@ import time
 from omnibus import argparse as oap
 from omnibus import asyncs as oas
 from omnibus import logs
-from omnibus import multiprocessing as mp
 
 from .trees import analysis
 from .trees import parsing
 from .trees import rendering
+from .utils import multiprocessing as imp
 
 
 log = logging.getLogger(__name__)
@@ -87,15 +87,13 @@ class Cli(oap.Cli):
 
 def main():
     logs.configure_standard_logging(logging.INFO)
-    mp.set_start_method('fork', force=True)
 
-    def f(i):
+    def fn(i):
         print(i)
-        return 1
+        pass
 
-    import functools
-    with cf.ProcessPoolExecutor(2) as exe:
-        oas.await_futures([exe.submit(f, i) for i in range(10)])
+    with imp.forking_process_pool(fn, 1) as exe:
+        oas.await_futures([exe.submit(fn, i) for i in range(10)])
         # oas.await_dependent_futures(exe, {functools.partial(f, i): {} for i in range(10)})
 
     exit(0)
