@@ -1,6 +1,7 @@
 """
 TODO:
- - newlines delimiting? only one deep
+ - codify yaml interop - special idents?
+  - ** REJECT ** ambiguous idents? also yaml control codes and shit
 
 https://golang.org/pkg/reflect/#StructTag lol
 /*+ materialization: {wait_time_s: 3600} */

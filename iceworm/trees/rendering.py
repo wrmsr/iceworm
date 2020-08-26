@@ -4,6 +4,9 @@ TODO:
  - pretty output - no duplication in a pprint.py
   - include comments (reqs carrying antlr into nodes)
  - custom open/close on paren?
+ - ** comments **
+  - placement - linearize parts
+   - ** preserve hot comments ** but can move others
 """
 import collections.abc
 import io

@@ -20,6 +20,26 @@ class IceSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by IceSqlParser#createTable.
+    def visitCreateTable(self, ctx:IceSqlParser.CreateTableContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by IceSqlParser#colSpec.
+    def visitColSpec(self, ctx:IceSqlParser.ColSpecContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by IceSqlParser#insert.
+    def visitInsert(self, ctx:IceSqlParser.InsertContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by IceSqlParser#delete.
+    def visitDelete(self, ctx:IceSqlParser.DeleteContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by IceSqlParser#select.
     def visitSelect(self, ctx:IceSqlParser.SelectContext):
         return self.visitChildren(ctx)

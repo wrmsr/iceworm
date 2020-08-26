@@ -4,17 +4,25 @@ TODO:
  - physical tables requiring refresh
  - incremental vs total physical tables
  - materialized vs unmaterialized virtuals
+ - ** dataclass interop ** - dc->tbl, query
+  - just return object refs? jsonize?
+  - support snowflake json garbage on objects
 
 Def conns:
+ - sql - snow + pg (+ incl internal state storage pg, 'self')
  - kafka
  - dynamo
- - system
+ - system - conns, nodes, running ops, etc
  - mongo
+ - redis
 
 Alt conns:
  - salesforce
  - pagerduty
  - jira
+ - gsheets
+ - slack
+ - github
 """
 import abc
 import typing as ta

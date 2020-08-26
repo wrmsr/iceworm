@@ -13,7 +13,7 @@ statement
     ;
 
 createTable
-    : CREATE TABLE qualifiedName ('(' colSpec (',' colSpec)*)? (AS select)?
+    : CREATE (OR REPLACE)? TABLE qualifiedName ('(' colSpec (',' colSpec)*)? (AS select)?
     ;
 
 colSpec
@@ -385,6 +385,7 @@ PIVOT: 'pivot';
 PRECEDING: 'preceding';
 QUALIFY: 'qualify';
 RANGE: 'range';
+REPLACE: 'replace';
 RESPECT: 'respect';
 RIGHT: 'right';
 RLIKE: 'rlike';

@@ -27,6 +27,42 @@ class IceSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by IceSqlParser#createTable.
+    def enterCreateTable(self, ctx:IceSqlParser.CreateTableContext):
+        pass
+
+    # Exit a parse tree produced by IceSqlParser#createTable.
+    def exitCreateTable(self, ctx:IceSqlParser.CreateTableContext):
+        pass
+
+
+    # Enter a parse tree produced by IceSqlParser#colSpec.
+    def enterColSpec(self, ctx:IceSqlParser.ColSpecContext):
+        pass
+
+    # Exit a parse tree produced by IceSqlParser#colSpec.
+    def exitColSpec(self, ctx:IceSqlParser.ColSpecContext):
+        pass
+
+
+    # Enter a parse tree produced by IceSqlParser#insert.
+    def enterInsert(self, ctx:IceSqlParser.InsertContext):
+        pass
+
+    # Exit a parse tree produced by IceSqlParser#insert.
+    def exitInsert(self, ctx:IceSqlParser.InsertContext):
+        pass
+
+
+    # Enter a parse tree produced by IceSqlParser#delete.
+    def enterDelete(self, ctx:IceSqlParser.DeleteContext):
+        pass
+
+    # Exit a parse tree produced by IceSqlParser#delete.
+    def exitDelete(self, ctx:IceSqlParser.DeleteContext):
+        pass
+
+
     # Enter a parse tree produced by IceSqlParser#select.
     def enterSelect(self, ctx:IceSqlParser.SelectContext):
         pass

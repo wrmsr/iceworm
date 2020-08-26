@@ -9,6 +9,9 @@ TODO:
  - TABLESAMPLE
  - omni cy
  - confirm l_v(v ignore nulls) == l_v(v) ignore nulls
+ - cython, obv
+ - parallelize
+ - cache?
 """
 from omnibus import antlr
 from omnibus import check

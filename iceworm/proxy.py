@@ -1,3 +1,8 @@
+"""
+https://docs.snowflake.com/en/user-guide/snowsql-start.html#using-a-proxy-server
+https://github.com/snowflakedb/snowflake-jdbc
+https://github.com/abhinavsingh/proxy.py/tree/develop/proxy
+"""
 import logging
 
 from omnibus import http
