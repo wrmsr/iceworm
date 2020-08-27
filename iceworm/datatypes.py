@@ -15,6 +15,18 @@ from .utils import seq
 class Datatype(dc.Enum):
     ALIASES: ta.ClassVar[ta.AbstractSet[str]] = frozenset()
 
+    @property
+    def py_type(self) -> type:
+        raise TypeError
+
+    @property
+    def is_equatable(self) -> bool:
+        return False
+
+    @property
+    def is_sortable(self) -> bool:
+        return False
+
 
 class Number(Datatype):
     ALIASES: ta.ClassVar = {
@@ -24,6 +36,18 @@ class Number(Datatype):
         'numeric',
         'smallint',
     }
+
+    @property
+    def py_type(self) -> type:
+        return int
+
+    @property
+    def is_equatable(self) -> bool:
+        return True
+
+    @property
+    def is_sortable(self) -> bool:
+        return True
 
 
 Bigint = Number
@@ -47,6 +71,14 @@ class Float(Datatype):
         'real',
     }
 
+    @property
+    def py_type(self) -> type:
+        return float
+
+    @property
+    def is_sortable(self) -> bool:
+        return True
+
 
 class Varchar(Datatype):
     ALIASES: ta.ClassVar = {
@@ -68,9 +100,32 @@ class Binary(Datatype):
         'varbinary'
     }
 
+    @property
+    def py_type(self) -> type:
+        return bytes
+
+    @property
+    def is_equatable(self) -> bool:
+        return True
+
+    @property
+    def is_sortable(self) -> bool:
+        return True
+
 
 class Boolean(Datatype):
-    pass
+
+    @property
+    def py_type(self) -> type:
+        return bool
+
+    @property
+    def is_equatable(self) -> bool:
+        return True
+
+    @property
+    def is_sortable(self) -> bool:
+        return True
 
 
 class Date(Datatype):
