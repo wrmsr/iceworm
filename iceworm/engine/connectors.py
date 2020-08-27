@@ -140,17 +140,25 @@ class ConnectorSet(ta.Iterable[Connector]):
     def __init__(self, ctors: ta.Iterable[Connector]) -> None:
         super().__init__()
 
-        self._ctors = list(ctors)
-        self._ctors_by_name = unique_dict((c.name, c) for c in self._ctors)
+        self._ctors = [check.isinstance(e, Connector) for e in ctors]
+
+        self._ctors_by_name: ta.Mapping[str, Connector] = unique_dict((c.name, c) for c in self._ctors)
+
+    @classmethod
+    def of(cls, it: ta.Iterable[Connector]) -> 'ConnectorSet':
+        if isinstance(it, cls):
+            return it
+        else:
+            return cls(it)
 
     def __iter__(self) -> ta.Iterator[Connector]:
         return iter(self._ctors)
 
     def __contains__(self, name: str) -> bool:
-        return name in self._ctors_by_name
+        return check.isinstance(name, str) in self._ctors_by_name
 
     def __getitem__(self, name: str) -> Connector:
-        return self._ctors_by_name[name]
+        return self._ctors_by_name[check.isinstance(name, str)]
 
     def close(self) -> None:
         for ctor in self._ctors:
@@ -163,12 +171,14 @@ class ConnectionSet(ta.Iterable[Connection]):
         super().__init__()
 
         self._ctors = check.isinstance(ctors, ConnectorSet)
+
         self._conns_by_ctor: ta.MutableMapping[Connector, Connection] = ocol.IdentityKeyDict()
 
     def __iter__(self) -> ta.Iterator[Connection]:
         return iter(self._conns_by_ctor.values())
 
     def __contains__(self, name: str) -> bool:
+        check.isinstance(name, str)
         try:
             ctor = self._ctors[name]
         except KeyError:
@@ -176,7 +186,7 @@ class ConnectionSet(ta.Iterable[Connection]):
         return ctor in self._conns_by_ctor
 
     def __getitem__(self, name: str) -> Connection:
-        ctor = self._ctors[name]
+        ctor = self._ctors[check.isinstance(name, str)]
         try:
             return self._conns_by_ctor[ctor]
         except KeyError:

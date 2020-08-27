@@ -165,15 +165,15 @@ class EquatableValueSet(ValueSet, lang.Final):
 
     @property
     def is_none(self) -> bool:
-        pass
+        raise NotImplementedError
 
     @property
     def is_all(self) -> bool:
-        pass
+        raise NotImplementedError
 
     @property
     def is_single_value(self) -> bool:
-        pass
+        raise NotImplementedError
 
     def contains_value(self, value: ta.Any) -> bool:
         pass

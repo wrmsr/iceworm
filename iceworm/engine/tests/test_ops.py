@@ -25,6 +25,7 @@ from .. import execution as exe
 from .. import files
 from .. import ops
 from .. import sql
+from .. import targets as tars
 from .. import transforms as tfm
 from .. import worlds as wo
 from ... import datatypes as dt
@@ -105,6 +106,14 @@ CONNECTORS = ctrs.ConnectorSet([
 
 ])
 
+
+TARGETS = [
+
+    tars.Table(
+
+    ),
+
+]
 
 VIEWS = [
 

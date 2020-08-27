@@ -2,33 +2,30 @@ import contextlib
 import typing as ta
 
 from omnibus import check
-from omnibus import dataclasses as dc
 
 from . import connectors as ctrs
+from . import targets as tars
 from .. import metadata as md
 from ..types import QualifiedName
-from ..utils import seq
-
-
-class Materialization(dc.Pure):
-    name: ta.Optional[QualifiedName] = dc.field(coerce=QualifiedName.of)
-
-
-class View(dc.Pure):
-    table: md.Table = dc.field(check=lambda o: isinstance(o, md.Table))
-    query: str = dc.field(check=lambda o: isinstance(o, str))
-    materializations: ta.Sequence[Materialization] = dc.field(
-        (), coerce=seq, check=lambda l: all(isinstance(o, Materialization) for o in l))
 
 
 class World:
 
-    def __init__(self, connectors: ctrs.ConnectorSet) -> None:
+    def __init__(self, ctors: ta.Iterable[ctrs.Connector], targets: ta.Iterable[tars.Target]) -> None:
         super().__init__()
 
-        self._ctors = check.isinstance(connectors, ctrs.ConnectorSet)
+        self._ctors = ctrs.ConnectorSet.of(ctors)
+        self._targets = tars.TargetSet.of(targets)
 
         self._views_by_name: ta.MutableMapping[QualifiedName, View] = {}
+
+    @property
+    def ctors(self) -> ctrs.ConnectorSet:
+        return self._ctors
+
+    @property
+    def targets(self) -> tars.TargetSet:
+        return self._targets
 
     def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
         objs = []
