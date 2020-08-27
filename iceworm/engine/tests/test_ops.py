@@ -107,82 +107,80 @@ CONNECTORS = ctrs.ConnectorSet([
 ])
 
 
-TARGETS = [
+TARGETS = tars.TargetSet([
 
-    tars.Table(
+    tars.Table(['pg', 'a']),
+    tars.Rows(['pg', 'a'], 'select * from csv.a'),
 
-    ),
+    tars.Table(['pg', 'b']),
+    tars.Rows(['pg', 'b'], 'select * from csv.b'),
 
-]
+    tars.Table(['pg', 'c']),
+    tars.Rows(['pg', 'c'], 'select * from pg.b'),
 
-VIEWS = [
+    tars.Table(['pg', 'nums']),
+    tars.Rows(['pg', 'nums'], 'select * from cmp.nums'),
 
-        wo.View(
-            md.Table(
-                ['a'],
-                [
-                    md.Column('id', dt.Integer(), primary_key=True),
-                    md.Column('a', dt.Integer()),
-                    md.Column('b', dt.Integer()),
-                ],
-            ),
-            'select * from csv.a',
-            [wo.Materialization(['pg', 'a'])],
-        ),
+])
 
-        wo.View(
-            md.Table(
-                ['b'],
-                [
-                    md.Column('id', dt.Integer(), primary_key=True),
-                    md.Column('c', dt.Integer()),
-                    md.Column('d', dt.Integer()),
-                ],
-            ),
-            'select * from csv.b',
-            [wo.Materialization(['pg', 'b'])],
-        ),
 
-        wo.View(
-            md.Table(
-                ['c'],
-                [
-                    md.Column('id', dt.Integer(), primary_key=True),
-                    md.Column('c', dt.Integer()),
-                    md.Column('d', dt.Integer()),
-                ],
-            ),
-            'select * from pg.b',
-            [wo.Materialization(['pg', 'c'])],
-        ),
+def infer_md_table(world: wo.World, query: str) -> md.Table:
+    root = par.parse_statement(query)
 
-        wo.View(
-            md.Table(
-                ['nums'],
-                [
-                    md.Column('num', dt.Integer(), primary_key=True),
-                ]
-            ),
-            'select * from cmp.nums',
-            [wo.Materialization(['pg', 'nums'])],
-        ),
+    table_names = {
+        tn.name.name
+        for tn in ana.basic(root).get_node_type_set(no.Table)
+    }
 
-        # wo.View(
-        #     md.Table(
-        #         ['qnums'],
-        #         [
-        #             md.Column('num', dt.Integer(), primary_key=True),
-        #         ]
-        #     ),
-        #     'select * from cmp.nums',
-        #     [wo.Materialization(['pg', 'nums'])],
-        # ),
+    alias_sets_by_tbl: ta.MutableMapping[md.Object, ta.Set[QualifiedName]] = ocol.IdentityKeyDict()
+    for tn in table_names:
+        obj = check.single(world.reflect(tn))
+        aset = alias_sets_by_tbl.setdefault(obj, set())
+        if tn != obj.name:
+            aset.add(tn)
 
-    ]
+    cat = md.Catalog(
+        tables=[
+            dc.replace(t, aliases={*t.aliases, *aset}) if aset else t
+            for t, aset in alias_sets_by_tbl.items()
+        ],
+    )
+
+    print(cat)
+
+    root = ttfm.AliasRelationsTransformer(root)(root)
+    root = ttfm.LabelSelectItemsTransformer(root)(root)
+    root = ttfm.ExpandSelectsTransformer(root, cat)(root)
+    print(rendering.render(root))
+
+    syms = symbols.analyze(root, cat)
+    oris = origins.analyze(root, syms)
+
+    dts = tdatatypes.analyze(root, oris, cat)
+    tt = check.isinstance(dts.dts_by_node[root], dt.Table)
+
+    return md.Table(
+        ['$anon'],
+        [md.Column(n, t) for n, t in tt.columns],
+    )
 
 
 @pytest.mark.xfail()
 def test_ops():
+    binder = inj.create_binder()
+
+    binder.bind(CONNECTORS)
+    binder.bind(inj.Key(ta.Iterable[ctrs.Connector]), to=ctrs.ConnectorSet)
+
+    binder.bind(TARGETS)
+    binder.bind(inj.Key(ta.Iterable[tars.Target]), to=tars.TargetSet)
+
+    binder.bind(wo.World, as_singleton=True)
+
+    injector = inj.create_injector(binder)
+
+    world = injector[wo.World]
+
     with contextlib.closing(CONNECTORS['csv'].connect()) as fconn:
         # print(fconn.reflect())
         print(fconn.reflect([QualifiedName.of(['a'])]))
@@ -192,13 +190,24 @@ def test_ops():
         ops.CreateTableAs(['pg', 'foo'], 'select 1'),
     ]
 
-    for view in VIEWS:
-        for mat in view.materializations:
+    ts = list(TARGETS)
+    for i in range(len(ts)):
+        tar = ts[i]
+        if isinstance(tar, tars.Table):
+            if tar.md is None:
+                rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == tar.name)
+                mdt = infer_md_table(world, rows.query)
+                ts[i] = dc.replace(ts[i], md=mdt)
+
+    for tar in ts:
+        if isinstance(tar, tars.Table):
+            mdt = check.isinstance(tar.md, md.Table)
             plan.extend([
-                ops.DropTable(mat.name),
-                ops.CreateTable(dc.replace(view.table, name=mat.name)),
-                ops.InsertIntoSelect(mat.name, view.query),
+                ops.DropTable(tar.name),
+                ops.CreateTable(dc.replace(mdt, name=tar.name)),
             ])
+        elif isinstance(tar, tars.Rows):
+            plan.append(ops.InsertIntoSelect(tar.table, tar.query))
 
     with contextlib.ExitStack() as es:
         conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(CONNECTORS)))
@@ -235,59 +244,3 @@ def test_ops():
         print(list(sa_conn.execute('select * from b')))
         print(list(sa_conn.execute('select * from c')))
         print(list(sa_conn.execute('select * from nums')))
-
-
-@pytest.mark.xfail()
-def test_queries():
-    binder = inj.create_binder()
-
-    binder.bind(CONNECTORS)
-    binder.bind(wo.World, as_singleton=True)
-
-    injector = inj.create_injector(binder)
-
-    world = injector[wo.World]
-
-    for query in [
-        'select * from cmp.nums',
-        'select * from csv.a',
-        'select * from pg.test',
-        'select * from cmp.nums, csv.a, pg.test',
-    ]:
-        print(query)
-
-        root = par.parse_statement(query)
-
-        table_names = {
-            tn.name.name
-            for tn in ana.basic(root).get_node_type_set(no.Table)
-        }
-
-        alias_sets_by_tbl: ta.MutableMapping[md.Object, ta.Set[QualifiedName]] = ocol.IdentityKeyDict()
-        for tn in table_names:
-            obj = check.single(world.reflect(tn))
-            aset = alias_sets_by_tbl.setdefault(obj, set())
-            if tn != obj.name:
-                aset.add(tn)
-
-        cat = md.Catalog(
-            tables=[
-                dc.replace(t, aliases={*t.aliases, *aset}) if aset else t
-                for t, aset in alias_sets_by_tbl.items()
-            ],
-        )
-
-        print(cat)
-
-        root = ttfm.AliasRelationsTransformer(root)(root)
-        root = ttfm.LabelSelectItemsTransformer(root)(root)
-        root = ttfm.ExpandSelectsTransformer(root, cat)(root)
-        print(rendering.render(root))
-
-        syms = symbols.analyze(root, cat)
-        oris = origins.analyze(root, syms)
-
-        dts = tdatatypes.analyze(root, oris, cat)
-        print(dts.dts_by_node[root])
-
-        print()

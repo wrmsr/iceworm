@@ -7,7 +7,7 @@ from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 
-from .. import metadata as md
+from .. import metadata as md_
 from ..types import QualifiedName
 
 
@@ -23,14 +23,14 @@ class Target(dc.Enum):
 
 class Table(Target):
     name: QualifiedName = dc.field(coerce=QualifiedName.of)
-    md: ta.Optional[md.Table] = dc.field(None, check=lambda o: o is None or isinstance(o, md.Table))
+    md: ta.Optional[md_.Table] = dc.field(None, check=lambda o: o is None or isinstance(o, md_.Table))
 
 
 class Rows(Target):
     table: QualifiedName = dc.field(coerce=QualifiedName.of)
     query: str = dc.field(check=lambda o: isinstance(o, str))
 
-    name: ta.Optional[QualifiedName] = dc.field(coerce=QualifiedName.of_optional, kwonly=True)
+    name: ta.Optional[QualifiedName] = dc.field(None, coerce=QualifiedName.of_optional, kwonly=True)
 
 
 class Function(Target):
