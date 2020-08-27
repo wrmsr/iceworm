@@ -134,5 +134,7 @@ class SqlRowSink(RowSink):
         self._table = check.isinstance(table, sa.Table)
 
     def consume_rows(self, rows: ta.Iterable[Row]) -> None:
+        ks = [c.name for c in self._table.columns]
         for row in rows:
-            self._conn.execute(self._table.insert(), [row])
+            dct = {k: row[k] for k in ks}
+            self._conn.execute(self._table.insert(), [dct])
