@@ -1,11 +1,28 @@
 import re
 
+import jinja2
+
 
 SIMPLE_JINJA_PATTERN = re.compile(r'[A-Za-z_]+')
 
 
 def is_simple_jinja(buf: str) -> bool:
     return SIMPLE_JINJA_PATTERN.fullmatch(buf) is not None
+
+
+class StrictEnvironment(jinja2.Environment):
+
+    def getitem(self, obj, argument):
+        try:
+            return obj[argument]
+        except (AttributeError, TypeError, LookupError):
+            return self.undefined(obj=obj, name=argument)
+
+    def getattr(self, obj, attribute):
+        try:
+            return getattr(obj, attribute)
+        except AttributeError:
+            return self.undefined(obj=obj, name=attribute)
 
 
 def test_simple_jinja():
