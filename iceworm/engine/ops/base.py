@@ -4,10 +4,10 @@ import typing as ta
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 
-from ..utils import annotations as anns
-from ..utils import build_dc_repr
-from ..utils import serde
-from ..utils.nodal import NodalDataclass
+from ...utils import annotations as anns
+from ...utils import build_dc_repr
+from ...utils import serde
+from ...utils.nodal import NodalDataclass
 
 
 class Annotation(anns.Annotation, abstract=True):

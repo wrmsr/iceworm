@@ -16,10 +16,10 @@ import typing as ta
 
 from omnibus import dataclasses as dc
 
-from .. import metadata as md
-from ..types import QualifiedName
-from ..utils import abs_set
-from ..utils import seq
+from ... import metadata as md
+from ...types import QualifiedName
+from ...utils import abs_set
+from ...utils import seq
 from .base import Op
 
 

@@ -19,14 +19,9 @@ from omnibus import inject as inj
 from omnibus import lang
 import pytest
 
-from .. import computed as cmp
 from .. import connectors as ctrs
-from .. import execution as exe
-from .. import files
 from .. import ops
-from .. import sql
 from .. import targets as tars
-from .. import transforms as tfm
 from .. import worlds as wo
 from ... import datatypes as dt
 from ... import metadata as md
@@ -40,7 +35,12 @@ from ...trees import symbols
 from ...trees import transforms as ttfm
 from ...types import QualifiedName
 from ...utils import secrets as sec
-from ..base import Op
+from ..connectors import computed as cmp
+from ..connectors import files
+from ..connectors import sql
+from ..ops import Op
+from ..ops import execution as exe
+from ..ops import transforms as tfm
 
 
 @lang.cached_nullary

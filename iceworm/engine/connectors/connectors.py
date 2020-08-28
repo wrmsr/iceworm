@@ -32,9 +32,9 @@ from omnibus import collections as ocol
 from omnibus import defs
 from omnibus import lang
 
-from .. import metadata as md
-from ..types import QualifiedName
-from ..utils import unique_dict
+from ... import metadata as md
+from ...types import QualifiedName
+from ...utils import unique_dict
 
 
 ConnectorT = ta.TypeVar('ConnectorT')

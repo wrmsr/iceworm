@@ -3,8 +3,8 @@ from omnibus import dispatch
 from omnibus import lang
 
 from . import ops
+from ..utils import parse_simple_select_tables
 from .base import Op
-from .utils import parse_simple_select_tables
 
 
 class Origin(lang.Marker):

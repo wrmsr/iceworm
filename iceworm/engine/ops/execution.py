@@ -11,13 +11,13 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 import sqlalchemy as sa
 
-from . import ops
-from .. import alchemy as alch
-from .. import sql
-from ..types import QualifiedName
-from .connectors import ConnectionSet
-from .sql import SqlConnection
-from .utils import parse_simple_select_table
+from .. import ops
+from ... import alchemy as alch
+from ... import sql
+from ...types import QualifiedName
+from ..connectors import ConnectionSet
+from ..connectors.sql import SqlConnection
+from ..utils import parse_simple_select_table
 
 
 OpT = ta.TypeVar('OpT', bound=ops.Op)
