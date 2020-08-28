@@ -2,6 +2,8 @@
 TODO:
  - just gen from dc's
   - data is serde'd json, marked fields are cols, indexes added from class metadata
+ - refs table?
+  - want gc
 """
 import sqlalchemy as sa
 import sqlalchemy.ext.declarative  # noqa
