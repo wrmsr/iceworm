@@ -114,21 +114,21 @@ class Analyzer(dispatch.Class, lang.Abstract, ta.Generic[T]):
 
 class PreferredNameAnalyzer(Analyzer[ta.Optional[str]]):
 
-    def _process(self, node: no.AliasedRelation) -> T:  # noqa
+    def _process(self, node: no.AliasedRelation) -> ta.Optional[str]:  # noqa
         return node.alias.name
 
-    def _process(self, node: no.Expr) -> T:  # noqa
+    def _process(self, node: no.Expr) -> ta.Optional[str]:  # noqa
         children = {self(c) for c in node.children}
         if len(children) == 1:
             return check.single(children)
         else:
             return None
 
-    def _process(self, node: no.ExprSelectItem) -> T:  # noqa
+    def _process(self, node: no.ExprSelectItem) -> ta.Optional[str]:  # noqa
         if node.label is not None:
-            return node.label
+            return node.label.name
         else:
             return self(node.value)
 
-    def _process(self, node: no.Table) -> T:  # noqa
+    def _process(self, node: no.Table) -> ta.Optional[str]:  # noqa
         return node.name[-1]
