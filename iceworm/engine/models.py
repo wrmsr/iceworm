@@ -4,6 +4,15 @@ TODO:
   - data is serde'd json, marked fields are cols, indexes added from class metadata
  - refs table?
   - want gc
+   - no constraints but offline?
+ - composite pk, world_id (just world?), auto-added when querying, prefixed in indices
+
+tables:
+ - worlds
+ - targets
+  - one per type?
+  - invalidations?
+   - historical invalidations? pending? handled? cleared at max interval according to scheds?
 """
 import sqlalchemy as sa
 import sqlalchemy.ext.declarative  # noqa
