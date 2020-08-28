@@ -5,8 +5,8 @@ from omnibus import dataclasses as dc
 
 from ... import metadata as md
 from ...types import QualifiedName
+from ...utils import seq
 from ..utils import parse_simple_select_table
-from ..utils import seq
 from .connectors import Connection
 from .connectors import Connector
 from .connectors import RowGen
