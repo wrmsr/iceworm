@@ -148,6 +148,7 @@ def infer_md_table(world: wo.World, query: str) -> md.Table:
 
     print(cat)
 
+    # FIXME: preserve column names if possible
     root = ttfm.AliasRelationsTransformer(root)(root)
     root = ttfm.LabelSelectItemsTransformer(root)(root)
     root = ttfm.ExpandSelectsTransformer(root, cat)(root)
@@ -156,7 +157,6 @@ def infer_md_table(world: wo.World, query: str) -> md.Table:
     syms = symbols.analyze(root, cat)
     oris = origins.analyze(root, syms)
 
-    # FIXME: preserve column names if possible
     dts = tdatatypes.analyze(root, oris, cat)
     tt = check.isinstance(dts.dts_by_node[root], dt.Table)
 

@@ -7,15 +7,18 @@ TODO:
   - including inferred jinja
  - * min/max/expected rowcounts *
   - if using insert into pagerduty/jira/slack/email/etc enforce bounds
+ - cache/memo wrap ana dispatch.prop?
 """
 import typing as ta
 
+from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dispatch
 from omnibus import lang
 from omnibus import properties
 
 from . import nodes as no
+from ..utils import memoized_unary
 
 
 T = ta.TypeVar('T')
@@ -72,6 +75,20 @@ class BasicAnalysis:
         walk(self._root)
         return dct
 
+    def yield_ancestors(self, node: no.Node) -> NodeGen:
+        cur = node
+        while True:
+            cur = self.parents_by_node.get(cur)
+            if cur is None:
+                break
+            yield cur
+
+    def get_first_parent_of_type(self, node: no.Node, ty: ta.Type[T]) -> ta.Optional[no.Node]:
+        for cur in self.yield_ancestors(node):
+            if isinstance(cur, ty):
+                return cur
+        return None
+
     @properties.cached
     def child_sets_by_node(self) -> ta.Mapping[no.Node, ta.AbstractSet[no.Node]]:
         def walk(cur: no.Node) -> None:
@@ -87,7 +104,31 @@ basic = BasicAnalysis
 
 
 class Analyzer(dispatch.Class, lang.Abstract, ta.Generic[T]):
-    __call__ = dispatch.property()
+    _process = dispatch.property()
 
-    def __call__(self, node: no.Node) -> T:  # noqa
+    __call__ = memoized_unary(_process, identity=True, max_recursion=100)
+
+    def _process(self, node: no.Node) -> T:  # noqa
         raise TypeError(node)
+
+
+class PreferredNameAnalyzer(Analyzer[ta.Optional[str]]):
+
+    def _process(self, node: no.AliasedRelation) -> T:  # noqa
+        return node.alias.name
+
+    def _process(self, node: no.Expr) -> T:  # noqa
+        children = {self(c) for c in node.children}
+        if len(children) == 1:
+            return check.single(children)
+        else:
+            return None
+
+    def _process(self, node: no.ExprSelectItem) -> T:  # noqa
+        if node.label is not None:
+            return node.label
+        else:
+            return self(node.value)
+
+    def _process(self, node: no.Table) -> T:  # noqa
+        return node.name[-1]
