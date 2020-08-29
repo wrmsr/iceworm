@@ -17,8 +17,6 @@ class World:
         self._ctors = ctrs.ConnectorSet.of(ctors)
         self._targets = tars.TargetSet.of(targets)
 
-        self._views_by_name: ta.MutableMapping[QualifiedName, View] = {}
-
     @property
     def ctors(self) -> ctrs.ConnectorSet:
         return self._ctors
