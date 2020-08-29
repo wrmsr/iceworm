@@ -1,3 +1,22 @@
+"""
+TODO:
+ - just gen from dc's
+  - data is serde'd json, marked fields are cols, indexes added from class metadata
+ - refs table?
+  - want gc
+   - no constraints but offline?
+ - composite pk, world_id (just world?), auto-added when querying, prefixed in indices
+ - _meta: revision, host, pid - same as query tags, likely more - world info
+ - dc anns like nodal/serde, ignored for heap
+
+tables:
+ - worlds
+ - targets
+  - one per type?
+  - invalidations?
+   - ranges?
+   - historical invalidations? pending? handled? cleared at max interval according to scheds?
+"""
 import abc
 
 from omnibus import check

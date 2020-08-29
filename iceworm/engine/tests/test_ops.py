@@ -1,6 +1,5 @@
 """
 TODO:
- - db nuke fixture
  - hot comments:
   - upstream cfg: select * from v /*+ weak */;
   - col type ann/enforcement: select a /*+ type: char(36) */
