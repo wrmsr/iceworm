@@ -13,9 +13,7 @@ import typing as ta
 from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
-from omnibus import docker
 from omnibus import inject as inj
-from omnibus import lang
 import pytest
 
 from .. import connectors as ctrs
@@ -24,6 +22,7 @@ from .. import targets as tars
 from .. import worlds as wo
 from ... import datatypes as dt
 from ... import metadata as md
+from ...tests.helpers import pg_url
 from ...trees import analysis as ana
 from ...trees import datatypes as tdatatypes
 from ...trees import nodes as no
@@ -37,25 +36,9 @@ from ...utils import secrets as sec
 from ..connectors import computed as cmp
 from ..connectors import files
 from ..connectors import sql
-from ..ops import Op
 from ..ops import execution as exe
+from ..ops import Op
 from ..ops import transforms as tfm
-
-
-@lang.cached_nullary
-def db_url():
-    if docker.is_in_docker():
-        (host, port) = 'iceworm-postgres', 5432
-
-    else:
-        with docker.client_context() as client:
-            eps = docker.get_container_tcp_endpoints(
-                client,
-                [('docker_iceworm-postgres_1', 5432)])
-
-        [(host, port)] = eps.values()
-
-    return f'postgresql+psycopg2://iceworm:iceworm@{host}:{port}'
 
 
 CONNECTORS = ctrs.ConnectorSet([
@@ -63,7 +46,7 @@ CONNECTORS = ctrs.ConnectorSet([
     sql.SqlConnector(
         'pg',
         sql.SqlConnector.Config(
-            url=sec.ComputedSecret(db_url),
+            url=sec.ComputedSecret(pg_url),
         ),
     ),
 
@@ -189,8 +172,8 @@ def test_ops():
         print(fconn.reflect([QualifiedName.of(['a'])]))
 
     plan = [
-        ops.DropTable(['pg', 'foo']),
-        ops.CreateTableAs(['pg', 'foo'], 'select 1'),
+        ops.DropTable(['pg', 'iceworm', 'foo']),
+        ops.CreateTableAs(['pg', 'iceworm', 'foo'], 'select 1'),
     ]
 
     ts = list(TARGETS)

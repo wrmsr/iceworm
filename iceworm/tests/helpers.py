@@ -3,6 +3,8 @@ TODO:
  - db setup/teardown
  - all docker compose services
 """
+import typing as ta
+
 from omnibus import check
 from omnibus import code as oco
 from omnibus import docker
@@ -31,9 +33,14 @@ def pytest_callable_fixture(*fxargs, **fxkwargs):
     return inner
 
 
+class HostPort(ta.NamedTuple):
+    host: str
+    port: int
+
+
 @pytest_callable_fixture()
 @lang.cached_nullary
-def pg_url():
+def pg_host_port() -> HostPort:
     if docker.is_in_docker():
         (host, port) = 'iceworm-postgres', 5432
 
@@ -45,4 +52,11 @@ def pg_url():
 
         [(host, port)] = eps.values()
 
-    return f'postgresql+psycopg2://iceworm:iceworm@{host}:{port}'
+    return HostPort(host, port)
+
+
+@pytest_callable_fixture()
+@lang.cached_nullary
+def pg_url():
+    hp = pg_host_port()
+    return f'postgresql+psycopg2://iceworm:iceworm@{hp.host}:{hp.port}'
