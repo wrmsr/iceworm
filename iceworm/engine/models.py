@@ -6,12 +6,14 @@ TODO:
   - want gc
    - no constraints but offline?
  - composite pk, world_id (just world?), auto-added when querying, prefixed in indices
+ - _meta: revision
 
 tables:
  - worlds
  - targets
   - one per type?
   - invalidations?
+   - ranges?
    - historical invalidations? pending? handled? cleared at max interval according to scheds?
 """
 import sqlalchemy as sa

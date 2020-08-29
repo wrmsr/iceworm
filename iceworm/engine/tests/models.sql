@@ -5,7 +5,8 @@ create table things(
   _seq serial,
   _at timestamp not null default current_timestamp,
   id varchar primary key not null,
-  data text not null
+  data text not null,
+  _meta text not null
 );
 
 create table things_vers(
@@ -13,7 +14,8 @@ create table things_vers(
   _seq integer not null,
   _at timestamp not null,
   id varchar not null,
-  data text not null
+  data text not null,
+  _meta text not null
 );
 
 create index _things_seq_index on things (_seq);
@@ -45,7 +47,7 @@ create trigger _things_before_write_trigger before insert or update on things
 for each row execute procedure _things_before_write_function();
 
 create or replace function _things_after_write_function() returns trigger as $$ begin
-  insert into things_vers (_seq, _at, id, data) values (new._seq, new._at, new.id, new.data);
+  insert into things_vers (_seq, _at, id, data, _meta) values (new._seq, new._at, new.id, new.data, new._meta);
 
   return null;
 end $$ language 'plpgsql';

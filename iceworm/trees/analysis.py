@@ -114,15 +114,25 @@ class Analyzer(dispatch.Class, lang.Abstract, ta.Generic[T]):
 
 class PreferredNameAnalyzer(Analyzer[ta.Optional[str]]):
 
-    def _process(self, node: no.AliasedRelation) -> ta.Optional[str]:  # noqa
-        return node.alias.name
+    def _traverse(self, nodes: ta.Iterable) -> None:
+        for node in nodes:
+            self(node)
 
-    def _process(self, node: no.Expr) -> ta.Optional[str]:  # noqa
+    def _from_children(self, node: no.Node) -> ta.Optional[str]:
         children = {self(c) for c in node.children}
         if len(children) == 1:
             return check.single(children)
         else:
             return None
+
+    def _process(self, node: no.AliasedRelation) -> ta.Optional[str]:  # noqa
+        return node.alias.name
+
+    def _process(self, node: no.AllSelectItem) -> ta.Optional[str]:  # noqa
+        return None
+
+    def _process(self, node: no.Expr) -> ta.Optional[str]:  # noqa
+        return self._from_children(node)
 
     def _process(self, node: no.ExprSelectItem) -> ta.Optional[str]:  # noqa
         if node.label is not None:
@@ -130,5 +140,13 @@ class PreferredNameAnalyzer(Analyzer[ta.Optional[str]]):
         else:
             return self(node.value)
 
+    def _process(self, node: no.Relation) -> ta.Optional[str]:  # noqa
+        return self._from_children(node)
+
+    def _process(self, node: no.Select) -> ta.Optional[str]:  # noqa
+        self._traverse(node.items)
+        self._traverse(node.relations)
+        return None
+
     def _process(self, node: no.Table) -> ta.Optional[str]:  # noqa
-        return node.name[-1]
+        return node.name.name[-1]
