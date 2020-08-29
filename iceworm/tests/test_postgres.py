@@ -1,15 +1,14 @@
 import textwrap
 
-from omnibus import docker
 from omnibus import lang
 import pytest
 import sqlalchemy as sa
 
-from .helpers import pg_url
+from .helpers import pg_url  # noqa
 
 
 @pytest.mark.xfail()
-def test_docker_postgres(pg_url):
+def test_docker_postgres(pg_url):  # noqa
     engine: sa.engine.Engine
     with lang.disposing(sa.create_engine(pg_url)) as engine:
         with engine.connect() as conn:

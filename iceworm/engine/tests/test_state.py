@@ -12,7 +12,7 @@ from ...tests.helpers import pg_url  # noqa
 
 
 @pytest.mark.xfail()
-def test_state(pg_url):
+def test_state(pg_url):  # noqa
     with open(os.path.join(os.path.dirname(__file__), 'state.sql'), 'r') as f:
         buf = f.read()
 
