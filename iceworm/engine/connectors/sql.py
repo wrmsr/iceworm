@@ -136,5 +136,8 @@ class SqlRowSink(RowSink):
     def consume_rows(self, rows: ta.Iterable[Row]) -> None:
         ks = [c.name for c in self._table.columns]
         for row in rows:
-            dct = {k: row[k] for k in ks}
+            try:
+                dct = {k: row[k] for k in ks}
+            except KeyError:
+                raise
             self._conn.execute(self._table.insert(), [dct])

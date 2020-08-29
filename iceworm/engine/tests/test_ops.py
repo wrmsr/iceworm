@@ -149,12 +149,12 @@ def infer_md_table(world: wo.World, query: str) -> md.Table:
     print(cat)
 
     # FIXME: preserve column names if possible
-    pna = ana.PreferredNameAnalyzer()
-    pna(root)
+    # pna = ana.PreferredNameAnalyzer()
+    # pna(root)
 
     root = ttfm.AliasRelationsTransformer(root)(root)
-    root = ttfm.LabelSelectItemsTransformer(root)(root)
     root = ttfm.ExpandSelectsTransformer(root, cat)(root)
+    root = ttfm.LabelSelectItemsTransformer(root)(root)
     print(rendering.render(root))
 
     syms = symbols.analyze(root, cat)

@@ -78,6 +78,7 @@ class AliasRelationsTransformer(Transformer):
         self._root = check.isinstance(root, no.Node)
 
         self._basic = ana.basic(root)
+        self._pna = ana.PreferredNameAnalyzer()
 
         rel_names = set()
         for ar in self._basic.get_node_type_set(no.AliasedRelation):
@@ -103,28 +104,6 @@ class AliasRelationsTransformer(Transformer):
         return node
 
 
-class LabelSelectItemsTransformer(Transformer):
-
-    def __init__(self, root: no.Node) -> None:
-        super().__init__()
-
-        self._root = check.isinstance(root, no.Node)
-
-        self._basic = ana.basic(root)
-
-        labels = set()
-        for item in self._basic.get_node_type_set(no.ExprSelectItem):
-            if item.label is not None:
-                labels.add(item.label.name)
-        self._name_gen = ocode.name_generator(unavailable_names=labels)
-
-    def __call__(self, node: no.ExprSelectItem) -> no.Node:  # noqa
-        return super().__call__(
-            node,
-            label=self(node.label) if node.label is not None else no.Identifier(self._name_gen()),
-        )
-
-
 class ExpandSelectsTransformer(Transformer):
 
     def __init__(self, root: no.Node, catalog: md.Catalog) -> None:
@@ -133,15 +112,8 @@ class ExpandSelectsTransformer(Transformer):
         self._root = check.isinstance(root, no.Node)
         self._catalog = check.isinstance(catalog, md.Catalog)
 
-        self._basic = ana.basic(root)
-
-        labels = set()
-        for item in self._basic.get_node_type_set(no.ExprSelectItem):
-            labels.add(check.not_none(item.label).name)
-        self._name_gen = ocode.name_generator(unavailable_names=labels)
-
     def __call__(self, node: no.Select) -> no.Node:  # noqa
-        sup = super().__call__  # FIXME: wut
+        sup = super().__call__
         rels = [check.isinstance(sup(r), no.Relation) for r in node.relations]
 
         items = []
@@ -153,8 +125,7 @@ class ExpandSelectsTransformer(Transformer):
                         for col in tbl.columns:
                             items.append(
                                 no.ExprSelectItem(
-                                    no.QualifiedNameNode.of([alias or tbl.name, col.name]),
-                                    no.Identifier(self._name_gen())))
+                                    no.QualifiedNameNode.of([alias or tbl.name, col.name])))
 
                     elif isinstance(rel, no.AliasedRelation):
                         check.none(alias)
@@ -176,3 +147,60 @@ class ExpandSelectsTransformer(Transformer):
                 raise TypeError(item)
 
         return super().__call__(node, items=items, relations=rels)
+
+
+class LabelSelectItemsTransformer(Transformer):
+
+    def __init__(self, root: no.Node) -> None:
+        super().__init__()
+
+        self._root = check.isinstance(root, no.Node)
+
+        self._basic = ana.basic(root)
+        self._pna = ana.PreferredNameAnalyzer()
+
+        # labels = set()
+        # for item in self._basic.get_node_type_set(no.ExprSelectItem):
+        #     labels.add(check.not_none(item.label).name)
+        # self._name_gen = ocode.name_generator(unavailable_names=labels)
+
+    def __call__(self, node: no.AllSelectItem) -> no.Node:  # noqa
+        raise TypeError(node)
+
+    def __call__(self, node: no.Select) -> no.Node:  # noqa
+        sup = super().__call__
+        items_and_names = [
+            (item, self._pna(item))
+            for item in node.items
+            for item in [sup(check.isinstance(item, no.ExprSelectItem))]
+        ]
+
+        cts = collections.Counter()
+        for item, name in items_and_names:
+            cts[name] += 1
+
+        new_items = []
+        rem = {n: -c for n, c in cts.items()}
+        for item, name in items_and_names:
+            item = check.isinstance(item, no.ExprSelectItem)
+            if cts[name] == 1:
+                check.state(rem[name] == -1)
+                rem[name] = 0
+                new_name = name
+            else:
+                rct = -rem[name]
+                check.state(rct)
+                rem[name] += 1
+                new_name = f'{name}_{rct}'  # FIXME: conflict-free via _name_gen
+
+            if item.label:
+                check.state(item.label.name == new_name)
+                new_item = item
+            else:
+                new_item = no.ExprSelectItem(item.value, no.Identifier(new_name))
+
+            new_items.append(new_item)
+
+        check.state(rem == {k: 0 for k in cts})
+
+        return super().__call__(node, items=new_items)

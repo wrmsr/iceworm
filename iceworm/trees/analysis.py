@@ -140,6 +140,9 @@ class PreferredNameAnalyzer(Analyzer[ta.Optional[str]]):
         else:
             return self(node.value)
 
+    def _process(self, node: no.QualifiedNameNode) -> ta.Optional[str]:  # noqa
+        return node.name[-1]
+
     def _process(self, node: no.Relation) -> ta.Optional[str]:  # noqa
         return self._from_children(node)
 
