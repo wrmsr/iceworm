@@ -148,10 +148,6 @@ def infer_md_table(world: wo.World, query: str) -> md.Table:
 
     print(cat)
 
-    # FIXME: preserve column names if possible
-    # pna = ana.PreferredNameAnalyzer()
-    # pna(root)
-
     root = ttfm.AliasRelationsTransformer(root)(root)
     root = ttfm.ExpandSelectsTransformer(root, cat)(root)
     root = ttfm.LabelSelectItemsTransformer(root)(root)
@@ -166,6 +162,7 @@ def infer_md_table(world: wo.World, query: str) -> md.Table:
     ren = rendering.render(root)
     print(ren)
 
+    # FIXME: pg.c defined in terms of generated pg.b, need iterativity
     return md.Table(
         ['$anon'],
         [md.Column(n, t) for n, t in tt.columns],
