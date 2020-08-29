@@ -163,6 +163,9 @@ def infer_md_table(world: wo.World, query: str) -> md.Table:
     dts = tdatatypes.analyze(root, oris, cat)
     tt = check.isinstance(dts.dts_by_node[root], dt.Table)
 
+    ren = rendering.render(root)
+    print(ren)
+
     return md.Table(
         ['$anon'],
         [md.Column(n, t) for n, t in tt.columns],

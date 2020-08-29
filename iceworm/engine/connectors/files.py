@@ -124,7 +124,8 @@ class CsvFileRowSource(RowSource):
         with open(self._table.path, 'r') as f:
             reader = csv.reader(f)
             rows = iter(reader)
-            cols = next(rows)
+            header_cols = next(rows)  # noqa
+            cols = [c.name for c in self._table.md_table.columns]
             for vals in rows:
                 row = dict(zip(cols, vals))
                 yield row
