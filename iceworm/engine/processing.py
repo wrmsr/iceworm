@@ -52,7 +52,7 @@ class TargetProcessor:
                     mdt = self.infer_table(rows.query)
                     ts[i] = dc.replace(ts[i], md=mdt)
 
-        raise NotImplementedError
+        return tars.TargetSet.of(ts)
 
     def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
         objs = []

@@ -9,7 +9,7 @@ import contextlib
 import os.path
 import typing as ta  # noqa
 
-from omnibus import check
+from omnibus import check  # noqa
 from omnibus import inject as inj  # noqa
 import pytest
 
@@ -105,14 +105,12 @@ def test_ops():
     targets = proc.TargetProcessor(TARGETS, CONNECTORS).output
     plan = pln.TargetPlanner(targets, CONNECTORS).plan
 
-    exe.PlanExecutor(plan).execute()
+    exe.PlanExecutor(plan, CONNECTORS).execute()
 
     with contextlib.closing(CONNECTORS['pg'].connect()) as pconn:
         print(pconn.reflect([QualifiedName.of(['a'])]))
-
-    sa_conn = check.isinstance(conns['pg'], sql.SqlConnection).sa_conn
-    print(list(sa_conn.execute('select * from foo')))
-    print(list(sa_conn.execute('select * from a')))
-    print(list(sa_conn.execute('select * from b')))
-    print(list(sa_conn.execute('select * from c')))
-    print(list(sa_conn.execute('select * from nums')))
+        print(list(pconn.execute('select * from foo')))
+        print(list(pconn.execute('select * from a')))
+        print(list(pconn.execute('select * from b')))
+        print(list(pconn.execute('select * from c')))
+        print(list(pconn.execute('select * from nums')))
