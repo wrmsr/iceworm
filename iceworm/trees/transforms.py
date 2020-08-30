@@ -159,10 +159,11 @@ class LabelSelectItemsTransformer(Transformer):
         self._basic = ana.basic(root)
         self._pna = ana.PreferredNameAnalyzer()
 
-        # labels = set()
-        # for item in self._basic.get_node_type_set(no.ExprSelectItem):
-        #     labels.add(check.not_none(item.label).name)
-        # self._name_gen = ocode.name_generator(unavailable_names=labels)
+        labels = set()
+        for item in self._basic.get_node_type_set(no.ExprSelectItem):
+            if item.label is not None:
+                labels.add(check.not_none(item.label).name)
+        self._name_gen = ocode.name_generator(unavailable_names=labels)
 
     def __call__(self, node: no.AllSelectItem) -> no.Node:  # noqa
         raise TypeError(node)
@@ -186,7 +187,10 @@ class LabelSelectItemsTransformer(Transformer):
             if cts[name] == 1:
                 check.state(rem[name] == -1)
                 rem[name] = 0
-                new_name = name
+                if name is not None:
+                    new_name = name
+                else:
+                    new_name = self._name_gen()
             else:
                 rct = -rem[name]
                 check.state(rct)

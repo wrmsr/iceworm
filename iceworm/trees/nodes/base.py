@@ -83,7 +83,7 @@ class Stmt(Node, abstract=True):
 
 
 class Identifier(Expr):
-    name: str
+    name: str = dc.field(check=lambda o: isinstance(o, str) and o)
 
     @classmethod
     def of(cls, obj: ta.Union['Identifier', str]) -> 'Identifier':
