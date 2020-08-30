@@ -14,18 +14,19 @@ from omnibus import inject as inj  # noqa
 import pytest
 
 from .. import connectors as ctrs
+from .. import execution as exe
 from .. import planning as pln
 from .. import processing as proc
 from .. import targets as tars
 from ... import datatypes as dt
 from ... import metadata as md
-from ...tests.helpers import pg_url
-from ...types import QualifiedName
+from ...tests.helpers import pg_engine  # noqa
+from ...tests.helpers import pg_url  # noqa  # FIXME: jesus christ pytest fucking sucks
+from ...tests.helpers import raw_pg_url
 from ...utils import secrets as sec
 from ..connectors import computed as cmp
 from ..connectors import files
 from ..connectors import sql
-from .. import execution as exe
 
 
 CONNECTORS = ctrs.ConnectorSet([
@@ -33,7 +34,7 @@ CONNECTORS = ctrs.ConnectorSet([
     sql.SqlConnector(
         'pg',
         sql.SqlConnector.Config(
-            url=sec.ComputedSecret(pg_url),
+            url=sec.ComputedSecret(raw_pg_url),
         ),
     ),
 
@@ -94,7 +95,7 @@ TARGETS = tars.TargetSet([
 
 
 @pytest.mark.xfail()
-def test_ops():
+def test_ops(pg_engine):  # noqa
     # binder = inj.create_binder()
     # binder.bind(CONNECTORS)
     # binder.bind(inj.Key(ta.Iterable[ctrs.Connector]), to=ctrs.ConnectorSet)
@@ -102,15 +103,17 @@ def test_ops():
     # binder.bind(inj.Key(ta.Iterable[tars.Target]), to=tars.TargetSet)
     # injector = inj.create_injector(binder)  # noqa
 
+    with pg_engine.connect() as pg_conn:
+        print(list(pg_conn.execute('select 1')))
+
     targets = proc.TargetProcessor(TARGETS, CONNECTORS).output
     plan = pln.TargetPlanner(targets, CONNECTORS).plan
 
     exe.PlanExecutor(plan, CONNECTORS).execute()
 
-    with contextlib.closing(CONNECTORS['pg'].connect()) as pconn:
-        print(pconn.reflect([QualifiedName.of(['a'])]))
-        print(list(pconn.sa_conn.execute('select * from foo')))
-        print(list(pconn.sa_conn.execute('select * from a')))
-        print(list(pconn.sa_conn.execute('select * from b')))
-        print(list(pconn.sa_conn.execute('select * from c')))
-        print(list(pconn.sa_conn.execute('select * from nums')))
+    with pg_engine.connect() as pg_conn:
+        print(list(pg_conn.execute('select * from foo')))
+        print(list(pg_conn.execute('select * from a')))
+        print(list(pg_conn.execute('select * from b')))
+        print(list(pg_conn.execute('select * from c')))
+        print(list(pg_conn.execute('select * from nums')))
