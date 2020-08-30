@@ -109,8 +109,8 @@ def test_ops():
 
     with contextlib.closing(CONNECTORS['pg'].connect()) as pconn:
         print(pconn.reflect([QualifiedName.of(['a'])]))
-        print(list(pconn.execute('select * from foo')))
-        print(list(pconn.execute('select * from a')))
-        print(list(pconn.execute('select * from b')))
-        print(list(pconn.execute('select * from c')))
-        print(list(pconn.execute('select * from nums')))
+        print(list(pconn.sa_conn.execute('select * from foo')))
+        print(list(pconn.sa_conn.execute('select * from a')))
+        print(list(pconn.sa_conn.execute('select * from b')))
+        print(list(pconn.sa_conn.execute('select * from c')))
+        print(list(pconn.sa_conn.execute('select * from nums')))
