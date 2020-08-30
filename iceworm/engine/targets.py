@@ -118,7 +118,7 @@ class TargetSet:
                 check.not_in(target.name, by_name)
                 by_name[target.name] = target
         self._targets_by_name: ta.Mapping[QualifiedName, Target] = by_name
-        self._node_sets_by_type: ta.Dict[type, ta.AbstractSet[Target]] = {}
+        self._target_sets_by_type: ta.Dict[type, ta.AbstractSet[Target]] = {}
 
     @classmethod
     def of(cls, it: ta.Iterable[Target]) -> 'TargetSet':
@@ -129,9 +129,9 @@ class TargetSet:
 
     def get_target_type_set(self, ty: ta.Type[T]) -> ta.AbstractSet[T]:
         try:
-            return self._node_sets_by_type[ty]
+            return self._target_sets_by_type[ty]
         except KeyError:
-            ret = self._node_sets_by_type[ty] = ocol.IdentitySet(n for n in self._targets if isinstance(n, ty))
+            ret = self._target_sets_by_type[ty] = ocol.IdentitySet(n for n in self._targets if isinstance(n, ty))
             return ret
 
     def __iter__(self) -> ta.Iterator[Target]:
