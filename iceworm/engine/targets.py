@@ -1,6 +1,7 @@
 """
 ** *NOT* nested **
 """
+import operator
 import typing as ta
 
 from omnibus import check
@@ -9,16 +10,43 @@ from omnibus import dataclasses as dc
 
 from .. import metadata as md_
 from ..types import QualifiedName
+from ..utils import annotations as anns
+from ..utils import serde
 
 
 T = ta.TypeVar('T"')
 
 
+class Annotation(anns.Annotation, abstract=True):
+    pass
+
+
+class Annotations(anns.Annotations[Annotation]):
+
+    @classmethod
+    def _ann_cls(cls) -> ta.Type[Annotation]:
+        return Annotation
+
+
 class Target(dc.Enum):
+
+    anns: Annotations = dc.field(
+        (),
+        kwonly=True,
+        repr=False,
+        hash=False,
+        compare=False,
+        coerce=Annotations,
+        metadata={serde.Ignore: operator.not_},
+    )
 
     @property
     def name(self) -> ta.Optional[QualifiedName]:
         return None
+
+
+class Origin(Annotation):
+    target: Target
 
 
 class Table(Target):

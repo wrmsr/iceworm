@@ -6,8 +6,11 @@ TODO:
   - want gc
    - no constraints but offline?
  - composite pk, world_id (just world?), auto-added when querying, prefixed in indices
+  - composite pk anyway below that - 'implicit' pk components?
+  - state.PrimaryKey([str]), state.Index([str])
  - _meta: revision, host, pid - same as query tags, likely more - world info
  - dc anns like nodal/serde, ignored for heap
+ - atom? running txns?
 
 tables:
  - worlds

@@ -106,6 +106,10 @@ TARGETS = tars.TargetSet([
 ])
 
 
+class InferenceError(Exception):
+    pass
+
+
 def infer_md_table(world: wo.World, query: str) -> md.Table:
     root = par.parse_statement(query)
 
@@ -116,7 +120,10 @@ def infer_md_table(world: wo.World, query: str) -> md.Table:
 
     alias_sets_by_tbl: ta.MutableMapping[md.Object, ta.Set[QualifiedName]] = ocol.IdentityKeyDict()
     for tn in table_names:
-        obj = check.single(world.reflect(tn))
+        objs = list(world.reflect(tn))
+        if not objs:
+            raise InferenceError
+        obj = check.single(objs)
         aset = alias_sets_by_tbl.setdefault(obj, set())
         if tn != obj.name:
             aset.add(tn)
