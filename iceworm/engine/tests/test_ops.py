@@ -5,7 +5,6 @@ TODO:
   - col type ann/enforcement: select a /*+ type: char(36) */
   - catalog chainmap?
 """
-import contextlib
 import os.path
 import typing as ta  # noqa
 

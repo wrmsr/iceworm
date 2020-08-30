@@ -137,7 +137,7 @@ class SqlRowSink(RowSink):
         ks = [c.name for c in self._table.columns]
         for row in rows:
             check.state(len(row) == len(ks))
-            row = dict(zip(ks, row.values()))  # FIXME
+            # row = dict(zip(ks, row.values()))  # FIXME
             try:
                 dct = {k: row[k] for k in ks}
             except KeyError:
