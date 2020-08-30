@@ -45,22 +45,35 @@ class TargetProcessor:
     def output(self) -> tars.TargetSet:
         ts = list(self._input)
 
-        tn_deps = {}
+        tar_tns = {}
         for tar in ts:
             if isinstance(tar, tars.Table):
+                check.not_in(tar.name, tar_tns)
+                tar_tns[tar.name] = tar
+
+        tn_deps = {}
+        tn_idxs = {}
+        for i, tar in enumerate(ts):
+            if isinstance(tar, tars.Table):
+                tn_idxs[tar.name] = i
                 rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == tar.name)
                 root = par.parse_statement(rows.query)
-                deps = {n.name.name for n in ana.basic(root).get_node_type_set(no.Table)}.
+                deps = {n.name.name for n in ana.basic(root).get_node_type_set(no.Table) if n.name.name in tar_tns}
                 check.not_in(tar.name, tn_deps)
                 tn_deps[tar.name] = deps
 
-        for i in range(len(ts)):
-            tar = ts[i]
-            if isinstance(tar, tars.Table):
+        given_tables: ta.Mapping[QualifiedName, md.Table] = {}
+
+        topo = list(ocol.toposort(tn_deps))
+        for sup in topo:
+            for tn in sup:
+                tar = tar_tns[tn]
                 if tar.md is None:
                     rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == tar.name)
-                    mdt = self.infer_table(rows.query)
+                    mdt = self.infer_table(rows.query, given_tables)
+                    i = tn_idxs[tar.name]
                     ts[i] = dc.replace(ts[i], md=mdt)
+                    given_tables[tar.name] = mdt
 
         return tars.TargetSet.of(ts)
 
@@ -82,7 +95,7 @@ class TargetProcessor:
 
         return objs
 
-    def infer_table(self, query: str) -> md.Table:
+    def infer_table(self, query: str, given_tables: ta.Mapping[QualifiedName, md.Table]) -> md.Table:
         root = par.parse_statement(query)
 
         table_names = {
@@ -92,13 +105,14 @@ class TargetProcessor:
 
         alias_sets_by_tbl: ta.MutableMapping[md.Object, ta.Set[QualifiedName]] = ocol.IdentityKeyDict()
         for tn in table_names:
-            objs = list(self.reflect(tn))
-            if not objs:
-                raise Exception  # InferenceError
-            obj = check.single(objs)
-            aset = alias_sets_by_tbl.setdefault(obj, set())
-            if tn != obj.name:
-                aset.add(tn)
+            if tn in given_tables:
+                alias_sets_by_tbl[given_tables[tn]] = set()
+            else:
+                objs = list(self.reflect(tn))
+                obj = check.single(objs)
+                aset = alias_sets_by_tbl.setdefault(obj, set())
+                if tn != obj.name:
+                    aset.add(tn)
 
         cat = md.Catalog(
             tables=[
