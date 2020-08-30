@@ -71,6 +71,7 @@ class TargetProcessor:
                 if tar.md is None:
                     rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == tar.name)
                     mdt = self.infer_table(rows.query, given_tables)
+                    mdt = dc.replace(mdt, name=tar.name)
                     i = tn_idxs[tar.name]
                     ts[i] = dc.replace(ts[i], md=mdt)
                     given_tables[tar.name] = mdt
