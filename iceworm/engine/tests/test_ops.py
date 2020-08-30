@@ -7,10 +7,10 @@ TODO:
 """
 import contextlib
 import os.path
-import typing as ta
+import typing as ta  # noqa
 
 from omnibus import check
-from omnibus import inject as inj
+from omnibus import inject as inj  # noqa
 import pytest
 
 from .. import connectors as ctrs
@@ -95,17 +95,12 @@ TARGETS = tars.TargetSet([
 
 @pytest.mark.xfail()
 def test_ops():
-    binder = inj.create_binder()
-
-    binder.bind(CONNECTORS)
-    binder.bind(inj.Key(ta.Iterable[ctrs.Connector]), to=ctrs.ConnectorSet)
-
-    binder.bind(TARGETS)
-    binder.bind(inj.Key(ta.Iterable[tars.Target]), to=tars.TargetSet)
-
-    binder.bind(wo.World, as_singleton=True)
-
-    injector = inj.create_injector(binder)  # noqa
+    # binder = inj.create_binder()
+    # binder.bind(CONNECTORS)
+    # binder.bind(inj.Key(ta.Iterable[ctrs.Connector]), to=ctrs.ConnectorSet)
+    # binder.bind(TARGETS)
+    # binder.bind(inj.Key(ta.Iterable[tars.Target]), to=tars.TargetSet)
+    # injector = inj.create_injector(binder)  # noqa
 
     targets = proc.TargetProcessor(TARGETS, CONNECTORS).output
     plan = pln.TargetPlanner(targets, CONNECTORS).plan

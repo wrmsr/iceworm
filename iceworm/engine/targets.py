@@ -67,7 +67,7 @@ class Annotations(anns.Annotations[Annotation]):
         return Annotation
 
 
-class Target(dc.Enum):
+class Target(dc.Enum, reorder=True):
 
     anns: Annotations = dc.field(
         (),
