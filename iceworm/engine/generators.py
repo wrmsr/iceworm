@@ -1,5 +1,8 @@
 """
 TODO:
+ - rename to rules? ..
+
+TODO:
  - *not* named macro cuz jinja
  - macros return lists of / yield strs, statements
   - maybe other things but prob not
