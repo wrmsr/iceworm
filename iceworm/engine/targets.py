@@ -1,5 +1,44 @@
 """
+TODO:
+ - sql files, directory structure, yamls, generators
+  - datagrip as ide? .sql scripts out of order, go-to-def?
+  - subdirs as schemas?
+  - sql files could start with 'use <conn>'
+ - lib freestanding, cfg in monorepo? up to datasci really
+ - pluggable mangling - users can write cifer$abc, run in datagrip goes to users schema, mangled at load by iw
+  - mangling here is for datagrip / user, not ice - ice doesnt need it
+ - 'scopes' not files
+  - lol, whoa, scoped sql variables?
+  - files written as executable tests?
+  - no if statements = actually good - explicitly take 'both sides'
+ - accept vs reject vs ignore replace
+ - modeling something as simple as an if statement from cfg service..
+  - flatten?
+  - patmatcher
+  - idiom: insert into foo select * from bar where exists (select 1 from config where key = 'a' and value = 'b')
+   - optimize fact config is 'static' and known, convert into if statement
+   - optimize away inserts from known empty tables
+   - support in ctes
+ - loops
+  - tbl funcs vs star templates
+  - either way an expansion, but table funcs more powerful
+ - dc style 'profiles' on tables?
+ - lol, templated (which always means jinja) sql files
+  - header can declare deps, injected into context: {foo: Foo, bar: 'Bar[int]'}
+
 ** *NOT* nested **
+
+blob:
+ - really, 'state' as configured by 'build' can be considered just a bigass sql file - a giant mass of creates / inserts
+ - could be shipped to service without flip
+ - like, sorta - 1G csvs could but shouldn't
+ - still want pre-verification
+ - task/thread/subsystem that frequently writes connector schemas somewhere
+  - to s3, a-p (sites?) can use for pre-verification
+ - lol, meta, written to an s3 connector, tables all the way down
+ - need connectors? have connectors?
+ - 'create connector'? borderline bad divergence from snowflake, but all-sql is powerful
+ - really all sql with hot comments
 """
 import operator
 import typing as ta

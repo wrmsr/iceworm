@@ -1,4 +1,8 @@
 """
+TODO:
+ - rationale: reflection, including for connectors
+ - alt: pretend to be snowflake but use presto driver?
+
 https://docs.snowflake.com/en/user-guide/snowsql-start.html#using-a-proxy-server
 https://github.com/snowflakedb/snowflake-jdbc
 https://github.com/abhinavsingh/proxy.py/tree/develop/proxy
