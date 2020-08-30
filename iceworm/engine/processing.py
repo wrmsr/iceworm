@@ -15,7 +15,7 @@ from ..trees import datatypes as tdatatypes
 from ..trees import nodes as no
 from ..trees import origins
 from ..trees import parsing as par
-from ..trees import rendering
+from ..trees import rendering  # noqa
 from ..trees import symbols
 from ..trees import transforms as ttfm
 from ..types import QualifiedName
@@ -44,6 +44,16 @@ class TargetProcessor:
     @properties.cached
     def output(self) -> tars.TargetSet:
         ts = list(self._input)
+
+        tn_deps = {}
+        for tar in ts:
+            if isinstance(tar, tars.Table):
+                rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == tar.name)
+                root = par.parse_statement(rows.query)
+                deps = {n.name.name for n in ana.basic(root).get_node_type_set(no.Table)}.
+                check.not_in(tar.name, tn_deps)
+                tn_deps[tar.name] = deps
+
         for i in range(len(ts)):
             tar = ts[i]
             if isinstance(tar, tars.Table):
@@ -97,12 +107,9 @@ class TargetProcessor:
             ],
         )
 
-        print(cat)
-
         root = ttfm.AliasRelationsTransformer(root)(root)
         root = ttfm.ExpandSelectsTransformer(root, cat)(root)
         root = ttfm.LabelSelectItemsTransformer(root)(root)
-        print(rendering.render(root))
 
         syms = symbols.analyze(root, cat)
         oris = origins.analyze(root, syms)
@@ -110,8 +117,8 @@ class TargetProcessor:
         dts = tdatatypes.analyze(root, oris, cat)
         tt = check.isinstance(dts.dts_by_node[root], dt.Table)
 
-        ren = rendering.render(root)
-        print(ren)
+        # ren = rendering.render(root)
+        # print(ren)  # FIXME: update query
 
         # FIXME: pg.c defined in terms of generated pg.b, need iterativity
         return md.Table(
