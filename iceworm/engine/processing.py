@@ -19,6 +19,7 @@ from ..trees import rendering  # noqa
 from ..trees import symbols
 from ..trees import transforms as ttfm
 from ..types import QualifiedName
+from ..utils import unique_dict
 
 
 class TargetProcessor:
@@ -43,14 +44,9 @@ class TargetProcessor:
 
     @properties.cached
     def output(self) -> tars.TargetSet:
+        tar_tns = unique_dict((tar.name, tar) for tar in self._input.get_target_type_set(tars.Table))
+
         ts = list(self._input)
-
-        tar_tns = {}
-        for tar in ts:
-            if isinstance(tar, tars.Table):
-                check.not_in(tar.name, tar_tns)
-                tar_tns[tar.name] = tar
-
         tn_deps = {}
         tn_idxs = {}
         for i, tar in enumerate(ts):
