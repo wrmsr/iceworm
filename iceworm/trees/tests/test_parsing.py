@@ -49,3 +49,14 @@ def test_parsing():
             # print(json.dumps(parts_ser, indent=4))
 
             print()
+
+
+def test_minor():
+    print(parsing.parse_expr('1'))
+    print(parsing.parse_expr('2 * f(a + b.c)'))
+
+    print(parsing.parse_col_spec('id integer'))
+    print(parsing.parse_col_spec('name varchar(420)'))
+
+    print(parsing.parse_type_spec('integer'))
+    print(parsing.parse_type_spec('varchar(420)'))

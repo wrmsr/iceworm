@@ -18,6 +18,7 @@ TODO:
   - maybe can get injected
   - 'call's? are removed from plan but retained for diagnosis, and are first class citizens - can be operated on
    - cifer 'metrics' are not discarded into a nest of tasks
+ - * `call f()` sql syntax?
 
 yes:
 - loops

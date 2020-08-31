@@ -461,7 +461,7 @@ class _ParseVisitor(IceSqlVisitor):
         return no.Var(txt[1:])
 
 
-def parse_statement(buf: str) -> no.Node:
+def create_parser(buf: str) -> IceSqlParser:
     lexer = IceSqlLexer(antlr4.InputStream(buf))
     lexer.removeErrorListeners()
     lexer.addErrorListener(antlr.SilentRaisingErrorListener())
@@ -473,6 +473,28 @@ def parse_statement(buf: str) -> no.Node:
     parser.removeErrorListeners()
     parser.addErrorListener(antlr.SilentRaisingErrorListener())
 
-    visitor = _ParseVisitor()
-    node = visitor.visit(parser.singleStatement())
+    return parser
+
+
+def parse_statement(buf: str) -> no.Node:
+    parser = create_parser(buf)
+    node = _ParseVisitor().visit(parser.singleStatement())
     return check.isinstance(node, no.Node)
+
+
+def parse_expr(buf: str) -> no.Expr:
+    parser = create_parser(buf)
+    node = _ParseVisitor().visit(parser.expression())
+    return check.isinstance(node, no.Expr)
+
+
+def parse_type_spec(buf: str) -> no.TypeSpec:
+    parser = create_parser(buf)
+    node = _ParseVisitor().visit(parser.typeSpec())
+    return check.isinstance(node, no.TypeSpec)
+
+
+def parse_col_spec(buf: str) -> no.ColSpec:
+    parser = create_parser(buf)
+    node = _ParseVisitor().visit(parser.colSpec())
+    return check.isinstance(node, no.ColSpec)

@@ -1,6 +1,7 @@
 """
 TODO:
  - deal w csv header
+  - oo, schema def in header lol: ```id integer, name varchar, ...```
  - NamePolicy - <schema>.<table>(.csv)?
  - local/pkg/s3/url/sftp?
  - csv/json/yaml/parquet

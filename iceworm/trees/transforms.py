@@ -10,7 +10,7 @@ TODO:
  - inlining
   - upstreams
   - (mat)views
-  - table funcs (laterals?)
+  - table funcs (strats: laterals? subqueries? ctes?)
  - jinja eval
  - parameter eval
  - lint / bugsquash
