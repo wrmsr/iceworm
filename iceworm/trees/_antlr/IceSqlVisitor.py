@@ -395,6 +395,11 @@ class IceSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by IceSqlParser#var.
+    def visitVar(self, ctx:IceSqlParser.VarContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by IceSqlParser#integerNumber.
     def visitIntegerNumber(self, ctx:IceSqlParser.IntegerNumberContext):
         return self.visitChildren(ctx)

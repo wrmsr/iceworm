@@ -155,3 +155,7 @@ class Between(Expr):
     value: Expr
     lower: Expr
     upper: Expr
+
+
+class Var(Expr):
+    name: str

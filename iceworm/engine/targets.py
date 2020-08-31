@@ -4,6 +4,10 @@ TODO:
   - datagrip as ide? .sql scripts out of order, go-to-def?
   - subdirs as schemas?
   - sql files could start with 'use <conn>'
+  - * temp / scoped tables *
+  - ** temp / scoped funcs - table and scalar **
+  - temp targets gc'd whenever possible, code to cleanup zombies
+  - make json comments the norm?
  - lib freestanding, cfg in monorepo? up to datasci really
  - pluggable mangling - users can write cifer$abc, run in datagrip goes to users schema, mangled at load by iw
   - mangling here is for datagrip / user, not ice - ice doesnt need it
@@ -102,6 +106,10 @@ class Rows(Target):
 
 class Function(Target):
     name: QualifiedName = dc.field(coerce=QualifiedName.of)
+
+
+class Rule(Target, abstract=True):
+    pass
 
 
 class TargetSet:

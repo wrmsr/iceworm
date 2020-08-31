@@ -4,6 +4,7 @@ TODO:
   - transform jinja exprs to params
    - inJinjaPredicate -> array arg + contains pred
  - pk awareness
+  - constraints in general
  - partition / clustering
  - slow vs fast changing
   - refresh interval awareness

@@ -455,6 +455,11 @@ class _ParseVisitor(IceSqlVisitor):
     def visitUnquotedIdentifier(self, ctx: IceSqlParser.UnquotedIdentifierContext):
         return no.Identifier(ctx.getText())
 
+    def visitVar(self, ctx: IceSqlParser.VarContext):
+        txt = ctx.VAR().getText()
+        check.state(txt.startswith('$') and len(txt) > 1)
+        return no.Var(txt[1:])
+
 
 def parse_statement(buf: str) -> no.Node:
     lexer = IceSqlLexer(antlr4.InputStream(buf))

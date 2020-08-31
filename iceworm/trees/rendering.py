@@ -403,6 +403,9 @@ class Renderer(dispatch.Class):
             ])]),
         ]
 
+    def render(self, node: no.Var) -> Part:  # noqa
+        return '$' + node.name
+
 
 class PartTransform(dispatch.Class):
     __call__ = dispatch.property()

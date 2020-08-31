@@ -1,8 +1,5 @@
 """
 TODO:
- - rename to rules? ..
-
-TODO:
  - *not* named macro cuz jinja
  - macros return lists of / yield strs, statements
   - maybe other things but prob not
@@ -53,3 +50,17 @@ https://medium.com/hashmapinc/dont-do-analytics-engineering-in-snowflake-until-y
 https://github.com/fishtown-analytics/dbt
 https://docs.getdbt.com/docs/building-a-dbt-project/building-models/materializations/
 """
+import typing as ta
+
+from omnibus import dataclasses as dc
+
+from .. import metadata as md_
+from ..types import QualifiedName
+from .targets import Rule
+
+
+class TableAsSelect(Rule):
+    name: QualifiedName = dc.field(coerce=QualifiedName.of)
+    query: str = dc.field(check=lambda o: isinstance(o, str))
+
+    md: ta.Optional[md_.Table] = dc.field(None, check=lambda o: o is None or isinstance(o, md_.Table), kwonly=True)
