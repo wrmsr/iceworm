@@ -105,7 +105,17 @@ def test_ops(pg_engine):  # noqa
     with pg_engine.connect() as pg_conn:
         print(list(pg_conn.execute('select 1')))
 
-    targets = proc.TargetProcessor(TARGETS, CONNECTORS).output
+    tprocs = [
+        proc.InferTableProcessor(CONNECTORS)
+    ]
+
+    targets = TARGETS
+    while True:
+        mtps = [tp for tp in tprocs if tp.matches(targets)]
+        if not mtps:
+            break
+        targets = mtps[0].process(targets)
+
     plan = pln.TargetPlanner(targets, CONNECTORS).plan
 
     exe.PlanExecutor(plan, CONNECTORS).execute()

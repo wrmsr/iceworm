@@ -44,12 +44,14 @@ blob:
  - 'create connector'? borderline bad divergence from snowflake, but all-sql is powerful
  - really all sql with hot comments
 """
+import abc
 import operator
 import typing as ta
 
 from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
+from omnibus import lang
 
 from .. import metadata as md_
 from ..types import QualifiedName
@@ -157,3 +159,14 @@ class TargetSet:
 
     def __getitem__(self, name: QualifiedName) -> Target:
         return self._targets_by_name[check.isinstance(name, QualifiedName)]
+
+
+class TargetProcessor(lang.Abstract):
+
+    @abc.abstractmethod
+    def matches(self, targets: TargetSet) -> bool:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def process(self, targets: TargetSet) -> TargetSet:
+        raise NotImplementedError
