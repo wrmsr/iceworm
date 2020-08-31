@@ -111,7 +111,6 @@ def test_ops(pg_engine):  # noqa
     exe.PlanExecutor(plan, CONNECTORS).execute()
 
     with pg_engine.connect() as pg_conn:
-        print(list(pg_conn.execute('select * from foo')))
         print(list(pg_conn.execute('select * from a')))
         print(list(pg_conn.execute('select * from b')))
         print(list(pg_conn.execute('select * from c')))
