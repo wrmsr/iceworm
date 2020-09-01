@@ -5,9 +5,11 @@ TODO:
 import collections.abc
 import typing as ta
 
+from omnibus import check
 from omnibus import dataclasses as dc
 
 from .utils import seq
+from .utils import serde
 
 
 class QualifiedName(dc.Pure, ta.Sequence[str]):
@@ -73,3 +75,12 @@ class QualifiedName(dc.Pure, ta.Sequence[str]):
             return None
         else:
             return cls.of(obj)
+
+
+class QualifiedNameSerde(serde.AutoSerde[QualifiedName]):
+
+    def serialize(self, obj: QualifiedName) -> ta.Any:
+        return check.isinstance(obj, QualifiedName).parts
+
+    def deserialize(self, ser: ta.Any) -> QualifiedName:
+        return QualifiedName.of(ser)

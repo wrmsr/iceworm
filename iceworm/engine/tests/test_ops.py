@@ -25,6 +25,7 @@ from ...tests.helpers import pg_url  # noqa  # FIXME: jesus christ pytest fuckin
 from ...tests.helpers import raw_pg_url
 from ...types import QualifiedName  # noqa
 from ...utils import secrets as sec
+from ...utils import serde
 from ..connectors import computed as cmp
 from ..connectors import files
 from ..connectors import sql
@@ -81,16 +82,28 @@ CONNECTORS = ctrs.ConnectorSet([
 ])
 
 
-TARGETS = tars.TargetSet([
-
-    rls.TableAsSelect(['pg', 'a'], 'select * from csv.a'),
-    rls.TableAsSelect(['pg', 'b'], 'select * from csv.b'),
-    rls.TableAsSelect(['pg', 'c'], 'select * from pg.b'),
-    rls.TableAsSelect(['pg', 'nums'], 'select * from cmp.nums'),
-
-    tars.Rows(['system', 'notifications'], "select 'hi' message"),
-
-])
+TARGETS_SER = [
+    {'table_as_select': {
+        'name': ['pg', 'a'],
+        'query': 'select * from csv.a',
+    }},
+    {'table_as_select': {
+        'name': ['pg', 'b'],
+        'query': 'select * from csv.b',
+    }},
+    {'table_as_select': {
+        'name': ['pg', 'c'],
+        'query': 'select * from pg.b',
+    }},
+    {'table_as_select': {
+        'name': ['pg', 'nums'],
+        'query': 'select * from cmp.nums',
+    }},
+    {'rows': {
+        'table': ['system', 'notifications'],
+        'query': "select 'hi' message",
+    }},
+]
 
 
 @pytest.mark.xfail()
@@ -98,7 +111,7 @@ def test_ops(pg_engine):  # noqa
     # binder = inj.create_binder()
     # binder.bind(CONNECTORS)
     # binder.bind(inj.Key(ta.Iterable[ctrs.Connector]), to=ctrs.ConnectorSet)
-    # binder.bind(TARGETS)
+    # binder.bind(targets)
     # binder.bind(inj.Key(ta.Iterable[tars.Target]), to=tars.TargetSet)
     # injector = inj.create_injector(binder)  # noqa
 
@@ -107,7 +120,8 @@ def test_ops(pg_engine):  # noqa
         proc.InferTableProcessor(CONNECTORS),
     ]
 
-    targets = TARGETS
+    targets = serde.deserialize(TARGETS_SER, ta.Sequence[tars.Target], no_reraise=True)
+
     while True:
         print(list(targets))
         mtps = [tp for tp in tprocs if tp.matches(targets)]

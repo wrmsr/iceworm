@@ -29,6 +29,8 @@ TODO:
  - dc style 'profiles' on tables?
  - lol, templated (which always means jinja) sql files
   - header can declare deps, injected into context: {foo: Foo, bar: 'Bar[int]'}
+ - 'internal'?
+ - individual 'processed' anns
 
 ** *NOT* nested **
 
@@ -55,6 +57,7 @@ from omnibus import lang
 
 from .. import metadata as md_
 from ..types import QualifiedName
+from ..utils.nodal import NodalDataclass
 from ..utils import annotations as anns
 from ..utils import serde
 
@@ -74,7 +77,11 @@ class Annotations(anns.Annotations[Annotation]):
         return Annotation
 
 
-class Target(dc.Enum, reorder=True):
+class Target(dc.Enum, NodalDataclass['Target'], reorder=True):
+
+    @classmethod
+    def _nodal_cls(cls) -> ta.Type['Target']:
+        return Target
 
     anns: Annotations = dc.field(
         (),

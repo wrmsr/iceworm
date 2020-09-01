@@ -7,11 +7,14 @@ TODO:
  - strict mode
  - replace with builtin omni generic impl
 """
+import abc
 import collections.abc
+import datetime
 import enum
 import typing as ta
 import weakref
 
+from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import defs
 from omnibus import lang
@@ -59,6 +62,41 @@ Serialized = ta.Union[
     ta.List['Serialized'],
     ta.Dict[str, 'Serialized'],
 ]
+
+
+class Serde(lang.Abstract, ta.Generic[T]):
+
+    @abc.abstractmethod
+    def serialize(self, obj: T) -> ta.Any:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def deserialize(self, ser: ta.Any) -> T:
+        raise NotImplementedError
+
+
+SERDES_BY_CLS: ta.MutableMapping[type, Serde] = weakref.WeakKeyDictionary()
+
+
+class AutoSerde(Serde[T], lang.Abstract):
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__()
+        check.state(cls.__bases__ == (AutoSerde,))
+        arg = check.single(rfl.spec(check.single(cls.__orig_bases__)).args)
+        ty = check.isinstance(check.isinstance(arg, rfl.NonGenericTypeSpec).cls, type)
+        check.not_in(ty, SERDES_BY_CLS)
+        inst = cls()
+        SERDES_BY_CLS[ty] = inst
+
+
+class DatetimeSerde(AutoSerde[datetime.datetime]):
+
+    def serialize(self, obj: T) -> ta.Any:
+        raise NotImplementedError
+
+    def deserialize(self, ser: ta.Any) -> T:
+        raise NotImplementedError
 
 
 _SubclassMap = ta.Mapping[str, type]
@@ -130,7 +168,11 @@ def _get_dataclass_field_type_map(dcls: type) -> _DataclassFieldSerdeMap:
 
 
 def serialize(obj: T) -> Serialized:
-    if dc.is_dataclass(obj):
+    if type(obj) in SERDES_BY_CLS:
+        serde = SERDES_BY_CLS[type(obj)]
+        return serde.serialize(obj)
+
+    elif dc.is_dataclass(obj):
         dct = {}
         for fn, fs in _get_dataclass_field_type_map(type(obj)).items():
             v = getattr(obj, fn)
@@ -155,6 +197,17 @@ def serialize(obj: T) -> Serialized:
         raise TypeError(obj)
 
 
+def _deserialize_dataclass(ser: Serialized, cls: type) -> T:
+    [[n, dct]] = ser.items()
+    dcls = _get_subclass_map(cls)[n]
+    fdct = _get_dataclass_field_type_map(dcls)
+    kw = {}
+    for k, v in dct.items():
+        fs = fdct[k]
+        kw[k] = deserialize(v, fs.cls)
+    return dcls(**kw)
+
+
 def _deserialize(ser: Serialized, cls: ta.Type[T]) -> T:
     if rfl.is_generic(cls) and cls.__origin__ is ta.Union:
         args = cls.__args__
@@ -165,7 +218,11 @@ def _deserialize(ser: Serialized, cls: ta.Type[T]) -> T:
             return None
         cls = ecls
 
-    if rfl.is_generic(cls) and cls.__origin__ is collections.abc.Mapping:
+    if isinstance(cls, type) and cls in SERDES_BY_CLS:
+        serde = SERDES_BY_CLS[cls]
+        return serde.deserialize(ser)
+
+    elif rfl.is_generic(cls) and cls.__origin__ is collections.abc.Mapping:
         [kcls, vcls] = cls.__args__
         if not isinstance(ser, collections.abc.Sequence) or isinstance(ser, str):
             raise TypeError(ser)
@@ -198,14 +255,7 @@ def _deserialize(ser: Serialized, cls: ta.Type[T]) -> T:
     elif dc.is_dataclass(cls):
         if not isinstance(ser, collections.abc.Mapping):
             raise TypeError(ser)
-        [[n, dct]] = ser.items()
-        dcls = _get_subclass_map(cls)[n]
-        fdct = _get_dataclass_field_type_map(dcls)
-        kw = {}
-        for k, v in dct.items():
-            fs = fdct[k]
-            kw[k] = deserialize(v, fs.cls)
-        return dcls(**kw)
+        return _deserialize_dataclass(ser, cls)
 
     elif issubclass(cls, enum.Enum):
         if isinstance(ser, str):
@@ -239,8 +289,11 @@ class DeserializationException(Exception):
         return repr(self)
 
 
-def deserialize(ser: Serialized, cls: ta.Type[T]) -> T:
-    try:
+def deserialize(ser: Serialized, cls: ta.Type[T], no_reraise: bool = False) -> T:
+    if no_reraise:
         return _deserialize(ser, cls)
-    except Exception as e:
-        raise DeserializationException(cls=cls, ser=ser) from e
+    else:
+        try:
+            return _deserialize(ser, cls)
+        except Exception as e:
+            raise DeserializationException(cls=cls, ser=ser) from e
