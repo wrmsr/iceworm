@@ -28,10 +28,13 @@ class Table(lang.Abstract):
         raise NotImplementedError
 
 
-class SystemConnector(Connector['SystemConnector']):
+class SystemConnector(Connector['SystemConnector', 'SystemConnector.Config']):
 
-    def __init__(self, name: str = 'system') -> None:
-        super().__init__(name)
+    class Config(Connector.Config):
+        name: str = dc.field('system', check=lambda s: isinstance(s, str) and s)
+
+    def __init__(self, config: Config) -> None:
+        super().__init__(check.isinstance(config, SystemConnector.Config))
 
         self._tables_by_name = unique_dict((t.md_table.name, t) for t in [
             NotificationsTable(),

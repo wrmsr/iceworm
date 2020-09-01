@@ -29,15 +29,17 @@ import typing as ta
 
 from omnibus import check
 from omnibus import collections as ocol
+from omnibus import dataclasses as dc
 from omnibus import defs
 from omnibus import lang
 
 from ... import metadata as md
 from ...types import QualifiedName
 from ...utils import unique_dict
+from ...utils.nodal import NodalDataclass
 
-
-ConnectorT = ta.TypeVar('ConnectorT')
+ConnectorT = ta.TypeVar('ConnectorT', bound='Connector')
+ConnectorConfigT = ta.TypeVar('ConnectorConfigT', bound='Connector.Config')
 
 Row = ta.Mapping[str, ta.Any]
 RowGen = ta.Generator[Row, None, None]
@@ -90,18 +92,30 @@ class ListRowSink(RowSink):
         self._rows.extend(rows)
 
 
-class Connector(lang.Abstract, ta.Generic[ConnectorT]):
+class Connector(lang.Abstract, ta.Generic[ConnectorT, ConnectorConfigT]):
 
-    def __init__(self, name: str) -> None:
+    class Config(dc.Enum, NodalDataclass['Connector.Config']):
+
+        @classmethod
+        def _nodal_cls(cls) -> ta.Type['Connector.Config']:
+            return Connector.Config
+
+        name: str = dc.field(check=lambda s: isinstance(s, str) and s)
+
+    def __init__(self, config: ConnectorConfigT) -> None:
         super().__init__()
 
-        self._name = check.not_empty(check.isinstance(name, str))
+        self._config: ConnectorConfigT = check.isinstance(config, Connector.Config)
 
     defs.repr('name')
 
     @property
+    def config(self) -> ConnectorConfigT:
+        return self._config
+
+    @property
     def name(self) -> str:
-        return self._name
+        return self._config.name
 
     def close(self) -> None:
         pass

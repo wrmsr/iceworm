@@ -17,19 +17,17 @@ from .connectors import RowSink
 from .connectors import RowSource
 
 
-class SqlConnector(Connector['SqlConnector']):
+class SqlConnector(Connector['SqlConnector', 'SqlConnector.Config']):
     """
     postgres/mysql/snowflake
     """
 
-    class Config(dc.Frozen):
+    class Config(Connector.Config):
         url: ta.Union[str, ta.Callable[[], str]]
         kwargs: ta.Mapping[str, ta.Any] = dc.field(ocol.frozendict(), coerce=ocol.frozendict)
 
-    def __init__(self, name: str, config: Config) -> None:
-        super().__init__(name)
-
-        self._config = check.isinstance(config, SqlConnector.Config)
+    def __init__(self, config: Config) -> None:
+        super().__init__(check.isinstance(config, SqlConnector.Config))
 
         self._engine: ta.Optional[sa.engine.Engine] = None
 
