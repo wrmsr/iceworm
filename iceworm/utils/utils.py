@@ -1,4 +1,5 @@
 import inspect
+import threading
 import typing as ta
 
 from omnibus import check
@@ -116,3 +117,26 @@ class MemoizedUnary(ta.Generic[T, U]):
 
 
 memoized_unary = MemoizedUnary
+
+
+class CountDownLatch:
+
+    def __init__(self, count: int = 1, *, reset: bool = False) -> None:
+        super().__init__()
+
+        self._count = self._initial_count = count
+        self._lock = threading.Condition()
+        self._reset = reset
+
+    def count_down(self) -> None:
+        with self._lock:
+            self._count -= 1
+            if self._count <= 0:
+                if self._reset:
+                    self._count = self._initial_count
+                self._lock.notify_all()
+
+    def wait(self, timeout: int = -1) -> None:
+        with self._lock.acquire(timeout=timeout):
+            while self._count > 0:
+                self._lock.wait()
