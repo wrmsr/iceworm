@@ -13,6 +13,7 @@ import typing as ta
 
 from omnibus import check
 from omnibus import dataclasses as dc
+from omnibus import lang
 from omnibus import properties
 
 from ... import metadata as md
@@ -30,12 +31,13 @@ class SchemaPolicy(dc.Enum):
     pass
 
 
-class YamlHeaderSchemaPolicy(SchemaPolicy):
-    pass
+class SchemaPolicies(lang.Namespace):
 
+    class YamlHeader(SchemaPolicy):
+        pass
 
-class ProvidedSchemaPolicy(SchemaPolicy):
-    columns: ta.Sequence[md.Column] = dc.field(coerce=seq)
+    class Provided(SchemaPolicy):
+        columns: ta.Sequence[md.Column] = dc.field(coerce=seq)
 
 
 class Mount(dc.Pure):
@@ -65,7 +67,7 @@ class FileConnector(Connector['FileConnector', 'FileConnector.Config']):
         for mnt in self._config.mounts:
             for glb in mnt.globs:
                 for fp in glob.iglob(os.path.join(mnt.path, glb)):
-                    if isinstance(mnt.schema, ProvidedSchemaPolicy):
+                    if isinstance(mnt.schema, SchemaPolicies.Provided):
                         cols = mnt.schema.columns
                     else:
                         raise TypeError(mnt.schema)

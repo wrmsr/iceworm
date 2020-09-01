@@ -42,7 +42,7 @@ CONNECTORS_SER = [
         'mounts': [
             {'mount': {
                 'path': os.path.join(os.path.dirname(__file__), 'csv'),
-                'schema': {'provided_schema_policy': {
+                'schema': {'provided': {
                     'columns': [
                         {'column': {'name': 'id', 'type': {'integer': {}}, 'primary_key': True}},
                         {'column': {'name': 'a', 'type': {'integer': {}}}},
