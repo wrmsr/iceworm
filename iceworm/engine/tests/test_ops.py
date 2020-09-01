@@ -23,13 +23,17 @@ from ... import metadata as md
 from ...tests.helpers import pg_engine  # noqa
 from ...tests.helpers import pg_url  # noqa  # FIXME: jesus christ pytest fucking sucks
 from ...tests.helpers import raw_pg_url
+from ...types import QualifiedName  # noqa
 from ...utils import secrets as sec
 from ..connectors import computed as cmp
 from ..connectors import files
 from ..connectors import sql
+from ..connectors import system
 
 
 CONNECTORS = ctrs.ConnectorSet([
+
+    system.SystemConnector(),
 
     sql.SqlConnector(
         'pg',

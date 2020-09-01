@@ -106,10 +106,12 @@ class Connection(lang.Abstract, ta.Generic[ConnectorT]):
 
     def reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:
         if names is not None:
+            check.not_isinstance(names, (str, QualifiedName))
             ret = {}
             missing = set()
 
             for name in names:
+                check.isinstance(name, QualifiedName)
                 try:
                     obj = self._reflect_cache[name]
                 except KeyError:
