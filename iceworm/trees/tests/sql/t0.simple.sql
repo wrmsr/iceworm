@@ -118,6 +118,7 @@ create table t as select 1, 2;
 create table t (a int, b int) as select 1, 2;
 insert into t select 1, 2;
 delete from t where c = 3;
+select '/*';
 select $v;
 select :v;
 select {% abc %} 1 {% def %};
