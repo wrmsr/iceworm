@@ -49,15 +49,13 @@ class Table(dc.Pure):
     path: str
 
 
-class FileConnector(Connector['FileConnector']):
+class FileConnector(Connector['FileConnector', 'FileConnector.Config']):
 
-    class Config(dc.Frozen):
+    class Config(Connector.Config):
         mounts: ta.Sequence[Mount] = dc.field(coerce=seq, check=lambda l: all(isinstance(e, Mount) for e in l))
 
-    def __init__(self, name: str, config: Config) -> None:
-        super().__init__(name)
-
-        self._config = check.isinstance(config, FileConnector.Config)
+    def __init__(self, config: Config) -> None:
+        super().__init__(check.isinstance(config, FileConnector.Config))
 
     @properties.cached
     @property

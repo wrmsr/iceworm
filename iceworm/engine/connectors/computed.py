@@ -19,15 +19,13 @@ class Table(dc.Pure):
     fn: ta.Callable[[], RowGen]
 
 
-class ComputedConnector(Connector['ComputedConnector']):
+class ComputedConnector(Connector['ComputedConnector', 'ComputedConnector.Config']):
 
-    class Config(dc.Frozen):
+    class Config(Connector.Config):
         tables: ta.Sequence[Table] = dc.field(coerce=seq)
 
-    def __init__(self, name: str, config: Config) -> None:
-        super().__init__(name)
-
-        self._config = check.isinstance(config, ComputedConnector.Config)
+    def __init__(self, config: Config) -> None:
+        super().__init__(check.isinstance(config, ComputedConnector.Config))
 
         self._tables_by_name: ta.Mapping[QualifiedName, Table] = {t.md_table.name: t for t in self._config.tables}
 

@@ -3,6 +3,7 @@ import logging
 import typing as ta
 
 from omnibus import check
+from omnibus import dataclasses as dc
 from omnibus import lang
 
 from ... import datatypes as dt
@@ -33,7 +34,7 @@ class SystemConnector(Connector['SystemConnector', 'SystemConnector.Config']):
     class Config(Connector.Config):
         name: str = dc.field('system', check=lambda s: isinstance(s, str) and s)
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config = Config()) -> None:
         super().__init__(check.isinstance(config, SystemConnector.Config))
 
         self._tables_by_name = unique_dict((t.md_table.name, t) for t in [

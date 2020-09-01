@@ -23,7 +23,7 @@ class SqlConnector(Connector['SqlConnector', 'SqlConnector.Config']):
     """
 
     class Config(Connector.Config):
-        url: ta.Union[str, ta.Callable[[], str]]
+        url: str
         kwargs: ta.Mapping[str, ta.Any] = dc.field(ocol.frozendict(), coerce=ocol.frozendict)
 
     def __init__(self, config: Config) -> None:

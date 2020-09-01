@@ -24,7 +24,7 @@ from ...tests.helpers import pg_engine  # noqa
 from ...tests.helpers import pg_url  # noqa  # FIXME: jesus christ pytest fucking sucks
 from ...tests.helpers import raw_pg_url
 from ...types import QualifiedName  # noqa
-from ...utils import secrets as sec
+from ...utils import secrets as sec  # noqa
 from ...utils import serde
 from ..connectors import computed as cmp
 from ..connectors import files
@@ -37,15 +37,16 @@ CONNECTORS = ctrs.ConnectorSet([
     system.SystemConnector(),
 
     sql.SqlConnector(
-        'pg',
         sql.SqlConnector.Config(
-            url=sec.ComputedSecret(raw_pg_url),
+            'pg',
+            # url=sec.ComputedSecret(raw_pg_url),  # FIXME: nodal typecheck can't union but need secret
+            url=raw_pg_url(),
         ),
     ),
 
     files.FileConnector(
-        'csv',
         files.FileConnector.Config(
+            'csv',
             mounts=[
                 files.Mount(
                     os.path.join(os.path.dirname(__file__), 'csv'),
@@ -63,8 +64,8 @@ CONNECTORS = ctrs.ConnectorSet([
     ),
 
     cmp.ComputedConnector(
-        'cmp',
         cmp.ComputedConnector.Config(
+            'cmp',
             tables=[
                 cmp.Table(
                     md.Table(
