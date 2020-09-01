@@ -1,7 +1,8 @@
 """
 TODO:
  - DomainInvalidation
- - TableInvalidation
+ - LookupInvalidation
+ - sensors - s3, sftp, user
 """
 from omnibus import dataclasses as dc
 
