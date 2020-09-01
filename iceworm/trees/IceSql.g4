@@ -466,6 +466,10 @@ BLOCK_COMMENT
     : '/*' .*? '*/' -> channel(HIDDEN)
     ;
 
+JINJA_STATEMENT
+    : '{%' .*? '%}' -> channel(HIDDEN)
+    ;
+
 WS
     : [ \t\n\r]+ -> skip
     ;
