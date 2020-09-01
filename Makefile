@@ -308,9 +308,14 @@ docker-invalidate:
 	date +%s > .dockertimestamp
 
 
-### Db
+### Utils
 
-.PHONY: db-repl
-db-repl: venv
+.PHONY: pg-repl
+pg-repl: venv
 	export PORT=$$(.venv/bin/python -c "import yaml; dct = yaml.safe_load(open('docker/docker-compose.yml', 'r').read()); print(dct['services']['iceworm-postgres']['ports'][0].split(':')[0])") ; \
 	PGPASSWORD=iceworm .venv/bin/pgcli --user iceworm --host localhost --port "$$PORT"
+
+.PHONY: sf-repl
+sf-repl:
+	export $$(.venv/bin/python -c "import os, configparser; parser = configparser.ConfigParser(); parser.read_file(open(os.environ['SNOWFLAKE_CONFIG_PATH'], 'r')); print(' '.join(f'SF_{k.upper()}={v}' for k, v in parser.items('snowflake')))" | xargs) && \
+	snowsql --username "$$SF_USER" --host "$$SF_HOST" --accountname "$$SF_ACCOUNT" --authenticator "$$SF_AUTHENTICATOR" --schemaname "$$SF_SCHEMA"

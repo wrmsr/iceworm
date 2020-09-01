@@ -79,7 +79,7 @@ def _get_subclass_map(cls: type) -> _SubclassMap:
             if cur in seen:
                 continue
             seen.add(cur)
-            n = cur.__name__
+            n = lang.decamelize(cur.__name__)
             try:
                 existing = dct[n]
             except KeyError:
@@ -137,7 +137,7 @@ def serialize(obj: T) -> Serialized:
             if fs.ignore_if is not None and fs.ignore_if(v):
                 continue
             dct[fn] = serialize(v)
-        return {type(obj).__name__: dct}
+        return {lang.decamelize(type(obj).__name__): dct}
 
     elif isinstance(obj, collections.abc.Mapping):
         return [[serialize(k), serialize(v)] for k, v in obj.items()]
