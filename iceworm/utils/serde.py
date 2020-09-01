@@ -265,6 +265,11 @@ def _deserialize(ser: Serialized, cls: ta.Type[T]) -> T:
             raise TypeError(ser)
         return [deserialize(e, ecls) for e in ser]
 
+    elif rfl.is_generic(cls) and cls.__origin__ is collections.abc.Callable:
+        if not callable(ser):
+            raise TypeError(ser)
+        return ser
+
     elif not isinstance(cls, type):
         raise TypeError(cls)
 

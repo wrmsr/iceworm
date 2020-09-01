@@ -8,9 +8,11 @@ TODO:
 """
 import typing as ta
 
+from omnibus import check
 from omnibus import dataclasses as dc
 
 from .utils import seq
+from .utils import serde
 
 
 class Datatype(dc.Enum):
@@ -66,7 +68,6 @@ class Float(Datatype):
     ALIASES: ta.ClassVar = {
         'double precision',
         'double',
-        'float',
         'float4',
         'float8',
         'real',
@@ -173,3 +174,16 @@ class Geography(Datatype):
 class Table(Datatype):
     columns: ta.Sequence[ta.Tuple[str, Datatype]] = dc.field(
         coerce=seq, check=lambda l: all(isinstance(k, str) and isinstance(v, Datatype) for k, v in l))
+
+
+def _build_datatype_subclass_map(cls: type) -> ta.Mapping[ta.Union[str, type], ta.Union[str, type]]:
+    check.state(cls is Datatype)
+    dct = serde.build_subclass_map(Datatype)
+    for k, v in list(dct.items()):
+        for a in getattr(v, 'ALIASES', []):
+            check.not_in(a, dct)
+            dct[a] = v
+    return dct
+
+
+serde.SUBCLASS_MAP_RESOLVERS_BY_CLS[Datatype] = _build_datatype_subclass_map

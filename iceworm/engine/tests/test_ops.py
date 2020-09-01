@@ -18,18 +18,12 @@ from .. import planning as pln
 from .. import processing as proc
 from .. import rules as rls
 from .. import targets as tars
-from ... import datatypes as dt
-from ... import metadata as md
 from ...tests.helpers import pg_engine  # noqa
 from ...tests.helpers import pg_url  # noqa  # FIXME: jesus christ pytest fucking sucks
 from ...tests.helpers import raw_pg_url
 from ...types import QualifiedName  # noqa
 from ...utils import secrets as sec  # noqa
 from ...utils import serde
-from ..connectors import computed as cmp
-from ..connectors import files
-from ..connectors import sql
-from ..connectors import system
 
 
 CONNECTORS_SER = [
@@ -67,7 +61,7 @@ CONNECTORS_SER = [
         'tables': [
             {'table': {
                 'md_table': {'table': {
-                    'name': 'nums',
+                    'name': ['nums'],
                     'columns': [
                         {'column': {'name': 'num', 'type': {'integer': {}}}},
                     ],
