@@ -295,6 +295,9 @@ class Renderer(dispatch.Class):
             self(node.frame),
         ]
 
+    def render(self, node: no.Param) -> Part:  # noqa
+        return ':' + node.name
+
     def render(self, node: no.Pivot) -> Part:  # noqa
         return [
             self(node.relation),

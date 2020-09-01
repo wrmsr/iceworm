@@ -134,6 +134,7 @@ primaryExpression
 
 simpleExpression
     : var
+    | param
     | qualifiedName
     | number
     | string
@@ -239,7 +240,11 @@ quotedIdentifier
     ;
 
 var
-    : VAR
+    : '$' IDENTIFIER
+    ;
+
+param
+    : ':' IDENTIFIER
     ;
 
 number
@@ -435,10 +440,6 @@ IDENTIFIER
 
 QUOTED_IDENTIFIER
     : '"' (~'"' | '""')* '"'
-    ;
-
-VAR
-    : '$' LETTER (LETTER | DIGIT | '_')*
     ;
 
 JINJA

@@ -312,6 +312,9 @@ class _ParseVisitor(IceSqlVisitor):
         frame = self.visit(ctx.frame()) if ctx.frame() is not None else None
         return no.Over(partition_by=partition_by, order_by=order_by, frame=frame)
 
+    def visitParam(self, ctx: IceSqlParser.ParamContext):
+        return no.Param(ctx.IDENTIFIER().getText())
+
     def visitParenRelation(self, ctx: IceSqlParser.ParenRelationContext):
         return self.visit(ctx.relation())
 
@@ -456,9 +459,7 @@ class _ParseVisitor(IceSqlVisitor):
         return no.Identifier(ctx.getText())
 
     def visitVar(self, ctx: IceSqlParser.VarContext):
-        txt = ctx.VAR().getText()
-        check.state(txt.startswith('$') and len(txt) > 1)
-        return no.Var(txt[1:])
+        return no.Var(ctx.IDENTIFIER().getText())
 
 
 def create_parser(buf: str) -> IceSqlParser:

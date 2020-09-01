@@ -400,6 +400,11 @@ class IceSqlVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by IceSqlParser#param.
+    def visitParam(self, ctx:IceSqlParser.ParamContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by IceSqlParser#integerNumber.
     def visitIntegerNumber(self, ctx:IceSqlParser.IntegerNumberContext):
         return self.visitChildren(ctx)

@@ -711,6 +711,15 @@ class IceSqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by IceSqlParser#param.
+    def enterParam(self, ctx:IceSqlParser.ParamContext):
+        pass
+
+    # Exit a parse tree produced by IceSqlParser#param.
+    def exitParam(self, ctx:IceSqlParser.ParamContext):
+        pass
+
+
     # Enter a parse tree produced by IceSqlParser#integerNumber.
     def enterIntegerNumber(self, ctx:IceSqlParser.IntegerNumberContext):
         pass

@@ -41,6 +41,7 @@ from .exprs import LIKE_KIND_MAP  # noqa
 from .exprs import LOGIC_OPS  # noqa
 from .exprs import Like  # noqa
 from .exprs import LikeKind  # noqa
+from .exprs import Param  # noqa
 from .exprs import Traversal  # noqa
 from .exprs import UNARY_OP_MAP  # noqa
 from .exprs import UnaryExpr  # noqa

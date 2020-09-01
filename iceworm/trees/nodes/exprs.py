@@ -159,3 +159,7 @@ class Between(Expr):
 
 class Var(Expr):
     name: str
+
+
+class Param(Expr):
+    name: str

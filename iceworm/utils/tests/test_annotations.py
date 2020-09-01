@@ -26,7 +26,7 @@ class B(TestAnn):
 def test_annotations():
     anns = TestAnns()
     s = serde.serialize(anns)
-    assert s == {'TestAnns': {}}
+    assert s == {'test_anns': {}}
     d = serde.deserialize(s, TestAnns)
     assert anns == d
 
