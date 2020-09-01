@@ -1,16 +1,11 @@
 """
 TODO:
- - custom + more builtin types:
-  - datetime.*
-  - uuid
-  - bytes
  - strict mode
  - replace with builtin omni generic impl
  - monomorphic (check final) dc field - don't require dict wrapping
 """
 import abc
 import collections.abc
-import datetime
 import enum
 import typing as ta
 import weakref
@@ -89,15 +84,6 @@ class AutoSerde(Serde[T], lang.Abstract):
         check.not_in(ty, SERDES_BY_CLS)
         inst = cls()
         SERDES_BY_CLS[ty] = inst
-
-
-class DatetimeSerde(AutoSerde[datetime.datetime]):
-
-    def serialize(self, obj: T) -> ta.Any:
-        raise NotImplementedError
-
-    def deserialize(self, ser: ta.Any) -> T:
-        raise NotImplementedError
 
 
 SubclassMap = ta.Mapping[ta.Union[str, type], ta.Union[type, str]]  # FIXME: gross

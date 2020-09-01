@@ -2,6 +2,7 @@ from . import annotations  # noqa
 from . import nodal  # noqa
 from . import secrets  # noqa
 from . import serde  # noqa
+from . import serdeimpls  # noqa
 from .collections import IndexedSeq  # noqa
 from .collections import IndexedSetSeq  # noqa
 from .collections import abs_set  # noqa
