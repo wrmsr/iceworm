@@ -11,13 +11,16 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 import sqlalchemy as sa
 
+from .. import connectors as ctrs
 from .. import ops
 from ... import alchemy as alch
 from ... import sql
+from ...trees import eval as teval
+from ...trees import parsing as tpar
 from ...types import QualifiedName
-from ..connectors import ConnectionSet
 from ..connectors.sql import SqlConnection
 from ..utils import parse_simple_select_table
+from ..utils import parse_simple_select_tables
 
 
 OpT = ta.TypeVar('OpT', bound=ops.Op)
@@ -39,10 +42,10 @@ class ListExecutor(Executor[ops.List]):
 
 class ConnsExecutor(Executor[OpT], lang.Abstract):
 
-    def __init__(self, conns: ConnectionSet) -> None:
+    def __init__(self, conns: ctrs.ConnectionSet) -> None:
         super().__init__()
 
-        self._conns = check.isinstance(conns, ConnectionSet)
+        self._conns = check.isinstance(conns, ctrs.ConnectionSet)
 
 
 class TransactionExecutor(ConnsExecutor[ops.Transaction]):
@@ -90,13 +93,32 @@ class AtomicCreateTableAsExecutor(ConnsExecutor[ops.AtomicCreateTableAs]):
 class InsertIntoSelectExecutor(ConnsExecutor[ops.InsertIntoSelect]):
 
     def execute(self, op: ops.InsertIntoSelect) -> None:
+        src = None
+
+        if src is None:
+            try:
+                src_name = parse_simple_select_table(op.query, star=True)
+            except ValueError:
+                pass
+            else:
+                src_conn = self._conns[src_name[0]]
+                src_query = f"select * from {'.'.join(src_name[1:])}"
+                src = src_conn.create_row_source(src_query)
+
+        if src is None:
+            try:
+                tbl_names = parse_simple_select_tables(op.query)
+                if tbl_names:
+                    raise ValueError
+            except ValueError:
+                pass
+            else:
+                root = tpar.parse_statement(op.query)
+                src = ctrs.ListRowSource(teval.StmtEvaluator().eval(root))
+
+        if src is None:
+            raise ValueError(op.query)
+
         dst_conn = self._conns[op.dst[0]]
-
-        src_name = parse_simple_select_table(op.query, star=True)
-        src_conn = self._conns[src_name[0]]
-        src_query = f"select * from {'.'.join(src_name[1:])}"
-
         dst = dst_conn.create_row_sink(QualifiedName(op.dst[1:]))
-        src = src_conn.create_row_source(src_query)
-
         dst.consume_rows(src.produce_rows())

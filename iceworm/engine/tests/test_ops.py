@@ -88,6 +88,8 @@ TARGETS = tars.TargetSet([
     rls.TableAsSelect(['pg', 'c'], 'select * from pg.b'),
     rls.TableAsSelect(['pg', 'nums'], 'select * from cmp.nums'),
 
+    tars.Rows(['system', 'notifications'], "select 'hi' message"),
+
 ])
 
 
@@ -99,9 +101,6 @@ def test_ops(pg_engine):  # noqa
     # binder.bind(TARGETS)
     # binder.bind(inj.Key(ta.Iterable[tars.Target]), to=tars.TargetSet)
     # injector = inj.create_injector(binder)  # noqa
-
-    with pg_engine.connect() as pg_conn:
-        print(list(pg_conn.execute('select 1')))
 
     tprocs = [
         tars.RuleTargetProcessor(rls.TableAsSelectProcessor()),

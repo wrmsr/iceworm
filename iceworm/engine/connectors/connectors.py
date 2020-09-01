@@ -57,6 +57,39 @@ class RowSink(lang.Abstract):
         raise NotImplementedError
 
 
+class ListRowSource(RowSource):
+
+    def __init__(self, rows: ta.Iterable[Row]) -> None:
+        super().__init__()
+
+        self._rows = list(rows)
+
+    @property
+    def rows(self) -> ta.List[Row]:
+        return self._rows
+
+    def produce_rows(self) -> RowGen:
+        yield from self._rows
+
+
+class ListRowSink(RowSink):
+
+    def __init__(self, rows: ta.Optional[ta.List[Row]] = None) -> None:
+        super().__init__()
+
+        self._rows = rows if rows is not None else []
+
+    @property
+    def rows(self) -> ta.List[Row]:
+        return self._rows
+
+    def __iter__(self) -> ta.Iterator[Row]:
+        return iter(self._rows)
+
+    def consume_rows(self, rows: ta.Iterable[Row]) -> None:
+        self._rows.extend(rows)
+
+
 class Connector(lang.Abstract, ta.Generic[ConnectorT]):
 
     def __init__(self, name: str) -> None:

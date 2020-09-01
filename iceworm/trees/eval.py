@@ -35,21 +35,32 @@ class StmtEvaluator(dispatch.Class):
         check.arg(not node.order_by)
         check.arg(not node.limit)
 
-        if list(node.items) != [no.AllSelectItem()]:
+        if list(node.items) == [no.AllSelectItem()]:
+            if len(node.relations) != 1:
+                raise ValueError(node.relations)
+            rows = list(self._rels.eval(node.relations[0]))
+
+            if node.where is not None:
+                filtered_rows = []
+                for row in rows:
+                    if self._exprs.eval(node.where, row):
+                        filtered_rows.append(row)
+                rows = filtered_rows
+
+            return rows
+
+        elif all(isinstance(i, no.ExprSelectItem) for i in node.items) and not node.relations:
+            row = {}
+            for i in node.items:
+                i = check.isinstance(i, no.ExprSelectItem)
+                k = check.not_none(i.label).name
+                v = self._exprs.eval(i.value, {})
+                row[k] = v
+
+            return [row]
+
+        else:
             raise ValueError(node.items)
-
-        if len(node.relations) != 1:
-            raise ValueError(node.relations)
-        rows = list(self._rels.eval(node.relations[0]))
-
-        if node.where is not None:
-            filtered_rows = []
-            for row in rows:
-                if self._exprs.eval(node.where, row):
-                    filtered_rows.append(row)
-            rows = filtered_rows
-
-        return rows
 
 
 class RelationEvaluator(dispatch.Class):
