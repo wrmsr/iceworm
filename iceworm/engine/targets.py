@@ -41,6 +41,7 @@ TODO:
  - insert into pagerduty.alerts (to, body) select 'dp@cb.com', 'not enough things' where (
      select count(*) from (select null from things where ds = today() limit 5)) < 5
   - lol, system table of failures, insert into pagerduty.alerts select … from system.failures where table_name = ...
+ - give everything a name? type:filename:line:col:seq?
 
 ** *NOT* nested **
 

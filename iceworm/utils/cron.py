@@ -8,6 +8,7 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 
 from .collections import seq
+from . import serde
 
 
 T = ta.TypeVar('T')
@@ -102,7 +103,7 @@ class Item(dc.Pure):
         return iter(self.rngs)
 
 
-class Entry(dc.Pure):
+class Spec(dc.Pure):
     minute: ta.Optional[Item] = dc.field(None, kwonly=True)
     hour: ta.Optional[Item] = dc.field(None, kwonly=True)
     day: ta.Optional[Item] = dc.field(None, kwonly=True)
@@ -112,38 +113,56 @@ class Entry(dc.Pure):
     def __str__(self):
         return ' '.join(str(i) if i is not None else '*' for f in FIELDS for i in [getattr(self, f.name)])
 
+    @classmethod
+    def parse(cls, s: str) -> 'Spec':
+        parts = s.strip().split()
+        check.arg(len(parts) == 5)
+        kw = {}
 
-def parse(s: str) -> Entry:
-    parts = s.strip().split()
-    check.arg(len(parts) == 5)
-    kw = {}
+        for p, f in zip(parts, FIELDS):
+            check.not_empty(p)
+            if p == '*':
+                continue
 
-    for p, f in zip(parts, FIELDS):
-        check.not_empty(p)
-        if p == '*':
-            continue
+            rs = []
+            for sp in p.split(','):
+                if '-' in sp:
+                    bs = _, _ = sp.split('-')
+                else:
+                    bs = [sp, sp]
 
-        rs = []
-        for sp in p.split(','):
-            if '-' in sp:
-                bs = _, _ = sp.split('-')
-            else:
-                bs = [sp, sp]
+                if f.enum is not None:
+                    bs = [f.enum.dct.get(b, b) for b in bs]
 
-            if f.enum is not None:
-                bs = [f.enum.dct.get(b, b) for b in bs]
+                l, r = map(int, bs)
+                r = Range(l, r)
+                check.arg(r in f.rng)
+                rs.append(r)
 
-            l, r = map(int, bs)
-            r = Range(l, r)
-            check.arg(r in f.rng)
-            rs.append(r)
+            kw[f.name] = Item(rs)
 
-        kw[f.name] = Item(rs)
+        return cls(**kw)
 
-    return Entry(**kw)
+    @classmethod
+    def of(cls, obj: ta.Union['Spec', str]) -> 'Spec':
+        if isinstance(obj, Spec):
+            return obj
+        elif isinstance(obj, str):
+            return Spec.parse(obj)
+        else:
+            raise TypeError(obj)
 
 
-SPECIALS = {k: parse(s) for k, s in {
+class SpecSerde(serde.AutoSerde[Spec]):
+
+    def serialize(self, obj: Spec) -> ta.Any:
+        return str(obj)
+
+    def deserialize(self, ser: ta.Any) -> Spec:
+        return Spec.of(ser)
+
+
+SPECIALS = {k: Spec.parse(s) for k, s in {
     'hourly': '0 * * * *',
     'daily': '0 0 * * *',
     'weekly': '0 0 * * 0',

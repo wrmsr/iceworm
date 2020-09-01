@@ -15,6 +15,7 @@ import pytest
 
 from .. import connectors as ctrs
 from .. import execution as exe
+from .. import invalidations as invs  # noqa
 from .. import planning as pln
 from .. import processing as proc
 from .. import rules as rls
@@ -33,9 +34,7 @@ CONNECTORS_SER = [
 
     {'sql': {
         'name': 'pg',
-
         'url_secret': 'pg_url',
-        # 'url': raw_pg_url(),
     }},
 
     {'file': {
@@ -76,26 +75,39 @@ CONNECTORS_SER = [
 
 
 TARGETS_SER = [
+
     {'table_as_select': {
         'name': ['pg', 'a'],
         'query': 'select * from csv.a',
     }},
+
     {'table_as_select': {
         'name': ['pg', 'b'],
         'query': 'select * from csv.b',
     }},
+
     {'table_as_select': {
         'name': ['pg', 'c'],
         'query': 'select * from pg.b',
     }},
+
     {'table_as_select': {
         'name': ['pg', 'nums'],
         'query': 'select * from cmp.nums',
     }},
+
     {'rows': {
         'table': ['system', 'notifications'],
         'query': "select 'hi' message",
     }},
+
+    {'invalidator': {
+        'table': ['pg', 'a'],
+        'kind': {'scheduled': {
+            'spec': '0 1 * * *',
+        }},
+    }},
+
 ]
 
 
