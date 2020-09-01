@@ -119,7 +119,7 @@ create table t (a int, b int) as select 1, 2;
 insert into t select 1, 2;
 delete from t where c = 3;
 select $v;
--- select :v; -- FIXME
+select :v;
 -- select seq4(), uniform(1, 10, random(12)) from table (generator(rowcount => 10)) v order by 1; -- FIXME
 -- with c as (select 1) (select 1);
 -- with c as (select 1) ((select 1) union (select 2));
