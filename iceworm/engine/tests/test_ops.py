@@ -43,50 +43,39 @@ CONNECTORS_SER = [
         'url': raw_pg_url(),
     }},
 
-    {'files': {
+    {'file': {
         'name': 'csv',
-        'monts': [
+        'mounts': [
             {'mount': {
-
+                'path': os.path.join(os.path.dirname(__file__), 'csv'),
+                'schema': {'provided_schema_policy': {
+                    'columns': [
+                        {'column': {'name': 'id', 'type': {'integer': {}}, 'primary_key': True}},
+                        {'column': {'name': 'a', 'type': {'integer': {}}}},
+                        {'column': {'name': 'b', 'type': {'integer': {}}}},
+                    ],
+                }},
+                'globs': [
+                    '*.csv',
+                ],
             }},
         ],
-    }}
+    }},
 
-    files.FileConnector(
-        files.FileConnector.Config(
-            'csv',
-            mounts=[
-                files.Mount(
-                    os.path.join(os.path.dirname(__file__), 'csv'),
-                    files.ProvidedSchemaPolicy([
-                        md.Column('id', dt.Integer(), primary_key=True),
-                        md.Column('a', dt.Integer()),
-                        md.Column('b', dt.Integer()),
-                    ]),
-                    [
-                        '*.csv',
+    {'computed': {
+        'name': 'cmp',
+        'tables': [
+            {'table': {
+                'md_table': {'table': {
+                    'name': 'nums',
+                    'columns': [
+                        {'column': {'name': 'num', 'type': {'integer': {}}}},
                     ],
-                ),
-            ],
-        ),
-    ),
-
-    cmp.ComputedConnector(
-        cmp.ComputedConnector.Config(
-            'cmp',
-            tables=[
-                cmp.Table(
-                    md.Table(
-                        ['nums'],
-                        [
-                            md.Column('num', dt.Integer()),
-                        ],
-                    ),
-                    lambda: [{'num': i} for i in range(10)],
-                ),
-            ],
-        ),
-    ),
+                }},
+                'fn': lambda: [{'num': i} for i in range(10)],
+            }},
+        ],
+    }},
 
 ]
 
@@ -124,13 +113,16 @@ def test_ops(pg_engine):  # noqa
     # binder.bind(inj.Key(ta.Iterable[tars.Target]), to=tars.TargetSet)
     # injector = inj.create_injector(binder)  # noqa
 
+    connectors = ctrs.ConnectorSet.of(serde.deserialize(CONNECTORS_SER, ta.Sequence[ctrs.Connector.Config]))
+
+    targets = tars.TargetSet.of(serde.deserialize(TARGETS_SER, ta.Sequence[tars.Target]))
+
     tprocs = [
         tars.RuleTargetProcessor(rls.TableAsSelectProcessor()),
-        proc.InferTableProcessor(CONNECTORS),
+        proc.InferTableProcessor(connectors),
     ]
 
-    targets = serde.deserialize(TARGETS_SER, ta.Sequence[tars.Target], no_reraise=True)
-
+    targets = list(targets)
     while True:
         print(list(targets))
         mtps = [tp for tp in tprocs if tp.matches(targets)]
@@ -138,7 +130,7 @@ def test_ops(pg_engine):  # noqa
             break
         targets = mtps[0].process(targets)
 
-    plan = pln.TargetPlanner(targets, CONNECTORS).plan(set(map(QualifiedName.of, [
+    plan = pln.TargetPlanner(targets, connectors).plan(set(map(QualifiedName.of, [
         ['pg', 'a'],
         ['pg', 'b'],
         ['pg', 'c'],
@@ -146,7 +138,7 @@ def test_ops(pg_engine):  # noqa
         ['system', 'notifications'],
     ])))
 
-    exe.PlanExecutor(plan, CONNECTORS).execute()
+    exe.PlanExecutor(plan, connectors).execute()
 
     with pg_engine.connect() as pg_conn:
         print(list(pg_conn.execute('select * from a')))

@@ -99,13 +99,17 @@ class DatetimeSerde(AutoSerde[datetime.datetime]):
         raise NotImplementedError
 
 
-SubclassMap = ta.Mapping[str, type]
+SubclassMap = ta.Mapping[ta.Union[str, type], ta.Union[type, str]]  # FIXME: gross
 SUBCLASS_MAP_RESOLVERS_BY_CLS: ta.MutableMapping[type, ta.Callable[[type], SubclassMap]] = weakref.WeakKeyDictionary()
 
 _SUBCLASS_MAPS_BY_CLS: ta.MutableMapping[type, SubclassMap] = weakref.WeakKeyDictionary()
 
 
-def build_subclass_map(cls: type, *, name_formatter: ta.Callable[[str], str] = lang.decamelize) -> SubclassMap:
+def build_subclass_map(
+        cls: type,
+        *,
+        name_formatter: ta.Callable[[type], str] = lambda t: lang.decamelize(t.__name__),
+) -> SubclassMap:
     dct = {}
     todo = {cls}
     seen = set()
@@ -114,7 +118,7 @@ def build_subclass_map(cls: type, *, name_formatter: ta.Callable[[str], str] = l
         if cur in seen:
             continue
         seen.add(cur)
-        n = name_formatter(cur.__name__)
+        n = name_formatter(cur)
         try:
             existing = dct[n]
         except KeyError:
@@ -123,6 +127,7 @@ def build_subclass_map(cls: type, *, name_formatter: ta.Callable[[str], str] = l
             if existing is not cur:
                 raise NameError(n)
         dct[n] = cur
+        dct[cur] = n
         todo.update(cur.__subclasses__())
     return dct
 
@@ -189,7 +194,8 @@ def serialize(obj: T) -> Serialized:
             if fs.ignore_if is not None and fs.ignore_if(v):
                 continue
             dct[fn] = serialize(v)
-        return {lang.decamelize(type(obj).__name__): dct}
+        scm = get_subclass_map(type(obj))
+        return {check.isinstance(scm[type(obj)], str): dct}
 
     elif isinstance(obj, collections.abc.Mapping):
         return [[serialize(k), serialize(v)] for k, v in obj.items()]
@@ -209,7 +215,7 @@ def serialize(obj: T) -> Serialized:
 
 def _deserialize_dataclass(ser: Serialized, cls: type) -> T:
     [[n, dct]] = ser.items()
-    dcls = get_subclass_map(cls)[n]
+    dcls = check.isinstance(get_subclass_map(cls)[n], type)
     fdct = _get_dataclass_field_type_map(dcls)
     kw = {}
     for k, v in dct.items():

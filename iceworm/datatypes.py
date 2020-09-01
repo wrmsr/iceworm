@@ -4,6 +4,7 @@ TODO:
  - bottom type for null const?
  - annotations?
   - NonNull? Nullable?
+ - serde aliases - subclass map thing
 """
 import typing as ta
 

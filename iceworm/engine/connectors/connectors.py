@@ -26,6 +26,7 @@ Alt conns:
 """
 import abc
 import typing as ta
+import weakref
 
 from omnibus import check
 from omnibus import collections as ocol
@@ -101,7 +102,29 @@ class Connector(lang.Abstract, ta.Generic[ConnectorT, ConnectorConfigT]):
         def _nodal_cls(cls) -> ta.Type['Connector.Config']:
             return Connector.Config
 
+        def __init_subclass__(cls, **kwargs) -> None:
+            super().__init_subclass__(**kwargs)
+
+            check.state(cls.__name__ == 'Config')
+            ocn, _ = cls.__qualname__.split('.')
+            check.state(ocn.endswith('Connector'))
+
         name: str = dc.field(check=lambda s: isinstance(s, str) and s)
+
+    CLS_MAP: ta.Mapping[str, ta.Type['Connector']] = weakref.WeakValueDictionary()
+    CONFIG_CLS_MAP: ta.Mapping[ta.Type[Config], ta.Type['Connector']] = weakref.WeakValueDictionary()
+
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+
+        if lang.Abstract not in cls.__bases__:
+            check.state(cls.__name__.endswith('Connector'))
+            n = check.not_empty(lang.decamelize(cls.__name__[:-9]))
+            check.not_in(n, Connector.CLS_MAP)
+            cfcls = check.issubclass(cls.Config, Connector.Config)
+            check.not_in(cfcls, Connector.CONFIG_CLS_MAP)
+            Connector.CLS_MAP[n] = cls
+            Connector.CONFIG_CLS_MAP[cfcls] = cls
 
     def __init__(self, config: ConnectorConfigT) -> None:
         super().__init__()
@@ -125,10 +148,24 @@ class Connector(lang.Abstract, ta.Generic[ConnectorT, ConnectorConfigT]):
     def connect(self) -> 'Connection[ConnectorT]':
         raise NotImplementedError
 
+    @classmethod
+    def of(cls, obj: ta.Union['Connector', Config]) -> 'Connector':
+        if isinstance(obj, Connector):
+            return obj
+        elif isinstance(obj, Connector.Config):
+            return cls.CONFIG_CLS_MAP[type(obj)](obj)
+        else:
+            raise TypeError(obj)
 
-def _build_connector_config_subclass_map(cls: type) -> ta.Mapping[[str], type]:
+
+def _build_connector_config_subclass_map(cls: type) -> ta.Mapping[ta.Union[str, type], ta.Union[str, type]]:
     check.state(cls is Connector.Config)
-    return serde.build_subclass_map(cls)
+    dct = {}
+    for n, ccls in Connector.CLS_MAP.items():
+        cfcls = check.issubclass(ccls.Config, Connector.Config)
+        dct[n] = cfcls
+        dct[cfcls] = n
+    return dct
 
 
 serde.SUBCLASS_MAP_RESOLVERS_BY_CLS[Connector.Config] = _build_connector_config_subclass_map
@@ -203,11 +240,11 @@ class ConnectorSet(ta.Iterable[Connector]):
         self._ctors_by_name: ta.Mapping[str, Connector] = unique_dict((c.name, c) for c in self._ctors)
 
     @classmethod
-    def of(cls, it: ta.Iterable[Connector]) -> 'ConnectorSet':
+    def of(cls, it: ta.Iterable[ta.Union[Connector, Connector.Config]]) -> 'ConnectorSet':
         if isinstance(it, cls):
             return it
         else:
-            return cls(it)
+            return cls((Connector.of(o) for o in it))
 
     def __iter__(self) -> ta.Iterator[Connector]:
         return iter(self._ctors)
