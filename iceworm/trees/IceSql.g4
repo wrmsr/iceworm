@@ -470,6 +470,10 @@ JINJA_STATEMENT
     : '{%' .*? '%}' -> channel(HIDDEN)
     ;
 
+JINJA_COMMENT
+    : '{#' .*? '#}' -> channel(HIDDEN)
+    ;
+
 WS
     : [ \t\n\r]+ -> skip
     ;
