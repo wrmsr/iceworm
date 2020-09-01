@@ -35,6 +35,10 @@ class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
         raise NotImplementedError
 
     @classmethod
+    def _nodal_cls_name(cls) -> str:
+        return cls.__name__
+
+    @classmethod
     def _build_fields_info(cls) -> _FieldsInfo:
         th = ta.get_type_hints(cls)
         flds = {}

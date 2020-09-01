@@ -35,6 +35,7 @@ from omnibus import lang
 
 from ... import metadata as md
 from ...types import QualifiedName
+from ...utils import serde
 from ...utils import unique_dict
 from ...utils.nodal import NodalDataclass
 
@@ -123,6 +124,14 @@ class Connector(lang.Abstract, ta.Generic[ConnectorT, ConnectorConfigT]):
     @abc.abstractmethod
     def connect(self) -> 'Connection[ConnectorT]':
         raise NotImplementedError
+
+
+def _build_connector_config_subclass_map(cls: type) -> ta.Mapping[[str], type]:
+    check.state(cls is Connector.Config)
+    return serde.build_subclass_map(cls)
+
+
+serde.SUBCLASS_MAP_RESOLVERS_BY_CLS[Connector.Config] = _build_connector_config_subclass_map
 
 
 class Connection(lang.Abstract, ta.Generic[ConnectorT]):

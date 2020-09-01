@@ -32,17 +32,25 @@ from ..connectors import sql
 from ..connectors import system
 
 
-CONNECTORS = ctrs.ConnectorSet([
+CONNECTORS_SER = [
 
-    system.SystemConnector(),
+    {'system': {}},
 
-    sql.SqlConnector(
-        sql.SqlConnector.Config(
-            'pg',
-            # url=sec.ComputedSecret(raw_pg_url),  # FIXME: nodal typecheck can't union but need secret
-            url=raw_pg_url(),
-        ),
-    ),
+    {'sql': {
+        'name': 'pg',
+
+        # 'url': url=sec.ComputedSecret(raw_pg_url),  # FIXME: nodal typecheck can't union but need secret
+        'url': raw_pg_url(),
+    }},
+
+    {'files': {
+        'name': 'csv',
+        'monts': [
+            {'mount': {
+
+            }},
+        ],
+    }}
 
     files.FileConnector(
         files.FileConnector.Config(
@@ -80,7 +88,7 @@ CONNECTORS = ctrs.ConnectorSet([
         ),
     ),
 
-])
+]
 
 
 TARGETS_SER = [

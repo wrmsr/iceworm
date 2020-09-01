@@ -99,35 +99,45 @@ class DatetimeSerde(AutoSerde[datetime.datetime]):
         raise NotImplementedError
 
 
-_SubclassMap = ta.Mapping[str, type]
-_SUBCLASS_MAPS_BY_CLS: ta.MutableMapping[type, _SubclassMap] = weakref.WeakKeyDictionary()
+SubclassMap = ta.Mapping[str, type]
+SUBCLASS_MAP_RESOLVERS_BY_CLS: ta.MutableMapping[type, ta.Callable[[type], SubclassMap]] = weakref.WeakKeyDictionary()
+
+_SUBCLASS_MAPS_BY_CLS: ta.MutableMapping[type, SubclassMap] = weakref.WeakKeyDictionary()
 
 
-def _get_subclass_map(cls: type) -> _SubclassMap:
+def build_subclass_map(cls: type, *, name_formatter: ta.Callable[[str], str] = lang.decamelize) -> SubclassMap:
+    dct = {}
+    todo = {cls}
+    seen = set()
+    while todo:
+        cur = todo.pop()
+        if cur in seen:
+            continue
+        seen.add(cur)
+        n = name_formatter(cur.__name__)
+        try:
+            existing = dct[n]
+        except KeyError:
+            pass
+        else:
+            if existing is not cur:
+                raise NameError(n)
+        dct[n] = cur
+        todo.update(cur.__subclasses__())
+    return dct
+
+
+def get_subclass_map(cls: type) -> SubclassMap:
     if not isinstance(cls, type):
         raise TypeError(cls)
     try:
         return _SUBCLASS_MAPS_BY_CLS[cls]
     except KeyError:
-        dct = {}
-        todo = {cls}
-        seen = set()
-        while todo:
-            cur = todo.pop()
-            if cur in seen:
-                continue
-            seen.add(cur)
-            n = lang.decamelize(cur.__name__)
-            try:
-                existing = dct[n]
-            except KeyError:
-                pass
-            else:
-                if existing is not cur:
-                    raise NameError(n)
-            dct[n] = cur
-            todo.update(cur.__subclasses__())
-        _SUBCLASS_MAPS_BY_CLS[cls] = dct
+        try:
+            bld = SUBCLASS_MAP_RESOLVERS_BY_CLS[cls]
+        except KeyError:
+            bld = build_subclass_map
+        dct = _SUBCLASS_MAPS_BY_CLS[cls] = bld(cls)
         return dct
 
 
@@ -199,7 +209,7 @@ def serialize(obj: T) -> Serialized:
 
 def _deserialize_dataclass(ser: Serialized, cls: type) -> T:
     [[n, dct]] = ser.items()
-    dcls = _get_subclass_map(cls)[n]
+    dcls = get_subclass_map(cls)[n]
     fdct = _get_dataclass_field_type_map(dcls)
     kw = {}
     for k, v in dct.items():
