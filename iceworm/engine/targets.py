@@ -99,6 +99,8 @@ class Table(Target):
     name: QualifiedName = dc.field(coerce=QualifiedName.of)
     md: ta.Optional[md_.Table] = dc.field(None, check=lambda o: o is None or isinstance(o, md_.Table))
 
+    dc.check(lambda name, md: md is None or name == md.name)
+
 
 class Rows(Target):
     table: QualifiedName = dc.field(coerce=QualifiedName.of)
