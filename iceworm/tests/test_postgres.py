@@ -1,5 +1,6 @@
 import contextlib
 import textwrap
+import time
 import typing as ta
 
 from omnibus import lang
@@ -66,34 +67,72 @@ def test_postgres_locks(pg_url):  # noqa
 
         print()
 
-        conns: ta.List[sa.engine.Connection] = [es.enter_context(engine.connect()) for _ in range(3)]
+        conns: ta.List[sa.engine.Connection] = [
+            es.enter_context(engine.connect().execution_options(autocommit=False, isolation_level='REPEATABLE READ'))
+            for _ in range(3)
+        ]
         conns[0].execute("create table blah0 (id integer primary key not null, data text)")
         conns[0].execute("create table blah1 (id integer primary key not null, data text)")
         conns[0].execute("insert into blah0 (id, data) values (0, 'hi')")
+        conns[0].execute('commit')
 
         for _ in range(2):
             print(conns[0].scalar("select txid_current()"))
 
-        for c in conns:
-            c.execute("set transaction isolation level repeatable read")
+        for i, c in enumerate(conns):
+            c.execute("abort")
             c.execute("begin")
+            c.execute("set transaction isolation level repeatable read")
+            c.execute("set local lock_timeout = '5s'")
+            print('conn %d: %d' % (i, c.scalar("select txid_current()")))
+            print(c.scalar("select current_setting('transaction_isolation')"))
+
+        a = conns[0].scalar('select data from blah0 where id = 0')
+        conns[1].execute("update blah0 set data = 'barf' where id = 0")
+        b = conns[0].scalar('select data from blah0 where id = 0')
+        conns[1].execute('commit')
+        c = conns[0].scalar('select data from blah0 where id = 0')
+        conns[0].execute('commit')
+        conns[0].execute('begin')
+        conns[1].execute('begin')
+        print((a, b, c))
+
+        for i, c in enumerate(conns):
+            c.execute("abort")
+            c.execute("begin")
+            c.execute("set transaction isolation level repeatable read")
+            c.execute("set local lock_timeout = '10s'")
+            print('conn %d: %d' % (i, c.scalar("select txid_current()")))
+            print(c.scalar("select current_setting('transaction_isolation')"))
 
         latch = CountDownLatch(3, reset=True)
 
         def t0():
             conns[0].execute("select id from blah0 where id = 0 for share")
+            print('t0 locked')
+            time.sleep(3)
             latch.count_down()
 
             conns[0].execute("insert into blah1 (id, data) values (0, 'hi')")
+            print('t0 inserted')
+            time.sleep(3)
+            latch.count_down()
 
+            conns[0].execute('commit')
             print('t0 done')
 
         def t1():
             conns[1].execute("select id from blah0 where id = 0 for share")
+            print('t1 locked')
+            time.sleep(3)
             latch.count_down()
 
             conns[1].execute("insert into blah1 (id, data) values (1, 'hi')")
+            print('t0 inserted')
+            time.sleep(3)
+            latch.count_down()
 
+            conns[1].execute('commit')
             print('t1 done')
 
         def t2():
@@ -101,6 +140,9 @@ def test_postgres_locks(pg_url):  # noqa
 
             conns[2].execute("select id from blah0 where id = 0 for update")
             print('t2 got lock')
+
+            conns[2].execute('commit')
+            print('t1 done')
 
         call_many_with_timeout([t0, t1, t2])
 

@@ -15,6 +15,9 @@ TODO:
   - how to get progress? can snowflake give that? ui has something
    - * YES *
   - also: show locks
+ - snowflake transactionality - and management re conns/sessions
+  - grabbing locks at start of multiop, ensuring source tables dont mutate during - snowflake repeatable read..
+ - ugh, need to impl a gil lol - continuous shared locks starve writers
 
 
 Heartbeat:
