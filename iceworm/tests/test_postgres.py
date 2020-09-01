@@ -3,7 +3,11 @@ import textwrap
 import time
 import typing as ta
 
+from omnibus import check
+from omnibus import dataclasses as dc
 from omnibus import lang
+from omnibus import tpch
+import omnibus.tpch.ents  # noqa
 import pytest
 import sqlalchemy as sa
 
@@ -148,3 +152,44 @@ def test_postgres_locks(pg_url):  # noqa
 
         for c in conns:
             c.execute("select 1")
+
+
+@pytest.mark.xfail()
+def test_tpch(pg_url):  # noqa
+    engine: sa.engine.Engine
+    with contextlib.ExitStack() as es:
+        engine = es.enter_context(lang.disposing(sa.create_engine(pg_url)))
+        clean_pg(engine)
+
+        sats = {
+            tpch.ents.Column.Type.INTEGER: sa.Integer(),
+            tpch.ents.Column.Type.IDENTIFIER: sa.Integer(),
+            tpch.ents.Column.Type.DATE: sa.Date(),
+            tpch.ents.Column.Type.DOUBLE: sa.Float(),
+            tpch.ents.Column.Type.VARCHAR: sa.String(),
+        }
+
+        samd = sa.MetaData()
+
+        for ent in [
+            tpch.ents.Customer,
+            tpch.ents.LineItem,
+            tpch.ents.Nation,
+            tpch.ents.Order,
+            tpch.ents.Part,
+            tpch.ents.PartSupplier,
+            tpch.ents.Region,
+            tpch.ents.Supplier,
+        ]:
+            sacs = []
+            for f in dc.fields(ent):
+                if tpch.ents.Column not in f.metadata:
+                    continue
+                tc = check.isinstance(f.metadata[tpch.ents.Column], tpch.ents.Column)
+                sac = sa.Column(tc.name, sats[tc.type])
+                sacs.append(sac)
+
+            sat = sa.Table(ent.__name__.upper(), samd, *sacs)
+            print(sat)
+
+            print()
