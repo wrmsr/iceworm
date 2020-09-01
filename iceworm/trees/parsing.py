@@ -12,6 +12,10 @@ TODO:
  - cython, obv
  - parallelize
  - cache?
+ - simple language extensions:
+  - trailing commas, 'and's, joins?
+ - special forms:
+  - let, drop
 """
 from omnibus import antlr
 from omnibus import check

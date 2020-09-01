@@ -29,3 +29,8 @@ def test_simple_jinja():
     assert is_simple_jinja('x')
     assert not is_simple_jinja('x[0]')
     assert not is_simple_jinja('x | y')
+
+
+def test_rendering():
+    tmpl = jinja2.Template('{%- macro hi(foo) -%} hi {{ foo -}}{% endmacro -%} {{ hi(x) }}')
+    assert tmpl.render(x=1)
