@@ -16,6 +16,7 @@ from .. import connectors as ctrs
 from .. import execution as exe
 from .. import planning as pln
 from .. import processing as proc
+from .. import rules as rls
 from .. import targets as tars
 from ... import datatypes as dt
 from ... import metadata as md
@@ -78,17 +79,10 @@ CONNECTORS = ctrs.ConnectorSet([
 
 TARGETS = tars.TargetSet([
 
-    tars.Table(['pg', 'a']),
-    tars.Rows(['pg', 'a'], 'select * from csv.a'),
-
-    tars.Table(['pg', 'b']),
-    tars.Rows(['pg', 'b'], 'select * from csv.b'),
-
-    tars.Table(['pg', 'c']),
-    tars.Rows(['pg', 'c'], 'select * from pg.b'),
-
-    tars.Table(['pg', 'nums']),
-    tars.Rows(['pg', 'nums'], 'select * from cmp.nums'),
+    rls.TableAsSelect(['pg', 'a'], 'select * from csv.a'),
+    rls.TableAsSelect(['pg', 'b'], 'select * from csv.b'),
+    rls.TableAsSelect(['pg', 'c'], 'select * from pg.b'),
+    rls.TableAsSelect(['pg', 'nums'], 'select * from cmp.nums'),
 
 ])
 
@@ -106,11 +100,13 @@ def test_ops(pg_engine):  # noqa
         print(list(pg_conn.execute('select 1')))
 
     tprocs = [
-        proc.InferTableProcessor(CONNECTORS)
+        tars.RuleTargetProcessor(rls.TableAsSelectProcessor()),
+        proc.InferTableProcessor(CONNECTORS),
     ]
 
     targets = TARGETS
     while True:
+        print(list(targets))
         mtps = [tp for tp in tprocs if tp.matches(targets)]
         if not mtps:
             break

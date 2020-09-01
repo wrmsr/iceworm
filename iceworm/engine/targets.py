@@ -60,6 +60,7 @@ from ..utils import serde
 
 
 T = ta.TypeVar('T"')
+RuleT = ta.TypeVar('RuleT', bound='Rule')
 
 
 class Annotation(anns.Annotation, abstract=True):
@@ -170,3 +171,37 @@ class TargetProcessor(lang.Abstract):
     @abc.abstractmethod
     def process(self, targets: TargetSet) -> TargetSet:
         raise NotImplementedError
+
+
+class RuleProcessor(lang.Abstract, ta.Generic[RuleT]):
+
+    @abc.abstractproperty
+    def rule_cls(self) -> ta.Type[RuleT]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def process(self, rule: RuleT) -> ta.Iterable[Target]:
+        raise NotImplementedError
+
+
+class RuleTargetProcessor(TargetProcessor, ta.Generic[RuleT]):
+
+    def __init__(self, proc: RuleProcessor[RuleT]) -> None:
+        super().__init__()
+
+        self._proc = check.isinstance(proc, RuleProcessor)
+
+    def matches(self, targets: TargetSet) -> bool:
+        return any(isinstance(t, self._proc.rule_cls) for t in targets)
+
+    def process(self, targets: TargetSet) -> TargetSet:
+        lst = []
+        for tar in targets:
+            if isinstance(tar, self._proc.rule_cls):
+                for sub in self._proc.process(tar):
+                    if Origin not in sub.anns:
+                        sub = dc.replace(sub, anns={**sub.anns, Origin: Origin(tar)})
+                    lst.append(sub)
+            else:
+                lst.append(tar)
+        return TargetSet.of(lst)

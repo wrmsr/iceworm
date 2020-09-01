@@ -71,7 +71,8 @@ class InferTableProcessor(tars.TargetProcessor):
                         mdt = self.infer_table(rows.query, given_tables)
                         mdt = dc.replace(mdt, name=tar.name)
                         i = tn_idxs[tar.name]
-                        ts[i] = dc.replace(ts[i], md=mdt)
+                        tsi = ts[i]
+                        ts[i] = dc.replace(tsi, md=mdt, anns={**tsi.anns, tars.Origin: tars.Origin(tsi)})
                         given_tables[tar.name] = mdt
 
             return tars.TargetSet.of(ts)
