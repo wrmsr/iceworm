@@ -2,12 +2,12 @@ from omnibus import lang
 import pytest
 import sqlalchemy as sa
 
-from .. import conns
+from .. import snowflake
 
 
 @pytest.mark.xfail()
 def test_conns():
-    with lang.disposing(sa.create_engine(conns.get_url())) as engine:
+    with lang.disposing(sa.create_engine(snowflake.get_url())) as engine:
         with engine.connect() as conn:
             print(conn.scalar('select current_version()'))
             print(conn.scalar('select current_warehouse()'))
