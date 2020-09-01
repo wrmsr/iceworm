@@ -6,12 +6,11 @@ import typing as ta
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
+from omnibus import threading as othr
 from omnibus import tpch
-import omnibus.tpch.ents  # noqa
 import pytest
 import sqlalchemy as sa
 
-from ..utils import CountDownLatch
 from .helpers import call_many_with_timeout
 from .helpers import clean_pg
 from .helpers import pg_url  # noqa
@@ -109,7 +108,7 @@ def test_postgres_locks(pg_url):  # noqa
             print('conn %d: %d' % (i, c.scalar("select txid_current()")))
             print(c.scalar("select current_setting('transaction_isolation')"))
 
-        latch = CountDownLatch(3, reset=True)
+        latch = othr.CountDownLatch(3, reset=True)
 
         def t0():
             conns[0].execute("select id from blah0 where id = 0 for share")
@@ -186,10 +185,12 @@ def test_tpch(pg_url):  # noqa
                 if tpch.ents.Column not in f.metadata:
                     continue
                 tc = check.isinstance(f.metadata[tpch.ents.Column], tpch.ents.Column)
-                sac = sa.Column(tc.name, sats[tc.type])
+                sac = sa.Column(tc.name, sats[tc.type], primary_key=f.name in ent.__meta__.primary_key)
                 sacs.append(sac)
 
             sat = sa.Table(ent.__name__.upper(), samd, *sacs)
             print(sat)
+
+            sat.create(bind=engine)
 
             print()
