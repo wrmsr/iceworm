@@ -4,11 +4,37 @@ import typing as ta
 from omnibus import check
 from omnibus import dataclasses as dc
 
+from . import serde
 from .collections import unique_dict
 
 
 class SecretKey(dc.Pure):
     key: str
+
+    @classmethod
+    def of(cls, obj: ta.Union[str, 'SecretKey']) -> 'SecretKey':
+        if isinstance(obj, SecretKey):
+            return obj
+        elif isinstance(obj, str):
+            return cls(check.not_empty(obj))
+        else:
+            raise TypeError(obj)
+
+    @classmethod
+    def of_optional(cls, obj: ta.Union[str, 'SecretKey', None]) -> ta.Optional['SecretKey']:
+        if obj is None:
+            return None
+        else:
+            return cls.of(obj)
+
+
+class SecretKeySerde(serde.AutoSerde[SecretKey]):
+
+    def serialize(self, obj: SecretKey) -> ta.Any:
+        return obj.key
+
+    def deserialize(self, ser: ta.Any) -> SecretKey:
+        return SecretKey.of(ser)
 
 
 class Secret(dc.Enum):

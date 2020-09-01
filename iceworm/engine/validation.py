@@ -11,6 +11,11 @@ TODO:
    - everyone the thing can email, just encode own internal emails in same iface as external
  - prod data bounds / stats
   - catch nullability, string convertibility, numeric bounds
+ - * anomaly detection *
+ - checks are rules
+  - can annotate at cols and in header
+  - expand to selects into their tables
+  - further 'aspect' rules (just 'aspects'?) insert those into output tables like pd or slack or system.notifications
 
 https://github.com/fishtown-analytics/dbt-utils
 

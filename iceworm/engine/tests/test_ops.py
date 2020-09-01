@@ -9,6 +9,7 @@ import os.path
 import typing as ta  # noqa
 
 from omnibus import check  # noqa
+from omnibus import dataclasses as dc  # noqa
 from omnibus import inject as inj  # noqa
 import pytest
 
@@ -33,8 +34,8 @@ CONNECTORS_SER = [
     {'sql': {
         'name': 'pg',
 
-        # 'url': url=sec.ComputedSecret(raw_pg_url),  # FIXME: nodal typecheck can't union but need secret
-        'url': raw_pg_url(),
+        'url_secret': 'pg_url',
+        # 'url': raw_pg_url(),
     }},
 
     {'file': {
@@ -107,7 +108,14 @@ def test_ops(pg_engine):  # noqa
     # binder.bind(inj.Key(ta.Iterable[tars.Target]), to=tars.TargetSet)
     # injector = inj.create_injector(binder)  # noqa
 
-    connectors = ctrs.ConnectorSet.of(serde.deserialize(CONNECTORS_SER, ta.Sequence[ctrs.Connector.Config]))
+    secrets = sec.Secrets({'pg_url': raw_pg_url()})
+
+    ctor_cfgs = serde.deserialize(CONNECTORS_SER, ta.Sequence[ctrs.Connector.Config])
+    for i, ctor_cfg in list(enumerate(ctor_cfgs)):
+        if isinstance(ctor_cfg, ctrs.sql.SqlConnector.Config) and ctor_cfg.url_secret is not None:
+            ctor_cfgs[i] = dc.replace(ctor_cfg, url=secrets[ctor_cfg.url_secret].value, url_secret=None)
+
+    connectors = ctrs.ConnectorSet.of(ctor_cfgs)
 
     targets = tars.TargetSet.of(serde.deserialize(TARGETS_SER, ta.Sequence[tars.Target]))
 

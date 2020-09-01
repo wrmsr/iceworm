@@ -31,6 +31,16 @@ TODO:
   - header can declare deps, injected into context: {foo: Foo, bar: 'Bar[int]'}
  - 'internal'?
  - individual 'processed' anns
+ - tok: 'push complexity to the plan' - obv cant as much, but still have ops to xform
+  - but recursive as ops contain query trees
+  - is there an equiv of 'jitfuncs'? basic blocks? everything between joins? everything between cross-conn joins?
+   - everything between *targets*?
+  - can still split, is not opaque, can analyse into
+  - simplifies viz
+  - does split/merge happen on the fly? reactive coalescing?
+ - insert into pagerduty.alerts (to, body) select 'dp@cb.com', 'not enough things' where (
+     select count(*) from (select null from things where ds = today() limit 5)) < 5
+  - lol, system table of failures, insert into pagerduty.alerts select … from system.failures where table_name = ...
 
 ** *NOT* nested **
 

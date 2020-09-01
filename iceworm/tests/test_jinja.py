@@ -1,3 +1,13 @@
+"""
+TODO:
+ - SandboxedEnvironment? worthless?
+ - ugh, LINE NUMBERS
+ - SortedMapping[int, int] ? :/
+ - also need to feed to serde
+ - ugh, escape helper? {{ user.username|e }} - better if it’s not there?
+ - lol, yaml jinja? :|
+  - * line tracking there too lol *
+"""
 import re
 
 import jinja2

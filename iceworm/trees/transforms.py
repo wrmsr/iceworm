@@ -25,6 +25,26 @@ TODO:
  - integrity check gen?
  - pk / ds? / 'generic?' propagation?
  - omni.matching?
+
+dialect extensions:
+ - intrin fns
+  - let forms
+  - lool jmespath
+   - can use udfs too
+   - can jit udfs too
+   - 'by default search gets whole row'
+   - by default embed in iceworm-jvm and webpack js for sf
+  - drop - drops a col
+ - haskell like lang extensions lol - no obv, all or nothing
+ - $var injection? yaml consts and shit? dont need $ds and that trash, reduced importance
+ - crazy object space equiv?
+  - if no struct type, use table types? array of objs as tbl lol, table scalars
+  - as sf does variant/object, large benefit is type awareness of fields
+   - when extracting and unnesting and shoving in a table know the col types
+   - oof, snowflake DOES NOT ENFORCE OBJECT SHAPES - WOULD HAVE TO BE PREPARED TO GET RANDOM SHIT
+  - intrin != special - intrin is blackbox macro, special is a whole analysis/xform concept
+ - lambdas? https://prestodb.io/blog/2020/03/02/presto-lambda
+ - allow trailing commas, where ‘ands’ (really in parsing layer)
 """
 import collections  # noqa
 import typing as ta

@@ -6,6 +6,7 @@ TODO:
   - bytes
  - strict mode
  - replace with builtin omni generic impl
+ - monomorphic (check final) dc field - don't require dict wrapping
 """
 import abc
 import collections.abc
@@ -182,20 +183,24 @@ def _get_dataclass_field_type_map(dcls: type) -> _DataclassFieldSerdeMap:
         return dct
 
 
+def serialize_dataclass(obj: T) -> Serialized:
+    dct = {}
+    for fn, fs in _get_dataclass_field_type_map(type(obj)).items():
+        v = getattr(obj, fn)
+        if fs.ignore_if is not None and fs.ignore_if(v):
+            continue
+        dct[fn] = serialize(v)
+    scm = get_subclass_map(type(obj))
+    return {check.isinstance(scm[type(obj)], str): dct}
+
+
 def serialize(obj: T) -> Serialized:
     if type(obj) in SERDES_BY_CLS:
         serde = SERDES_BY_CLS[type(obj)]
         return serde.serialize(obj)
 
     elif dc.is_dataclass(obj):
-        dct = {}
-        for fn, fs in _get_dataclass_field_type_map(type(obj)).items():
-            v = getattr(obj, fn)
-            if fs.ignore_if is not None and fs.ignore_if(v):
-                continue
-            dct[fn] = serialize(v)
-        scm = get_subclass_map(type(obj))
-        return {check.isinstance(scm[type(obj)], str): dct}
+        return serialize_dataclass(obj)
 
     elif isinstance(obj, collections.abc.Mapping):
         return [[serialize(k), serialize(v)] for k, v in obj.items()]
@@ -213,7 +218,7 @@ def serialize(obj: T) -> Serialized:
         raise TypeError(obj)
 
 
-def _deserialize_dataclass(ser: Serialized, cls: type) -> T:
+def deserialize_dataclass(ser: Serialized, cls: type) -> T:
     [[n, dct]] = ser.items()
     dcls = check.isinstance(get_subclass_map(cls)[n], type)
     fdct = _get_dataclass_field_type_map(dcls)
@@ -276,7 +281,7 @@ def _deserialize(ser: Serialized, cls: ta.Type[T]) -> T:
     elif dc.is_dataclass(cls):
         if not isinstance(ser, collections.abc.Mapping):
             raise TypeError(ser)
-        return _deserialize_dataclass(ser, cls)
+        return deserialize_dataclass(ser, cls)
 
     elif issubclass(cls, enum.Enum):
         if isinstance(ser, str):

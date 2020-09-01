@@ -5,6 +5,7 @@ TODO:
  - annotations?
   - NonNull? Nullable?
  - serde aliases - subclass map thing
+ - serde types as just strings
 """
 import typing as ta
 
