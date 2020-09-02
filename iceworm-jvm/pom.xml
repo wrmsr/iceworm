@@ -88,6 +88,12 @@
             <!-- Other -->
 
             <dependency>
+                <groupId>io.burt</groupId>
+                <artifactId>jmespath-core</artifactId>
+                <version>0.5.0</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-core</artifactId>
                 <version>${dep.log4j.version}</version>

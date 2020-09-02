@@ -2,7 +2,7 @@ package com.wrmsr.iceworm.spark;
 
 import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Object;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -15,8 +15,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JsTest
-        extends TestCase
 {
     public static final String DEFAULT_TEMP_DIR_PREFIX = "iceworm";
 
@@ -58,6 +60,7 @@ public class JsTest
     Function<Object[], Object> method = (Function<Object[], Object>) object.get("assign");
     */
 
+    @Test
     public void testJs()
             throws Throwable
     {
@@ -88,6 +91,7 @@ public class JsTest
         engine.eval("println(x);", newContext);
     }
 
+    @Test
     public void testV8()
             throws Throwable
     {
