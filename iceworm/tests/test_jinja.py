@@ -9,9 +9,17 @@ TODO:
   - * line tracking there too lol *
  - extensions: jinja, j2
 """
+import codecs
+import linecache
+import os
 import re
+import tempfile
 
 import jinja2
+import jinja2.nativetypes
+import jinja2.nodes
+import jinja2.parser
+import jinja2.sandbox
 
 
 SIMPLE_JINJA_PATTERN = re.compile(r'[A-Za-z_]+')
@@ -42,6 +50,79 @@ def test_simple_jinja():
     assert not is_simple_jinja('x | y')
 
 
+def _linecache_inject(source, write):
+    if write:
+        tmp_file = tempfile.NamedTemporaryFile(
+            prefix='iceworm-macro-',
+            suffix='.py',
+            delete=False,
+            mode='w+',
+            encoding='utf-8',
+        )
+        tmp_file.write(source)
+        filename = tmp_file.name
+    else:
+        rnd = codecs.encode(os.urandom(12), 'hex')
+        filename = rnd.decode('ascii')
+
+    cache_entry = (
+        len(source),
+        None,
+        [line + '\n' for line in source.splitlines()],
+        filename,
+    )
+    linecache.cache[filename] = cache_entry
+    return filename
+
+
+class Parser(jinja2.parser.Parser):
+
+    def parse_macro(self):
+        node = jinja2.nodes.Macro(lineno=next(self.stream).lineno)
+        node.name = self.parse_assign_target(name_only=True).name
+        self.parse_signature(node)
+        node.body = self.parse_statements(('name:endmacro',), drop_needle=True)
+        return node
+
+
+class Environment(jinja2.sandbox.SandboxedEnvironment):
+
+    def _parse(self, source, name, filename):
+        return Parser(self, source, name, filename).parse()
+
+    def _compile(self, source, filename):
+        if filename == '<template>':
+            filename = _linecache_inject(source, True)
+        return super()._compile(source, filename)
+
+
+class NativeSandboxEnvironment(Environment):
+    code_generator_class = jinja2.nativetypes.NativeCodeGenerator
+
+
+TEXT_FILTERS = {
+    'as_text': lambda x: x,
+    'as_bool': lambda x: x,
+    'as_native': lambda x: x,
+    'as_number': lambda x: x,
+}
+
+
 def test_rendering():
-    tmpl = jinja2.Template('{%- macro hi(foo) -%} hi {{ foo -}}{% endmacro -%} {{ hi(x) }}')
-    assert tmpl.render(x=1)
+    args = {
+        'extensions': [
+            'jinja2.ext.do',
+            'jinja2.ext.loopcontrols',
+        ],
+    }
+
+    env_cls = Environment
+    filters = TEXT_FILTERS
+
+    env = env_cls(**args)
+    env.filters.update(filters)
+
+    src = '{%- macro hi(foo) -%} hi {{ foo -}}{% endmacro -%} {{ hi(x) }}'
+    tmpl = env.from_string(src)
+
+    assert tmpl.render()

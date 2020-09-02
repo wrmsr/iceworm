@@ -7,6 +7,7 @@ TODO:
   - dist?
 
 https://github.com/SherpaConsulting/PyHiveSpark/blob/master/pyhive/sqlalchemy_spark.py
+https://github.com/dropbox/PyHive/pull/247/files
 
 (cd temp && \
 JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_261.jdk/Contents/Home \
