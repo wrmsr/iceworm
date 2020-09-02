@@ -5,6 +5,20 @@ TODO:
   - make vs setup.py.. reqs.txt..
    - just ship a reqs.txt w/ git+http://?
   - dist?
+
+(cd temp && \
+JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_261.jdk/Contents/Home \
+SPARK_HOME=../.venv/lib/python3.7/site-packages/pyspark \
+../.venv/lib/python3.7/site-packages/pyspark/sbin/spark-daemon.sh \
+submit org.apache.spark.sql.hive.thriftserver.HiveThriftServer2 1 --name "Thrift JDBC/ODBC Server" \
+)
+
+(cd temp && \
+JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_261.jdk/Contents/Home \
+SPARK_HOME=../.venv/lib/python3.7/site-packages/pyspark \
+../.venv/lib/python3.7/site-packages/pyspark/sbin/spark-daemon.sh \
+stop org.apache.spark.sql.hive.thriftserver.HiveThriftServer2 1 \
+)
 """
 import operator
 import tempfile

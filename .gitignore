@@ -29,4 +29,5 @@
 /MANIFEST
 /profiles/
 /target/
+/temp/
 antlr-*.jar
