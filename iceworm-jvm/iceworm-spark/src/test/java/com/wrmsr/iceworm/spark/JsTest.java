@@ -72,12 +72,12 @@ public class JsTest
 
         engine.eval("print('Hello World!');");
         engine.eval("function add2(v) { return v + 2; }");
-        engine.eval("f(2)");
+        engine.eval("add2(2)");
         // engine.eval("f(x)", );
 
         engine.put("x", "hello");
         // print global variable "x"
-        engine.eval("println(x);");
+        // engine.eval("println(x);");
         // the above line prints "hello"
 
         // Now, pass a different script context
@@ -88,7 +88,7 @@ public class JsTest
         engineScope.put("x", "world");
 
         // execute the same script - but this time pass a different script context
-        engine.eval("println(x);", newContext);
+        // engine.eval("println(x);", newContext);
     }
 
     @Test
