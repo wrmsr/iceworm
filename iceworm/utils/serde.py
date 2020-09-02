@@ -73,6 +73,21 @@ class Serde(lang.Abstract, ta.Generic[T]):
 _SERDES_BY_CLS: ta.MutableMapping[type, Serde] = weakref.WeakKeyDictionary()
 
 
+def serde_for(*clss):
+    def inner(obj):
+        if isinstance(obj, type):
+            sd = obj()
+        else:
+            sd = obj
+        check.isinstance(sd, Serde)
+        for c in clss:
+            check.not_in(c, _SERDES_BY_CLS)
+            _SERDES_BY_CLS[c] = sd
+        return obj
+    check.arg(all(isinstance(c, type) for c in clss))
+    return inner
+
+
 class AutoSerde(Serde[T], lang.Abstract):
 
     def __init_subclass__(cls, **kwargs):
@@ -80,9 +95,7 @@ class AutoSerde(Serde[T], lang.Abstract):
         check.state(cls.__bases__ == (AutoSerde,))
         arg = check.single(rfl.spec(check.single(cls.__orig_bases__)).args)
         ty = check.isinstance(check.isinstance(arg, rfl.NonGenericTypeSpec).cls, type)
-        check.not_in(ty, _SERDES_BY_CLS)
-        inst = cls()
-        _SERDES_BY_CLS[ty] = inst
+        serde_for(ty)(cls)
 
 
 SubclassMap = ta.Mapping[ta.Union[str, type], ta.Union[type, str]]  # FIXME: gross

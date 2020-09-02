@@ -1,5 +1,7 @@
+import datetime
 import enum
 import typing as ta
+import uuid
 
 from omnibus import dataclasses as dc
 import pytest
@@ -56,3 +58,9 @@ def test_serde():
 
     rt(Box(Pt(1, 2), Pt(3, 4)))
     rt(Zbox(Pt(1, 2), Pt(3, 4), 5))
+
+    rt(b'abc\0d')
+    rt(datetime.datetime.now().date())
+    rt(datetime.datetime.now().time())
+    rt(datetime.datetime.now())
+    rt(uuid.uuid4())

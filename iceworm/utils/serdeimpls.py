@@ -1,50 +1,94 @@
+import abc
+import base64
 import datetime
+import re
 import typing as ta
 import uuid
 
+from omnibus import check
+from omnibus import lang
+
 from .serde import AutoSerde
+from .serde import Serde
+from .serde import serde_for
+
+
+T = ta.TypeVar('T')
 
 
 class BytesSerde(AutoSerde[bytes]):
 
-    def serialize(self, obj: bytes) -> ta.Any:
-        raise NotImplementedError
+    def serialize(self, obj: bytes) -> str:
+        return base64.b64encode(obj).decode('utf-8')
 
     def deserialize(self, ser: ta.Any) -> bytes:
+        return base64.b64decode(check.isinstance(ser, str).encode('utf-8'))
+
+
+class _DatetimeSerde(Serde[T], lang.Abstract):
+
+    @abc.abstractproperty
+    def formats(self) -> ta.Sequence[str]:
         raise NotImplementedError
 
-
-class DateSerde(AutoSerde[datetime.date]):
-
-    def serialize(self, obj: datetime.date) -> ta.Any:
+    @abc.abstractmethod
+    def extract(self, dt: datetime.datetime) -> T:
         raise NotImplementedError
 
-    def deserialize(self, ser: ta.Any) -> datetime.date:
-        raise NotImplementedError
+    def serialize(self, obj: T) -> ta.Any:
+        return obj.strftime(self.formats[0])
+
+    def deserialize(self, ser: ta.Any) -> T:
+        for fmt in self.formats:
+            try:
+                return self.extract(datetime.datetime.strptime(ser, fmt))
+            except ValueError:
+                pass
+        else:
+            raise ValueError(ser)
 
 
-class TimeSerde(AutoSerde[datetime.time]):
+@serde_for(datetime.date)
+class DateSerde(_DatetimeSerde[datetime.date]):
 
-    def serialize(self, obj: datetime.time) -> ta.Any:
-        raise NotImplementedError
+    formats = [
+        '%Y-%m-%d',
+    ]
 
-    def deserialize(self, ser: ta.Any) -> datetime.time:
-        raise NotImplementedError
+    def extract(self, dt: datetime.datetime) -> datetime.date:
+        return dt.date()
 
 
-class DatetimeSerde(AutoSerde[datetime.datetime]):
+@serde_for(datetime.time)
+class TimeSerde(_DatetimeSerde[datetime.time]):
 
-    def serialize(self, obj: datetime.datetime) -> ta.Any:
-        raise NotImplementedError
+    formats = [
+        '%H:%M:%S.%f',
+        '%H:%M:%S',
+        '%H:%M',
+    ]
 
-    def deserialize(self, ser: ta.Any) -> datetime.datetime:
-        raise NotImplementedError
+    def extract(self, dt: datetime.datetime) -> datetime.time:
+        return dt.time()
+
+
+@serde_for(datetime.datetime)
+class DatetimeSerde(_DatetimeSerde[datetime.datetime]):
+
+    formats = [d + 'T' + t for d in DateSerde.formats for t in TimeSerde.formats]
+
+    def extract(self, dt: datetime.datetime) -> T:
+        return dt
 
 
 class UuidSerde(AutoSerde[uuid.UUID]):
 
+    PATTERN = re.compile('([0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12})|([0-9A-Fa-f]{32})')
+
     def serialize(self, obj: uuid.UUID) -> ta.Any:
-        raise NotImplementedError
+        return str(obj)
 
     def deserialize(self, ser: ta.Any) -> uuid.UUID:
-        raise NotImplementedError
+        check.isinstance(ser, str)
+        check.arg(self.PATTERN.fullmatch(ser) is not None)
+        return uuid.UUID(ser.replace('-', ''))
