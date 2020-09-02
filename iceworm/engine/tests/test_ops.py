@@ -40,34 +40,34 @@ CONNECTORS_SER = [
     {'file': {
         'name': 'csv',
         'mounts': [
-            {'mount': {
+            {
                 'path': os.path.join(os.path.dirname(__file__), 'csv'),
                 'schema': {'provided': {
                     'columns': [
-                        {'column': {'name': 'id', 'type': {'integer': {}}, 'primary_key': True}},
-                        {'column': {'name': 'a', 'type': {'integer': {}}}},
-                        {'column': {'name': 'b', 'type': {'integer': {}}}},
+                        {'name': 'id', 'type': {'integer': {}}, 'primary_key': True},
+                        {'name': 'a', 'type': {'integer': {}}},
+                        {'name': 'b', 'type': {'integer': {}}},
                     ],
                 }},
                 'globs': [
                     '*.csv',
                 ],
-            }},
+            },
         ],
     }},
 
     {'computed': {
         'name': 'cmp',
         'tables': [
-            {'table': {
-                'md_table': {'table': {
+            {
+                'md_table': {
                     'name': ['nums'],
                     'columns': [
-                        {'column': {'name': 'num', 'type': {'integer': {}}}},
+                        {'name': 'num', 'type': {'integer': {}}},
                     ],
-                }},
+                },
                 'fn': lambda: [{'num': i} for i in range(10)],
-            }},
+            },
         ],
     }},
 
