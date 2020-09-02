@@ -122,7 +122,19 @@ def test_rendering():
     env = env_cls(**args)
     env.filters.update(filters)
 
-    src = '{%- macro hi(foo) -%} hi {{ foo -}}{% endmacro -%} {{ hi(x) }}'
+    src = """
+{%- macro hi(foo) -%}
+    hi {{ foo -}}
+    abcd
+    bye {{ foo -}}
+{% endmacro -%}
+
+a
+{{ hi(x) }}
+b
+{{ hi(y) }}
+    """
+
     tmpl = env.from_string(src)
 
-    assert tmpl.render()
+    print(tmpl.render())
