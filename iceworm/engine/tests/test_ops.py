@@ -123,9 +123,14 @@ def test_ops(pg_engine):  # noqa
     secrets = sec.Secrets({'pg_url': raw_pg_url()})
 
     ctor_cfgs = serde.deserialize(CONNECTORS_SER, ta.Sequence[ctrs.Connector.Config])
-    for i, ctor_cfg in list(enumerate(ctor_cfgs)):
-        if isinstance(ctor_cfg, ctrs.sql.SqlConnector.Config) and ctor_cfg.url_secret is not None:
-            ctor_cfgs[i] = dc.replace(ctor_cfg, url=secrets[ctor_cfg.url_secret].value, url_secret=None)
+
+    def replace_url_secrets(cfg: ctrs.Connector.Config) -> ta.Mapping[str, ta.Any]:
+        if isinstance(cfg, ctrs.sql.SqlConnector.Config) and cfg.url_secret is not None:
+            return {'url': secrets[cfg.url_secret].value, 'url_secret': None}
+        else:
+            return {}
+
+    ctor_cfgs = [cfg.map(replace_url_secrets, **replace_url_secrets(cfg)) for cfg in ctor_cfgs]
 
     connectors = ctrs.ConnectorSet.of(ctor_cfgs)
 
