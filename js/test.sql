@@ -10,7 +10,7 @@ $$;
 select
   jp(
     'foo.bar.baz[' || i || ']',
-     cast(parse_json('{foo: {bar: {baz: [0, 1, 2, 3, 4]}}}') as variant)
+     parse_json('{foo: {bar: {baz: [0, 1, 2, 3, 4]}}}')
   )
 from
   (select seq4() i from table(generator(rowcount => 10)))
