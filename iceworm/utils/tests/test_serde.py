@@ -46,6 +46,9 @@ def test_serde():
 
     rt({1, 2}, ta.AbstractSet[int])
 
+    assert serde.deserialize([[0, 1], [2, 3]], ta.Mapping[int, int]) == {0: 1, 2: 3}
+    assert serde.deserialize({0: 1, 2: 3}, ta.Mapping[int, int]) == {0: 1, 2: 3}
+
     with pytest.raises(serde.DeserializationException):
         serde.deserialize(None, int)
 

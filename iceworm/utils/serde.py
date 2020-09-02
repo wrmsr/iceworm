@@ -272,17 +272,26 @@ def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) ->
 
     elif rfl.is_generic(cls) and cls.__origin__ is collections.abc.Mapping:
         [kcls, vcls] = cls.__args__
-        if not isinstance(ser, collections.abc.Sequence) or isinstance(ser, str):
-            raise TypeError(ser)
         dct = {}
-        for e in ser:
-            if not isinstance(e, collections.abc.Sequence) or isinstance(e, str):
-                raise TypeError(e)
-            kser, vser = e
-            k, v = deserialize(kser, kcls, succinct=succinct), deserialize(vser, vcls, succinct=succinct)
-            if k in dct:
-                raise KeyError(k)
-            dct[k] = v
+        if isinstance(ser, str):
+            raise TypeError(ser)
+        elif isinstance(ser, collections.abc.Mapping):
+            for kser, vser in ser.items():
+                k, v = deserialize(kser, kcls, succinct=succinct), deserialize(vser, vcls, succinct=succinct)
+                if k in dct:
+                    raise KeyError(k)
+                dct[k] = v
+        elif isinstance(ser, collections.abc.Sequence):
+            for e in ser:
+                if not isinstance(e, collections.abc.Sequence) or isinstance(e, str):
+                    raise TypeError(e)
+                kser, vser = e
+                k, v = deserialize(kser, kcls, succinct=succinct), deserialize(vser, vcls, succinct=succinct)
+                if k in dct:
+                    raise KeyError(k)
+                dct[k] = v
+        else:
+            raise TypeError(ser)
         return dct
 
     elif rfl.is_generic(cls) and cls.__origin__ is collections.abc.Set:
