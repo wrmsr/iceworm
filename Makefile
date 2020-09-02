@@ -48,7 +48,7 @@ clean:
 		-name '.revision' -delete
 		-name '__pycache__' -delete -or \
 
-	(cd iceworm-spark && make clean)
+	(cd iceworm-jvm && make clean)
 
 
 ### Venvs

@@ -4,6 +4,8 @@ TODO:
  - LookupInvalidation
  - sensors - s3, sftp, user
   - * codechange *
+ - Invalidator takes an Invalidation
+ - a Lookup invalidation is its own trigger..
 """
 from omnibus import dataclasses as dc
 from omnibus import lang
