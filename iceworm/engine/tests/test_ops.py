@@ -30,6 +30,7 @@ from ...utils import serde
 
 
 CONNECTORS_YML = f"""
+
 - system: {{}}
 
 - sql:
@@ -52,6 +53,7 @@ CONNECTORS_YML = f"""
             type: integer
       globs:
       - '*.csv'
+
 """
 
 CONNECTORS_SER = yaml.safe_load(CONNECTORS_YML)
@@ -75,41 +77,37 @@ CONNECTORS_SER.extend([
 
 ])
 
-TARGETS_SER = [
+TARGETS_YML = """
 
-    {'table_as_select': {
-        'name': ['pg', 'a'],
-        'query': 'select * from csv.a',
-    }},
+- table_as_select:
+    name: [pg, a]
+    query: "select * from csv.a"
 
-    {'table_as_select': {
-        'name': ['pg', 'b'],
-        'query': 'select * from csv.b',
-    }},
+- table_as_select:
+    name: [pg, b]
+    query: "select * from csv.b"
 
-    {'table_as_select': {
-        'name': ['pg', 'c'],
-        'query': 'select * from pg.b',
-    }},
+- table_as_select:
+    name: [pg, c]
+    query: "select * from pg.b"
 
-    {'table_as_select': {
-        'name': ['pg', 'nums'],
-        'query': 'select * from cmp.nums',
-    }},
+- table_as_select:
+    name: [pg, nums]
+    query: "select * from cmp.nums"
 
-    {'rows': {
-        'table': ['system', 'notifications'],
-        'query': "select 'hi' message",
-    }},
+- rows:
+    table: [system, notifications]
+    query: "select 'hi' as message"
 
-    {'invalidator': {
-        'table': ['pg', 'a'],
-        'kind': {'scheduled': {
-            'spec': '0 1 * * *',
-        }},
-    }},
+- invalidator:
+    table: [pg, a]
+    kind:
+      scheduled:
+        spec: '0 1 * * *'
 
-]
+"""
+
+TARGETS_SER = yaml.safe_load(TARGETS_YML)
 
 
 @pytest.mark.xfail()
