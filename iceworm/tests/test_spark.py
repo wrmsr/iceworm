@@ -6,6 +6,8 @@ TODO:
    - just ship a reqs.txt w/ git+http://?
   - dist?
 
+https://github.com/SherpaConsulting/PyHiveSpark/blob/master/pyhive/sqlalchemy_spark.py
+
 (cd temp && \
 JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_261.jdk/Contents/Home \
 SPARK_HOME=../.venv/lib/python3.7/site-packages/pyspark \
