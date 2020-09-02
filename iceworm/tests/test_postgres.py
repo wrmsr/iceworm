@@ -188,7 +188,7 @@ def test_tpch(pg_url):  # noqa
                 sac = sa.Column(tc.name, sats[tc.type], primary_key=f.name in ent.__meta__.primary_key)
                 sacs.append(sac)
 
-            sat = sa.Table(ent.__name__.upper(), samd, *sacs)
+            sat = sa.Table(ent.__name__.lower(), samd, *sacs)
             print(sat)
 
             sat.create(bind=engine)
