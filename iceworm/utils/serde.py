@@ -1,6 +1,5 @@
 """
 TODO:
- - ** mappings as dicts or seqs - serialize to seq, deser either **
  - strict mode
  - replace with builtin omni generic impl
 """
