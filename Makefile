@@ -40,15 +40,20 @@ clean:
 	-rm -rf dist
 
 	find $(PROJECT) \
+	\
 		-name '*.dylib' -delete -or \
 		-name '*.exe' -delete -or \
 		-name '*.pyc' -delete -or \
 		-name '*.pyo' -delete -or \
 		-name '*.so' -delete -or \
-		-name '.revision' -delete
+		-name '.revision' -delete -or \
 		-name '__pycache__' -delete -or \
+	\
+	-name NeVeRmAtCh
 
 	(cd iceworm-jvm && make clean)
+
+	(cd js && make clean)
 
 
 ### Venvs
