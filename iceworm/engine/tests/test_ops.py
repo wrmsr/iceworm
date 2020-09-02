@@ -44,9 +44,9 @@ CONNECTORS_SER = [
                 'path': os.path.join(os.path.dirname(__file__), 'csv'),
                 'schema': {'provided': {
                     'columns': [
-                        {'name': 'id', 'type': {'integer': {}}, 'primary_key': True},
-                        {'name': 'a', 'type': {'integer': {}}},
-                        {'name': 'b', 'type': {'integer': {}}},
+                        {'name': 'id', 'type': 'integer', 'primary_key': True},
+                        {'name': 'a', 'type': 'integer'},
+                        {'name': 'b', 'type': 'integer'},
                     ],
                 }},
                 'globs': [
@@ -63,7 +63,7 @@ CONNECTORS_SER = [
                 'md_table': {
                     'name': ['nums'],
                     'columns': [
-                        {'name': 'num', 'type': {'integer': {}}},
+                        {'name': 'num', 'type': 'integer'},
                     ],
                 },
                 'fn': lambda: [{'num': i} for i in range(10)],

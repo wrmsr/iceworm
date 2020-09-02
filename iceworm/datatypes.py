@@ -11,6 +11,7 @@ import typing as ta
 
 from omnibus import check
 from omnibus import dataclasses as dc
+from omnibus import lang
 
 from .utils import seq
 from .utils import serde
@@ -18,6 +19,16 @@ from .utils import serde
 
 class Datatype(dc.Enum):
     ALIASES: ta.ClassVar[ta.AbstractSet[str]] = frozenset()
+
+    CLS_MAP: ta.ClassVar[ta.Mapping[str, ta.Type['Datatype']]] = {}
+
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+
+        if lang.Abstract not in cls.__bases__:
+            for n in [cls.__name__.lower()] + list(cls.ALIASES):
+                check.not_in(n, Datatype.CLS_MAP)
+                Datatype.CLS_MAP[n] = cls
 
     @property
     def py_type(self) -> type:
@@ -175,6 +186,18 @@ class Geography(Datatype):
 class Table(Datatype):
     columns: ta.Sequence[ta.Tuple[str, Datatype]] = dc.field(
         coerce=seq, check=lambda l: all(isinstance(k, str) and isinstance(v, Datatype) for k, v in l))
+
+
+class DatatypeSerde(serde.AutoSerde[Datatype]):
+
+    def serialize(self, obj: Datatype) -> ta.Any:
+        return serde.serialize_dataclass(obj)
+
+    def deserialize(self, ser: ta.Any) -> Datatype:
+        if isinstance(ser, str):
+            cls = Datatype.CLS_MAP[ser]
+            return cls()
+        return serde.deserialize_dataclass(ser, Datatype)
 
 
 def _build_datatype_subclass_map(cls: type) -> ta.Mapping[ta.Union[str, type], ta.Union[str, type]]:
