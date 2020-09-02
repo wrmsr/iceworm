@@ -19,5 +19,5 @@ class Goal(dc.Enum):
         return None
 
 
-class Invalidation(Goal):
+class Invalidate(Goal):
     pass
