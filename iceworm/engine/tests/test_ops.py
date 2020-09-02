@@ -22,6 +22,7 @@ from .. import planning as pln
 from .. import processing as proc
 from .. import rules as rls
 from .. import targets as tars
+from ... import domains as doms
 from ...tests.helpers import pg_engine  # noqa
 from ...tests.helpers import pg_url  # noqa  # FIXME: jesus christ pytest fucking sucks
 from ...tests.helpers import raw_pg_url
@@ -98,13 +99,21 @@ TARGETS_YML = """
 
 - invalidator:
     table: [pg, a]
-    kind:
+    trigger:
       scheduled:
         spec: '0 1 * * *'
 
 """
 
 TARGETS_SER = yaml.safe_load(TARGETS_YML)
+
+
+def get_task_dependencies(targets: ta.Iterable[tars.Target]) -> ta.Mapping[tars.Target, ta.AbstractSet[tars.Target]]:  # noqa
+    raise NotImplementedError
+
+
+def get_src_table_domain(query: str, src: QualifiedName, dom: doms.Domain) -> doms.Domain:  # noqa
+    raise NotImplementedError
 
 
 @pytest.mark.xfail()

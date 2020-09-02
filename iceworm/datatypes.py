@@ -42,6 +42,13 @@ class Datatype(dc.Enum):
     def is_sortable(self) -> bool:
         return False
 
+    @classmethod
+    def of(cls, obj: 'Datatype') -> 'Datatype':
+        if isinstance(obj, Datatype):
+            return obj
+        else:
+            raise TypeError(obj)
+
 
 class Number(Datatype):
     ALIASES: ta.ClassVar = {

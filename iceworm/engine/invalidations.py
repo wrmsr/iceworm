@@ -14,19 +14,19 @@ from ..utils import cron
 from .targets import Target
 
 
-class InvalidatorKind(dc.Enum):
+class InvalidatorTrigger(dc.Enum):
     pass
 
 
-class InvalidatorKinds(lang.Namespace):
+class InvalidatorTriggers(lang.Namespace):
 
-    class Scheduled(InvalidatorKind):
+    class Scheduled(InvalidatorTrigger):
         spec: cron.Spec = dc.field(coerce=cron.Spec.of)
 
 
 class Invalidator(Target):
     table: QualifiedName
-    kind: InvalidatorKind
+    trigger: InvalidatorTrigger
 
 
 class Invalidation(dc.Enum):
