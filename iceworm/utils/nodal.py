@@ -122,5 +122,5 @@ class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
                 rpl_kw[k] = v
         return dc.replace(self, **rpl_kw)
 
-    def fmap(self, fn: ta.Callable[[NodalT], ta.Mapping[str, ta.Any]]) -> NodalT:
+    def fmap(self: Self, fn: ta.Callable[[NodalT], ta.Mapping[str, ta.Any]]) -> Self:
         return self.map(fn, **fn(self))

@@ -116,3 +116,12 @@ class MemoizedUnary(ta.Generic[T, U]):
 
 
 memoized_unary = MemoizedUnary
+
+
+TRUE_STRS = {'true', 'True', 'TRUE', 'yes', 'Yes', 'YES', '1'}
+TRUE_VALS = {True, 1, *TRUE_STRS}
+
+FALSE_STRS = {'false', 'False', 'FALSE', 'no', 'No', 'NO', '0'}
+FALSE_VALS = {False, 0, *FALSE_STRS}
+
+check.empty(TRUE_VALS & FALSE_VALS)

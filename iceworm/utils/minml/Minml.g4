@@ -78,7 +78,7 @@ TRI_SQ_STRING
     ;
 
 IDENTIFIER
-    : [A-Za-z_] [A-Za-z_0-9\-]*
+    : [A-Za-z_] [A-Za-z_0-9\-$.]*
     ;
 
 fragment ESC
