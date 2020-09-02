@@ -2,6 +2,7 @@ import concurrent.futures as cf
 import contextlib
 import functools
 import multiprocessing as mp
+import typing as ta
 
 
 class _PendingWorkItems:
@@ -51,7 +52,12 @@ class _PendingWorkItems:
 
 
 @contextlib.contextmanager
-def forking_process_pool(fn, *args, **kwargs):
+def forking_process_pool(fn: ta.Callable, *args, **kwargs) -> ta.ContextManager[cf.Executor]:
+    """
+    Workaround for https://bugs.python.org/issue33725 to force forking (enabling CoW of non-picklable state). Per ticket
+    can't be safely used in a process touching obj-c runtime internals. Caller beware.
+    """
+
     if not callable(fn):
         raise TypeError(fn)
 
