@@ -29,6 +29,9 @@ from omnibus import lang
 from omnibus import properties
 from omnibus.dev.testing.helpers import skip_if_cant_import
 from omnibus.spark import local as sl
+from pyhive import hive  # noqa
+import pytest
+import sqlalchemy as sa
 
 if ta.TYPE_CHECKING:
     import pyspark as ps
@@ -83,3 +86,14 @@ def test_local_launcher():
     Driver().drive()
     """))
     launcher.launch()
+
+
+@pytest.mark.xfail()
+def test_sql():
+    # conn = hive.Connection(host='localhost', port=10000)
+    # cur = conn.cursor()
+    # print(list(cur.execute('select 1')))
+
+    engine = sa.create_engine('hive://localhost:10000/default')
+    with engine.connect() as conn:
+        print(list(conn.execute(sa.select([1]))))
