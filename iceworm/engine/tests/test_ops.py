@@ -4,6 +4,7 @@ TODO:
   - upstream cfg: select * from v /*+ weak */;
   - col type ann/enforcement: select a /*+ type: char(36) */
   - catalog chainmap?
+ - 'system: {}' -> 'system:' - null dc body = defaults? can't be global..
 """
 import os.path
 import typing as ta  # noqa
@@ -44,13 +45,9 @@ CONNECTORS_YML = f"""
       schema:
         provided:
           columns:
-          - name: id
-            type: integer
-            primary_key: true
-          - name: a
-            type: integer
-          - name: b
-            type: integer
+          - {{name: id, type: integer, primary_key: true}}
+          - {{name: a, type: integer}}
+          - {{name: b, type: integer}}
       globs:
       - '*.csv'
 
