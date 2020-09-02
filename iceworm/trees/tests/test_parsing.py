@@ -30,6 +30,7 @@ def test_parsing():
             hash(node)
 
             ser = serde.serialize(node)  # noqa
+            print(json.dumps(ser))
             des = serde.deserialize(ser, no.Node)  # noqa
             # assert des == node
 

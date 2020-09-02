@@ -1,10 +1,12 @@
 import enum
+import operator
 import typing as ta
 
 from omnibus import dataclasses as dc
 
 from ...utils import build_enum_value_map
 from ...utils import seq
+from ...utils import serde
 from .base import Expr
 from .base import Identifier
 from .base import Integer
@@ -101,7 +103,7 @@ class IdentifierAllSelectItem(SelectItem):
 
 class ExprSelectItem(SelectItem):
     value: Expr
-    label: ta.Optional[Identifier] = None
+    label: ta.Optional[Identifier] = dc.field(None, metadata={serde.Ignore: operator.not_})
 
 
 class Grouping(Node, abstract=True):
@@ -122,15 +124,15 @@ class SetsGrouping(Grouping):
 
 class Select(Selectable, Stmt):
     items: ta.Sequence[SelectItem] = dc.field(coerce=seq)
-    relations: ta.Sequence[Relation] = dc.field((), coerce=seq)
-    where: ta.Optional[Expr] = None
-    top_n: ta.Optional[Integer] = None
-    set_quantifier: ta.Optional[SetQuantifier] = None
-    group_by: ta.Optional[Grouping] = None
-    having: ta.Optional[Expr] = None
-    qualify: ta.Optional[Expr] = None
-    order_by: ta.Optional[ta.Sequence[SortItem]] = dc.field(None, coerce=seq)
-    limit: ta.Optional[int] = None
+    relations: ta.Sequence[Relation] = dc.field((), coerce=seq, metadata={serde.Ignore: operator.not_})
+    where: ta.Optional[Expr] = dc.field(None, metadata={serde.Ignore: operator.not_})
+    top_n: ta.Optional[Integer] = dc.field(None, metadata={serde.Ignore: operator.not_})
+    set_quantifier: ta.Optional[SetQuantifier] = dc.field(None, metadata={serde.Ignore: operator.not_})
+    group_by: ta.Optional[Grouping] = dc.field(None, metadata={serde.Ignore: operator.not_})
+    having: ta.Optional[Expr] = dc.field(None, metadata={serde.Ignore: operator.not_})
+    qualify: ta.Optional[Expr] = dc.field(None, metadata={serde.Ignore: operator.not_})
+    order_by: ta.Optional[ta.Sequence[SortItem]] = dc.field(None, coerce=seq, metadata={serde.Ignore: operator.not_})
+    limit: ta.Optional[int] = dc.field(None, metadata={serde.Ignore: operator.not_})
 
 
 class Cte(Node):
