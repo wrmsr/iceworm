@@ -111,7 +111,7 @@ class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
         else:
             return {}
 
-    def map(self: Self, fn: ta.Callable[[NodalT], NodalT], **kwargs) -> Self:
+    def map(self: Self, fn: ta.Callable[[NodalT], ta.Mapping[str, ta.Any]], **kwargs) -> Self:
         rpl_kw = {**kwargs}
         for fld in dc.fields(self):
             if fld.name in kwargs:
@@ -121,3 +121,6 @@ class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
                     raise KeyError(k)
                 rpl_kw[k] = v
         return dc.replace(self, **rpl_kw)
+
+    def fmap(self, fn: ta.Callable[[NodalT], ta.Mapping[str, ta.Any]]) -> NodalT:
+        return self.map(fn, **fn(self))

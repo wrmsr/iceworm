@@ -130,7 +130,7 @@ def test_ops(pg_engine):  # noqa
         else:
             return {}
 
-    ctor_cfgs = [cfg.map(replace_url_secrets, **replace_url_secrets(cfg)) for cfg in ctor_cfgs]
+    ctor_cfgs = [cfg.fmap(replace_url_secrets) for cfg in ctor_cfgs]
 
     connectors = ctrs.ConnectorSet.of(ctor_cfgs)
 
