@@ -24,6 +24,17 @@ class NULL(lang.Marker):
 
 class _ParseVisitor(MinmlVisitor):
 
+    def __init__(
+            self,
+            *,
+            null_value: ta.Any = NULL,
+            default_object_value: ta.Any = True,
+    ) -> None:
+        super().__init__()
+
+        self._null_value = null_value
+        self._default_object_value = default_object_value
+
     def visit(self, ctx: antlr4.ParserRuleContext):
         check.isinstance(ctx, antlr4.ParserRuleContext)
         return ctx.accept(self)
@@ -46,7 +57,7 @@ class _ParseVisitor(MinmlVisitor):
         return ctx.IDENTIFIER().getText()
 
     def visitNull(self, ctx: MinmlParser.NullContext):
-        return NULL
+        return self._null_value
 
     def visitNumber(self, ctx: MinmlParser.NumberContext):
         txt = ctx.getText()
@@ -62,7 +73,7 @@ class _ParseVisitor(MinmlVisitor):
 
     def visitPair(self, ctx: MinmlParser.PairContext):
         key = self.visit(ctx.k)
-        value = self.visit(ctx.v) if ctx.v is not None else True
+        value = self.visit(ctx.v) if ctx.v is not None else self._default_object_value
         return key, value
 
     def visitTrue(self, ctx: MinmlParser.TrueContext):

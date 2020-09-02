@@ -12,6 +12,7 @@ from omnibus import check  # noqa
 from omnibus import dataclasses as dc  # noqa
 from omnibus import inject as inj  # noqa
 import pytest
+import yaml
 
 from .. import connectors as ctrs
 from .. import execution as exe
@@ -28,33 +29,34 @@ from ...utils import secrets as sec  # noqa
 from ...utils import serde
 
 
-CONNECTORS_SER = [
+CONNECTORS_YML = f"""
+- system: {{}}
 
-    {'system': {}},
+- sql:
+    name: pg
+    url_secret: pg_url
 
-    {'sql': {
-        'name': 'pg',
-        'url_secret': 'pg_url',
-    }},
+- file:
+    name: csv
+    mounts:
+    - path: {os.path.join(os.path.dirname(__file__), 'csv')}
+      schema:
+        provided:
+          columns:
+          - name: id
+            type: integer
+            primary_key: true
+          - name: a
+            type: integer
+          - name: b
+            type: integer
+      globs:
+      - '*.csv'
+"""
 
-    {'file': {
-        'name': 'csv',
-        'mounts': [
-            {
-                'path': os.path.join(os.path.dirname(__file__), 'csv'),
-                'schema': {'provided': {
-                    'columns': [
-                        {'name': 'id', 'type': 'integer', 'primary_key': True},
-                        {'name': 'a', 'type': 'integer'},
-                        {'name': 'b', 'type': 'integer'},
-                    ],
-                }},
-                'globs': [
-                    '*.csv',
-                ],
-            },
-        ],
-    }},
+CONNECTORS_SER = yaml.safe_load(CONNECTORS_YML)
+
+CONNECTORS_SER.extend([
 
     {'computed': {
         'name': 'cmp',
@@ -71,8 +73,7 @@ CONNECTORS_SER = [
         ],
     }},
 
-]
-
+])
 
 TARGETS_SER = [
 

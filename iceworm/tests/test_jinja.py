@@ -2,7 +2,8 @@
 TODO:
  - SandboxedEnvironment? worthless?
  - ugh, LINE NUMBERS
- - SortedMapping[int, int] ? :/
+  - ** only track toplevel src line numbers **
+  - SortedMapping[int, int] ? :/
  - also need to feed to serde
  - ugh, escape helper? {{ user.username|e }} - better if it’s not there?
  - lol, yaml jinja? :|
