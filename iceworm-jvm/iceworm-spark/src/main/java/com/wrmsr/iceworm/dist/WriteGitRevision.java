@@ -71,7 +71,7 @@ public class WriteGitRevision
         checkState(cwd.getFileName().toString().equals("iceworm-spark"));
 
         String parentName = cwd.getParent().getFileName().toString();
-        checkState(parentName.equalsIgnoreCase("iceworm") || parentName.equalsIgnoreCase("build"));
+        checkState(parentName.equalsIgnoreCase("iceworm-jvm") || parentName.equalsIgnoreCase("build"));
         Path git = Paths.get(cwd.getParent().toString(), ".git");
         if (!git.toFile().exists()) {
             return;

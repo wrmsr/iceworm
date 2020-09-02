@@ -1,9 +1,11 @@
-**/.DS_Store
 **/.benchmarks/
+**/.DS_Store
 **/.idea/
 **/.revision
+**/node_modules/
 *.dylib
 *.exe
+*.iml
 *.pstats
 *.pstats.png
 *.pyc
@@ -18,13 +20,13 @@
 /.python-version
 /.tox/
 /.venv*/
-/MANIFEST
 /__pycache__/
 /build/
 /cython_debug/
 /dist/
 /gen/
 /iceworm.egg-info/
+/MANIFEST
 /profiles/
 /target/
 antlr-*.jar
