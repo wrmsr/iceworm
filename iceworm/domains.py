@@ -195,16 +195,16 @@ class EquatableValueSet(ValueSet, lang.Final):
         raise NotImplementedError
 
     def contains_value(self, value: ta.Any) -> bool:
-        pass
+        raise NotImplementedError
 
     def intersect(self, other: 'ValueSet') -> 'ValueSet':
-        pass
+        raise NotImplementedError
 
     def union(self, other: 'ValueSet') -> 'ValueSet':
-        pass
+        raise NotImplementedError
 
     def complement(self) -> 'ValueSet':
-        pass
+        raise NotImplementedError
 
 
 class SortedRangeSet(ValueSet, lang.Final):
@@ -218,28 +218,28 @@ class SortedRangeSet(ValueSet, lang.Final):
         raise NotImplementedError
 
     def type(self) -> dt.Datatype:
-        pass
+        raise NotImplementedError
 
     def is_none(self) -> bool:
-        pass
+        raise NotImplementedError
 
     def is_all(self) -> bool:
-        pass
+        raise NotImplementedError
 
     def is_single_value(self) -> bool:
-        pass
+        raise NotImplementedError
 
     def contains_value(self, value: ta.Any) -> bool:
-        pass
+        raise NotImplementedError
 
     def intersect(self, other: 'ValueSet') -> 'ValueSet':
-        pass
+        raise NotImplementedError
 
     def union(self, other: 'ValueSet') -> 'ValueSet':
-        pass
+        raise NotImplementedError
 
     def complement(self) -> 'ValueSet':
-        pass
+        raise NotImplementedError
 
 
 class Domain(lang.Final):

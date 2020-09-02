@@ -1,6 +1,51 @@
 """
 TODO:
  - expanded reflection - partitioning etc
+
+show locks:
+ resource
+ type
+ transaction
+ transaction_started_on
+ status
+ acquired_on
+ query_id
+
+show transactions
+ id
+ user
+ session
+ name
+ started_on
+ state
+
+show external functions
+ created_on
+ name
+ schema_name
+ is_builtin
+ is_aggregate
+ is_ansi
+ min_num_arguments
+ max_num_arguments
+ arguments
+ description
+ catalog_name
+ is_table_function
+ valid_for_clustering
+ is_secure
+ is_external_function
+
+show streams
+ name
+ database_name
+ schema_name
+ owner
+ comment
+ table_name
+ type
+ stale
+ mode
 """
 import configparser
 import io
