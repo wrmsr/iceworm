@@ -200,14 +200,12 @@ class DatatypeSerde(serde.AutoSerde[Datatype]):
         return serde.deserialize_dataclass(ser, Datatype)
 
 
+@serde.subclass_map_resolver_for(Datatype)
 def _build_datatype_subclass_map(cls: type) -> ta.Mapping[ta.Union[str, type], ta.Union[str, type]]:
     check.state(cls is Datatype)
-    dct = serde.build_subclass_map(Datatype)
+    dct = dict(serde.build_subclass_map(Datatype))
     for k, v in list(dct.items()):
         for a in getattr(v, 'ALIASES', []):
             check.not_in(a, dct)
             dct[a] = v
     return dct
-
-
-serde.SUBCLASS_MAP_RESOLVERS_BY_CLS[Datatype] = _build_datatype_subclass_map

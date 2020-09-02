@@ -158,6 +158,7 @@ class Connector(lang.Abstract, ta.Generic[ConnectorT, ConnectorConfigT]):
             raise TypeError(obj)
 
 
+@serde.subclass_map_resolver_for(Connector.Config)
 def _build_connector_config_subclass_map(cls: type) -> ta.Mapping[ta.Union[str, type], ta.Union[str, type]]:
     check.state(cls is Connector.Config)
     dct = {}
@@ -166,9 +167,6 @@ def _build_connector_config_subclass_map(cls: type) -> ta.Mapping[ta.Union[str, 
         dct[n] = cfcls
         dct[cfcls] = n
     return dct
-
-
-serde.SUBCLASS_MAP_RESOLVERS_BY_CLS[Connector.Config] = _build_connector_config_subclass_map
 
 
 class Connection(lang.Abstract, ta.Generic[ConnectorT]):

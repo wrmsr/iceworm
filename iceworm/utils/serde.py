@@ -70,7 +70,7 @@ class Serde(lang.Abstract, ta.Generic[T]):
         raise NotImplementedError
 
 
-SERDES_BY_CLS: ta.MutableMapping[type, Serde] = weakref.WeakKeyDictionary()
+_SERDES_BY_CLS: ta.MutableMapping[type, Serde] = weakref.WeakKeyDictionary()
 
 
 class AutoSerde(Serde[T], lang.Abstract):
@@ -80,15 +80,26 @@ class AutoSerde(Serde[T], lang.Abstract):
         check.state(cls.__bases__ == (AutoSerde,))
         arg = check.single(rfl.spec(check.single(cls.__orig_bases__)).args)
         ty = check.isinstance(check.isinstance(arg, rfl.NonGenericTypeSpec).cls, type)
-        check.not_in(ty, SERDES_BY_CLS)
+        check.not_in(ty, _SERDES_BY_CLS)
         inst = cls()
-        SERDES_BY_CLS[ty] = inst
+        _SERDES_BY_CLS[ty] = inst
 
 
 SubclassMap = ta.Mapping[ta.Union[str, type], ta.Union[type, str]]  # FIXME: gross
-SUBCLASS_MAP_RESOLVERS_BY_CLS: ta.MutableMapping[type, ta.Callable[[type], SubclassMap]] = weakref.WeakKeyDictionary()
+_SUBCLASS_MAP_RESOLVERS_BY_CLS: ta.MutableMapping[type, ta.Callable[[type], SubclassMap]] = weakref.WeakKeyDictionary()
 
 _SUBCLASS_MAPS_BY_CLS: ta.MutableMapping[type, SubclassMap] = weakref.WeakKeyDictionary()
+
+
+def subclass_map_resolver_for(*clss):
+    def inner(fn):
+        check.callable(fn)
+        for c in clss:
+            check.not_in(c, _SUBCLASS_MAP_RESOLVERS_BY_CLS)
+            _SUBCLASS_MAP_RESOLVERS_BY_CLS[c] = fn
+        return fn
+    check.arg(all(isinstance(c, type) for c in clss))
+    return inner
 
 
 def build_subclass_map(
@@ -125,7 +136,7 @@ def get_subclass_map(cls: type) -> SubclassMap:
         return _SUBCLASS_MAPS_BY_CLS[cls]
     except KeyError:
         try:
-            bld = SUBCLASS_MAP_RESOLVERS_BY_CLS[cls]
+            bld = _SUBCLASS_MAP_RESOLVERS_BY_CLS[cls]
         except KeyError:
             bld = build_subclass_map
         dct = _SUBCLASS_MAPS_BY_CLS[cls] = bld(cls)
@@ -205,8 +216,8 @@ def serialize(obj: T, *, fcls: ta.Optional[ta.Type] = None) -> Serialized:
             raise TypeError(fcls)
         [fcls] = [a for a in args if a not in (None, type(None))]
 
-    if type(obj) in SERDES_BY_CLS:
-        serde = SERDES_BY_CLS[type(obj)]
+    if type(obj) in _SERDES_BY_CLS:
+        serde = _SERDES_BY_CLS[type(obj)]
         return serde.serialize(obj)
 
     elif dc.is_dataclass(obj):
@@ -265,8 +276,8 @@ def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) ->
             return None
         cls = ecls
 
-    if isinstance(cls, type) and cls in SERDES_BY_CLS:
-        serde = SERDES_BY_CLS[cls]
+    if isinstance(cls, type) and cls in _SERDES_BY_CLS:
+        serde = _SERDES_BY_CLS[cls]
         return serde.deserialize(ser)
 
     elif rfl.is_generic(cls) and cls.__origin__ is collections.abc.Mapping:
