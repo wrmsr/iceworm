@@ -8,6 +8,17 @@ from omnibus import lang
 from . import datatypes as dt
 
 
+class DiscreteValues(lang.Abstract):
+
+    @abc.abstractproperty
+    def is_white_list(self) -> bool:
+        raise NotImplementedError
+
+    @abc.abstractproperty
+    def values(self) -> ta.Collection[ta.Any]:
+        raise NotImplementedError
+
+
 class ValueSet(lang.Abstract):
 
     @abc.abstractproperty
@@ -35,7 +46,7 @@ class ValueSet(lang.Abstract):
         raise NotImplementedError
 
     @property
-    def discrete_values(self) -> 'DiscreteValues':
+    def discrete_values(self) -> DiscreteValues:
         raise TypeError
 
     @property
@@ -66,7 +77,7 @@ class ValueSet(lang.Abstract):
     @staticmethod
     def none(type: dt.Datatype) -> 'ValueSet':
         if type.is_sortable:
-            return SortedValueSet.none(type)
+            return SortedRangeSet.none(type)
         elif type.is_equatable:
             return EquatableValueSet.none(type)
         else:
@@ -75,7 +86,7 @@ class ValueSet(lang.Abstract):
     @staticmethod
     def all(type: dt.Datatype) -> 'ValueSet':
         if type.is_sortable:
-            return SortedValueSet.all(type)
+            return SortedRangeSet.all(type)
         elif type.is_equatable:
             return EquatableValueSet.all(type)
         else:
@@ -151,6 +162,14 @@ class EquatableValueSet(ValueSet, lang.Final):
 
     defs.basic('type', 'is_white_list', 'values')
 
+    @classmethod
+    def none(cls, type: dt.Datatype) -> ValueSet:
+        return cls(type, True, [])
+
+    @classmethod
+    def all(cls, type: dt.Datatype) -> ValueSet:
+        return cls(type, False, [])
+
     @property
     def type(self) -> dt.Datatype:
         return self._type
@@ -165,11 +184,11 @@ class EquatableValueSet(ValueSet, lang.Final):
 
     @property
     def is_none(self) -> bool:
-        raise NotImplementedError
+        return self._is_white_list and not self._values
 
     @property
     def is_all(self) -> bool:
-        raise NotImplementedError
+        return not self._is_white_list and not self._values
 
     @property
     def is_single_value(self) -> bool:
@@ -188,15 +207,39 @@ class EquatableValueSet(ValueSet, lang.Final):
         pass
 
 
-class DiscreteValues(lang.Abstract):
+class SortedRangeSet(ValueSet, lang.Final):
 
-    @abc.abstractproperty
-    def is_white_list(self) -> bool:
+    @classmethod
+    def none(cls, type: dt.Datatype) -> ValueSet:
         raise NotImplementedError
 
-    @abc.abstractproperty
-    def values(self) -> ta.Collection[ta.Any]:
+    @classmethod
+    def all(cls, type: dt.Datatype) -> ValueSet:
         raise NotImplementedError
+
+    def type(self) -> dt.Datatype:
+        pass
+
+    def is_none(self) -> bool:
+        pass
+
+    def is_all(self) -> bool:
+        pass
+
+    def is_single_value(self) -> bool:
+        pass
+
+    def contains_value(self, value: ta.Any) -> bool:
+        pass
+
+    def intersect(self, other: 'ValueSet') -> 'ValueSet':
+        pass
+
+    def union(self, other: 'ValueSet') -> 'ValueSet':
+        pass
+
+    def complement(self) -> 'ValueSet':
+        pass
 
 
 class Domain(lang.Final):
@@ -302,3 +345,7 @@ class Domain(lang.Final):
     def subtract(self, other: 'Domain') -> 'Domain':
         other = self._check_compat(other)
         return Domain(self._values.subtract(other._values), self._null_allowed and other._null_allowed)
+
+
+class TupleDomain:
+    pass
