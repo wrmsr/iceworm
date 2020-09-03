@@ -17,7 +17,7 @@ from .helpers import pg_url  # noqa
 
 
 IS_NUMBER_JS = """
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){jp=require("is-number");module.exports.is_number=is_number},{"is-number":2}],2:[function(require,module,exports){"use strict";module.exports=function(num){if(typeof num==="number"){return num-num===0}if(typeof num==="string"&&num.trim()!==""){return Number.isFinite?Number.isFinite(+num):isFinite(+num)}return false}},{}]},{},[1]);
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){is_number=require("is-number");module.exports.is_number=is_number},{"is-number":2}],2:[function(require,module,exports){"use strict";module.exports=function(num){if(typeof num==="number"){return num-num===0}if(typeof num==="string"&&num.trim()!==""){return Number.isFinite?Number.isFinite(+num):isFinite(+num)}return false}},{}]},{},[1]);
 """  # noqa
 
 
@@ -53,6 +53,25 @@ def test_docker_postgres(pg_url):  # noqa
         select plv8_test(array['name', 'age'], array['tom', '29']);
         """))
         assert result == {'name': 'tom', 'age': '29'}
+
+        conn.execute(textwrap.dedent(f"""
+        create or replace function plv8_isnum(val json) returns json as $$
+            if (typeof is_number == 'undefined') {{
+            {IS_NUMBER_JS}
+            }}
+            return is_number(val);
+        $$ language plv8 immutable strict;
+        """))
+
+        result = conn.scalar(textwrap.dedent("""
+        select plv8_isnum('420');
+        """))
+        assert result is True
+
+        result = conn.scalar(textwrap.dedent("""
+        select plv8_isnum('"a420"');
+        """))
+        assert result is False
 
         conn.execute(textwrap.dedent("""
         drop table if exists test;
