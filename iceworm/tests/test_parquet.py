@@ -46,4 +46,16 @@ def test_pyarrow_parquet():
 
 @pytest.mark.xfail()
 def test_fastparquet_parquet():
-    pass
+    import pandas as pd
+    import fastparquet
+
+    d = {'col1': [1, 2], 'col2': [3, 4]}
+    df = pd.DataFrame(data=d)
+
+    dp = tempfile.mkdtemp()
+    fp = os.path.join(dp, 'example.parquet')
+    fastparquet.write(fp, df)
+
+    pf = fastparquet.ParquetFile(fp)
+    df2 = pf.to_pandas()
+    print(df2)

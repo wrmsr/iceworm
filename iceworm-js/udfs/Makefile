@@ -12,6 +12,7 @@ deps:
 		\
 			browserify \
 			grunt \
+			is-number \
 			jmespath \
 			uglify \
 		\

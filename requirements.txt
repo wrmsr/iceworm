@@ -28,7 +28,7 @@ pyspark==3.0.0
 
 ## parquet
 
-fastparquet-0.4.1
+fastparquet==0.4.1
 pyarrow==1.0.1
 python-snappy==0.5.4
 
