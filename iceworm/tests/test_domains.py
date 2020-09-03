@@ -10,3 +10,5 @@ def test_domains():
     vs = dom.EquatableValueSet.none(dt.Integer())
     assert not vs.is_all
     assert vs.is_none
+
+    vs = dom.SortedRangeSet.none(dt.Integer())  # noqa

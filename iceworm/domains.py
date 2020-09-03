@@ -1,7 +1,6 @@
 import abc
 import enum
 import functools
-import re
 import typing as ta
 
 from omnibus import check
@@ -24,24 +23,21 @@ class Bound(enum.Enum):
 
 @functools.total_ordering
 class Marker(ta.Generic[T]):
-    __slots__ = (
-        '_value',
-        '_bound',
-    )
 
-    UNBOUNDED_BELOW: 'Marker' = None
-    EMPTY: 'Marker' = None
-    UNBOUNDED_ABOVE: 'Marker' = None
-
-    def __init__(self, value: ta.Optional[T], bound: Bound) -> None:
+    def __init__(self, type: dt.Datatype, value: ta.Optional[T], bound: Bound) -> None:
         super().__init__()
 
+        self._type = check.isinstance(type, dt.Datatype)
         self._value = value
         self._bound = check.isinstance(bound, Bound)
+        check.state(self._type.is_sortable)
+        check.state(not (value is not None and bound == Bound.EXACTLY))
 
-    @classmethod
-    def of(cls, value, bound) -> 'Marker':
-        return cls(value, lang.parse_enum(bound, Bound))
+    defs.basic('type', 'value', 'bound')
+
+    @property
+    def type(self) -> dt.Datatype:
+        return self._type
 
     @property
     def value(self) -> ta.Optional[T]:
@@ -50,9 +46,6 @@ class Marker(ta.Generic[T]):
     @property
     def bound(self) -> Bound:
         return self._bound
-
-    defs.repr('value', 'bound')
-    defs.hash_eq('value', 'bound')
 
     def __lt__(self, other: 'Marker[T]') -> bool:
         if type(self) is not type(other):
@@ -63,7 +56,7 @@ class Marker(ta.Generic[T]):
                 self._bound.value < other._bound._value
 
     def __str__(self) -> str:
-        prefix = '<' if self._bonud == Bound.BELOW else '>' if self._bound == Bound.ABOVE else ''
+        prefix = '<' if self._bound == Bound.BELOW else '>' if self._bound == Bound.ABOVE else ''
         value = '...' if self._value is None else str(self._value)
         return prefix + value
 
@@ -75,31 +68,8 @@ class Marker(ta.Generic[T]):
     def is_all(self) -> bool:
         return self._value is None and self._bound != Bound.EXACTLY
 
-    def to_dict(self):
-        return {
-            'value': self._value,
-            'bound': self._bound._name,
-        }
-
-    @classmethod
-    def from_dict(cls, dct):
-        check.arg(set(dct.keys()) == {'value', 'bound'})
-        return cls(dct['value'], lang.parse_enum(dct['bound'], Bound))
-
-    to_json = _to_json = to_dict
-    from_json = _from_json = from_dict
-
-
-Marker.UNBOUNDED_BELOW = Marker(None, Bound.BELOW)
-Marker.EMPTY = Marker(None, Bound.EXACTLY)
-Marker.UNBOUNDED_ABOVE = Marker(None, Bound.ABOVE)
-
 
 class Range(ta.Generic[T]):
-    __slots__ = (
-        '_low',
-        '_high',
-    )
 
     UNBOUNDED: 'Range' = None
     EMPTY: 'Range' = None
@@ -110,6 +80,7 @@ class Range(ta.Generic[T]):
         self._low = check.isinstance(low, Marker)
         self._high = check.isinstance(high, Marker)
 
+        check.state(low.type == high.type)
         if low.is_none or high.is_none:
             if not (low.is_none and high.is_none):
                 raise ValueError(f'Lower {low!r} and high {high!r} must both be none')
@@ -120,9 +91,7 @@ class Range(ta.Generic[T]):
         if low.value is not None and high.value is not None and low.value > high.value:
             raise ValueError(f'Lower {low!r} > high {high!r}')
 
-    @classmethod
-    def of(cls, low_value, low_bound, high_value, high_bound) -> 'Range':
-        return Range(Marker.of(low_value, low_bound), Marker.of(high_value, high_bound))
+    defs.basic('low', 'high')
 
     @property
     def low(self) -> Marker[T]:
@@ -131,9 +100,6 @@ class Range(ta.Generic[T]):
     @property
     def high(self) -> Marker[T]:
         return self._high
-
-    defs.repr('low', 'high')
-    defs.hash_eq('low', 'high')
 
     def __contains__(self, item: Marker[T]) -> bool:
         if type(self) is not Marker:
@@ -149,21 +115,6 @@ class Range(ta.Generic[T]):
         lvalue = '...' if self._low.value is None else str(self._low.value)
         rvalue = '...' if self._high.value is None else str(self._high.value)
         return lblock + lvalue + ',' + rvalue + rblock
-
-    PARSE_PATTERN = re.compile(r'([\(\[])([^,]+),([^\]\)]+)([\)\]])')
-
-    @classmethod
-    def parse(cls, s: str, *, coerce: ta.Callable[[str], T] = str) -> 'Range[T]':
-        match = cls.PARSE_PATTERN.match(s)
-        if not match:
-            raise ValueError(s)
-        lb, lv, uv, ub = match.groups()
-        lv = coerce(lv) if lv != '...' else None
-        uv = coerce(uv) if uv != '...' else None
-        return cls(
-            Marker.UNBOUNDED_ABOVE if lv is None else Marker(lv, Bound.ABOVE if lb == '(' else Bound.EXACTLY),
-            Marker.UNBOUNDED_BELOW if uv is None else Marker(uv, Bound.BELOW if ub == ')' else Bound.EXACTLY),
-        )
 
     @property
     def is_none(self) -> bool:
@@ -183,24 +134,6 @@ class Range(ta.Generic[T]):
     @property
     def is_single_value(self) -> bool:
         return self._low.bound == Bound.EXACTLY and self._low == self._high
-
-    def to_dict(self) -> dict:
-        return {
-            'low': self._low.to_dict(),
-            'high': self._high.to_dict(),
-        }
-
-    @classmethod
-    def from_dict(cls, dct):
-        check.arg(set(dct.keys()) == {'low', 'high'})
-        return cls(Marker.from_dict(dct['low']), Marker.from_dict(dct['high']))
-
-    to_json = _to_json = to_dict
-    from_json = _from_json = from_dict
-
-
-Range.UNBOUNDED = Range(Marker.UNBOUNDED_ABOVE, Marker.UNBOUNDED_BELOW)
-Range.EMPTY = Range(Marker.EMPTY, Marker.EMPTY)
 
 
 def _mod_align_up(value: T, alignment: U) -> T:
@@ -222,6 +155,7 @@ def aligned_range(
 ) -> ta.Iterator[Range[T]]:
     check.not_none(rng.low.value)
     check.not_none(rng.high.value)
+    ty = rng.low.type
 
     def yield_inclusive_aligned_values() -> ta.Iterator[T]:
         cur = align_up(rng.low.value, alignment)
@@ -242,17 +176,17 @@ def aligned_range(
             pass
         else:
             if not _equiv(value, rng.low.value):
-                yield Marker(value, Bound.EXACTLY)
+                yield Marker(ty, value, Bound.EXACTLY)
 
         for value in it:
-            yield Marker(value, Bound.EXACTLY)
+            yield Marker(ty, value, Bound.EXACTLY)
 
     def yield_ranges() -> ta.Iterator[Range[T]]:
         it = yield_inclusive_aligned_low_markers()
         low = next(it)
 
         for next_low in it:
-            yield Range(low, Marker(next_low.value, Bound.BELOW))
+            yield Range(low, Marker(ty, next_low.value, Bound.BELOW))
             low = next_low
 
         yield Range(low, rng.high)
@@ -461,17 +395,17 @@ class EquatableValueSet(ValueSet, lang.Final):
 
 class SortedRangeSet(ValueSet, lang.Final):
 
-    def __init__(self, type: dt.Datatype, low_indexed_ranges: ocol.SortedMapping[Marker, Range]) -> None:
+    def __init__(self, type: dt.Datatype, ranges: ta.Iterable[Range]) -> None:
         super().__init__()
 
         self._type = check.isinstance(type, dt.Datatype)
-        self._low_indexed_ranges = check.isinstance(low_indexed_ranges, ocol.SortedMapping)
-
+        self._ranges = [check.isinstance(r, Range) for r in ranges]
         check.state(self._type.is_sortable)
 
-        self._ranges = list(self._low_indexed_ranges.values())
+        low_indexed_ranges: ocol.SortedMapping[Marker, Range] = ocol.SkipListDict()
+        self._low_indexed_ranges = low_indexed_ranges
 
-    defs.basic('type', 'low_indexed_ranges')
+    defs.basic('type', 'ranges')
 
     @classmethod
     def none(cls, type: dt.Datatype) -> ValueSet:
