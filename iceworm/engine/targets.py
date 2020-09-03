@@ -1,5 +1,7 @@
 """
 TODO:
+ - 'project'? 'world'?
+  - 'mount'-like 'grafts' of dirs with configs: mangling, templating, etc
  - sql files, directory structure, yamls, generators
   - datagrip as ide? .sql scripts out of order, go-to-def?
   - subdirs as schemas?
