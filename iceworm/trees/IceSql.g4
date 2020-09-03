@@ -371,6 +371,7 @@ unquotedIdentifier
     | MONTH
     | OUTER
     | RANGE
+    | REPLACE
     | RIGHT
     | RLIKE
     | SECOND

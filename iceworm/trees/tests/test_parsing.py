@@ -14,7 +14,11 @@ from ...utils import serde
 from .._antlr.IceSqlParser import IceSqlParserConfig
 
 
-def _assert_query(query: str, *, config: ta.Optional[IceSqlParserConfig] = None) -> no.Node:
+def _assert_query(query: str, *, config: ta.Optional[IceSqlParserConfig] = None) -> ta.Optional[no.Node]:
+    query = query.strip(' \r\n;')
+    if not query:
+        return None
+
     print(query)
 
     node = parsing.parse_statement(query + ';', config=config)
@@ -87,7 +91,7 @@ def test_interval_units():
 
         _assert_query("select interval 3 day", config=cfg)
 
-        n = _assert_query("select interval '3' day", config=cfg)
+        n = check.isinstance(_assert_query("select interval '3' day", config=cfg), no.Select)
         it = check.isinstance(check.isinstance(n, no.Select).items[0], no.ExprSelectItem)
         ie = check.isinstance(it.value, no.Interval)
         if not iv:

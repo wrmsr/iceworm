@@ -71,7 +71,7 @@ class Cli(oap.Cli):
                     raise ValueError('Reparse failed')
 
             except Exception as e:  # noqa
-                log.exception('Parse failure')
+                log.exception(f'Parse failure in {path}')
 
         if self.args.parallelism:
             exe = imp.forking_process_pool(process, self.args.parallelism)

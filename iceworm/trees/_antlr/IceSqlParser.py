@@ -117,7 +117,7 @@ def serializedATN():
         buf.write("TT\5\2>>JJ``\4\2==^^\7\2((<<MNccrr\4\2\64\64ZZ\4\2\\\\")
         buf.write("bb\4\2\37\37**\4\2\63\63GG\4\2\33\33++\3\2\17\25\4\2\7")
         buf.write("\7\26\32\3\2\26\27\22\2\"\"\'(\61\61\63\63::<<>>GGIJM")
-        buf.write("NVV\\\\_`ccrrww\2\u03cd\2l\3\2\2\2\4v\3\2\2\2\6x\3\2\2")
+        buf.write("NVV\\]_`ccrrww\2\u03cd\2l\3\2\2\2\4v\3\2\2\2\6x\3\2\2")
         buf.write("\2\b\u0090\3\2\2\2\n\u0094\3\2\2\2\f\u0099\3\2\2\2\16")
         buf.write("\u00a0\3\2\2\2\20\u00ab\3\2\2\2\22\u00af\3\2\2\2\24\u00b5")
         buf.write("\3\2\2\2\26\u00bc\3\2\2\2\30\u00c9\3\2\2\2\32\u00d0\3")
@@ -1057,7 +1057,7 @@ class IceSqlParser ( Parser ):
             self.state = 144
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << IceSqlParser.CASE) | (1 << IceSqlParser.DATE) | (1 << IceSqlParser.DAY) | (1 << IceSqlParser.EXTRACT) | (1 << IceSqlParser.FIRST) | (1 << IceSqlParser.GROUPING) | (1 << IceSqlParser.HOUR) | (1 << IceSqlParser.ILIKE))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (IceSqlParser.LAST - 69)) | (1 << (IceSqlParser.LEFT - 69)) | (1 << (IceSqlParser.LIKE - 69)) | (1 << (IceSqlParser.MINUTE - 69)) | (1 << (IceSqlParser.MONTH - 69)) | (1 << (IceSqlParser.OUTER - 69)) | (1 << (IceSqlParser.RANGE - 69)) | (1 << (IceSqlParser.RIGHT - 69)) | (1 << (IceSqlParser.RLIKE - 69)) | (1 << (IceSqlParser.SECOND - 69)) | (1 << (IceSqlParser.YEAR - 69)) | (1 << (IceSqlParser.IDENTIFIER - 69)) | (1 << (IceSqlParser.QUOTED_IDENTIFIER - 69)))) != 0):
+            if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << IceSqlParser.CASE) | (1 << IceSqlParser.DATE) | (1 << IceSqlParser.DAY) | (1 << IceSqlParser.EXTRACT) | (1 << IceSqlParser.FIRST) | (1 << IceSqlParser.GROUPING) | (1 << IceSqlParser.HOUR) | (1 << IceSqlParser.ILIKE))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (IceSqlParser.LAST - 69)) | (1 << (IceSqlParser.LEFT - 69)) | (1 << (IceSqlParser.LIKE - 69)) | (1 << (IceSqlParser.MINUTE - 69)) | (1 << (IceSqlParser.MONTH - 69)) | (1 << (IceSqlParser.OUTER - 69)) | (1 << (IceSqlParser.RANGE - 69)) | (1 << (IceSqlParser.REPLACE - 69)) | (1 << (IceSqlParser.RIGHT - 69)) | (1 << (IceSqlParser.RLIKE - 69)) | (1 << (IceSqlParser.SECOND - 69)) | (1 << (IceSqlParser.YEAR - 69)) | (1 << (IceSqlParser.IDENTIFIER - 69)) | (1 << (IceSqlParser.QUOTED_IDENTIFIER - 69)))) != 0):
                 self.state = 143
                 self.typeSpec()
 
@@ -2116,7 +2116,7 @@ class IceSqlParser ( Parser ):
                 self.state = 280
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << IceSqlParser.AS) | (1 << IceSqlParser.CASE) | (1 << IceSqlParser.DATE) | (1 << IceSqlParser.DAY) | (1 << IceSqlParser.EXTRACT) | (1 << IceSqlParser.FIRST) | (1 << IceSqlParser.GROUPING) | (1 << IceSqlParser.HOUR) | (1 << IceSqlParser.ILIKE))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (IceSqlParser.LAST - 69)) | (1 << (IceSqlParser.LEFT - 69)) | (1 << (IceSqlParser.LIKE - 69)) | (1 << (IceSqlParser.MINUTE - 69)) | (1 << (IceSqlParser.MONTH - 69)) | (1 << (IceSqlParser.OUTER - 69)) | (1 << (IceSqlParser.RANGE - 69)) | (1 << (IceSqlParser.RIGHT - 69)) | (1 << (IceSqlParser.RLIKE - 69)) | (1 << (IceSqlParser.SECOND - 69)) | (1 << (IceSqlParser.YEAR - 69)) | (1 << (IceSqlParser.IDENTIFIER - 69)) | (1 << (IceSqlParser.QUOTED_IDENTIFIER - 69)))) != 0):
+                if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << IceSqlParser.AS) | (1 << IceSqlParser.CASE) | (1 << IceSqlParser.DATE) | (1 << IceSqlParser.DAY) | (1 << IceSqlParser.EXTRACT) | (1 << IceSqlParser.FIRST) | (1 << IceSqlParser.GROUPING) | (1 << IceSqlParser.HOUR) | (1 << IceSqlParser.ILIKE))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (IceSqlParser.LAST - 69)) | (1 << (IceSqlParser.LEFT - 69)) | (1 << (IceSqlParser.LIKE - 69)) | (1 << (IceSqlParser.MINUTE - 69)) | (1 << (IceSqlParser.MONTH - 69)) | (1 << (IceSqlParser.OUTER - 69)) | (1 << (IceSqlParser.RANGE - 69)) | (1 << (IceSqlParser.REPLACE - 69)) | (1 << (IceSqlParser.RIGHT - 69)) | (1 << (IceSqlParser.RLIKE - 69)) | (1 << (IceSqlParser.SECOND - 69)) | (1 << (IceSqlParser.YEAR - 69)) | (1 << (IceSqlParser.IDENTIFIER - 69)) | (1 << (IceSqlParser.QUOTED_IDENTIFIER - 69)))) != 0):
                     self.state = 277
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
@@ -3187,7 +3187,7 @@ class IceSqlParser ( Parser ):
             self.state = 419
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [IceSqlParser.CASE, IceSqlParser.DATE, IceSqlParser.DAY, IceSqlParser.EXTRACT, IceSqlParser.FIRST, IceSqlParser.GROUPING, IceSqlParser.HOUR, IceSqlParser.ILIKE, IceSqlParser.LAST, IceSqlParser.LEFT, IceSqlParser.LIKE, IceSqlParser.MINUTE, IceSqlParser.MONTH, IceSqlParser.OUTER, IceSqlParser.RANGE, IceSqlParser.RIGHT, IceSqlParser.RLIKE, IceSqlParser.SECOND, IceSqlParser.YEAR, IceSqlParser.IDENTIFIER, IceSqlParser.QUOTED_IDENTIFIER]:
+            if token in [IceSqlParser.CASE, IceSqlParser.DATE, IceSqlParser.DAY, IceSqlParser.EXTRACT, IceSqlParser.FIRST, IceSqlParser.GROUPING, IceSqlParser.HOUR, IceSqlParser.ILIKE, IceSqlParser.LAST, IceSqlParser.LEFT, IceSqlParser.LIKE, IceSqlParser.MINUTE, IceSqlParser.MONTH, IceSqlParser.OUTER, IceSqlParser.RANGE, IceSqlParser.REPLACE, IceSqlParser.RIGHT, IceSqlParser.RLIKE, IceSqlParser.SECOND, IceSqlParser.YEAR, IceSqlParser.IDENTIFIER, IceSqlParser.QUOTED_IDENTIFIER]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 416
                 self.identifier()
@@ -3777,7 +3777,7 @@ class IceSqlParser ( Parser ):
                 self.state = 478
                 self.param()
                 pass
-            elif token in [IceSqlParser.CASE, IceSqlParser.DATE, IceSqlParser.DAY, IceSqlParser.EXTRACT, IceSqlParser.FIRST, IceSqlParser.GROUPING, IceSqlParser.HOUR, IceSqlParser.ILIKE, IceSqlParser.LAST, IceSqlParser.LEFT, IceSqlParser.LIKE, IceSqlParser.MINUTE, IceSqlParser.MONTH, IceSqlParser.OUTER, IceSqlParser.RANGE, IceSqlParser.RIGHT, IceSqlParser.RLIKE, IceSqlParser.SECOND, IceSqlParser.YEAR, IceSqlParser.IDENTIFIER, IceSqlParser.QUOTED_IDENTIFIER]:
+            elif token in [IceSqlParser.CASE, IceSqlParser.DATE, IceSqlParser.DAY, IceSqlParser.EXTRACT, IceSqlParser.FIRST, IceSqlParser.GROUPING, IceSqlParser.HOUR, IceSqlParser.ILIKE, IceSqlParser.LAST, IceSqlParser.LEFT, IceSqlParser.LIKE, IceSqlParser.MINUTE, IceSqlParser.MONTH, IceSqlParser.OUTER, IceSqlParser.RANGE, IceSqlParser.REPLACE, IceSqlParser.RIGHT, IceSqlParser.RLIKE, IceSqlParser.SECOND, IceSqlParser.YEAR, IceSqlParser.IDENTIFIER, IceSqlParser.QUOTED_IDENTIFIER]:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 479
                 self.qualifiedName()
@@ -3874,7 +3874,7 @@ class IceSqlParser ( Parser ):
                 self.state = 497
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << IceSqlParser.T__6) | (1 << IceSqlParser.T__11) | (1 << IceSqlParser.CASE) | (1 << IceSqlParser.DATE) | (1 << IceSqlParser.DAY) | (1 << IceSqlParser.EXTRACT) | (1 << IceSqlParser.FALSE) | (1 << IceSqlParser.FIRST) | (1 << IceSqlParser.GROUPING) | (1 << IceSqlParser.HOUR) | (1 << IceSqlParser.ILIKE))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (IceSqlParser.LAST - 69)) | (1 << (IceSqlParser.LEFT - 69)) | (1 << (IceSqlParser.LIKE - 69)) | (1 << (IceSqlParser.MINUTE - 69)) | (1 << (IceSqlParser.MONTH - 69)) | (1 << (IceSqlParser.NULL - 69)) | (1 << (IceSqlParser.OUTER - 69)) | (1 << (IceSqlParser.RANGE - 69)) | (1 << (IceSqlParser.RIGHT - 69)) | (1 << (IceSqlParser.RLIKE - 69)) | (1 << (IceSqlParser.SECOND - 69)) | (1 << (IceSqlParser.TRUE - 69)) | (1 << (IceSqlParser.YEAR - 69)) | (1 << (IceSqlParser.STRING - 69)) | (1 << (IceSqlParser.INTEGER_VALUE - 69)) | (1 << (IceSqlParser.DECIMAL_VALUE - 69)) | (1 << (IceSqlParser.FLOAT_VALUE - 69)) | (1 << (IceSqlParser.IDENTIFIER - 69)) | (1 << (IceSqlParser.QUOTED_IDENTIFIER - 69)))) != 0):
+                if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << IceSqlParser.T__6) | (1 << IceSqlParser.T__11) | (1 << IceSqlParser.CASE) | (1 << IceSqlParser.DATE) | (1 << IceSqlParser.DAY) | (1 << IceSqlParser.EXTRACT) | (1 << IceSqlParser.FALSE) | (1 << IceSqlParser.FIRST) | (1 << IceSqlParser.GROUPING) | (1 << IceSqlParser.HOUR) | (1 << IceSqlParser.ILIKE))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (IceSqlParser.LAST - 69)) | (1 << (IceSqlParser.LEFT - 69)) | (1 << (IceSqlParser.LIKE - 69)) | (1 << (IceSqlParser.MINUTE - 69)) | (1 << (IceSqlParser.MONTH - 69)) | (1 << (IceSqlParser.NULL - 69)) | (1 << (IceSqlParser.OUTER - 69)) | (1 << (IceSqlParser.RANGE - 69)) | (1 << (IceSqlParser.REPLACE - 69)) | (1 << (IceSqlParser.RIGHT - 69)) | (1 << (IceSqlParser.RLIKE - 69)) | (1 << (IceSqlParser.SECOND - 69)) | (1 << (IceSqlParser.TRUE - 69)) | (1 << (IceSqlParser.YEAR - 69)) | (1 << (IceSqlParser.STRING - 69)) | (1 << (IceSqlParser.INTEGER_VALUE - 69)) | (1 << (IceSqlParser.DECIMAL_VALUE - 69)) | (1 << (IceSqlParser.FLOAT_VALUE - 69)) | (1 << (IceSqlParser.IDENTIFIER - 69)) | (1 << (IceSqlParser.QUOTED_IDENTIFIER - 69)))) != 0):
                     self.state = 489
                     self.simpleExpression()
                     self.state = 494
@@ -5649,7 +5649,7 @@ class IceSqlParser ( Parser ):
                         self.state = 749
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
-                        if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << IceSqlParser.CASE) | (1 << IceSqlParser.DATE) | (1 << IceSqlParser.DAY) | (1 << IceSqlParser.EXTRACT) | (1 << IceSqlParser.FIRST) | (1 << IceSqlParser.GROUPING) | (1 << IceSqlParser.HOUR) | (1 << IceSqlParser.ILIKE))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (IceSqlParser.LAST - 69)) | (1 << (IceSqlParser.LEFT - 69)) | (1 << (IceSqlParser.LIKE - 69)) | (1 << (IceSqlParser.MINUTE - 69)) | (1 << (IceSqlParser.MONTH - 69)) | (1 << (IceSqlParser.OUTER - 69)) | (1 << (IceSqlParser.RANGE - 69)) | (1 << (IceSqlParser.RIGHT - 69)) | (1 << (IceSqlParser.RLIKE - 69)) | (1 << (IceSqlParser.SECOND - 69)) | (1 << (IceSqlParser.YEAR - 69)) | (1 << (IceSqlParser.IDENTIFIER - 69)) | (1 << (IceSqlParser.QUOTED_IDENTIFIER - 69)))) != 0):
+                        if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << IceSqlParser.CASE) | (1 << IceSqlParser.DATE) | (1 << IceSqlParser.DAY) | (1 << IceSqlParser.EXTRACT) | (1 << IceSqlParser.FIRST) | (1 << IceSqlParser.GROUPING) | (1 << IceSqlParser.HOUR) | (1 << IceSqlParser.ILIKE))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (IceSqlParser.LAST - 69)) | (1 << (IceSqlParser.LEFT - 69)) | (1 << (IceSqlParser.LIKE - 69)) | (1 << (IceSqlParser.MINUTE - 69)) | (1 << (IceSqlParser.MONTH - 69)) | (1 << (IceSqlParser.OUTER - 69)) | (1 << (IceSqlParser.RANGE - 69)) | (1 << (IceSqlParser.REPLACE - 69)) | (1 << (IceSqlParser.RIGHT - 69)) | (1 << (IceSqlParser.RLIKE - 69)) | (1 << (IceSqlParser.SECOND - 69)) | (1 << (IceSqlParser.YEAR - 69)) | (1 << (IceSqlParser.IDENTIFIER - 69)) | (1 << (IceSqlParser.QUOTED_IDENTIFIER - 69)))) != 0):
                             self.state = 748
                             self.identifierList()
 
@@ -6082,7 +6082,7 @@ class IceSqlParser ( Parser ):
             self.state = 822
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [IceSqlParser.CASE, IceSqlParser.DATE, IceSqlParser.DAY, IceSqlParser.EXTRACT, IceSqlParser.FIRST, IceSqlParser.GROUPING, IceSqlParser.HOUR, IceSqlParser.ILIKE, IceSqlParser.LAST, IceSqlParser.LEFT, IceSqlParser.LIKE, IceSqlParser.MINUTE, IceSqlParser.MONTH, IceSqlParser.OUTER, IceSqlParser.RANGE, IceSqlParser.RIGHT, IceSqlParser.RLIKE, IceSqlParser.SECOND, IceSqlParser.YEAR, IceSqlParser.IDENTIFIER]:
+            if token in [IceSqlParser.CASE, IceSqlParser.DATE, IceSqlParser.DAY, IceSqlParser.EXTRACT, IceSqlParser.FIRST, IceSqlParser.GROUPING, IceSqlParser.HOUR, IceSqlParser.ILIKE, IceSqlParser.LAST, IceSqlParser.LEFT, IceSqlParser.LIKE, IceSqlParser.MINUTE, IceSqlParser.MONTH, IceSqlParser.OUTER, IceSqlParser.RANGE, IceSqlParser.REPLACE, IceSqlParser.RIGHT, IceSqlParser.RLIKE, IceSqlParser.SECOND, IceSqlParser.YEAR, IceSqlParser.IDENTIFIER]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 820
                 self.unquotedIdentifier()
@@ -6988,6 +6988,9 @@ class IceSqlParser ( Parser ):
         def RANGE(self):
             return self.getToken(IceSqlParser.RANGE, 0)
 
+        def REPLACE(self):
+            return self.getToken(IceSqlParser.REPLACE, 0)
+
         def RIGHT(self):
             return self.getToken(IceSqlParser.RIGHT, 0)
 
@@ -7029,7 +7032,7 @@ class IceSqlParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 869
             _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << IceSqlParser.CASE) | (1 << IceSqlParser.DATE) | (1 << IceSqlParser.DAY) | (1 << IceSqlParser.EXTRACT) | (1 << IceSqlParser.FIRST) | (1 << IceSqlParser.GROUPING) | (1 << IceSqlParser.HOUR) | (1 << IceSqlParser.ILIKE))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (IceSqlParser.LAST - 69)) | (1 << (IceSqlParser.LEFT - 69)) | (1 << (IceSqlParser.LIKE - 69)) | (1 << (IceSqlParser.MINUTE - 69)) | (1 << (IceSqlParser.MONTH - 69)) | (1 << (IceSqlParser.OUTER - 69)) | (1 << (IceSqlParser.RANGE - 69)) | (1 << (IceSqlParser.RIGHT - 69)) | (1 << (IceSqlParser.RLIKE - 69)) | (1 << (IceSqlParser.SECOND - 69)) | (1 << (IceSqlParser.YEAR - 69)) | (1 << (IceSqlParser.IDENTIFIER - 69)))) != 0)):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << IceSqlParser.CASE) | (1 << IceSqlParser.DATE) | (1 << IceSqlParser.DAY) | (1 << IceSqlParser.EXTRACT) | (1 << IceSqlParser.FIRST) | (1 << IceSqlParser.GROUPING) | (1 << IceSqlParser.HOUR) | (1 << IceSqlParser.ILIKE))) != 0) or ((((_la - 69)) & ~0x3f) == 0 and ((1 << (_la - 69)) & ((1 << (IceSqlParser.LAST - 69)) | (1 << (IceSqlParser.LEFT - 69)) | (1 << (IceSqlParser.LIKE - 69)) | (1 << (IceSqlParser.MINUTE - 69)) | (1 << (IceSqlParser.MONTH - 69)) | (1 << (IceSqlParser.OUTER - 69)) | (1 << (IceSqlParser.RANGE - 69)) | (1 << (IceSqlParser.REPLACE - 69)) | (1 << (IceSqlParser.RIGHT - 69)) | (1 << (IceSqlParser.RLIKE - 69)) | (1 << (IceSqlParser.SECOND - 69)) | (1 << (IceSqlParser.YEAR - 69)) | (1 << (IceSqlParser.IDENTIFIER - 69)))) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
