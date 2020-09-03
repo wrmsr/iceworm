@@ -1,6 +1,6 @@
 # FIXME: npm install --global @vue/cli?
 
-all:
+all: build
 
 .PHONY: clean
 clean:
@@ -12,7 +12,7 @@ deps:
 	yarn install
 
 .PHONY: build
-build:
+build: deps
 	yarn build
 
 .PHONY: serve

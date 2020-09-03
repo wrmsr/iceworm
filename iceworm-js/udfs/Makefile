@@ -12,9 +12,7 @@ deps:
 		\
 			browserify \
 			grunt \
-			is-number \
 			jmespath \
-			lodash \
 			uglify \
 		\
 		; \
