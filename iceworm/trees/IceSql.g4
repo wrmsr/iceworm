@@ -1,6 +1,34 @@
 grammar IceSql;
 
 
+@header {
+import dataclasses
+
+
+@dataclasses.dataclass(frozen=True)
+class IceSqlParserConfig:
+    interval_units: bool = False
+
+
+DEFAULT_ICE_SQL_PARSER_CONFIG = IceSqlParserConfig()
+}
+
+
+@parser::members {
+_config = None
+
+@property
+def config(self):
+    return self._config or DEFAULT_ICE_SQL_PARSER_CONFIG
+
+@config.setter
+def config(self, config):
+    if self._config is not None or not isinstance(config, IceSqlParserConfig):
+        raise TypeError
+    self._config = config
+}
+
+
 singleStatement
     : statement ';'? EOF
     ;
@@ -120,16 +148,18 @@ traversalKey
     ;
 
 primaryExpression
-    : functionCall                                                     #functionCallExpression
-    | CASE (val=expression)? caseItem* (ELSE default=expression)? END  #caseExpression
-    | INTERVAL expression                                              #intervalExpression
-    | '(' select ')'                                                   #selectExpression
-    | '(' expression ')'                                               #parenExpression
-    | CAST '(' expression AS typeSpec ')'                              #castCallExpression
-    | DATE string                                                      #dateExpression
-    | EXTRACT '(' part=identifier FROM value=expression ')'            #extractExpression
-    | JINJA                                                            #jinjaExpression
-    | simpleExpression                                                 #simplePrimaryExpression
+    : functionCall                                                      #functionCallExpression
+    | CASE (val=expression)? caseItem* (ELSE default=expression)? END   #caseExpression
+    | { not self.config.interval_units }? INTERVAL expression           #intervalExpression
+    | { self.config.interval_units }? INTERVAL expression intervalUnit  #intervalExpression
+    | INTERVAL expression intervalUnit                                  #intervalExpression
+    | '(' select ')'                                                    #selectExpression
+    | '(' expression ')'                                                #parenExpression
+    | CAST '(' expression AS typeSpec ')'                               #castCallExpression
+    | DATE string                                                       #dateExpression
+    | EXTRACT '(' part=identifier FROM value=expression ')'             #extractExpression
+    | JINJA                                                             #jinjaExpression
+    | simpleExpression                                                  #simplePrimaryExpression
     ;
 
 simpleExpression
@@ -169,6 +199,15 @@ kwarg
 
 caseItem
     : WHEN expression THEN expression
+    ;
+
+intervalUnit
+    : SECOND
+    | MINUTE
+    | HOUR
+    | DAY
+    | MONTH
+    | YEAR
     ;
 
 over
@@ -319,17 +358,23 @@ unquotedIdentifier
 
     | CASE
     | DATE
+    | DAY
     | EXTRACT
     | FIRST
     | GROUPING
+    | HOUR
     | ILIKE
     | LAST
     | LEFT
     | LIKE
+    | MINUTE
+    | MONTH
     | OUTER
     | RANGE
     | RIGHT
     | RLIKE
+    | SECOND
+    | YEAR
 
     ;
 
@@ -346,6 +391,7 @@ CREATE: 'create';
 CROSS: 'cross';
 CURRENT: 'current';
 DATE: 'date';
+DAY: 'day';
 DELETE: 'delete';
 DESC: 'desc';
 DISTINCT: 'distinct';
@@ -365,6 +411,7 @@ FUNCTION: 'function';
 GROUP: 'group';
 GROUPING: 'grouping';
 HAVING: 'having';
+HOUR: 'hour';
 IGNORE: 'ignore';
 ILIKE: 'ilike';
 IN: 'in';
@@ -381,6 +428,8 @@ LEFT: 'left';
 LIKE: 'like';
 LIMIT: 'limit';
 MINUS: 'minus';
+MINUTE: 'minute';
+MONTH: 'month';
 NATURAL: 'natural';
 NOT: 'not';
 NULL: 'null';
@@ -401,6 +450,7 @@ RIGHT: 'right';
 RLIKE: 'rlike';
 ROW: 'row';
 ROWS: 'rows';
+SECOND: 'second';
 SELECT: 'select';
 SETS: 'sets';
 TABLE: 'table';
@@ -415,6 +465,7 @@ WHEN: 'when';
 WHERE: 'where';
 WITH: 'with';
 WITHIN: 'within';
+YEAR: 'year';
 
 STRING
     : '\'' (~'\'' | '\'\'' | '\\\'')* '\''

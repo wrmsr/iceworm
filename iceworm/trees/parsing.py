@@ -16,7 +16,13 @@ TODO:
   - trailing commas, 'and's, joins?
  - special forms:
   - let, drop
+
+TODO ( https://calcite.apache.org/docs/reference.html ):
+ - UNNEST '(' expression ')' [ WITH ORDINALITY ]
+ - MATCH_RECOGNIZE
 """
+import typing as ta
+
 from omnibus import antlr
 from omnibus import check
 from omnibus import dataclasses as dc
@@ -25,6 +31,7 @@ from omnibus._vendor import antlr4
 from . import nodes as no
 from ._antlr.IceSqlLexer import IceSqlLexer
 from ._antlr.IceSqlParser import IceSqlParser
+from ._antlr.IceSqlParser import IceSqlParserConfig
 from ._antlr.IceSqlVisitor import IceSqlVisitor
 from .quoting import unquote
 
@@ -227,7 +234,8 @@ class _ParseVisitor(IceSqlVisitor):
 
     def visitIntervalExpression(self, ctx: IceSqlParser.IntervalExpressionContext):
         value = self.visit(ctx.expression())
-        return no.Interval(value)
+        unit = no.INTERVAL_UNIT_MAP[ctx.intervalUnit().getText()] if ctx.intervalUnit() is not None else None
+        return no.Interval(value, unit)
 
     def visitIsNullPredicate(self, ctx: IceSqlParser.IsNullPredicateContext):
         value = self.visit(ctx.value)
@@ -466,7 +474,7 @@ class _ParseVisitor(IceSqlVisitor):
         return no.Var(ctx.IDENTIFIER().getText())
 
 
-def create_parser(buf: str) -> IceSqlParser:
+def create_parser(buf: str, *, config: ta.Optional[IceSqlParserConfig] = None) -> IceSqlParser:
     lexer = IceSqlLexer(antlr4.InputStream(buf))
     lexer.removeErrorListeners()
     lexer.addErrorListener(antlr.SilentRaisingErrorListener())
@@ -475,31 +483,33 @@ def create_parser(buf: str) -> IceSqlParser:
     stream.fill()
 
     parser = IceSqlParser(stream)
+    if config is not None:
+        parser.config = check.isinstance(config, IceSqlParserConfig)
     parser.removeErrorListeners()
     parser.addErrorListener(antlr.SilentRaisingErrorListener())
 
     return parser
 
 
-def parse_statement(buf: str) -> no.Node:
-    parser = create_parser(buf)
+def parse_statement(buf: str, **kwargs) -> no.Node:
+    parser = create_parser(buf, **kwargs)
     node = _ParseVisitor().visit(parser.singleStatement())
     return check.isinstance(node, no.Node)
 
 
-def parse_expr(buf: str) -> no.Expr:
-    parser = create_parser(buf)
+def parse_expr(buf: str, **kwargs) -> no.Expr:
+    parser = create_parser(buf, **kwargs)
     node = _ParseVisitor().visit(parser.expression())
     return check.isinstance(node, no.Expr)
 
 
-def parse_type_spec(buf: str) -> no.TypeSpec:
-    parser = create_parser(buf)
+def parse_type_spec(buf: str, **kwargs) -> no.TypeSpec:
+    parser = create_parser(buf, **kwargs)
     node = _ParseVisitor().visit(parser.typeSpec())
     return check.isinstance(node, no.TypeSpec)
 
 
-def parse_col_spec(buf: str) -> no.ColSpec:
-    parser = create_parser(buf)
+def parse_col_spec(buf: str, **kwargs) -> no.ColSpec:
+    parser = create_parser(buf, **kwargs)
     node = _ParseVisitor().visit(parser.colSpec())
     return check.isinstance(node, no.ColSpec)

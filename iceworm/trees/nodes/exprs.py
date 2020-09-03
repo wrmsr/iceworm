@@ -83,8 +83,21 @@ class UnaryExpr(Expr):
     value: Expr
 
 
+class IntervalUnit(enum.Enum):
+    SECOND = 'second'
+    MINUTE = 'minute'
+    HOUR = 'hour'
+    DAY = 'day'
+    MONTH = 'month'
+    YEAR = 'year'
+
+
+INTERVAL_UNIT_MAP: ta.Mapping[str, IntervalUnit] = build_enum_value_map(IntervalUnit)
+
+
 class Interval(Expr):
     value: Expr
+    unit: ta.Optional[IntervalUnit] = None
 
 
 class CaseItem(Node):

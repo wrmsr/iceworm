@@ -1,5 +1,6 @@
 """
 TODO:
+ - * decree: multitenant out the gate - allows mvcc shit *
  - just gen from dc's
   - data is serde'd json, marked fields are cols, indexes added from class metadata
  - refs table?

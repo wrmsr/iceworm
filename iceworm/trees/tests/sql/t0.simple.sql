@@ -76,6 +76,7 @@ select * from t, lateral (select * from u) as t;
 select * from t, lateral f(x => x + 1);
 select * from t join lateral (select * from u);
 select interval 'x';
+select interval '3' minute;
 select count(distinct x);
 select cast('x' as int);
 select x::decimal(1);

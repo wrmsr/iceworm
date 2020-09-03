@@ -6,6 +6,17 @@ if __name__ is not None and "." in __name__:
 else:
     from IceSqlParser import IceSqlParser
 
+import dataclasses
+
+
+@dataclasses.dataclass(frozen=True)
+class IceSqlParserConfig:
+    interval_units: bool = False
+
+
+DEFAULT_ICE_SQL_PARSER_CONFIG = IceSqlParserConfig()
+
+
 # This class defines a complete generic visitor for a parse tree produced by IceSqlParser.
 
 class IceSqlVisitor(ParseTreeVisitor):
@@ -272,6 +283,11 @@ class IceSqlVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by IceSqlParser#caseItem.
     def visitCaseItem(self, ctx:IceSqlParser.CaseItemContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by IceSqlParser#intervalUnit.
+    def visitIntervalUnit(self, ctx:IceSqlParser.IntervalUnitContext):
         return self.visitChildren(ctx)
 
 

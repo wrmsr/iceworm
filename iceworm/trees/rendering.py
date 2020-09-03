@@ -243,7 +243,7 @@ class Renderer(dispatch.Class):
         return str(node.value)
 
     def render(self, node: no.Interval) -> Part:  # noqa
-        return ['interval', self(node.value)]
+        return ['interval', self(node.value), node.unit.value if node.unit is not None else []]
 
     def render(self, node: no.IsNull) -> Part:  # noqa
         return [self(node.value), 'is', 'not' if node.not_ else [], 'null']

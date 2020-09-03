@@ -1,3 +1,5 @@
+use csv::Error;
+
 extern crate postgres;
 extern crate postgres_openssl;
 
@@ -86,3 +88,56 @@ fn test_hit_postgres() {
 //     let x = rt.block_on(fut);
 //     x.expect("could not upload");
 // }
+
+#[test]
+fn test_csv() {
+    let csv = "year,make,model,description
+        1948,Porsche,356,Luxury sports car
+        1967,Ford,Mustang fastback 1967,American car";
+
+    let mut reader = csv::Reader::from_reader(csv.as_bytes());
+    for record in reader.records() {
+        let record = record.unwrap();
+        println!(
+            "In {}, {} built the {} model. It is a {}.",
+            &record[0],
+            &record[1],
+            &record[2],
+            &record[3]
+        );
+    }
+
+    // let mut wtr = csv::Writer::from_path("foo.csv").unwrap();
+    // wtr.write_record(&["a", "b", "c"]).unwrap();
+    // wtr.write_record(&["x", "y", "z"]).unwrap();
+    // wtr.flush().unwrap();
+}
+
+#[test]
+fn test_mongo() {
+    let client = mongodb::sync::Client::with_uri_str("mongodb://localhost:27017").unwrap();
+    let database = client.database("mydb");
+    let collection = database.collection("books");
+
+    let docs = vec![
+        bson::doc! { "title": "1984", "author": "George Orwell" },
+        bson::doc! { "title": "Animal Farm", "author": "George Orwell" },
+        bson::doc! { "title": "The Great Gatsby", "author": "F. Scott Fitzgerald" },
+    ];
+
+    collection.insert_many(docs, None).unwrap();
+
+    let cursor = collection.find(bson::doc! { "author": "George Orwell" }, None).unwrap();
+    for result in cursor {
+        match result {
+            Ok(document) => {
+                if let Some(title) = document.get("title").and_then(bson::Bson::as_str) {
+                    println!("title: {}", title);
+                } else {
+                    println!("no title found");
+                }
+            }
+            Err(e) => ()
+        }
+    };
+}

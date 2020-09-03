@@ -34,8 +34,10 @@ from .exprs import Cast  # noqa
 from .exprs import CastCall  # noqa
 from .exprs import Date  # noqa
 from .exprs import Extract  # noqa
+from .exprs import INTERVAL_UNIT_MAP  # noqa
 from .exprs import InList  # noqa
 from .exprs import Interval  # noqa
+from .exprs import IntervalUnit  # noqa
 from .exprs import IsNull  # noqa
 from .exprs import LIKE_KIND_MAP  # noqa
 from .exprs import LOGIC_OPS  # noqa
