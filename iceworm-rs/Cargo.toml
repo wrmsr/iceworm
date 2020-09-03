@@ -1,0 +1,18 @@
+[package]
+name = "iceworm-rs"
+version = "0.1.0"
+authors = ["wrmsr"]
+edition = "2018"
+
+[lib]
+name = "iceworm_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+parquet = "1.0.1"
+postgres = "0.17.5"
+postgres-openssl = "0.3.0"
+pyo3 = { version = "0.11.1", features = ["extension-module"] }
+rusoto_core = "0.45.0"
+rusoto_s3 = "0.45.0"
+tokio = "0.2.22"

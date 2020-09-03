@@ -49,7 +49,9 @@ clean:
 	\
 	-name NeVeRmAtCh
 
+	(cd iceworm-js && make clean)
 	(cd iceworm-jvm && make clean)
+	(cd iceworm-rs && make clean)
 
 	(cd js && make clean)
 
