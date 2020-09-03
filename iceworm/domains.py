@@ -47,6 +47,14 @@ class Marker(ta.Generic[T]):
     def lower_unbounded(cls, type: dt.Datatype) -> 'Marker[T]':
         return cls(type, None, Bound.ABOVE)
 
+    @classmethod
+    def min(cls, marker1: 'Marker', marker2: 'Marker') -> 'Marker[T]':
+        return marker1 if marker1 <= marker2 else marker2
+
+    @classmethod
+    def max(cls, marker1: 'Marker', marker2: 'Marker') -> 'Marker[T]':
+        return marker1 if marker1 >= marker2 else marker2
+
     @property
     def type(self) -> dt.Datatype:
         return self._type
@@ -203,6 +211,12 @@ class Range(ta.Generic[T]):
     def contains(self, other: 'Range') -> bool:
         self._check_marker_compat(other)
         return self._low <= other._low and self._high >= other._high
+
+    def span(self, other: 'Range') -> 'Range[T]':
+        self._check_compat(other)
+        low_marker = Marker.min(self._low, other._low)
+        high_marker = Marker.max(self._high, other._high)
+        return Range(low_marker, high_marker)
 
 
 def _mod_align_up(value: T, alignment: U) -> T:

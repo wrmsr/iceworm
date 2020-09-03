@@ -20,3 +20,10 @@ def test_domains():
     ]
     vs = dom.SortedRangeSet(dt.Integer(), rngs)
     print(vs)
+
+    rngs = [
+        dom.Range(dom.Marker(dt.Integer(), 10, dom.Bound.EXACTLY), dom.Marker(dt.Integer(), 20, dom.Bound.BELOW)),
+        dom.Range(dom.Marker(dt.Integer(), 20, dom.Bound.EXACTLY), dom.Marker(dt.Integer(), 40, dom.Bound.BELOW)),
+    ]
+    vs = dom.SortedRangeSet(dt.Integer(), rngs)
+    print(vs)
