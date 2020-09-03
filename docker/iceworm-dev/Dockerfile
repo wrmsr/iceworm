@@ -1,13 +1,19 @@
-FROM ubuntu:eoan-20200410
+FROM ubuntu:focal-20200729
 COPY .dockertimestamp /
 
 
 # Packages
 
 RUN sed -i 's/^# deb-src/deb-src/' /etc/apt/sources.list
-RUN apt-get update && apt-get upgrade -y && apt-get install -y apt-utils
+RUN ( \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y apt-utils \
+)
 
 RUN ( \
+    export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y \
 \
         aria2 \
@@ -23,6 +29,8 @@ RUN ( \
         iputils-tracepath \
         jq \
         less \
+        libpcre2-dev \
+        libpcre3-dev \
         libpq-dev \
         libsasl2-dev \
         libsnappy-dev \
@@ -60,6 +68,7 @@ RUN echo "\n\n" >> ~/.bashrc
 RUN apt-get build-dep -y python3
 
 RUN ( \
+    export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y \
 \
         libbz2-dev \
@@ -101,7 +110,7 @@ RUN ( \
     echo "\
 source ~/.cargo/env \n\
 \n\
-    " >> ~/.bashrc \
+" >> ~/.bashrc \
 )
 
 
@@ -113,7 +122,7 @@ RUN ( \
 PYENV_ROOT=~/.pyenv \n\
 PATH=\"~/.pyenv/bin:\$PATH\" \n\
 \n\
-    " >> ~/.bashrc \
+" >> ~/.bashrc \
 )
 
 

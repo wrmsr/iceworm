@@ -1,4 +1,4 @@
-FROM ubuntu:eoan-20200410
+FROM ubuntu:focal-20200729
 COPY .dockertimestamp /
 
 
