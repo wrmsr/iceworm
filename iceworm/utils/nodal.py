@@ -1,5 +1,6 @@
 """
 TODO:
+ - ** diffing **
  - explicit subclass registration for serde
 """
 import abc

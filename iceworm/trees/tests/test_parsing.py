@@ -1,3 +1,4 @@
+import collections.abc
 import glob
 import json  # noqa
 import os.path
@@ -5,6 +6,7 @@ import typing as ta
 
 from omnibus.antlr import ParseException
 from omnibus import check
+from omnibus import dataclasses as dc
 import pytest
 
 from .. import nodes as no
@@ -38,6 +40,21 @@ def _assert_query(query: str, *, config: ta.Optional[IceSqlParserConfig] = None)
     try:
         assert reparsed == node
     except Exception:
+        def rec(k, l, r):
+            if l == r:
+                return
+            elif dc.is_dataclass(l) or dc.is_dataclass(r):
+                assert type(l) is type(r)
+                for f in dc.fields(l):
+                    rec(f, getattr(l, f.name), getattr(r, f.name))
+            elif isinstance(l, collections.abc.Sequence) or isinstance(r, collections.abc.Sequence):
+                assert isinstance(l, collections.abc.Sequence) and isinstance(r, collections.abc.Sequence)
+                assert len(l) == len(r)
+                for i, (lo, ro) in enumerate(zip(l, r)):
+                    rec(i, lo, ro)
+            else:
+                raise ValueError(l, r)
+        rec(None, reparsed, node)
         raise
 
     assert hash(reparsed) == hash(node)
