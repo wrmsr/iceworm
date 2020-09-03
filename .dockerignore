@@ -1,4 +1,7 @@
+**/.idea
+**/node_modules
 **__pycache__**
+*.iml
 *.sock
 .cache
 .env
@@ -10,9 +13,13 @@
 attic
 build
 dist
+iceworm-js/*/dist
+iceworm-jvm/*/target
+iceworm-jvm/target
+iceworm-rs/target
 iceworm.egg-info
-profiles
 target
+temp
 
 !.git/HEAD
 !.git/refs
