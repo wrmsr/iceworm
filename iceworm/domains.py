@@ -35,6 +35,18 @@ class Marker(ta.Generic[T]):
 
     defs.basic('type', 'value', 'bound')
 
+    @classmethod
+    def exactly(cls, type: dt.Datatype, value: T) -> 'Marker[T]':
+        return cls(type, value, Bound.EXACTLY)
+
+    @classmethod
+    def upper_unbounded(cls, type: dt.Datatype) -> 'Marker[T]':
+        return cls(type, None, Bound.BELOW)
+
+    @classmethod
+    def lower_unbounded(cls, type: dt.Datatype) -> 'Marker[T]':
+        return cls(type, None, Bound.ABOVE)
+
     @property
     def type(self) -> dt.Datatype:
         return self._type
@@ -53,7 +65,7 @@ class Marker(ta.Generic[T]):
         else:
             return \
                 self._value < other._value and \
-                self._bound.value < other._bound._value
+                self._bound.value < other._bound.value
 
     def __str__(self) -> str:
         prefix = '<' if self._bound == Bound.BELOW else '>' if self._bound == Bound.ABOVE else ''
@@ -67,6 +79,31 @@ class Marker(ta.Generic[T]):
     @property
     def is_all(self) -> bool:
         return self._value is None and self._bound != Bound.EXACTLY
+
+    def _check_compat(self, other: 'Marker') -> 'Marker':
+        check.isinstance(other, Marker)
+        if other._type != self._type:
+            raise TypeError(other)
+        return other
+
+    @property
+    def is_upper_unbounded(self) -> bool:
+        return self._value is None and self._bound == Bound.BELOW
+
+    @property
+    def is_lower_unbounded(self) -> bool:
+        return self._value is None and self._bound == Bound.ABOVE
+
+    def is_adjacent(self, other: 'Marker') -> bool:
+        self._check_compat(other)
+        if self.is_upper_unbounded or self.is_lower_unbounded or other.is_upper_unbounded or other.is_lower_unbounded:
+            return False
+        if self._value != other._value:
+            return False
+        return (
+                (self._bound == Bound.EXACTLY and other._bound != Bound.EXACTLY) or
+                (self._bound != Bound.EXACTLY and other._bound == Bound.EXACTLY)
+        )
 
 
 class Range(ta.Generic[T]):
@@ -93,6 +130,10 @@ class Range(ta.Generic[T]):
 
     defs.basic('low', 'high')
 
+    @classmethod
+    def all(cls, type: dt.Datatype) -> 'Range[T]':
+        return cls(Marker.lower_unbounded(type), Marker.upper_unbounded(type))
+
     @property
     def low(self) -> Marker[T]:
         return self._low
@@ -100,6 +141,10 @@ class Range(ta.Generic[T]):
     @property
     def high(self) -> Marker[T]:
         return self._high
+
+    @property
+    def type(self) -> dt.Datatype:
+        return self._low._type
 
     def __contains__(self, item: Marker[T]) -> bool:
         if type(self) is not Marker:
@@ -134,6 +179,30 @@ class Range(ta.Generic[T]):
     @property
     def is_single_value(self) -> bool:
         return self._low.bound == Bound.EXACTLY and self._low == self._high
+
+    def _check_compat(self, other: 'Range') -> 'Range':
+        check.isinstance(other, Range)
+        if other._low._type != self._low._type:
+            raise TypeError(other)
+        return other
+
+    def _check_marker_compat(self, marker: Marker) -> Marker:
+        check.isinstance(marker, Marker)
+        if marker._type != self._low._type:
+            raise TypeError(marker)
+        return marker
+
+    def overlaps(self, other: 'Range') -> bool:
+        self._check_compat(other)
+        return self._low <= other._high and other._low <= self._high
+
+    def includes(self, marker: Marker) -> bool:
+        self._check_marker_compat(marker)
+        return self._low <= marker and self._high >= marker
+
+    def contains(self, other: 'Range') -> bool:
+        self._check_marker_compat(other)
+        return self._low <= other._low and self._high >= other._high
 
 
 def _mod_align_up(value: T, alignment: U) -> T:
@@ -406,7 +475,7 @@ class SortedRangeSet(ValueSet, lang.Final):
 
         dct: ocol.SortedMapping[Marker, Range] = ocol.SkipListDict()
 
-        cur = self._ranges[0]
+        cur = self._ranges[0] if self._ranges else None
         for nxt in self._ranges[1:]:
             if cur.overlaps(nxt) or cur.high.is_adjacent(nxt.low):
                 cur = cur.span(nxt)
@@ -549,7 +618,7 @@ class Domain(lang.Final):
             return self._values.contains_value(value)
 
     def _check_compat(self, other: 'Domain') -> 'Domain':
-        if other.type.py_type != self._type:
+        if other.type.py_type != self._values.type:
             raise TypeError(other)
         if not isinstance(other, Domain):
             raise TypeError(other)
