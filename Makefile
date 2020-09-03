@@ -18,8 +18,6 @@ PYENV_BREW_DEPS:= \
 
 ANTLR_VERSION=4.8
 
-REQUIREMENTS_TXT=requirements-dev.txt
-
 
 ### Toplevel
 
@@ -111,17 +109,17 @@ define do-venv
 endef
 
 define do-deps
-	(cat requirements.txt ; cat requirements-dev.txt ; echo) | \
+	(cat requirements.txt ; (if [ $(2) == "1" ] ; then cat requirements-dev.txt ; fi) ; echo) | \
 		egrep -o '^[^#]+' | \
 		egrep -v '[ ]*-r' | \
 		egrep -v omnibus | \
-		xargs .venv/bin/pip $(PIP_ARGS) install && \
+		xargs $(1)/bin/pip $(PIP_ARGS) install ; \
 	\
 	$(1)/bin/pip install $(PIP_ARGS) --upgrade git+https://github.com/wrmsr/omnibus@wrmsr_working ; \
 	\
-	if [ -d "/Applications/PyCharm.app/Contents/helpers/pydev/" ] ; then \
+	if [ -d "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/" ] ; then \
 		if $(1)/bin/python -c 'import sys; exit(0 if sys.version_info < (3, 7) else 1)' ; then \
-			$(1)/bin/python "/Applications/PyCharm.app/Contents/helpers/pydev/setup_cython.py" build_ext --inplace ; \
+			$(1)/bin/python "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/setup_cython.py" build_ext --inplace ; \
 		fi ; \
 	fi
 endef
@@ -130,7 +128,14 @@ endef
 venv:
 	if [ ! -d .venv ] ; then \
 		$(call do-venv,.venv,$(PYTHON_VERSION)) ; \
-		$(call do-deps,.venv,$(REQUIREMENTS_TXT)) ; \
+		$(call do-deps,.venv,1) ; \
+	fi
+
+.PHONY: venv-inst
+venv-inst:
+	if [ ! -d .venv-inst ] ; then \
+		$(call do-venv,.venv-inst,$(PYTHON_VERSION)) ; \
+		$(call do-deps,.venv-inst,0) ; \
 	fi
 
 
@@ -233,7 +238,7 @@ test-verbose: build
 
 .PHONY: deps
 deps: venv
-	$(call do-deps,.venv,$(REQUIREMENTS_TXT))
+	$(call do-deps,.venv,1)
 
 .PHONY: dep-freze
 dep-freeze: venv
@@ -292,6 +297,64 @@ dist: venv
 
 ### Docker
 
+## Proxies
+
+.PHONY: docker-clean-venv
+docker-clean-venv:
+	rm -rf .venv-docker
+
+.PHONY: docker-venv
+docker-venv:
+	./docker-dev make _docker-venv
+
+.PHONY: _docker-venv
+_docker-venv:
+	if [ ! -d .venv-docker ] ; then \
+		$(call do-venv,.venv-docker,$(PYTHON_VERSION)) ; \
+		$(call do-deps,.venv-docker,1) ; \
+	fi
+
+.PHONY: docker-venv-inst
+docker-venv-inst:
+	./docker-dev make _docker-venv-inst
+
+.PHONY: _docker-venv-inst
+_docker-venv-inst:
+	if [ ! -d .venv-docker-inst ] ; then \
+		$(call do-venv,.venv-docker-inst,$(PYTHON_VERSION)) ; \
+		$(call do-deps,.venv-docker-inst,0) ; \
+	fi
+
+.PHONY: docker-deps
+docker-deps:
+	./docker-dev make _docker-deps
+
+.PHONY: _docker-deps
+_docker-deps: _docker-venv
+	$(call do-deps,.venv-docker,1)
+
+.PHONY: docker-build
+docker-build: docker-venv
+	./docker-dev make _docker-build
+
+.PHONY: _docker-build
+_docker-build: _docker-venv
+	$(call do-build,.venv-docker)
+
+.PHONY: docker-test
+docker-test: docker-build
+	./docker-dev .venv-docker/bin/pytest -v $(PROJECT)
+
+.PHONY: docker-dist
+docker-dist: docker-venv
+	./docker-dev make _docker-dist
+
+.PHONY: _docker-dist
+_docker-dist: _docker-venv
+	$(call do-dist,.venv-docker,0,1)
+
+## Compose
+
 .PHONY: docker-clean
 docker-clean:
 	(cd docker && $(MAKE) clean)
@@ -307,6 +370,8 @@ docker-rmdev:
 .PHONY: docker-reup
 docker-reup:
 	(cd docker && $(MAKE) reup)
+
+## Images
 
 .PHONY: docker-invalidate
 docker-invalidate:

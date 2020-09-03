@@ -24,6 +24,7 @@ RUN ( \
         jq \
         less \
         libpq-dev \
+        libsasl2-dev \
         libsnappy-dev \
         make \
         man \

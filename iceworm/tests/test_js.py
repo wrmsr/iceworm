@@ -6,6 +6,23 @@ import pytest
 from .. import js
 
 
+JS_WITH_MINML_HEADER = """
+/*
+args: {
+  x: int,
+  y: int,
+]
+*/
+
+call_count = 0;
+
+function add2(x, y) {
+  call_count += 1;
+  return x + 2;
+}
+"""
+
+
 @pytest.mark.xfail()
 def test_fallback_js(tmpdir):
     loop = js.build_loop('function(s){ return s + "!" }')

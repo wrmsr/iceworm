@@ -29,11 +29,13 @@ class _ParseVisitor(MinmlVisitor):
             *,
             null_value: ta.Any = NULL,
             default_object_value: ta.Any = True,
+            non_strict_keys: bool = False,
     ) -> None:
         super().__init__()
 
         self._null_value = null_value
         self._default_object_value = default_object_value
+        self._non_strict_keys = non_strict_keys
 
     def visit(self, ctx: antlr4.ParserRuleContext):
         check.isinstance(ctx, antlr4.ParserRuleContext)
@@ -69,7 +71,13 @@ class _ParseVisitor(MinmlVisitor):
             return int(txt)
 
     def visitObj(self, ctx: MinmlParser.ObjContext):
-        return dict(map(self.visit, ctx.pair()))
+        dct = {}
+        for pair in ctx.pair():
+            key, value = self.visit(pair)
+            if not self._non_strict_keys:
+                check.not_in(key, dct)
+            dct[key] = value
+        return dct
 
     def visitPair(self, ctx: MinmlParser.PairContext):
         key = self.visit(ctx.k)
