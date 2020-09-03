@@ -31,7 +31,7 @@ class Marker(ta.Generic[T]):
         self._value = value
         self._bound = check.isinstance(bound, Bound)
         check.state(self._type.is_sortable)
-        check.state(not (value is not None and bound == Bound.EXACTLY))
+        check.state(not (value is None and bound == Bound.EXACTLY))
 
     defs.basic('type', 'value', 'bound')
 
@@ -402,14 +402,40 @@ class SortedRangeSet(ValueSet, lang.Final):
         self._ranges = [check.isinstance(r, Range) for r in ranges]
         check.state(self._type.is_sortable)
 
-        low_indexed_ranges: ocol.SortedMapping[Marker, Range] = ocol.SkipListDict()
-        self._low_indexed_ranges = low_indexed_ranges
+        self._ranges.sort(key=lambda r: r.low)
+
+        dct: ocol.SortedMapping[Marker, Range] = ocol.SkipListDict()
+
+        cur = self._ranges[0]
+        for nxt in self._ranges[1:]:
+            if cur.overlaps(nxt) or cur.high.is_adjacent(nxt.low):
+                cur = cur.span(nxt)
+            else:
+                dct[cur.low] = cur
+                cur = nxt
+        if cur is not None:
+            dct[cur.low] = cur
+
+        if isinstance(self._type, dt.Boolean):
+            true_allowed = False
+            false_allowed = False
+            for k, v in dct.items():
+                if v.includes(Marker.exactly(dt.Boolean(), True)):
+                    true_allowed = True
+                if v.includes(Marker.exactly(dt.Boolean(), False)):
+                    false_allowed = True
+
+            if true_allowed and false_allowed:
+                dct = ocol.SkipListDict()
+                dct[Range.all(dt.Boolean()).low] = Range.all(dt.Boolean())
+
+        self._low_indexed_ranges = dct
 
     defs.basic('type', 'ranges')
 
     @classmethod
     def none(cls, type: dt.Datatype) -> ValueSet:
-        raise NotImplementedError
+        return cls(type, [])
 
     @classmethod
     def all(cls, type: dt.Datatype) -> ValueSet:

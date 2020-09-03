@@ -1,5 +1,6 @@
 """
 TODO:
+ - * nullary singletons via __new__ *
  - sqla bidir adapter (postgres specifically)
  - bottom type for null const?
  - annotations?

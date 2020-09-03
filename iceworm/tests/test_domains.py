@@ -11,4 +11,12 @@ def test_domains():
     assert not vs.is_all
     assert vs.is_none
 
-    vs = dom.SortedRangeSet.none(dt.Integer())  # noqa
+    vs = dom.SortedRangeSet.none(dt.Integer())
+    print(vs)
+
+    rngs = [
+        dom.Range(dom.Marker(dt.Integer(), 10, dom.Bound.EXACTLY), dom.Marker(dt.Integer(), 20, dom.Bound.BELOW)),
+        dom.Range(dom.Marker(dt.Integer(), 30, dom.Bound.EXACTLY), dom.Marker(dt.Integer(), 40, dom.Bound.BELOW)),
+    ]
+    vs = dom.SortedRangeSet(dt.Integer(), rngs)
+    print(vs)
