@@ -146,9 +146,12 @@ def dc_only(
 ) -> bool:
     if isinstance(flds, str):
         raise TypeError(flds)
+    fdct = dc.fields_dict(obj)
+    for fn in flds:
+        if fn not in fdct:
+            raise KeyError(fn)
     rem = set(flds)
-    for f in dc.fields(obj):
-        fn = f.name
+    for fn, f in fdct.items():
         if not f.compare and fn not in rem:
             continue
         v = getattr(obj, fn)
