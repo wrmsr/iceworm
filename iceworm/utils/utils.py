@@ -1,3 +1,4 @@
+import collections.abc
 import inspect
 import typing as ta
 
@@ -125,3 +126,37 @@ FALSE_STRS = {'false', 'False', 'FALSE', 'no', 'No', 'NO', '0'}
 FALSE_VALS = {False, 0, *FALSE_STRS}
 
 check.empty(TRUE_VALS & FALSE_VALS)
+
+
+def _dc_only_test(v: ta.Any) -> bool:
+    if v is None:
+        return False
+    elif isinstance(v, collections.abc.Iterable):
+        return bool(v)
+    else:
+        return True
+
+
+def dc_only(
+        obj: ta.Any,
+        flds: ta.Iterable[str],
+        *,
+        all: bool = False,
+        test: ta.Callable[[ta.Any], bool] = _dc_only_test,
+) -> bool:
+    if isinstance(flds, str):
+        raise TypeError(flds)
+    rem = set(flds)
+    for f in dc.fields(obj):
+        fn = f.name
+        if not f.compare and fn not in rem:
+            continue
+        v = getattr(obj, fn)
+        if test(v):
+            if fn in rem:
+                rem.remove(fn)
+            else:
+                return False
+    if rem and all:
+        return False
+    return True

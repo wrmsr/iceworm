@@ -12,6 +12,7 @@ TODO:
  - _meta: revision, host, pid - same as query tags, likely more - world info
  - dc anns like nodal/serde, ignored for heap
  - atom? running txns?
+ - codec? for heap referential vs serialized
 
 tables:
  - worlds
@@ -22,11 +23,14 @@ tables:
    - historical invalidations? pending? handled? cleared at max interval according to scheds?
 """
 import abc
+import collections.abc
 import typing as ta
 
 from omnibus import check
 from omnibus import lang
+import sqlalchemy as sa
 
+from ..utils import serde
 from ..utils import unique_dict
 
 
@@ -70,11 +74,45 @@ class ObjMapper:
         return tuple(key[f] for f in self._key_fields)
 
 
+class ObjMappers(ta.Iterable[ObjMapper]):
+
+    def __init__(self, mappers: ta.Iterable[ObjMapper]) -> None:
+        super().__init__()
+
+        self._mappers_by_cls = unique_dict((sm.cls, sm) for sm in mappers for _ in [check.isinstance(sm, ObjMapper)])
+
+    @classmethod
+    def of(cls, obj: ta.Union['ObjMappers', ta.Iterable[ObjMapper]]) -> 'ObjMappers':
+        if isinstance(obj, ObjMappers):
+            return obj
+        elif isinstance(obj, collections.abc.Iterable):
+            return cls(obj)
+        else:
+            raise TypeError(obj)
+
+    def __iter__(self) -> ta.Iterator[ObjMapper]:
+        return iter(self._mappers_by_cls.values())
+
+    def __getitem__(self, cls: ObjCls) -> ObjMapper:
+        return self._mappers_by_cls[check.isinstance(cls, type)]
+
+    def key(self, obj: Obj) -> Key:
+        return self[type(obj)].obj_to_key(obj)
+
+
 class ObjStore(lang.Abstract):
 
-    @abc.abstractmethod
+    def __init__(self, mappers: ta.Iterable[ObjMapper]) -> None:
+        super().__init__()
+
+        self._mappers = ObjMappers.of(mappers)
+
+    @property
+    def mappers(self) -> ObjMappers:
+        return self._mappers
+
     def key(self, obj: Obj) -> Key:
-        raise NotImplementedError
+        return self._mappers.key(obj)
 
     @abc.abstractmethod
     def get(self, cls: ObjCls, key: Key) -> Obj:
@@ -92,43 +130,42 @@ class ObjStore(lang.Abstract):
 class HeapObjStore(ObjStore):
 
     def __init__(self, mappers: ta.Iterable[ObjMapper]) -> None:
-        super().__init__()
+        super().__init__(mappers)
 
-        self._mappers_by_cls = unique_dict((sm.cls, sm) for sm in mappers for _ in [check.isinstance(sm, ObjMapper)])
         self._objs_by_key_tup_by_cls: ta.Dict[ta.Dict[KeyTup, Obj]] = {}
 
-    def key(self, obj: Obj) -> Key:
-        return self._mappers_by_cls[type(obj)].obj_to_key(obj)
-
     def get(self, cls: ObjCls, key: Key) -> Obj:
-        kt = self._mappers_by_cls[cls].key_to_key_tup(key)
-        return check.isinstance(self._objs_by_key_tup_by_cls[cls][kt], cls)
+        kt = self._mappers[cls].key_to_key_tup(key)
+        return check.isinstance(serde.deserialize(self._objs_by_key_tup_by_cls[cls][kt], cls), cls)
 
     def put(self, obj: ObjCls) -> None:
         cls = type(obj)
-        kt = self._mappers_by_cls[cls].obj_to_key_tup(obj)
-        self._objs_by_key_tup_by_cls.setdefault(cls, {})[kt] = obj
+        kt = self._mappers[cls].obj_to_key_tup(obj)
+        self._objs_by_key_tup_by_cls.setdefault(cls, {})[kt] = serde.serialize(obj)
 
     def delete(self, cls: ObjCls, key: Key) -> None:
-        kt = self._mappers_by_cls[cls].key_to_key_tup(key)
+        kt = self._mappers[cls].key_to_key_tup(key)
         del self._objs_by_key_tup_by_cls[cls][kt]
 
 
 class SqlObjStore(ObjStore):
 
-    class Adapter(lang.Abstract):
+    class Adapter:
         pass
 
     class PostgresAdapter(Adapter):
         pass
 
-    def __init__(self, adapter: Adapter) -> None:
-        super().__init__()
+    def __init__(
+            self,
+            mappers: ta.Iterable[ObjMapper],
+            conn: sa.engine.Connection,
+            adapter: Adapter = Adapter(),
+    ) -> None:
+        super().__init__(mappers)
 
+        self._conn = check.isinstance(conn, sa.engine.Connection)
         self._adapter = check.isinstance(adapter, SqlObjStore.Adapter)
-
-    def key(self, obj: Obj) -> Key:
-        raise NotImplementedError
 
     def get(self, cls: ObjCls, key: Key) -> Obj:
         raise NotImplementedError

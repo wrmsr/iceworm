@@ -6,6 +6,7 @@ from omnibus import dispatch
 
 from . import nodes as no
 from ..types import QualifiedName
+from ..utils import dc_only
 
 
 StrMap = ta.Mapping[str, ta.Any]
@@ -27,13 +28,7 @@ class StmtEvaluator(dispatch.Class):
         raise TypeError(node)
 
     def eval(self, node: no.Select) -> ta.Sequence[StrMap]:  # noqa
-        check.arg(not node.top_n)
-        check.arg(not node.set_quantifier)
-        check.arg(not node.group_by)
-        check.arg(not node.having)
-        check.arg(not node.qualify)
-        check.arg(not node.order_by)
-        check.arg(not node.limit)
+        check.arg(dc_only(node, ['items', 'relations', 'where']))
 
         if list(node.items) == [no.AllSelectItem()]:
             if len(node.relations) != 1:

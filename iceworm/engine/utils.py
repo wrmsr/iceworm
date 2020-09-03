@@ -6,20 +6,12 @@ from ..trees import analysis as tana
 from ..trees import nodes as no
 from ..trees import parsing as par
 from ..types import QualifiedName
+from ..utils import dc_only
 
 
 def is_simple_select(root: no.Select) -> bool:
     check.isinstance(root, no.Select)
-    return (
-            not root.where and
-            not root.top_n and
-            not root.set_quantifier and
-            not root.group_by and
-            not root.having and
-            not root.qualify and
-            not root.order_by and
-            not root.limit
-    )
+    return dc_only(root, ['items', 'relations'])
 
 
 def parse_simple_select_tables(query: str) -> ta.AbstractSet[QualifiedName]:
