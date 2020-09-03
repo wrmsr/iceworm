@@ -21,9 +21,9 @@ create table things_vers(
 create index _things_seq_index on things (_seq);
 create index _things_at_index on things (_at);
 
-create index _things_vers_seq_index on things (_seq);
-create index _things_vers_id_seq_index on things (id, _seq);
-create index _things_vers_at_id_seq_index on things (_at, id, _seq);
+create index _things_vers_seq_index on things_vers (_seq);
+create index _things_vers_id_seq_index on things_vers (id, _seq);
+create index _things_vers_at_id_seq_index on things_vers (_at, id, _seq);
 
 create or replace function _things_before_write_function() returns trigger as $$ begin
   if new._seq != old._seq then

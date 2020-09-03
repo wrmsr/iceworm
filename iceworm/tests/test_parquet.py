@@ -4,15 +4,17 @@ https://arrow.apache.org/docs/python/parquet.html
 import os.path
 import tempfile
 
-import pyarrow as pa
-import pyarrow.parquet as pq
 import pytest
 
 
 @pytest.mark.xfail()
-def test_parquet():
-    with pytest.raises(ImportError):
-        import pandas  # noqa
+def test_pyarrow_parquet():
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    # FIXME fuck pandas
+    # with pytest.raises(ImportError):
+    #     import pandas  # noqa
 
     # pq.ParquetDataset
 
@@ -40,3 +42,8 @@ def test_parquet():
     table2 = pq.read_table(fp, columns=['f0', 'f1', 'f2'])
     print(table2)
     print(list(table2))
+
+
+@pytest.mark.xfail()
+def test_fastparquet_parquet():
+    pass
