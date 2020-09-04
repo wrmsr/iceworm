@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "proto": "pbjs -t static-module -w commonjs -o src/proto/proto.js src/proto/*.proto"
+    "proto": "pbjs -t static-module -w commonjs -o src/proto/bundle.js src/proto/*.proto && pbts -o src/proto/bundle.d.ts src/proto/bundle.js"
   },
   "dependencies": {
     "core-js": "^3.6.5",
