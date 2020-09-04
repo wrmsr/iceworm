@@ -55,6 +55,55 @@ import typing as ta
 from omnibus import lang
 
 
+EXEC_MULTI_SP_SRC = """
+create or replace procedure exec_multi(stmts variant)
+    returns variant language javascript as $$
+    var sfstmts = [];
+    for (var i = 0; i < STMTS.length; ++i) {
+        var arg = STMTS[i];
+        var sfstmt;
+        if (Array.isArray(arg)) {
+            sfstmt = snowflake.createStatement({
+                sqlText: arg[0],
+                binds: arg.slice(1),
+            });
+        }
+        else if (typeof arg === "string") {
+            sfstmt = snowflake.createStatement({
+                sqlText: arg,
+            });
+        }
+        else {
+            throw "invalid arg";
+        }
+        sfstmts.push(sfstmt)
+    }
+    var ret = [];
+    for (var i = 0; i < sfstmts.length; ++i) {
+        var sfstmt = sfstmts[i];
+        var rs = sfstmt.execute();
+        var rows = [];
+        while (rs.next()) {
+            var row = {};
+            for (var j = 1; ; ++j) {
+                var cn;
+                try {
+                    cn = rs.getColumnName(j);
+                }
+                catch (err) {
+                    break;
+                }
+                row[cn] = rs.getColumnValue(j);
+            }
+            rows.push(row);
+        }
+        ret.push(rows);
+    }
+    return ret;
+$$ ;
+"""
+
+
 @lang.cached_nullary
 def get_config() -> ta.Mapping[str, str]:
     config_file_path = os.environ['ICEWORM_SNOWFLAKE_CONFIG_PATH']
