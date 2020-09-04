@@ -21,7 +21,7 @@
         <dep.jackson.version>2.6.7</dep.jackson.version>
         <dep.jackson-module-scala.version>2.6.7.1</dep.jackson-module-scala.version>
         <dep.jackson.databind.version>2.6.7.3</dep.jackson.databind.version>
-        <dep.protobuf.version>3.11.4</dep.protobuf.version>
+        <dep.protobuf.version>3.13.0</dep.protobuf.version>
         <dep.log4j.version>2.13.3</dep.log4j.version>
 
     </properties>

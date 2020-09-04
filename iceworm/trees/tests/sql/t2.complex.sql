@@ -7,3 +7,4 @@ select sum(c.d_h * c.a_s)::float / sum(c.a_s)::float as w_m_h_d;
 select avg(b.s_b) over (partition by b.c, b.u_i order by b.d asc rows between 7 preceding and 1 preceding) as p_w_a_b;
 select sum(case when a.c not in (x) then a.a * 1000000 else a.a end) over (partition by a.a_i order by a.h_b_a, a._i rows unbounded preceding) as a_b;
 select e_r_id, listagg(d_n, ' | ') within group (order by d_n) as d_n;
+select coalesce(max() over (partition by a) / (count() over (partition by b)::number(10, 5)), iff(c = 'd', e, 0));
