@@ -15,6 +15,10 @@ PYENV_BREW_DEPS:= \
 	sqlite3 \
 	zlib \
 
+BREW_DEPS:= \
+	$(PYENV_BREW_DEPS) \
+	protobuf \
+
 ANTLR_VERSION=4.8
 
 
@@ -53,11 +57,11 @@ clean:
 	(cd $(PROJECT)-rs && make clean)
 
 
-### Venvs
+### Env
 
 .PHONY: brew
 brew:
-	brew install $(PYENV_BREW_DEPS)
+	brew install $(BREW_DEPS)
 
 define do-venv
 	set -e ; \
