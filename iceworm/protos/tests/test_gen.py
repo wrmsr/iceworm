@@ -37,3 +37,16 @@ def test_compiled():
     t2 = ip._Stub()
     t2.ParseFromString(s)
     assert t == t2
+
+    from google.protobuf import json_format as jf
+    j = jf.MessageToJson(t2)
+    print(j)
+
+    t3 = jf.Parse(j, ip._Stub)
+    print(t3)
+
+    d = jf.MessageToDict(t2)
+    print(d)
+
+    t4 = jf.ParseDict(d, ip._Stub)
+    print(t4)

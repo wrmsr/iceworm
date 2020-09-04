@@ -1,3 +1,7 @@
+"""
+TODO:
+ - ** decree: QUARANTINE DEP - lazy_import, not required for core **
+"""
 import typing as ta
 
 from omnibus import check

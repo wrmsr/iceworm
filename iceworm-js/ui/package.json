@@ -25,6 +25,7 @@
     "@vue/eslint-config-typescript": "^5.0.2",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "stylelint": "^13.7.0",
     "typescript": "~3.9.3",
     "vue-template-compiler": "^2.6.11"
   },
@@ -42,6 +43,11 @@
       "ecmaVersion": 2020
     },
     "rules": {}
+  },
+  "stylelint": {
+    "rules": {
+      "color-no-invalid-hex": true
+    }
   },
   "browserslist": [
     "> 1%",
