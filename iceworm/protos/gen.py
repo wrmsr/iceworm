@@ -120,8 +120,10 @@ class Gen:
                     ty = 'string'
                 elif fld.type == int:
                     ty = 'int32'
+                elif fld.type == float:
+                    ty = 'float'
                 else:
-                    raise TypeError(ty)
+                    raise TypeError(fld.type)
 
                 self._out.write(f"{ty} {fld.name} = {i + 1};\n")
 

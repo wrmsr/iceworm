@@ -8,3 +8,7 @@ option java_package = "com.wrmsr.iceworm";
 message _Stub {
   string data = 1;
 }
+// iceworm.service.web.WebServiceStatus
+message WebServiceStatus {
+  float uptime = 1;
+}

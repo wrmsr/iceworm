@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'\n\021com.wrmsr.iceworm',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\riceworm.proto\x12\x07iceworm\"\x15\n\x05_Stub\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\tB\x13\n\x11\x63om.wrmsr.icewormb\x06proto3'
+  serialized_pb=b'\n\riceworm.proto\x12\x07iceworm\"\x15\n\x05_Stub\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\t\"\"\n\x10WebServiceStatus\x12\x0e\n\x06uptime\x18\x01 \x01(\x02\x42\x13\n\x11\x63om.wrmsr.icewormb\x06proto3'
 )
 
 
@@ -58,7 +58,40 @@ __STUB = _descriptor.Descriptor(
   serialized_end=47,
 )
 
+
+_WEBSERVICESTATUS = _descriptor.Descriptor(
+  name='WebServiceStatus',
+  full_name='iceworm.WebServiceStatus',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='uptime', full_name='iceworm.WebServiceStatus.uptime', index=0,
+      number=1, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=49,
+  serialized_end=83,
+)
+
 DESCRIPTOR.message_types_by_name['_Stub'] = __STUB
+DESCRIPTOR.message_types_by_name['WebServiceStatus'] = _WEBSERVICESTATUS
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 _Stub = _reflection.GeneratedProtocolMessageType('_Stub', (_message.Message,), {
@@ -67,6 +100,13 @@ _Stub = _reflection.GeneratedProtocolMessageType('_Stub', (_message.Message,), {
   # @@protoc_insertion_point(class_scope:iceworm._Stub)
   })
 _sym_db.RegisterMessage(_Stub)
+
+WebServiceStatus = _reflection.GeneratedProtocolMessageType('WebServiceStatus', (_message.Message,), {
+  'DESCRIPTOR' : _WEBSERVICESTATUS,
+  '__module__' : 'iceworm_pb2'
+  # @@protoc_insertion_point(class_scope:iceworm.WebServiceStatus)
+  })
+_sym_db.RegisterMessage(WebServiceStatus)
 
 
 DESCRIPTOR._options = None

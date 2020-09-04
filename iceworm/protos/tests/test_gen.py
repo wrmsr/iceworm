@@ -40,6 +40,7 @@ def test_compiled():
 
     from google.protobuf import json_format as jf
     j = jf.MessageToJson(t2)
+
     print(j)
 
     t3 = jf.Parse(j, ip._Stub)

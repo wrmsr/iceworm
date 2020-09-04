@@ -4,16 +4,17 @@ TODO:
  - 'acknowledgable' alerts / warnings - 'do not auto backfill if table bigger than …'
 """
 import contextlib
-import json
 import logging
 import time
 import typing as ta
 
+from omnibus import dataclasses as dc
 from omnibus import http
 from omnibus import logs
 from omnibus.http.types import Self
 
 from . import resources
+from .. import protos
 
 
 log = logging.getLogger(__name__)
@@ -21,6 +22,11 @@ log = logging.getLogger(__name__)
 
 class BoomException(Exception):
     pass
+
+
+@protos.proto()
+class WebServiceStatus(dc.Pure):
+    uptime: float
 
 
 class App(http.App):
@@ -56,12 +62,22 @@ class App(http.App):
                 start_response(http.consts.STATUS_OK, response_headers)
                 return [response_body]
 
-            elif path == '/uptime':
-                response_body = json.dumps({'uptime': time.time() - self._start_time}).encode('utf-8')
+            elif path == '/status':
+                status = WebServiceStatus(time.time() - self._start_time)
+
+                from ..protos._gen import iceworm_pb2 as pb2
+                status_pb = pb2.WebServiceStatus()
+                for fld in dc.fields(status):
+                    setattr(status_pb, fld.name, getattr(status, fld.name))
+
+                from google.protobuf import json_format as jf
+                response_body = jf.MessageToJson(status_pb).encode('utf-8')
+
                 response_headers = [
                     ('Content-Type', http.consts.CONTENT_JSON),
                     ('Content-Length', str(len(response_body))),
                 ]
+
                 start_response(http.consts.STATUS_OK, response_headers)
                 return [response_body]
 
