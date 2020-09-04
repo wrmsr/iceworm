@@ -1,6 +1,7 @@
 """
 TODO:
  - enums
+ - record revision
 """
 import logging
 import os.path
@@ -57,7 +58,7 @@ class Gen:
                 log.info(f'Imported {ie}')
 
         if self._objs is None:
-            self._objs = list(_PROTO_OBJS.values())
+            self._objs = [o for n, o in sorted(_PROTO_OBJS.items(), key=lambda t: t[0])]
 
         self._out.write('syntax = "proto3";\n')
         self._out.write('\n')
@@ -68,10 +69,14 @@ class Gen:
             self._out.write(f'option java_package = "{self._java_prefix}.{self._package}";\n')
             self._out.write('\n')
 
+        self._out.write('\n')
+
         for obj in self._objs:
             self._gen_obj(obj)
+            self._out.write('\n')
+            self._out.write('\n')
 
-        src = self._out.getvalue()
+        src = self._out.getvalue().strip() + '\n'
 
         if self._output_file_path is not None:
             with open(self._output_file_path, 'w') as f:

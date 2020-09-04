@@ -4,11 +4,14 @@ package iceworm;
 
 option java_package = "com.wrmsr.iceworm";
 
-// iceworm.protos.registry._Stub
-message _Stub {
-  string data = 1;
-}
+
 // iceworm.service.web.WebServiceStatus
 message WebServiceStatus {
   float uptime = 1;
+}
+
+
+// iceworm.protos.registry._Stub
+message _Stub {
+  string data = 1;
 }
