@@ -11,8 +11,12 @@ clean:
 deps:
 	yarn install
 
+.PHONY: gen
+gen: deps
+	yarn proto
+
 .PHONY: build
-build: deps
+build: gen
 	yarn build
 
 .PHONY: serve
