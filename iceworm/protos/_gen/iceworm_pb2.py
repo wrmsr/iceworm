@@ -19,9 +19,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='iceworm.proto',
   package='iceworm',
   syntax='proto3',
-  serialized_options=None,
+  serialized_options=b'\n\021com.wrmsr.iceworm',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\riceworm.proto\x12\x07iceworm\"\x15\n\x05_Stub\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\tb\x06proto3'
+  serialized_pb=b'\n\riceworm.proto\x12\x07iceworm\"\x15\n\x05_Stub\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\tB\x13\n\x11\x63om.wrmsr.icewormb\x06proto3'
 )
 
 
@@ -69,4 +69,5 @@ _Stub = _reflection.GeneratedProtocolMessageType('_Stub', (_message.Message,), {
 _sym_db.RegisterMessage(_Stub)
 
 
+DESCRIPTOR._options = None
 # @@protoc_insertion_point(module_scope)

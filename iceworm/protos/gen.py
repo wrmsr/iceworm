@@ -5,6 +5,7 @@ TODO:
 import logging
 import os.path
 import subprocess
+import sys
 import typing as ta
 
 from omnibus import argparse as oap
@@ -14,6 +15,7 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import logs
 
+from .. import __about__
 from .registry import _PROTO_OBJS
 
 
@@ -21,6 +23,7 @@ log = logging.getLogger(__name__)
 
 
 PACKAGE = __package__.split('.')[0]
+JAVA_PREFIX = 'com.' + __about__.__author__
 
 
 class Gen:
@@ -33,6 +36,7 @@ class Gen:
             output_file_path: ta.Optional[str] = None,
             compile: bool = False,
             import_roots: ta.Iterable[str] = (),
+            java_prefix: ta.Optional[str] = JAVA_PREFIX,
     ) -> None:
         super().__init__()
 
@@ -41,6 +45,7 @@ class Gen:
         self._output_file_path = output_file_path
         self._compile = compile
         self._import_roots = list(check.isinstance(e, str) for e in (check.not_isinstance(import_roots, str) or []))
+        self._java_prefix = java_prefix
 
         self._out = ocod.IndentWriter(indent='  ')
 
@@ -58,6 +63,10 @@ class Gen:
         self._out.write('\n')
         self._out.write(f'package {self._package};\n')
         self._out.write('\n')
+
+        if self._java_prefix:
+            self._out.write(f'option java_package = "{self._java_prefix}.{self._package}";\n')
+            self._out.write('\n')
 
         for obj in self._objs:
             self._gen_obj(obj)
@@ -79,6 +88,7 @@ class Gen:
                         os.path.basename(self._output_file_path),
                     ],
                     cwd=os.path.dirname(self._output_file_path),
+                    stderr=sys.stderr,
                 )
 
                 cfp = self._output_file_path.rpartition('.')[0] + '_pb2.py'

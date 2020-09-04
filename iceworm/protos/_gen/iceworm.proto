@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package iceworm;
 
+option java_package = "com.wrmsr.iceworm";
+
 // iceworm.protos.registry._Stub
 message _Stub {
   string data = 1;
