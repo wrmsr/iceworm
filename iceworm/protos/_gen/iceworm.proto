@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package iceworm;
+
+// iceworm.protos.registry._Stub
+message _Stub {
+  string data = 1;
+}

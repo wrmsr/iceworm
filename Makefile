@@ -142,7 +142,7 @@ venv-inst:
 ### Gen
 
 .PHONY: gen
-gen: antlr
+gen: antlr proto
 	true
 
 .PHONY: antlr
@@ -195,6 +195,10 @@ antlr:
 			) ; \
 		done ; \
 	done
+
+.PHONY: proto
+proto: venv
+	.venv/bin/python -m $(PROJECT).protos.gen gen
 
 
 ### Build

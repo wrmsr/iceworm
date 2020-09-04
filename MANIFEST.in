@@ -1,7 +1,11 @@
 include README.md
 include LICENSE
 include LICENSE-*
-include **/.revision
+
+global-include *.g4
+global-include *.proto
+global-include *.tokens
+global-include .revision
 
 global-exclude *.py[cod]
 global-exclude *.so
