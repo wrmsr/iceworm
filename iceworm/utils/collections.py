@@ -24,7 +24,7 @@ def seq(it: ta.Optional[ta.Iterable[T]]) -> ta.Optional[ta.Sequence[T]]:
     elif isinstance(it, str):
         raise TypeError(it)
     else:
-        return ocol.frozenlist(it)
+        return tuple(it)
 
 
 def mapping(obj: ta.Union[ta.Mapping[K, V], ta.Iterable[ta.Tuple[K, V]], None]) -> ta.Optional[ta.Mapping[K, V]]:

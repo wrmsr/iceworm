@@ -111,7 +111,7 @@ class Renderer(dispatch.Class):
         return ['when', self(node.when), 'then', self(node.then)]
 
     def render(self, node: no.Cast) -> Part:  # noqa
-        return Concat([self(node.value), '::', self(node.type)])
+        return Paren(Concat([self(node.value), '::', self(node.type)]))
 
     def render(self, node: no.CastCall) -> Part:  # noqa
         return Concat(['cast', Paren([self(node.value), 'as', self(node.type)])])

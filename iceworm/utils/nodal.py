@@ -8,7 +8,6 @@ import collections
 import types
 import typing as ta
 
-from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import reflect as rfl
@@ -108,7 +107,7 @@ class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
         if isinstance(val, self._nodal_cls()):
             return {fld.name: fn(val)}
         elif isinstance(val, collections.abc.Sequence) and not isinstance(val, str):
-            return {fld.name: ocol.frozenlist([fn(item) if isinstance(item, self._nodal_cls()) else item for item in val])}  # noqa
+            return {fld.name: tuple([fn(item) if isinstance(item, self._nodal_cls()) else item for item in val])}  # noqa
         else:
             return {}
 
