@@ -28,10 +28,10 @@ ENTS = [
 ]
 
 
-def build_sa_tables(*, samd: ta.Optional[sa.MetaData] = None) -> ta.Sequence[sa.Table]:
-    if samd is None:
-        samd = sa.MetaData()
-    check.isinstance(samd, sa.MetaData)
+def build_sa_tables(*, metadata: ta.Optional[sa.MetaData] = None) -> ta.Sequence[sa.Table]:
+    if metadata is None:
+        metadata = sa.MetaData()
+    check.isinstance(metadata, sa.MetaData)
 
     sats = []
     for ent in ENTS:
@@ -43,17 +43,17 @@ def build_sa_tables(*, samd: ta.Optional[sa.MetaData] = None) -> ta.Sequence[sa.
             sac = sa.Column(tc.name, SA_TYPES_BY_TPCH_TYPE[tc.type], primary_key=f.name in ent.__meta__.primary_key)
             sacs.append(sac)
 
-        sat = sa.Table(ent.__name__.lower(), samd, *sacs)
+        sat = sa.Table(ent.__name__.lower(), metadata, *sacs)
         sats.append(sat)
 
     return sats
 
 
-def populate_sa_tables(conn: sa.engine.Connection, samd: sa.MetaData) -> None:
+def populate_sa_tables(conn: sa.engine.Connection, metadata: sa.MetaData) -> None:
     check.isinstance(conn, sa.engine.Connection)
-    check.isinstance(samd, sa.MetaData)
+    check.isinstance(metadata, sa.MetaData)
 
-    cust_sat = samd.tables['customer']
+    cust_sat = check.single(t for t in metadata.tables.values() if t.name == 'customer')
     cg = tpch.gens.CustomerGenerator(10, 1, 20)
     for c in itertools.islice(cg, 100):
         dct = {}

@@ -1,3 +1,9 @@
+"""
+TODO:
+ - QualifiedName visitability.. somewhere
+ - CreateOrReplaceTable (w/ prefixes)
+ - batching for snowflake...
+"""
 from omnibus import dataclasses as dc
 import sqlalchemy as sa
 import sqlalchemy.ext.compiler  # noqa
@@ -19,13 +25,13 @@ def visit_qualified_name(element: QualifiedNameElement, compiler, **kwargs):
 
 @dc.dataclass(frozen=True)
 class DropTableIfExists(sa.sql.expression.Executable, sa.sql.expression.ClauseElement):
-    name: sa.sql.visitors.Visitable = dc.field(check=lambda o: isinstance(o, sa.sql.visitors.Visitable))
+    name: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
 @sa.ext.compiler.compiles(DropTableIfExists)
 def visit_drop_table_if_exists(element: DropTableIfExists, compiler, **kwargs):
     return 'DROP TABLE IF EXISTS %s' % (
-        compiler.process(element.name),
+        '.'.join(compiler.preparer.quote(p) for p in element.name),
     )
 
 

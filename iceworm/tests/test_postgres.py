@@ -182,10 +182,10 @@ def test_tpch(pg_url):  # noqa
         engine = es.enter_context(lang.disposing(sa.create_engine(pg_url)))
         clean_pg(engine)
 
-        samd = sa.MetaData()
-        sats = tpch.build_sa_tables(samd=samd)
+        metadata = sa.MetaData()
+        sats = tpch.build_sa_tables(metadata=metadata)
         for sat in sats:
             sat.create(bind=engine)
 
         conn = es.enter_context(engine.connect())
-        tpch.populate_sa_tables(conn, samd)
+        tpch.populate_sa_tables(conn, metadata)
