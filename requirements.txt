@@ -5,29 +5,33 @@ Cython==0.29.21
 git+https://github.com/wrmsr/omnibus@wrmsr_working
 
 
-## db deps
-
-pg8000==1.16.5
-psycopg2==2.8.5
-PyHive[hive]==0.6.3
-snowflake-connector-python==2.3.1
-snowflake-sqlalchemy==1.2.3
-SQLAlchemy==1.3.19
-
-
-## future deps
+## core deps
 
 Jinja2==2.11.2
-PyYAML==5.3.1
-boto3==1.14.53
-botocore==1.17.53
-jmespath==0.10.0
+SQLAlchemy==1.3.19
 protobuf==3.13.0
+
+
+## connector deps
+
+PyHive[hive]==0.6.3
+boto3==1.14.56
+botocore==1.17.56
+pg8000==1.16.5
+psycopg2==2.8.5
 pymongo==3.11.0
+snowflake-connector-python[secure-local-storage]==2.3.1
+snowflake-sqlalchemy==1.2.3
+
+
+## extra deps
+
+PyYAML==5.3.1
+jmespath==0.10.0
 pyspark==3.0.0
 
 
-## parquet
+## parquet deps
 
 fastparquet==0.4.1
 pyarrow==1.0.1
@@ -37,4 +41,4 @@ python-snappy==0.5.4
 ## transitive deps
 
 docutils==0.15.2
-idna==2.10
+idna==2.9  # pinned for snowflake-connector

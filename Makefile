@@ -394,5 +394,6 @@ pg-repl: venv
 
 .PHONY: sf-repl
 sf-repl:
-	export $$(.venv/bin/python -c "import os, configparser; parser = configparser.ConfigParser(); parser.read_file(open(os.environ['SNOWFLAKE_CONFIG_PATH'], 'r')); print(' '.join(f'SF_{k.upper()}={v}' for k, v in parser.items('snowflake')))" | xargs) && \
+	export $(cat .env | sed 's/#.*//g' | xargs) && \
+	export $$(.venv/bin/python -c "import os, configparser; parser = configparser.ConfigParser(); parser.read_file(open(os.environ['ICEWORM_SNOWFLAKE_CONFIG_PATH'], 'r')); print(' '.join(f'SF_{k.upper()}={v}' for k, v in parser.items('snowflake')))" | xargs) && \
 	snowsql --username "$$SF_USER" --host "$$SF_HOST" --accountname "$$SF_ACCOUNT" --authenticator "$$SF_AUTHENTICATOR" --schemaname "$$SF_SCHEMA"

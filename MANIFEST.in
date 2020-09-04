@@ -2,6 +2,7 @@ include README.md
 include LICENSE
 include LICENSE-*
 
+global-include *.dss
 global-include *.g4
 global-include *.proto
 global-include *.tokens

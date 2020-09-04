@@ -57,7 +57,7 @@ from omnibus import lang
 
 @lang.cached_nullary
 def get_config() -> ta.Mapping[str, str]:
-    config_file_path = os.environ['SNOWFLAKE_CONFIG_PATH']
+    config_file_path = os.environ['ICEWORM_SNOWFLAKE_CONFIG_PATH']
     with open(os.path.expanduser(config_file_path), 'r') as f:
         txt = f.read()
 

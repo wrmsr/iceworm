@@ -44,6 +44,9 @@ PACKAGE_DATA = [
 
 
 INSTALL_REQUIRES = [
+    'Jinja2>=2.11',
+    'SQLAlchemy>=1.3',
+    'omnibus>=0.100',
 ]
 
 EXTRAS_REQUIRE = {

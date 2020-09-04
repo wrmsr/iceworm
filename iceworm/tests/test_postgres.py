@@ -3,14 +3,12 @@ import textwrap
 import time
 import typing as ta
 
-from omnibus import check
-from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import threading as othr
-from omnibus import tpch
 import pytest
 import sqlalchemy as sa
 
+from .. import tpch
 from .helpers import call_many_with_timeout
 from .helpers import clean_pg
 from .helpers import pg_url  # noqa
@@ -184,37 +182,10 @@ def test_tpch(pg_url):  # noqa
         engine = es.enter_context(lang.disposing(sa.create_engine(pg_url)))
         clean_pg(engine)
 
-        sats = {
-            tpch.ents.Column.Type.INTEGER: sa.Integer(),
-            tpch.ents.Column.Type.IDENTIFIER: sa.Integer(),
-            tpch.ents.Column.Type.DATE: sa.Date(),
-            tpch.ents.Column.Type.DOUBLE: sa.Float(),
-            tpch.ents.Column.Type.VARCHAR: sa.String(),
-        }
-
         samd = sa.MetaData()
-
-        for ent in [
-            tpch.ents.Customer,
-            tpch.ents.LineItem,
-            tpch.ents.Nation,
-            tpch.ents.Order,
-            tpch.ents.Part,
-            tpch.ents.PartSupplier,
-            tpch.ents.Region,
-            tpch.ents.Supplier,
-        ]:
-            sacs = []
-            for f in dc.fields(ent):
-                if tpch.ents.Column not in f.metadata:
-                    continue
-                tc = check.isinstance(f.metadata[tpch.ents.Column], tpch.ents.Column)
-                sac = sa.Column(tc.name, sats[tc.type], primary_key=f.name in ent.__meta__.primary_key)
-                sacs.append(sac)
-
-            sat = sa.Table(ent.__name__.lower(), samd, *sacs)
-            print(sat)
-
+        sats = tpch.build_sa_tables(samd=samd)
+        for sat in sats:
             sat.create(bind=engine)
 
-            print()
+        conn = es.enter_context(engine.connect())
+        tpch.populate_sa_tables(conn, samd)
