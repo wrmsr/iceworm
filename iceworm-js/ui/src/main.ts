@@ -4,6 +4,7 @@ TODO:
  - https://programmer.help/blogs/how-to-use-protobuf-in-the-front-end-vue-chapter.html
  - https://router.vuejs.org/
  - https://github.com/vuejs/vue-router/tree/dev/examples
+ - https://blog.logrocket.com/how-to-write-a-vue-js-app-completely-in-typescript/
 */
 import Vue from 'vue'
 import App from './App.vue'
