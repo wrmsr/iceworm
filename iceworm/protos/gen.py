@@ -69,6 +69,8 @@ class Gen:
                 f.write(src)
 
             if self._compile:
+                protoc_ver = subprocess.check_output(['protoc', '--version']).decode('utf-8').strip()
+
                 subprocess.check_call(
                     [
                         'protoc',
@@ -84,6 +86,7 @@ class Gen:
                     csrc = f.read()
                 with open(cfp, 'w') as f:
                     f.write('# flake8: noqa\n')
+                    f.write(f'# protoc: {protoc_ver}\n')
                     f.write(csrc)
 
         return src

@@ -15,7 +15,6 @@ PYENV_BREW_DEPS:= \
 	sqlite3 \
 	zlib \
 
-
 ANTLR_VERSION=4.8
 
 
