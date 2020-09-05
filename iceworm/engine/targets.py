@@ -76,6 +76,7 @@ from ..utils import serde
 
 
 T = ta.TypeVar('T"')
+TargetT = ta.TypeVar('TargetT', bound='Target')
 RuleT = ta.TypeVar('RuleT', bound='Rule')
 
 
@@ -109,6 +110,10 @@ class Target(dc.Enum, NodalDataclass['Target'], reorder=True):
     @property
     def name(self) -> ta.Optional[QualifiedName]:
         return None
+
+
+class TargetRef(dc.Pure, ta.Generic[TargetT]):
+    name: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
 class Origin(Annotation):

@@ -68,7 +68,7 @@ public class WriteGitRevision
         }
 
         Path cwd = Paths.get(System.getProperty("user.dir"));
-        checkState(cwd.getFileName().toString().equals("iceworm-spark"));
+        checkState(cwd.getFileName().toString().equals("iceworm-core"));
 
         String parentName = cwd.getParent().getFileName().toString();
         checkState(parentName.equalsIgnoreCase("iceworm-jvm") || parentName.equalsIgnoreCase("build"));

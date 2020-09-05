@@ -27,11 +27,33 @@
     </properties>
 
     <modules>
+        <module>iceworm-core</module>
         <module>iceworm-spark</module>
+        <module>iceworm-tool</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- Self -->
+
+            <dependency>
+                <groupId>com.wrmsr.iceworm</groupId>
+                <artifactId>iceworm-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.wrmsr.iceworm</groupId>
+                <artifactId>iceworm-spark</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.wrmsr.iceworm</groupId>
+                <artifactId>iceworm-tool</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Protobuf -->
 
@@ -92,6 +114,18 @@
             </dependency>
 
             <!-- Other -->
+
+            <dependency>
+                <groupId>org.apache.parquet</groupId>
+                <artifactId>parquet-tools</artifactId>
+                <version>1.11.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.prestosql.hadoop</groupId>
+                <artifactId>hadoop-apache</artifactId>
+                <version>3.2.0-8</version>
+            </dependency>
 
             <dependency>
                 <groupId>io.burt</groupId>

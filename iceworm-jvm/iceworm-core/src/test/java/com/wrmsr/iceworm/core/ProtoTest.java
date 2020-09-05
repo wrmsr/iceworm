@@ -1,4 +1,4 @@
-package com.wrmsr.iceworm.spark;
+package com.wrmsr.iceworm.core;
 
 import com.google.protobuf.util.JsonFormat;
 import com.wrmsr.iceworm.Iceworm;
