@@ -124,10 +124,15 @@ def subclass_map_resolver_for(*clss):
     return inner
 
 
+def format_subclass_name(cls: type) -> str:
+    check.isinstance(cls, type)
+    return lang.decamelize(cls.__name__)
+
+
 def build_subclass_map(
         cls: type,
         *,
-        name_formatter: ta.Callable[[type], str] = lambda t: lang.decamelize(t.__name__),
+        name_formatter: ta.Callable[[type], str] = format_subclass_name,
 ) -> SubclassMap:
     dct = {}
     todo = {cls}
@@ -137,7 +142,13 @@ def build_subclass_map(
         if cur in seen:
             continue
         seen.add(cur)
-        n = name_formatter(cur)
+        n = None
+        if dc.is_dataclass(cls):
+            n = dc.metadatas_dict(cls, shallow=True).get(Name)
+        if n is None:
+            n = name_formatter(cur)
+        check.isinstance(n, str)
+        check.not_empty(n)
         try:
             existing = dct[n]
         except KeyError:
