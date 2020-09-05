@@ -82,22 +82,39 @@ create or replace procedure exec_multi(stmts variant)
     for (var i = 0; i < sfstmts.length; ++i) {
         var sfstmt = sfstmts[i];
         var rs = sfstmt.execute();
+        var names = [];
+        var types = [];
+        for (var j = 1; ; ++j) {
+            var cn;
+            try {
+                cn = rs.getColumnName(j);
+            }
+            catch (err) {
+                break;
+            }
+            names.push(cn);
+            types.push(rs.getColumnSqlType(j));
+        }
         var rows = [];
         while (rs.next()) {
-            var row = {};
+            var row = [];
             for (var j = 1; ; ++j) {
-                var cn;
+                var val;
                 try {
-                    cn = rs.getColumnName(j);
+                    val = rs.getColumnValue(j);
                 }
                 catch (err) {
                     break;
                 }
-                row[cn] = rs.getColumnValue(j);
+                row.push(val);
             }
             rows.push(row);
         }
-        ret.push(rows);
+        ret.push({
+            names: names,
+            types: types,
+            rows: rows,
+        });
     }
     return ret;
 $$ ;

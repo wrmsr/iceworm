@@ -53,3 +53,22 @@ def test_tpch():
             sat.create(bind=conn)
 
         tpch.populate_sa_tables(conn, metadata)
+
+
+@pytest.mark.xfail()
+def test_exec_multi():
+    engine: sa.engine.Engine
+    with contextlib.ExitStack() as es:
+        engine = es.enter_context(lang.disposing(sa.create_engine(snowflake.get_url())))
+        conn = es.enter_context(engine.connect())
+        schema = check.not_empty(snowflake.get_config()['schema'])
+
+        query = f'call {schema}.exec_multi(array_construct(:a, :b))'
+        params = {
+            'a': 'select 1',
+            'b': 'select 2',
+        }
+
+        stmt = sa.text(query).bindparams(*[sa.bindparam(k) for k in params])
+        ret = list(conn.execute(stmt, params))
+        print(ret)

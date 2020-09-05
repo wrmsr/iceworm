@@ -8,7 +8,7 @@ from omnibus import dataclasses as dc
 import sqlalchemy as sa
 import sqlalchemy.ext.compiler  # noqa
 
-from .types import QualifiedName
+from ..types import QualifiedName
 
 
 @dc.dataclass(frozen=True)
