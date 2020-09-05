@@ -40,7 +40,8 @@ def build_sa_tables(*, metadata: ta.Optional[sa.MetaData] = None) -> ta.Sequence
             if tpch.ents.Column not in f.metadata:
                 continue
             tc = check.isinstance(f.metadata[tpch.ents.Column], tpch.ents.Column)
-            sac = sa.Column(tc.name, SA_TYPES_BY_TPCH_TYPE[tc.type], primary_key=f.name in ent.__meta__.primary_key)
+            meta = dc.metadatas_dict(ent)[tpch.ents.Meta]
+            sac = sa.Column(tc.name, SA_TYPES_BY_TPCH_TYPE[tc.type], primary_key=f.name in meta.primary_key)
             sacs.append(sac)
 
         sat = sa.Table(ent.__name__.lower(), metadata, *sacs)
@@ -53,14 +54,17 @@ def populate_sa_tables(conn: sa.engine.Connection, metadata: sa.MetaData) -> Non
     check.isinstance(conn, sa.engine.Connection)
     check.isinstance(metadata, sa.MetaData)
 
-    cust_sat = check.single(t for t in metadata.tables.values() if t.name == 'customer')
-    cg = tpch.gens.CustomerGenerator(10, 1, 20)
-    for c in itertools.islice(cg, 100):
-        dct = {}
-        for f in dc.fields(c):
-            try:
-                col = check.isinstance(f.metadata[tpch.ents.Column], tpch.ents.Column)
-            except KeyError:
-                continue
-            dct[col.name] = getattr(c, f.name)
-        conn.execute(cust_sat.insert(), [dct])
+    for n, g in [
+        ('region', tpch.gens.RegionGenerator()),
+        ('customer', tpch.gens.CustomerGenerator(10, 1, 20)),
+    ]:
+        sat = check.single(t for t in metadata.tables.values() if t.name == n)
+        for e in itertools.islice(g, 100):
+            dct = {}
+            for f in dc.fields(e):
+                try:
+                    col = check.isinstance(f.metadata[tpch.ents.Column], tpch.ents.Column)
+                except KeyError:
+                    continue
+                dct[col.name] = getattr(e, f.name)
+            conn.execute(sat.insert(), [dct])

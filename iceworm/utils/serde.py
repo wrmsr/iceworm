@@ -25,6 +25,14 @@ class GetType(lang.Marker):
     pass
 
 
+class Name(lang.Marker):
+    pass
+
+
+class Aliases(lang.Marker):
+    pass
+
+
 T = ta.TypeVar('T')
 
 
