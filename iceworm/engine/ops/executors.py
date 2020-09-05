@@ -67,8 +67,7 @@ class DropTableExecutor(ConnsExecutor[ops.DropTable]):
         sa_conn = check.isinstance(self._conns[op.name[0]], SqlConnection).sa_conn
         sa_conn.execute(
             sql.DropTableIfExists(
-                sql.QualifiedNameElement(
-                    QualifiedName(op.name[1:]))))
+                QualifiedName(op.name[1:])))
 
 
 class CreateTableExecutor(ConnsExecutor[ops.CreateTable]):

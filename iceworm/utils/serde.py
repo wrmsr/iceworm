@@ -144,7 +144,9 @@ def build_subclass_map(
         seen.add(cur)
         n = None
         if dc.is_dataclass(cls):
-            n = dc.metadatas_dict(cls, shallow=True).get(Name)
+            n = dc.metadatas_dict(cls).get(Name)
+            if callable(n):
+                n = n(cls)
         if n is None:
             n = name_formatter(cur)
         check.isinstance(n, str)
