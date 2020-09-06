@@ -2,6 +2,7 @@ import contextlib
 import textwrap
 import time
 import typing as ta
+import urllib.parse
 
 from omnibus import lang
 from omnibus import threading as othr
@@ -189,3 +190,14 @@ def test_tpch(pg_url):  # noqa
 
         conn = es.enter_context(engine.connect())
         tpch.populate_sa_tables(conn, metadata)
+
+
+@pytest.mark.xfail()
+def test_pg8000(pg_url):  # noqa
+    pg_url = urllib.parse.urlunparse(urllib.parse.urlparse(pg_url)._replace(scheme='postgresql+pg8000'))
+
+    engine: sa.engine.Engine
+    with contextlib.ExitStack() as es:
+        engine = es.enter_context(lang.disposing(sa.create_engine(pg_url)))
+        conn = es.enter_context(engine.connect())
+        print(conn.scalar('select 1'))
