@@ -6,6 +6,7 @@ TODO:
  - enforce only modified ids that matched (or added new)
  - ** timing, + detect infinite loops **
   - max iterations?
+  - 'aspect_id' tagging equiv - 'ProcessedBy' attribute?
 """
 import abc
 import typing as ta
