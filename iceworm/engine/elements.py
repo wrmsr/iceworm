@@ -140,14 +140,18 @@ class Ref(dc.Frozen, ta.Generic[ElementT], repr=False, eq=False, order=False):
     __str__ = __repr__
 
     def __eq__(self, other: ta.Any) -> bool:
-        if type(other) is not type(self):
+        if isinstance(other, self.ele_cls):
+            return self.name == other.name
+        elif type(other) is type(self):
+            return self.name == other.name
+        else:
             raise TypeError(other)
-        return self.name == other.name
 
     def __lt__(self, other: ta.Any) -> bool:
-        if type(other) is not type(self):
+        if type(other) is type(self):
+            return self.name < other.name
+        else:
             raise TypeError(other)
-        return self.name < other.name
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__()

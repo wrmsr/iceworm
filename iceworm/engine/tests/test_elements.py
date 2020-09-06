@@ -29,5 +29,15 @@ def test_refs():
     with pytest.raises(TypeError):
         assert rx < fx
 
+    tx = tars.Table('x')
+    ty = tars.Table('y')
+    assert rx == tx
+    assert rx != ty
+    with pytest.raises(TypeError):
+        rx < tx  # noqa
+    fx = tars.Function('x')
+    with pytest.raises(TypeError):
+        rx == fx  # noqa
+
     with pytest.raises(TypeError):
         els.Ref[int]  # noqa
