@@ -35,6 +35,7 @@ from omnibus import dataclasses as dc
 from omnibus import defs
 from omnibus import lang
 
+from .. import elements as els
 from ... import metadata as md
 from ...types import QualifiedName
 from ...utils import serde
@@ -97,11 +98,7 @@ class ListRowSink(RowSink):
 
 class Connector(lang.Abstract, ta.Generic[ConnectorT, ConnectorConfigT]):
 
-    class Config(dc.Enum, NodalDataclass['Connector.Config']):
-
-        @classmethod
-        def _nodal_cls(cls) -> ta.Type['Connector.Config']:
-            return Connector.Config
+    class Config(els.Element, abstract=True):
 
         def __init_subclass__(cls, **kwargs) -> None:
             super().__init_subclass__(**kwargs)
