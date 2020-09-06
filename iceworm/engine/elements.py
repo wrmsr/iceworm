@@ -135,6 +135,12 @@ class Ref(dc.Frozen, lang.Abstract, ta.Generic[ElementT], repr=False, eq=False, 
 
     ele_cls: ta.ClassVar[type]
 
+    def __hash__(self) -> int:
+        raise TypeError('Forbidden')
+
+    def __bool__(self) -> bool:
+        raise TypeError('Forbidden')
+
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.id!r})'
 
@@ -182,6 +188,8 @@ class Ref(dc.Frozen, lang.Abstract, ta.Generic[ElementT], repr=False, eq=False, 
             ns = {
                 'ele_cls': arg,
                 '__class_getitem__': ta.Generic.__class_getitem__,
+                '__hash__': Ref.__hash__,
+                '__bool__': Ref.__bool__,
             }
             ret = lang.new_type(
                 f'{cls.__name__}[{arg.__name__}]',

@@ -161,13 +161,13 @@ def test_ops(pg_engine):  # noqa
             break
         elements = mtps[0].process(elements)
 
-    plan = pln.ElementPlanner(elements, connectors).plan(set(map(QualifiedName.of, [
-        ['pg', 'a'],
-        ['pg', 'b'],
-        ['pg', 'c'],
-        ['pg', 'nums'],
-        ['system', 'notifications'],
-    ])))
+    plan = pln.ElementPlanner(elements, connectors).plan({
+        'pg/a',
+        'pg/b',
+        'pg/c',
+        'pg/nums',
+        'system/notifications',
+    })
 
     exe.PlanExecutor(plan, connectors).execute()
 
