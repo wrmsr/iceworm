@@ -1,5 +1,6 @@
 """
 TODO:
+ - class Id? like Ref? comparison validity via issubclass?
  - 'project'? 'world'?
   - 'mount'-like 'grafts' of dirs with configs: mangling, templating, etc
  - sql files, directory structure, yamls, generators
@@ -210,24 +211,24 @@ class Origin(Annotation):
     element: Element
 
 
-class ElementSet:
+class ElementSet(ta.Generic[ElementT]):
 
-    def __init__(self, elements: ta.Iterable[Element]) -> None:
+    def __init__(self, elements: ta.Iterable[ElementT]) -> None:
         super().__init__()
 
         self._elements = [check.isinstance(e, Element) for e in elements]
 
         self._element_set = ocol.IdentitySet(self._elements)
-        by_id: ta.Dict[Id, Element] = {}
+        by_id: ta.Dict[Id, ElementT] = {}
         for element in self._elements:
             if element.id is not None:
                 check.not_in(element.id, by_id)
                 by_id[element.id] = element
-        self._elements_by_id: ta.Mapping[Id, Element] = by_id
-        self._element_sets_by_type: ta.Dict[type, ta.AbstractSet[Element]] = {}
+        self._elements_by_id: ta.Mapping[Id, ElementT] = by_id
+        self._element_sets_by_type: ta.Dict[type, ta.AbstractSet[ElementT]] = {}
 
     @classmethod
-    def of(cls, it: ta.Iterable[Element]) -> 'ElementSet':
+    def of(cls, it: ta.Iterable[ElementT]) -> 'ElementSet[ElementT]':
         if isinstance(it, cls):
             return it
         else:
@@ -240,10 +241,10 @@ class ElementSet:
             ret = self._element_sets_by_type[ty] = ocol.IdentitySet(n for n in self._elements if isinstance(n, ty))
             return ret
 
-    def __iter__(self) -> ta.Iterator[Element]:
+    def __iter__(self) -> ta.Iterator[ElementT]:
         return iter(self._elements)
 
-    def __contains__(self, key: ta.Union[Id, Element, type]) -> bool:
+    def __contains__(self, key: ta.Union[Id, ElementT, type]) -> bool:
         if isinstance(key, Id):
             return key in self._elements_by_id
         elif isinstance(key, Element):
@@ -253,7 +254,7 @@ class ElementSet:
         else:
             raise TypeError(key)
 
-    def __getitem__(self, id: Id) -> Element:
+    def __getitem__(self, id: Id) -> ElementT:
         return self._elements_by_id[check.isinstance(id, Id)]
 
 

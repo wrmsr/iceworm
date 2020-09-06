@@ -49,14 +49,14 @@ class InferTableProcessor(els.ElementProcessor):
         def output(self) -> els.ElementSet:
             ele_tns = unique_dict((ele.id, ele) for ele in self._input.get_element_type_set(tars.Table))
 
-            ts = list(self._input)
+            ts = els.ElementSet(self._input)
             tn_deps = {}
             tn_idxs = {}
             for i, ele in enumerate(ts):
                 if isinstance(ele, tars.Table):
                     tn_idxs[ele.id] = i
                     # TODO: get single Materialization, do.. something..
-                    rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == ele)
+                    rows = check.single(rt for rt in ts.get_element_type_set(tars.Rows) if rt.table == ele)
                     root = par.parse_statement(rows.query)
                     deps = {n.name.name for n in ana.basic(root).get_node_type_set(no.Table) if n.name.name in ele_tns}
                     check.not_in(ele.id, tn_deps)
@@ -64,6 +64,7 @@ class InferTableProcessor(els.ElementProcessor):
 
             given_tables: ta.Mapping[QualifiedName, md.Table] = {}
 
+            ts = list(ts)
             topo = list(ocol.toposort(tn_deps))
             for sup in topo:
                 for tn in sup:
