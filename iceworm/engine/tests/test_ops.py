@@ -36,11 +36,11 @@ CONNECTORS_YML = f"""
 - system_connector: {{}}
 
 - sql_connector:
-    name: pg
+    id: pg
     url_secret: pg_url
 
 - file_connector:
-    name: csv
+    id: csv
     mounts:
     - path: {os.path.join(os.path.dirname(__file__), 'csv')}
       schema:
@@ -59,7 +59,7 @@ CONNECTORS_SER = yaml.safe_load(CONNECTORS_YML)
 CONNECTORS_SER.extend([
 
     {'computed_connector': {
-        'name': 'cmp',
+        'id': 'cmp',
         'tables': [
             {
                 'md_table': {

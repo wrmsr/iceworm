@@ -4,6 +4,7 @@ TODO:
  - replace with builtin omni generic impl
  - extensible serde Contexts? want pluggable datatypes, -> Datatype.of
  - recursive custom serde?
+ - allow_empty? system: {{}}
 """
 import abc
 import collections.abc

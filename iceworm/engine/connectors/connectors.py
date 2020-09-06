@@ -111,7 +111,7 @@ class Connector(lang.Abstract, ta.Generic[ConnectorT, ConnectorConfigT]):
 
         dc.metadata({serde.Name: lambda cls: cls._cls_name})
 
-        name: str = dc.field(check=lambda s: isinstance(s, str) and s)
+        id: els.Id = dc.field(check=lambda s: isinstance(s, els.Id) and s)
 
     CLS_MAP: ta.ClassVar[ta.Mapping[str, ta.Type['Connector']]] = weakref.WeakValueDictionary()
     CONFIG_CLS_MAP: ta.ClassVar[ta.Mapping[ta.Type[Config], ta.Type['Connector']]] = weakref.WeakValueDictionary()
@@ -133,15 +133,15 @@ class Connector(lang.Abstract, ta.Generic[ConnectorT, ConnectorConfigT]):
 
         self._config: ConnectorConfigT = check.isinstance(config, Connector.Config)
 
-    defs.repr('name')
+    defs.repr('id')
 
     @property
     def config(self) -> ConnectorConfigT:
         return self._config
 
     @property
-    def name(self) -> str:
-        return self._config.name
+    def id(self) -> els.Id:
+        return self._config.id
 
     def close(self) -> None:
         pass
@@ -226,7 +226,7 @@ class ConnectorSet(ta.Iterable[Connector]):
 
         self._ctors = [check.isinstance(e, Connector) for e in ctors]
 
-        self._ctors_by_name: ta.Mapping[str, Connector] = unique_dict((c.name, c) for c in self._ctors)
+        self._ctors_by_id: ta.Mapping[els.Id, Connector] = unique_dict((c.id, c) for c in self._ctors)
 
     @classmethod
     def of(cls, it: ta.Iterable[ta.Union[Connector, Connector.Config]]) -> 'ConnectorSet':
@@ -238,11 +238,11 @@ class ConnectorSet(ta.Iterable[Connector]):
     def __iter__(self) -> ta.Iterator[Connector]:
         return iter(self._ctors)
 
-    def __contains__(self, name: str) -> bool:
-        return check.isinstance(name, str) in self._ctors_by_name
+    def __contains__(self, id: els.Id) -> bool:
+        return check.isinstance(id, els.Id) in self._ctors_by_id
 
-    def __getitem__(self, name: str) -> Connector:
-        return self._ctors_by_name[check.isinstance(name, str)]
+    def __getitem__(self, id: els.Id) -> Connector:
+        return self._ctors_by_id[check.isinstance(id, els.Id)]
 
     def close(self) -> None:
         for ctor in self._ctors:
@@ -261,16 +261,16 @@ class ConnectionSet(ta.Iterable[Connection]):
     def __iter__(self) -> ta.Iterator[Connection]:
         return iter(self._conns_by_ctor.values())
 
-    def __contains__(self, name: str) -> bool:
-        check.isinstance(name, str)
+    def __contains__(self, id: els.Id) -> bool:
+        check.isinstance(id, els.Id)
         try:
-            ctor = self._ctors[name]
+            ctor = self._ctors[id]
         except KeyError:
             return False
         return ctor in self._conns_by_ctor
 
-    def __getitem__(self, name: str) -> Connection:
-        ctor = self._ctors[check.isinstance(name, str)]
+    def __getitem__(self, id: els.Id) -> Connection:
+        ctor = self._ctors[check.isinstance(id, els.Id)]
         try:
             return self._conns_by_ctor[ctor]
         except KeyError:

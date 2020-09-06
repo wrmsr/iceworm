@@ -6,6 +6,7 @@ from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
 
+from .. import elements as els
 from ... import datatypes as dt
 from ... import metadata as md
 from ...types import QualifiedName
@@ -32,7 +33,7 @@ class Table(lang.Abstract):
 class SystemConnector(Connector['SystemConnector', 'SystemConnector.Config']):
 
     class Config(Connector.Config):
-        name: str = dc.field('system', check=lambda s: isinstance(s, str) and s)
+        id: els.Id = dc.field('system', check=lambda s: isinstance(s, els.Id) and s)
 
     def __init__(self, config: Config = Config()) -> None:
         super().__init__(check.isinstance(config, SystemConnector.Config))
