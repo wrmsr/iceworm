@@ -16,7 +16,7 @@ class Target(els.Element, abstract=True):
 
 
 class Table(Target):
-    name: str = dc.field(None, check=els.name_check)
+    id: els.Id = dc.field(None, check=els.id_check)
     md: ta.Optional[md_.Table] = dc.field(None, check=lambda o: o is None or isinstance(o, md_.Table))
 
 
@@ -26,7 +26,7 @@ class Rows(Target):
 
 
 class Function(Target):
-    name: str = dc.field(None, check=els.name_check)
+    id: els.Id = dc.field(None, check=els.id_check)
 
 
 class Materialization(Target):

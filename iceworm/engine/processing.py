@@ -47,20 +47,20 @@ class InferTableProcessor(els.ElementProcessor):
 
         @properties.stateful_cached
         def output(self) -> els.ElementSet:
-            ele_tns = unique_dict((ele.name, ele) for ele in self._input.get_element_type_set(tars.Table))
+            ele_tns = unique_dict((ele.id, ele) for ele in self._input.get_element_type_set(tars.Table))
 
             ts = list(self._input)
             tn_deps = {}
             tn_idxs = {}
             for i, ele in enumerate(ts):
                 if isinstance(ele, tars.Table):
-                    tn_idxs[ele.name] = i
+                    tn_idxs[ele.id] = i
                     # TODO: get single Materialization, do.. something..
                     rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == ele)
                     root = par.parse_statement(rows.query)
                     deps = {n.name.name for n in ana.basic(root).get_node_type_set(no.Table) if n.name.name in ele_tns}
-                    check.not_in(ele.name, tn_deps)
-                    tn_deps[ele.name] = deps
+                    check.not_in(ele.id, tn_deps)
+                    tn_deps[ele.id] = deps
 
             given_tables: ta.Mapping[QualifiedName, md.Table] = {}
 
