@@ -32,3 +32,5 @@ class Function(Target):
 class Materialization(Target):
     table: els.Ref[Table] = dc.field(coerce=els.Ref.cls(Table).of)
     dst: QualifiedName = dc.field(coerce=QualifiedName.of)
+
+    # TODO: writeable: bool = dc.field(False, kwonly=True)
