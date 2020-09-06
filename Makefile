@@ -347,7 +347,7 @@ _docker-venv:
 
 .PHONY: docker-venv-38
 docker-venv-38:
-	./docker-dev make _docker-venv
+	./docker-dev make _docker-venv-38
 
 .PHONY: _docker-venv-38
 _docker-venv-38:
