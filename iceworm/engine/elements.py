@@ -1,6 +1,5 @@
 """
 TODO:
- - ** s/name/id/? **
  - 'project'? 'world'?
   - 'mount'-like 'grafts' of dirs with configs: mangling, templating, etc
  - sql files, directory structure, yamls, generators
@@ -79,15 +78,15 @@ from ..utils import serde
 T = ta.TypeVar('T"')
 ElementT = ta.TypeVar('ElementT', bound='Element')
 Self = ta.TypeVar('Self"')
-Name = str
+Id = str
 
 
-def name_check(obj: ta.Any) -> bool:
-    return isinstance(obj, str) and obj
+def id_check(obj: ta.Any) -> bool:
+    return isinstance(obj, Id) and obj
 
 
-def optional_name_check(obj: ta.Any) -> bool:
-    return obj is None or (isinstance(obj, str) and obj)
+def optional_id_check(obj: ta.Any) -> bool:
+    return obj is None or (isinstance(obj, Id) and obj)
 
 
 class Annotation(anns.Annotation, abstract=True):
@@ -117,12 +116,12 @@ class Element(dc.Enum, NodalDataclass['Element'], reorder=True):
         metadata={serde.Ignore: operator.not_},
     )
 
-    name: ta.Optional[str] = dc.field(None, check=optional_name_check, kwonly=True)
+    id: ta.Optional[Id] = dc.field(None, check=optional_id_check, kwonly=True)
 
     def __init_subclass__(cls, **kwargs) -> None:
         super().__init_subclass__(**kwargs)
-        nf = dc.fields_dict(cls)['name']
-        check.state(nf.type in (str, ta.Optional[str]))
+        nf = dc.fields_dict(cls)['id']
+        check.state(nf.type in (Id, ta.Optional[Id]))
 
 
 _REF_CLS_CACHE: ta.MutableMapping[type, ta.Type['Ref']] = weakref.WeakKeyDictionary()
@@ -130,26 +129,26 @@ _REF_CLS_CACHE: ta.MutableMapping[type, ta.Type['Ref']] = weakref.WeakKeyDiction
 
 @functools.total_ordering
 class Ref(dc.Frozen, ta.Generic[ElementT], repr=False, eq=False, order=False):
-    name: Name = dc.field(check=name_check)
+    id: Id = dc.field(check=id_check)
 
     ele_cls: ta.ClassVar[type]
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.name!r})'
+        return f'{self.__class__.__name__}({self.id!r})'
 
     __str__ = __repr__
 
     def __eq__(self, other: ta.Any) -> bool:
         if isinstance(other, self.ele_cls):
-            return self.name == other.name
+            return self.id == other.id
         elif type(other) is type(self):
-            return self.name == other.name
+            return self.id == other.id
         else:
             raise TypeError(other)
 
     def __lt__(self, other: ta.Any) -> bool:
         if type(other) is type(self):
-            return self.name < other.name
+            return self.id < other.id
         else:
             raise TypeError(other)
 
@@ -167,10 +166,10 @@ class Ref(dc.Frozen, ta.Generic[ElementT], repr=False, eq=False, order=False):
             _bind = cls
 
             def serialize(self, obj: Ref) -> ta.Any:
-                return check.isinstance(obj, cls).name
+                return check.isinstance(obj, cls).id
 
             def deserialize(self, ser: ta.Any) -> Ref:
-                return cls(check.isinstance(ser, Name))
+                return cls(check.isinstance(ser, Id))
 
     def __class_getitem__(cls, arg: type) -> type:
         check.isinstance(arg, type)
@@ -198,10 +197,10 @@ class Ref(dc.Frozen, ta.Generic[ElementT], repr=False, eq=False, order=False):
         return cls[arg]
 
     @classmethod
-    def of(cls: ta.Type[Self], obj: ta.Union['Ref', Name]) -> Self:
+    def of(cls: ta.Type[Self], obj: ta.Union['Ref', Id]) -> Self:
         if type(obj) is cls:
             return obj
-        elif isinstance(obj, Name):
+        elif isinstance(obj, Id):
             return cls(obj)
         else:
             raise TypeError(obj)
@@ -219,12 +218,12 @@ class ElementSet:
         self._elements = [check.isinstance(e, Element) for e in elements]
 
         self._element_set = ocol.IdentitySet(self._elements)
-        by_name: ta.Dict[Name, Element] = {}
+        by_id: ta.Dict[Id, Element] = {}
         for element in self._elements:
-            if element.name is not None:
-                check.not_in(element.name, by_name)
-                by_name[element.name] = element
-        self._elements_by_name: ta.Mapping[Name, Element] = by_name
+            if element.id is not None:
+                check.not_in(element.id, by_id)
+                by_id[element.id] = element
+        self._elements_by_id: ta.Mapping[Id, Element] = by_id
         self._element_sets_by_type: ta.Dict[type, ta.AbstractSet[Element]] = {}
 
     @classmethod
@@ -244,9 +243,9 @@ class ElementSet:
     def __iter__(self) -> ta.Iterator[Element]:
         return iter(self._elements)
 
-    def __contains__(self, key: ta.Union[Name, Element, type]) -> bool:
-        if isinstance(key, Name):
-            return key in self._elements_by_name
+    def __contains__(self, key: ta.Union[Id, Element, type]) -> bool:
+        if isinstance(key, Id):
+            return key in self._elements_by_id
         elif isinstance(key, Element):
             return key in self._element_set
         elif isinstance(key, type):
@@ -254,8 +253,8 @@ class ElementSet:
         else:
             raise TypeError(key)
 
-    def __getitem__(self, name: Name) -> Element:
-        return self._elements_by_name[check.isinstance(name, Name)]
+    def __getitem__(self, id: Id) -> Element:
+        return self._elements_by_id[check.isinstance(id, Id)]
 
 
 class ElementProcessor(lang.Abstract):

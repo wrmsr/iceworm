@@ -55,7 +55,8 @@ class InferTableProcessor(els.ElementProcessor):
             for i, ele in enumerate(ts):
                 if isinstance(ele, tars.Table):
                     tn_idxs[ele.name] = i
-                    rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == ele.name)
+                    # TODO: get single Materialization, do.. something..
+                    rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == ele)
                     root = par.parse_statement(rows.query)
                     deps = {n.name.name for n in ana.basic(root).get_node_type_set(no.Table) if n.name.name in ele_tns}
                     check.not_in(ele.name, tn_deps)
