@@ -1,4 +1,5 @@
 import contextlib
+import json
 
 from omnibus import check
 from omnibus import lang
@@ -68,7 +69,17 @@ def test_exec_multi():
             'a': 'select 1',
             'b': 'select 2',
         }
-
         stmt = sa.text(query).bindparams(*[sa.bindparam(k) for k in params])
-        ret = list(conn.execute(stmt, params))
-        print(ret)
+        row = json.loads(check.single(check.single(conn.execute(stmt, params))))
+        print(row)
+
+        query = f'call {schema}.exec_multi(parse_json(:a))'
+        params = {
+            'a': json.dumps([
+                'select 1',
+                'select 2',
+            ]),
+        }
+        stmt = sa.text(query).bindparams(*[sa.bindparam(k) for k in params])
+        row = json.loads(check.single(check.single(conn.execute(stmt, params))))
+        print(row)

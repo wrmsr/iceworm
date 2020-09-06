@@ -3,6 +3,7 @@ SHELL:=/bin/bash
 PROJECT:=iceworm
 
 PYTHON_VERSION:=3.7.8
+PYTHON_38_VERSION:=3.8.5
 
 PYENV_ROOT:=$(shell if [ -z "$${PYENV_ROOT}" ]; then echo "$${HOME}/.pyenv" ; else echo "$${PYENV_ROOT%/}" ; fi)
 PYENV_BIN:=$(shell if [ -f "$${HOME}/.pyenv/bin/pyenv" ] ; then echo "$${HOME}/.pyenv/bin/pyenv" ; else echo pyenv ; fi)
@@ -134,6 +135,13 @@ venv:
 		$(call do-deps,.venv,1) ; \
 	fi
 
+.PHONY: venv-38
+venv-38:
+	if [ ! -d .venv-38 ] ; then \
+		$(call do-venv,.venv-38,$(PYTHON_38_VERSION)) ; \
+		$(call do-deps,.venv-38,1) ; \
+	fi
+
 .PHONY: venv-inst
 venv-inst:
 	if [ ! -d .venv-inst ] ; then \
@@ -214,6 +222,10 @@ endef
 build: venv
 	$(call do-build,.venv)
 
+.PHONY: build-38
+build-38: venv-38 gen
+	$(call do-build,.venv-38)
+
 
 ### Check
 
@@ -232,6 +244,10 @@ typecheck: venv
 test: build
 	.venv/bin/pytest -v $(PROJECT)
 
+.PHONY: test-38
+test-38: build-38
+	.venv-38/bin/pytest -v -n auto $(PROJECT)
+
 .PHONY: test-parallel
 test-parallel: build
 	.venv/bin/pytest -v -n auto $(PROJECT)
@@ -246,6 +262,10 @@ test-verbose: build
 .PHONY: deps
 deps: venv
 	$(call do-deps,.venv,1)
+
+.PHONY: deps-38
+deps-38: venv-38
+	$(call do-deps,.venv-38,$(REQUIREMENTS_TXT))
 
 .PHONY: dep-freze
 dep-freeze: venv
@@ -301,6 +321,10 @@ endef
 dist: venv
 	$(call do-dist,.venv,0)
 
+.PHONY: dist-38
+dist-38: venv-38
+	$(call do-dist,.venv-38,0)
+
 
 ### Docker
 
@@ -319,6 +343,17 @@ _docker-venv:
 	if [ ! -d .venv-docker ] ; then \
 		$(call do-venv,.venv-docker,$(PYTHON_VERSION)) ; \
 		$(call do-deps,.venv-docker,1) ; \
+	fi
+
+.PHONY: docker-venv-38
+docker-venv-38:
+	./docker-dev make _docker-venv
+
+.PHONY: _docker-venv-38
+_docker-venv-38:
+	if [ ! -d .venv-docker-38 ] ; then \
+		$(call do-venv,.venv-docker-38,$(PYTHON_38_VERSION)) ; \
+		$(call do-deps,.venv-docker-38,1) ; \
 	fi
 
 .PHONY: docker-venv-inst
@@ -348,9 +383,21 @@ docker-build: docker-venv
 _docker-build: _docker-venv
 	$(call do-build,.venv-docker)
 
+.PHONY: docker-build-38
+docker-build-38: docker-venv-38
+	./docker-dev make _docker-build-38
+
+.PHONY: _docker-build-38
+_docker-build-38: _docker-venv-38
+	$(call do-build,.venv-docker-38)
+
 .PHONY: docker-test
 docker-test: docker-build
 	./docker-dev .venv-docker/bin/pytest -v $(PROJECT)
+
+.PHONY: docker-test-38
+docker-test-38: docker-build-38
+	./docker-dev .venv-docker-38/bin/pytest -v $(PROJECT)
 
 .PHONY: docker-dist
 docker-dist: docker-venv
