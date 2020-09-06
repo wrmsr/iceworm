@@ -17,7 +17,6 @@ from omnibus import collections as ocol
 from omnibus import lang
 
 from .base import Element
-from .base import Id
 from .collections import ElementSet
 
 
@@ -39,7 +38,7 @@ class SubPhase(lang.AutoEnum):
 class ElementProcessor(lang.Abstract):
 
     @abc.abstractmethod
-    def processes(self, elements: ElementSet) -> ta.AbstractSet[Id]:
+    def processes(self, elements: ElementSet) -> ta.Iterable[Element]:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -67,14 +66,19 @@ class ElementProcessingDriver:
 
     def process(self, elements: ta.Iterable[Element]) -> ElementSet:
         elements = ElementSet.of(elements)
+
         while True:
-            dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Id]] = ocol.IdentityKeyDict()
+            dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Element]] = ocol.IdentityKeyDict()
             for ep in self._processors:
-                epids = ep.processes(elements)
-                if epids:
-                    dct[ep] = epids
+                epes = ocol.IdentitySet(check.isinstance(e, Element) for e in ep.processes(elements))
+                if epes:
+                    dct[ep] = epes
             if not dct:
                 break
+
             cur = next(iter(dct.keys()))
-            elements = ElementSet.of(cur.process(elements))
+            res = ElementSet.of(cur.process(elements))
+            # TODO: check
+            elements = res
+
         return elements

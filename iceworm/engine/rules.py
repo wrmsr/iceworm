@@ -89,8 +89,8 @@ class RuleElementProcessor(els.ElementProcessor, ta.Generic[RuleT]):
 
         self._proc = check.isinstance(proc, RuleProcessor)
 
-    def processes(self, elements: els.ElementSet) -> ta.AbstractSet[els.Id]:
-        return {t.id for t in elements.get_element_type_set(self._proc.rule_cls)}
+    def processes(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
+        return [t for t in elements.get_element_type_set(self._proc.rule_cls)]
 
     def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
         lst = []
