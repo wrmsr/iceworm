@@ -81,7 +81,31 @@ class Serde(lang.Abstract, ta.Generic[T]):
         raise NotImplementedError
 
 
-_SERDES_BY_CLS: ta.MutableMapping[type, Serde] = weakref.WeakKeyDictionary()
+class _DataclassFieldSerde(dc.Pure):
+    cls: ta.Any
+    ignore_if: ta.Optional[ta.Callable[[ta.Any], bool]] = dc.field(None, kwonly=True)
+
+
+SubclassMap = ta.Mapping[ta.Union[str, type], ta.Union[type, str]]  # FIXME: gross
+
+
+_DataclassFieldSerdeMap = ta.Mapping[str, _DataclassFieldSerde]
+
+
+class _SerdeState(dc.Pure):
+
+    serdes_by_cls: ta.MutableMapping[type, Serde] = dc.field(default_factory=weakref.WeakKeyDictionary)
+
+    subclass_map_resolvers_by_cls: ta.MutableMapping[type, ta.Callable[[type], SubclassMap]] = dc.field(default_factory=weakref.WeakKeyDictionary)  # noqa
+
+    subclass_maps_by_cls: ta.MutableMapping[type, SubclassMap] = dc.field(default_factory=weakref.WeakKeyDictionary)
+
+    is_monomorphic_dataclass_by_cls: ta.MutableMapping[type, bool] = dc.field(default_factory=weakref.WeakKeyDictionary)
+
+    field_type_maps_by_dataclass: ta.MutableMapping[type, _DataclassFieldSerdeMap] = dc.field(default_factory=weakref.WeakKeyDictionary)  # noqa
+
+
+_STATE = _SerdeState()
 
 
 def serde_for(*clss):
@@ -92,8 +116,8 @@ def serde_for(*clss):
             sd = obj
         check.isinstance(sd, Serde)
         for c in clss:
-            check.not_in(c, _SERDES_BY_CLS)
-            _SERDES_BY_CLS[c] = sd
+            check.not_in(c, _STATE.serdes_by_cls)
+            _STATE.serdes_by_cls[c] = sd
         return obj
     check.arg(all(isinstance(c, type) for c in clss))
     return inner
@@ -109,18 +133,12 @@ class AutoSerde(Serde[T], lang.Abstract):
         serde_for(ty)(cls)
 
 
-SubclassMap = ta.Mapping[ta.Union[str, type], ta.Union[type, str]]  # FIXME: gross
-_SUBCLASS_MAP_RESOLVERS_BY_CLS: ta.MutableMapping[type, ta.Callable[[type], SubclassMap]] = weakref.WeakKeyDictionary()
-
-_SUBCLASS_MAPS_BY_CLS: ta.MutableMapping[type, SubclassMap] = weakref.WeakKeyDictionary()
-
-
 def subclass_map_resolver_for(*clss):
     def inner(fn):
         check.callable(fn)
         for c in clss:
-            check.not_in(c, _SUBCLASS_MAP_RESOLVERS_BY_CLS)
-            _SUBCLASS_MAP_RESOLVERS_BY_CLS[c] = fn
+            check.not_in(c, _STATE.subclass_map_resolvers_by_cls)
+            _STATE.subclass_map_resolvers_by_cls[c] = fn
         return fn
     check.arg(all(isinstance(c, type) for c in clss))
     return inner
@@ -171,46 +189,34 @@ def get_subclass_map(cls: type) -> SubclassMap:
     if not isinstance(cls, type):
         raise TypeError(cls)
     try:
-        return _SUBCLASS_MAPS_BY_CLS[cls]
+        return _STATE.subclass_maps_by_cls[cls]
     except KeyError:
         try:
-            bld = _SUBCLASS_MAP_RESOLVERS_BY_CLS[cls]
+            bld = _STATE.subclass_map_resolvers_by_cls[cls]
         except KeyError:
             bld = build_subclass_map
-        dct = _SUBCLASS_MAPS_BY_CLS[cls] = bld(cls)
+        dct = _STATE.subclass_maps_by_cls[cls] = bld(cls)
         return dct
-
-
-_IS_MONOMORPHIC_DATACLASS_BY_CLS: ta.MutableMapping[type, bool] = weakref.WeakKeyDictionary()
 
 
 def _is_monomorphic_dataclass(cls: type) -> bool:
     try:
-        return _IS_MONOMORPHIC_DATACLASS_BY_CLS[cls]
+        return _STATE.is_monomorphic_dataclass_by_cls[cls]
     except KeyError:
         scm = get_subclass_map(cls)
         scmcls = {k: v for k, v in scm.items() if isinstance(k, type)}
         ret = False
         if len(scmcls) == 1 and list(scmcls) == [cls] and lang.Final in cls.__bases__:
             ret = True
-        _IS_MONOMORPHIC_DATACLASS_BY_CLS[cls] = ret
+        _STATE.is_monomorphic_dataclass_by_cls[cls] = ret
         return ret
-
-
-class _DataclassFieldSerde(dc.Pure):
-    cls: ta.Any
-    ignore_if: ta.Optional[ta.Callable[[ta.Any], bool]] = dc.field(None, kwonly=True)
-
-
-_DataclassFieldSerdeMap = ta.Mapping[str, _DataclassFieldSerde]
-_FIELD_TYPE_MAPS_BY_DATACLASS: ta.MutableMapping[type, _DataclassFieldSerdeMap] = weakref.WeakKeyDictionary()
 
 
 def _get_dataclass_field_type_map(dcls: type) -> _DataclassFieldSerdeMap:
     if not isinstance(dcls, type) or not dc.is_dataclass(dcls):
         raise TypeError(dcls)
     try:
-        return _FIELD_TYPE_MAPS_BY_DATACLASS[dcls]
+        return _STATE.field_type_maps_by_dataclass[dcls]
     except KeyError:
         th = ta.get_type_hints(dcls)
         dct = {}
@@ -229,7 +235,7 @@ def _get_dataclass_field_type_map(dcls: type) -> _DataclassFieldSerdeMap:
             else:
                 fcls = th[f.name]
             dct[f.name] = _DataclassFieldSerde(fcls, ignore_if=ignore_if)
-        _FIELD_TYPE_MAPS_BY_DATACLASS[dcls] = dct
+        _STATE.field_type_maps_by_dataclass[dcls] = dct
         return dct
 
 
@@ -254,8 +260,8 @@ def serialize(obj: T, *, fcls: ta.Optional[ta.Type] = None) -> Serialized:
             raise TypeError(fcls)
         [fcls] = [a for a in args if a not in (None, type(None))]
 
-    if type(obj) in _SERDES_BY_CLS:
-        serde = _SERDES_BY_CLS[type(obj)]
+    if type(obj) in _STATE.serdes_by_cls:
+        serde = _STATE.serdes_by_cls[type(obj)]
         return serde.serialize(obj)
 
     elif dc.is_dataclass(obj):
@@ -316,8 +322,8 @@ def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) ->
             return None
         cls = ecls
 
-    if isinstance(cls, type) and cls in _SERDES_BY_CLS:
-        serde = _SERDES_BY_CLS[cls]
+    if isinstance(cls, type) and cls in _STATE.serdes_by_cls:
+        serde = _STATE.serdes_by_cls[cls]
         return serde.deserialize(ser)
 
     elif rfl.is_generic(cls) and cls.__origin__ is collections.abc.Mapping:
