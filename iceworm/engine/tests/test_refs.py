@@ -4,6 +4,7 @@ import weakref
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
+import pytest
 
 
 T = ta.TypeVar('T')
@@ -13,7 +14,7 @@ _REF_CLS_CACHE: ta.MutableMapping[type, ta.Type['Ref']] = weakref.WeakKeyDiction
 
 
 class Ref(dc.Frozen, ta.Generic[T]):
-    obj: T
+    name: str
 
     ref_cls: ta.ClassVar[type]
 
@@ -54,5 +55,8 @@ class Thing(dc.Pure):
 
 
 def test_ref():
-    thing = Thing(Ref[int](420))
-    assert thing.ref.obj == 420
+    thing = Thing(Ref[int]('hi'))
+    assert thing.ref.name == 'hi'
+
+    with pytest.raises(dc.CheckException):
+        thing = Thing(Ref[str]('hi'))  # noqa
