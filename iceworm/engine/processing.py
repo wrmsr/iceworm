@@ -48,7 +48,7 @@ class InferTableProcessor(els.ElementProcessor):
         @properties.stateful_cached
         def output(self) -> els.ElementSet:
             ele_tns = unique_dict(
-                (ele.dst, self._input[ele.table]) for ele in self._input.get_element_type_set(tars.Materialization))
+                (ele.dst, self._input[ele.table]) for ele in self._input.get_type_set(tars.Materialization))
             tele_ids = unique_dict((ele.id, qn) for qn, ele in ele_tns.items())
 
             ts = els.ElementSet(self._input)
@@ -58,7 +58,7 @@ class InferTableProcessor(els.ElementProcessor):
                 if isinstance(ele, tars.Table):
                     tn_idxs[ele.id] = i
                     # TODO: get single Materialization, do.. something..
-                    rows = check.single(rt for rt in ts.get_element_type_set(tars.Rows) if rt.table == ele)
+                    rows = check.single(rt for rt in ts.get_type_set(tars.Rows) if rt.table == ele)
                     root = par.parse_statement(rows.query)
                     deps = {
                         ele_tns[n.name.name].id
@@ -75,7 +75,7 @@ class InferTableProcessor(els.ElementProcessor):
                 for tn in sup:
                     ele: tars.Table = self._input[tn]
                     if ele.md is None:
-                        rows = check.single(rt for rt in self._input.get_element_type_set(tars.Rows) if rt.table == ele)
+                        rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
                         mdt = self.infer_table(rows.query, given_tables)
                         qn = tele_ids[ele.id]
                         mdt = dc.replace(mdt, name=qn)
@@ -150,7 +150,7 @@ class InferTableProcessor(els.ElementProcessor):
             )
 
     def processes(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
-        return [t for t in elements.get_element_type_set(tars.Table) if t.md is None]
+        return [t for t in elements.get_type_set(tars.Table) if t.md is None]
 
     def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
         return self.Instance(self, elements).output

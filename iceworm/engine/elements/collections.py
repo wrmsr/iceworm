@@ -19,14 +19,22 @@ class ElementSet(ta.Generic[ElementT]):
 
         self._elements = [check.isinstance(e, Element) for e in elements]
 
-        self._element_set = ocol.IdentitySet(self._elements)
+        ele_set = ocol.IdentitySet()
         by_id: ta.Dict[Id, ElementT] = {}
-        for element in self._elements:
-            if element.id is not None:
-                check.not_in(element.id, by_id)
-                by_id[element.id] = element
-        self._elements_by_id: ta.Mapping[Id, ElementT] = by_id
-        self._element_sets_by_type: ta.Dict[type, ta.AbstractSet[ElementT]] = {}
+        for ele in self._elements:
+            check.not_in(ele, ele_set)
+            if ele.id is not None:
+                check.not_in(ele.id, by_id)
+                by_id[ele.id] = ele
+            ele_set.add(ele)
+        self._by_id: ta.Mapping[Id, ElementT] = by_id
+        self._set = ele_set
+
+        self._sets_by_type: ta.Dict[type, ta.AbstractSet[ElementT]] = {}
+
+    @property
+    def set(self) -> ta.AbstractSet[Element]:
+        return self._set
 
     @classmethod
     def of(cls, it: ta.Iterable[ElementT]) -> 'ElementSet[ElementT]':
@@ -35,11 +43,11 @@ class ElementSet(ta.Generic[ElementT]):
         else:
             return cls(it)
 
-    def get_element_type_set(self, ty: ta.Type[T]) -> ta.AbstractSet[T]:
+    def get_type_set(self, ty: ta.Type[T]) -> ta.AbstractSet[T]:
         try:
-            return self._element_sets_by_type[ty]
+            return self._sets_by_type[ty]
         except KeyError:
-            ret = self._element_sets_by_type[ty] = ocol.IdentitySet(n for n in self._elements if isinstance(n, ty))
+            ret = self._sets_by_type[ty] = ocol.IdentitySet(n for n in self._elements if isinstance(n, ty))
             return ret
 
     def __iter__(self) -> ta.Iterator[ElementT]:
@@ -47,21 +55,21 @@ class ElementSet(ta.Generic[ElementT]):
 
     def __contains__(self, key: ta.Union[Id, ElementT, type]) -> bool:
         if isinstance(key, Id):
-            return key in self._elements_by_id
+            return key in self._by_id
         elif isinstance(key, Element):
-            return key in self._element_set
+            return key in self._set
         elif isinstance(key, type):
-            return bool(self.get_element_type_set(key))
+            return bool(self.get_type_set(key))
         else:
             raise TypeError(key)
 
     def __getitem__(self, key: ta.Union[Ref, Id]) -> ElementT:
         if isinstance(key, Ref):
-            ele = self._elements_by_id[key.id]
+            ele = self._by_id[key.id]
             if not isinstance(ele, key.ele_cls):
                 raise TypeError(ele, key)
             return ele
         elif isinstance(key, Id):
-            return self._elements_by_id[key]
+            return self._by_id[key]
         else:
             raise TypeError(key)

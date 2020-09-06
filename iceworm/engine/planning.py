@@ -35,7 +35,7 @@ class ElementPlanner:
         plan = []
 
         tbl_qn_sets_by_id = {}
-        for mat in self._elements.get_element_type_set(tars.Materialization):
+        for mat in self._elements.get_type_set(tars.Materialization):
             tbl_qn_sets_by_id.setdefault(mat.table.id, set()).add(mat.dst)
 
         for ele in self._elements:
