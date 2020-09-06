@@ -111,6 +111,18 @@
             </dependency>
 
             <dependency>
+                <groupId>org.sonatype.aether</groupId>
+                <artifactId>aether-api</artifactId>
+                <version>1.13.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift.resolver</groupId>
+                <artifactId>resolver</artifactId>
+                <version>1.6</version>
+            </dependency>
+
+            <dependency>
                 <groupId>io.burt</groupId>
                 <artifactId>jmespath-core</artifactId>
                 <version>0.5.0</version>
