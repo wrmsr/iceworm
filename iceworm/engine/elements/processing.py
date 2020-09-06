@@ -23,7 +23,7 @@ from .collections import ElementSet
 
 
 class ProcessedBy(dc.Pure):
-    processors: ta.AbstractSet['ElementProcessor']
+    processors: ta.AbstractSet['ElementProcessor'] = dc.field(check=lambda o: isinstance(o, ocol.IdentitySet))
 
 
 class Phase(lang.AutoEnum):
@@ -85,9 +85,26 @@ class ElementProcessingDriver:
             cur, cures = next(iter(dct.items()))
             expected = [e for e in elements if e not in cures]
             res = ElementSet.of(cur.process(elements))
+
             missing = [e for e in expected if e not in res]
             if missing:
                 raise ValueError(missing)
+
+            swaps: ta.MutableMapping[Element, Element] = ocol.IdentityKeyDict()
+
+            added = [e for e in res if e not in elements]
+            removed = [e for e in elements if e not in res]  # noqa
+            for e in added:
+                pbs = e.meta.get(ProcessedBy)
+                if pbs is not None:
+                    check.state(check.single(pbs) is cur)
+                    continue
+                swaps[e] = dc.replace(e, meta={**e.meta, ProcessedBy: ocol.IdentitySet([cur])})
+            # TODO: tag matched but unmodified?
+
+            if swaps:
+                res = ElementSet.of(swaps.get(e, e) for e in res)
+
             elements = res
 
         return elements

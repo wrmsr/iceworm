@@ -1,3 +1,9 @@
+"""
+TODO:
+ - ElementSet/ElementSetImpl/ElementSetView? for only showing EP's unprocessed els?
+ - debug mode and make ESet props lazy / eager iff debug?
+  - auto-rerun with dbg on fail?
+"""
 import typing as ta
 
 from omnibus import check

@@ -1,6 +1,6 @@
 """
 TODO:
- - class Id? like Ref? comparison validity via issubclass?
+ - class Id? like Ref? comparison validity via issubclass? or, due to cyclic def, just refuses to cmp vs str?
  - 'project'? 'world'?
   - 'mount'-like 'grafts' of dirs with configs: mangling, templating, etc
  - sql files, directory structure, yamls, generators
