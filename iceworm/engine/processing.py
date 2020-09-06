@@ -142,7 +142,7 @@ class InferTableProcessor(els.ElementProcessor):
             )
 
     def matches(self, elements: els.ElementSet) -> bool:
-        return any(isinstance(t, els.Table) and t.md is None for t in elements)
+        return any(isinstance(t, tars.Table) and t.md is None for t in elements)
 
     def process(self, elements: els.ElementSet) -> els.ElementSet:
         return self.Instance(self, elements).output
