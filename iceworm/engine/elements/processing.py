@@ -9,6 +9,7 @@ TODO:
   - max iterations?
   - 'aspect_id' tagging equiv - 'ProcessedBy' attribute?
  - ProcessedBy allowed to be updated but only for self, added if not
+ - RULES phase - keep? serde already bound lol, can't load any dynamic rule types yet.. *yet*.. nuke serde ctx?
 """
 import abc
 import typing as ta
