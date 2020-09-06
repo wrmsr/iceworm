@@ -10,10 +10,11 @@ TODO:
 from omnibus import dataclasses as dc
 from omnibus import lang
 
+from . import elements as els
+from . import targets as tars
 from .. import domains as doms
 from ..types import QualifiedName
 from ..utils import cron
-from .elements import Element
 
 
 class InvalidatorTrigger(dc.Enum):
@@ -26,8 +27,8 @@ class InvalidatorTriggers(lang.Namespace):
         spec: cron.Spec = dc.field(coerce=cron.Spec.of)
 
 
-class Invalidator(Element):
-    table: QualifiedName
+class Invalidator(els.Element):
+    target: els.Ref[tars.Target]
     trigger: InvalidatorTrigger
 
 

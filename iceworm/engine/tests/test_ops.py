@@ -12,7 +12,7 @@ import typing as ta  # noqa
 from omnibus import check  # noqa
 from omnibus import dataclasses as dc  # noqa
 from omnibus import inject as inj  # noqa
-import pytest
+import pytest  # noqa
 import yaml
 
 from .. import connectors as ctrs
@@ -78,27 +78,31 @@ CONNECTORS_SER.extend([
 ELEMENTS_YML = """
 
 - table_as_select:
-    name: [pg, a]
+    table: [pg, a]
     query: "select * from csv.a"
 
 - table_as_select:
-    name: [pg, b]
+    table: [pg, b]
     query: "select * from csv.b"
 
 - table_as_select:
-    name: [pg, c]
+    table: [pg, c]
     query: "select * from pg.b"
 
 - table_as_select:
-    name: [pg, nums]
+    table: [pg, nums]
     query: "select * from cmp.nums"
 
+- materialization:
+    table: system/notification
+    dst: [system, notifications]
+
 - rows:
-    table: [system, notifications]
+    table: system/notifications
     query: "select 'hi' as message"
 
 - invalidator:
-    table: [pg, a]
+    target: pg/a
     trigger:
       scheduled:
         spec: '0 1 * * *'
@@ -116,7 +120,7 @@ def get_src_table_domain(query: str, src: QualifiedName, dom: doms.Domain) -> do
     raise NotImplementedError
 
 
-@pytest.mark.xfail()
+# @pytest.mark.xfail()
 def test_ops(pg_engine):  # noqa
     # binder = inj.create_binder()
     # binder.bind(CONNECTORS)

@@ -296,10 +296,12 @@ def deserialize_dataclass(ser: Serialized, cls: type, *, succinct: bool = False)
         try:
             fs = fdct[k]
         except KeyError:
-            breakpoint()
             raise
         kw[k] = deserialize(v, fs.cls, succinct=True)
-    return dcls(**kw)
+    try:
+        return dcls(**kw)
+    except Exception as e:  # noqa
+        raise
 
 
 def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) -> T:

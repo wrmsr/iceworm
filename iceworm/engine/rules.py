@@ -106,7 +106,7 @@ class RuleElementProcessor(els.ElementProcessor, ta.Generic[RuleT]):
 
 
 class TableAsSelect(Rule):
-    name: QualifiedName = dc.field(coerce=QualifiedName.of)
+    table: QualifiedName = dc.field(coerce=QualifiedName.of)
     query: str = dc.field(check=lambda o: isinstance(o, str))
 
     md: ta.Optional[md_.Table] = dc.field(None, check=lambda o: o is None or isinstance(o, md_.Table), kwonly=True)
@@ -116,7 +116,10 @@ class TableAsSelectProcessor(RuleProcessor[TableAsSelect]):
     rule_cls = TableAsSelect
 
     def process(self, rule: TableAsSelect) -> ta.Iterable[els.Element]:
+        cn, tn = rule.table
+        ten = cn + '/' + tn
         return [
-            tars.Table(rule.name, md=rule.md),
-            tars.Rows(rule.name, rule.query),
+            tars.Table(ten, md=rule.md),
+            tars.Materialization(ten, rule.table),
+            tars.Rows(ten, rule.query),
         ]

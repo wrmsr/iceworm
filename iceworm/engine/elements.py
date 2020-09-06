@@ -1,5 +1,6 @@
 """
 TODO:
+ - ** s/name/id/? **
  - 'project'? 'world'?
   - 'mount'-like 'grafts' of dirs with configs: mangling, templating, etc
  - sql files, directory structure, yamls, generators
@@ -69,7 +70,6 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import lang
 
-from ..types import QualifiedName
 from ..utils.nodal import NodalDataclass
 from ..utils import annotations as anns
 from ..utils import serde
@@ -78,6 +78,15 @@ from ..utils import serde
 T = ta.TypeVar('T"')
 ElementT = ta.TypeVar('ElementT', bound='Element')
 Self = ta.TypeVar('Self"')
+Name = str
+
+
+def name_check(obj: ta.Any) -> bool:
+    return isinstance(obj, str) and obj
+
+
+def optional_name_check(obj: ta.Any) -> bool:
+    return obj is None or (isinstance(obj, str) and obj)
 
 
 class Annotation(anns.Annotation, abstract=True):
@@ -107,21 +116,24 @@ class Element(dc.Enum, NodalDataclass['Element'], reorder=True):
         metadata={serde.Ignore: operator.not_},
     )
 
-    @property
-    def name(self) -> ta.Optional[QualifiedName]:
-        return None
+    name: ta.Optional[str] = dc.field(None, check=optional_name_check, kwonly=True)
+
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+        nf = dc.fields_dict(cls)['name']
+        check.state(nf.type in (str, ta.Optional[str]))
 
 
 _REF_CLS_CACHE: ta.MutableMapping[type, ta.Type['Ref']] = weakref.WeakKeyDictionary()
 
 
 class Ref(dc.Frozen, ta.Generic[ElementT], repr=False):
-    name: QualifiedName = dc.field(coerce=QualifiedName.of)
+    name: Name = dc.field(check=name_check)
 
     ele_cls: ta.ClassVar[type]
 
     def __repr__(self) -> str:
-        return '%s([%s])' % (self.__class__.__name__, ', '.join(map(repr, self.name.parts)),)
+        return f'{self.__class__.__name__}({self.name!r}'
 
     __str__ = __repr__
 
@@ -139,10 +151,10 @@ class Ref(dc.Frozen, ta.Generic[ElementT], repr=False):
             _bind = cls
 
             def serialize(self, obj: Ref) -> ta.Any:
-                return check.isinstance(obj, cls).name.parts
+                return check.isinstance(obj, cls).name
 
             def deserialize(self, ser: ta.Any) -> Ref:
-                return cls(QualifiedName.of(ser))
+                return cls(check.isinstance(ser, Name))
 
     def __class_getitem__(cls, arg: type) -> type:
         check.isinstance(arg, type)
@@ -164,15 +176,17 @@ class Ref(dc.Frozen, ta.Generic[ElementT], repr=False):
         return ret
 
     @classmethod
-    def cls(cls, arg: type) -> type:
+    def cls(cls: ta.Type[Self], arg: type) -> ta.Type[Self]:
         return cls[arg]
 
     @classmethod
-    def of(cls: ta.Type[Self], obj: ta.Union['Ref', QualifiedName, ta.Iterable[str]]) -> Self:
+    def of(cls: ta.Type[Self], obj: ta.Union['Ref', Name]) -> Self:
         if type(obj) is cls:
             return obj
+        elif isinstance(obj, Name):
+            return cls(obj)
         else:
-            return cls(QualifiedName.of(obj))
+            raise TypeError(obj)
 
 
 class Origin(Annotation):
@@ -187,12 +201,12 @@ class ElementSet:
         self._elements = [check.isinstance(e, Element) for e in elements]
 
         self._element_set = ocol.IdentitySet(self._elements)
-        by_name = ocol.IdentityKeyDict()
+        by_name: ta.Dict[Name, Element] = {}
         for element in self._elements:
             if element.name is not None:
                 check.not_in(element.name, by_name)
                 by_name[element.name] = element
-        self._elements_by_name: ta.Mapping[QualifiedName, Element] = by_name
+        self._elements_by_name: ta.Mapping[Name, Element] = by_name
         self._element_sets_by_type: ta.Dict[type, ta.AbstractSet[Element]] = {}
 
     @classmethod
@@ -212,8 +226,8 @@ class ElementSet:
     def __iter__(self) -> ta.Iterator[Element]:
         return iter(self._elements)
 
-    def __contains__(self, key: ta.Union[QualifiedName, Element, type]) -> bool:
-        if isinstance(key, QualifiedName):
+    def __contains__(self, key: ta.Union[Name, Element, type]) -> bool:
+        if isinstance(key, Name):
             return key in self._elements_by_name
         elif isinstance(key, Element):
             return key in self._element_set
@@ -222,8 +236,8 @@ class ElementSet:
         else:
             raise TypeError(key)
 
-    def __getitem__(self, name: QualifiedName) -> Element:
-        return self._elements_by_name[check.isinstance(name, QualifiedName)]
+    def __getitem__(self, name: Name) -> Element:
+        return self._elements_by_name[check.isinstance(name, Name)]
 
 
 class ElementProcessor(lang.Abstract):
