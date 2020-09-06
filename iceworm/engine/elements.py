@@ -68,7 +68,6 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import lang
 
-from .. import metadata as md_
 from ..types import QualifiedName
 from ..utils.nodal import NodalDataclass
 from ..utils import annotations as anns
@@ -118,24 +117,6 @@ class ElementRef(dc.Pure, ta.Generic[ElementT]):
 
 class Origin(Annotation):
     element: Element
-
-
-class Table(Element):
-    name: QualifiedName = dc.field(coerce=QualifiedName.of)
-    md: ta.Optional[md_.Table] = dc.field(None, check=lambda o: o is None or isinstance(o, md_.Table))
-
-    dc.check(lambda name, md: md is None or name == md.name)
-
-
-class Rows(Element):
-    table: QualifiedName = dc.field(coerce=QualifiedName.of)
-    query: str = dc.field(check=lambda o: isinstance(o, str))
-
-    name: ta.Optional[QualifiedName] = dc.field(None, coerce=QualifiedName.of_optional, kwonly=True)
-
-
-class Function(Element):
-    name: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
 class Rule(Element, abstract=True):

@@ -56,6 +56,7 @@ import typing as ta
 from omnibus import dataclasses as dc
 
 from . import elements as els
+from . import targets as tars
 from .. import metadata as md_
 from ..types import QualifiedName
 
@@ -72,6 +73,6 @@ class TableAsSelectProcessor(els.RuleProcessor[TableAsSelect]):
 
     def process(self, rule: TableAsSelect) -> ta.Iterable[els.Element]:
         return [
-            els.Table(rule.name, md=rule.md),
-            els.Rows(rule.name, rule.query),
+            tars.Table(rule.name, md=rule.md),
+            tars.Rows(rule.name, rule.query),
         ]

@@ -12,6 +12,7 @@ from omnibus import properties
 
 from . import connectors as ctrs
 from . import elements as els
+from . import targets as tars
 from .. import datatypes as dt
 from .. import metadata as md
 from ..trees import analysis as ana
@@ -46,15 +47,15 @@ class InferTableProcessor(els.ElementProcessor):
 
         @properties.cached
         def output(self) -> els.ElementSet:
-            ele_tns = unique_dict((ele.name, ele) for ele in self._input.get_element_type_set(els.Table))
+            ele_tns = unique_dict((ele.name, ele) for ele in self._input.get_element_type_set(tars.Table))
 
             ts = list(self._input)
             tn_deps = {}
             tn_idxs = {}
             for i, ele in enumerate(ts):
-                if isinstance(ele, els.Table):
+                if isinstance(ele, tars.Table):
                     tn_idxs[ele.name] = i
-                    rows = check.single(rt for rt in ts if isinstance(rt, els.Rows) and rt.table == ele.name)
+                    rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == ele.name)
                     root = par.parse_statement(rows.query)
                     deps = {n.name.name for n in ana.basic(root).get_node_type_set(no.Table) if n.name.name in ele_tns}
                     check.not_in(ele.name, tn_deps)
@@ -67,7 +68,7 @@ class InferTableProcessor(els.ElementProcessor):
                 for tn in sup:
                     ele = ele_tns[tn]
                     if ele.md is None:
-                        rows = check.single(rt for rt in ts if isinstance(rt, els.Rows) and rt.table == ele.name)
+                        rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == ele.name)
                         mdt = self.infer_table(rows.query, given_tables)
                         mdt = dc.replace(mdt, name=ele.name)
                         i = tn_idxs[ele.name]

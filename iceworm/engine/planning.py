@@ -4,8 +4,9 @@ from omnibus import check
 from omnibus import dataclasses as dc
 
 from . import connectors as ctrs
-from . import ops
 from . import elements as els
+from . import ops
+from . import targets as tars
 from .. import metadata as md
 from ..types import QualifiedName
 
@@ -35,7 +36,7 @@ class ElementPlanner:
         plan = []
 
         for ele in self._elements:
-            if isinstance(ele, els.Table):
+            if isinstance(ele, tars.Table):
                 if ele.name in invalidated_tables:
                     mdt = check.isinstance(ele.md, md.Table)
                     plan.extend([
@@ -43,7 +44,7 @@ class ElementPlanner:
                         ops.CreateTable(dc.replace(mdt, name=ele.name)),
                     ])
 
-            elif isinstance(ele, els.Rows):
+            elif isinstance(ele, tars.Rows):
                 if ele.table in invalidated_tables:
                     plan.append(ops.InsertIntoSelect(ele.table, ele.query))
 
