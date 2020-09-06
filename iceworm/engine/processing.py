@@ -45,7 +45,7 @@ class InferTableProcessor(els.ElementProcessor):
             self._owner = check.isinstance(owner, InferTableProcessor)
             self._input = check.isinstance(input, els.ElementSet)
 
-        @properties.cached
+        @properties.stateful_cached
         def output(self) -> els.ElementSet:
             ele_tns = unique_dict((ele.name, ele) for ele in self._input.get_element_type_set(tars.Table))
 

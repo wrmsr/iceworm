@@ -6,17 +6,28 @@ from ...utils import serde
 
 
 def test_refs():
-    r = els.Ref[tars.Table](['hi'])
-    assert repr(r) == "Ref[Table](['hi'])"
+    r = els.Ref[tars.Table]('hi')
+    assert repr(r) == "Ref[Table]('hi')"
+
+    with pytest.raises(TypeError):
+        r == 'hi'  # noqa
 
     rs = serde.serialize(r)
-    assert rs == ('hi',)
+    assert rs == 'hi'
     rd = serde.deserialize(rs, els.Ref[tars.Table])
     assert rd == r
 
-    l = els.Ref[tars.Table](['x'])
-    r = els.Ref[tars.Function](['x'])
-    assert l != r
+    rx = els.Ref[tars.Table]('x')
+    ry = els.Ref[tars.Table]('y')
+    assert rx != ry
+    assert rx < ry
+    assert ry > rx
+
+    fx = els.Ref[tars.Function]('x')
+    with pytest.raises(TypeError):
+        assert rx != fx
+    with pytest.raises(TypeError):
+        assert rx < fx
 
     with pytest.raises(TypeError):
         els.Ref[int]  # noqa

@@ -61,6 +61,7 @@ blob:
  - really all sql with hot comments
 """
 import abc
+import functools
 import operator
 import typing as ta
 import weakref
@@ -127,15 +128,26 @@ class Element(dc.Enum, NodalDataclass['Element'], reorder=True):
 _REF_CLS_CACHE: ta.MutableMapping[type, ta.Type['Ref']] = weakref.WeakKeyDictionary()
 
 
-class Ref(dc.Frozen, ta.Generic[ElementT], repr=False):
+@functools.total_ordering
+class Ref(dc.Frozen, ta.Generic[ElementT], repr=False, eq=False, order=False):
     name: Name = dc.field(check=name_check)
 
     ele_cls: ta.ClassVar[type]
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.name!r}'
+        return f'{self.__class__.__name__}({self.name!r})'
 
     __str__ = __repr__
+
+    def __eq__(self, other: ta.Any) -> bool:
+        if type(other) is not type(self):
+            raise TypeError(other)
+        return self.name == other.name
+
+    def __lt__(self, other: ta.Any) -> bool:
+        if type(other) is not type(self):
+            raise TypeError(other)
+        return self.name < other.name
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__()
@@ -147,7 +159,7 @@ class Ref(dc.Frozen, ta.Generic[ElementT], repr=False):
         check.not_in(rc, _REF_CLS_CACHE)
         _REF_CLS_CACHE[rc] = cls
 
-        class _Serde(serde.AutoSerde[cls]):  # noqa
+        class _RefSerde(serde.AutoSerde[cls]):  # noqa
             _bind = cls
 
             def serialize(self, obj: Ref) -> ta.Any:
@@ -171,6 +183,8 @@ class Ref(dc.Frozen, ta.Generic[ElementT], repr=False):
                 (bc, lang.Final),
                 ns,
                 repr=False,
+                eq=False,
+                order=False,
             )
         check.state(_REF_CLS_CACHE[arg] is ret)
         return ret
