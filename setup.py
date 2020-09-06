@@ -5,6 +5,10 @@ import sys
 import setuptools.command.build_ext
 
 
+if sys.version_info < (3, 7):
+    raise EnvironmentError('python >= 3.7 required')
+
+
 PROJECT = 'iceworm'
 
 BASE_DIR = os.path.dirname(__file__)
