@@ -8,16 +8,22 @@ TODO:
  - ** timing, + detect infinite loops **
   - max iterations?
   - 'aspect_id' tagging equiv - 'ProcessedBy' attribute?
+ - ProcessedBy allowed to be updated but only for self, added if not
 """
 import abc
 import typing as ta
 
 from omnibus import check
 from omnibus import collections as ocol
+from omnibus import dataclasses as dc
 from omnibus import lang
 
 from .base import Element
 from .collections import ElementSet
+
+
+class ProcessedBy(dc.Pure):
+    processors: ta.AbstractSet['ElementProcessor']
 
 
 class Phase(lang.AutoEnum):
@@ -76,9 +82,12 @@ class ElementProcessingDriver:
             if not dct:
                 break
 
-            cur = next(iter(dct.keys()))
+            cur, cures = next(iter(dct.items()))
+            expected = [e for e in elements if e not in cures]
             res = ElementSet.of(cur.process(elements))
-            # TODO: check
+            missing = [e for e in expected if e not in res]
+            if missing:
+                raise ValueError(missing)
             elements = res
 
         return elements

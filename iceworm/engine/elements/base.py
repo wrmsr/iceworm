@@ -65,6 +65,7 @@ import operator
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 
 from ...utils.nodal import NodalDataclass
@@ -108,6 +109,16 @@ class Element(dc.Enum, NodalDataclass['Element'], reorder=True):
         compare=False,
         coerce=Annotations,
         metadata={serde.Ignore: operator.not_},
+    )
+
+    meta: ta.Mapping[ta.Any, ta.Any] = dc.field(
+        ocol.frozendict(),
+        kwonly=True,
+        repr=False,
+        hash=False,
+        compare=False,
+        coerce=ocol.frozendict,
+        metadata={serde.Ignore: True},
     )
 
     id: ta.Optional[Id] = dc.field(None, check=optional_id_check, kwonly=True)
