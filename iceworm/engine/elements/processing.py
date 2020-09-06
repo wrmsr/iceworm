@@ -13,6 +13,7 @@ import abc
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as ocol
 from omnibus import lang
 
 from .base import Element
@@ -51,13 +52,29 @@ class ElementProcessingDriver:
     def __init__(self, processors: ta.Iterable[ElementProcessor]) -> None:
         super().__init__()
 
-        self._processors = [check.isinstance(p, ElementProcessor) for p in processors]
+        lst = []
+        seen = ocol.IdentitySet()
+        for ep in processors:
+            check.isinstance(ep, ElementProcessor)
+            check.not_in(ep, seen)
+            lst.append(ep)
+            seen.add(ep)
+        self._processors: ta.Sequence[ElementProcessor] = lst
+
+    @property
+    def processors(self) -> ta.Sequence[ElementProcessor]:
+        return self._processors
 
     def process(self, elements: ta.Iterable[Element]) -> ElementSet:
         elements = ElementSet.of(elements)
         while True:
-            mtps = [tp for tp in self._processors if tp.processes(elements)]
-            if not mtps:
+            dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Id]] = ocol.IdentityKeyDict()
+            for ep in self._processors:
+                epids = ep.processes(elements)
+                if epids:
+                    dct[ep] = epids
+            if not dct:
                 break
-            elements = ElementSet.of(mtps[0].process(elements))
+            cur = next(iter(dct.keys()))
+            elements = ElementSet.of(cur.process(elements))
         return elements
