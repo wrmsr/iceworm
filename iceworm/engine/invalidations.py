@@ -13,7 +13,7 @@ from omnibus import lang
 from .. import domains as doms
 from ..types import QualifiedName
 from ..utils import cron
-from .targets import Target
+from .elements import Element
 
 
 class InvalidatorTrigger(dc.Enum):
@@ -26,7 +26,7 @@ class InvalidatorTriggers(lang.Namespace):
         spec: cron.Spec = dc.field(coerce=cron.Spec.of)
 
 
-class Invalidator(Target):
+class Invalidator(Element):
     table: QualifiedName
     trigger: InvalidatorTrigger
 

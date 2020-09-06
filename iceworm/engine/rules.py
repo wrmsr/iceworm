@@ -55,23 +55,23 @@ import typing as ta
 
 from omnibus import dataclasses as dc
 
-from . import targets as tars
+from . import elements as els
 from .. import metadata as md_
 from ..types import QualifiedName
 
 
-class TableAsSelect(tars.Rule):
+class TableAsSelect(els.Rule):
     name: QualifiedName = dc.field(coerce=QualifiedName.of)
     query: str = dc.field(check=lambda o: isinstance(o, str))
 
     md: ta.Optional[md_.Table] = dc.field(None, check=lambda o: o is None or isinstance(o, md_.Table), kwonly=True)
 
 
-class TableAsSelectProcessor(tars.RuleProcessor[TableAsSelect]):
+class TableAsSelectProcessor(els.RuleProcessor[TableAsSelect]):
     rule_cls = TableAsSelect
 
-    def process(self, rule: TableAsSelect) -> ta.Iterable[tars.Target]:
+    def process(self, rule: TableAsSelect) -> ta.Iterable[els.Element]:
         return [
-            tars.Table(rule.name, md=rule.md),
-            tars.Rows(rule.name, rule.query),
+            els.Table(rule.name, md=rule.md),
+            els.Rows(rule.name, rule.query),
         ]

@@ -11,7 +11,7 @@ from omnibus import dataclasses as dc
 from omnibus import properties
 
 from . import connectors as ctrs
-from . import targets as tars
+from . import elements as els
 from .. import datatypes as dt
 from .. import metadata as md
 from ..trees import analysis as ana
@@ -26,7 +26,7 @@ from ..types import QualifiedName
 from ..utils import unique_dict
 
 
-class InferTableProcessor(tars.TargetProcessor):
+class InferTableProcessor(els.ElementProcessor):
 
     def __init__(
             self,
@@ -38,44 +38,44 @@ class InferTableProcessor(tars.TargetProcessor):
 
     class Instance:
 
-        def __init__(self, owner: 'InferTableProcessor', input: tars.TargetSet) -> None:
+        def __init__(self, owner: 'InferTableProcessor', input: els.ElementSet) -> None:
             super().__init__()
 
             self._owner = check.isinstance(owner, InferTableProcessor)
-            self._input = check.isinstance(input, tars.TargetSet)
+            self._input = check.isinstance(input, els.ElementSet)
 
         @properties.cached
-        def output(self) -> tars.TargetSet:
-            tar_tns = unique_dict((tar.name, tar) for tar in self._input.get_target_type_set(tars.Table))
+        def output(self) -> els.ElementSet:
+            ele_tns = unique_dict((ele.name, ele) for ele in self._input.get_element_type_set(els.Table))
 
             ts = list(self._input)
             tn_deps = {}
             tn_idxs = {}
-            for i, tar in enumerate(ts):
-                if isinstance(tar, tars.Table):
-                    tn_idxs[tar.name] = i
-                    rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == tar.name)
+            for i, ele in enumerate(ts):
+                if isinstance(ele, els.Table):
+                    tn_idxs[ele.name] = i
+                    rows = check.single(rt for rt in ts if isinstance(rt, els.Rows) and rt.table == ele.name)
                     root = par.parse_statement(rows.query)
-                    deps = {n.name.name for n in ana.basic(root).get_node_type_set(no.Table) if n.name.name in tar_tns}
-                    check.not_in(tar.name, tn_deps)
-                    tn_deps[tar.name] = deps
+                    deps = {n.name.name for n in ana.basic(root).get_node_type_set(no.Table) if n.name.name in ele_tns}
+                    check.not_in(ele.name, tn_deps)
+                    tn_deps[ele.name] = deps
 
             given_tables: ta.Mapping[QualifiedName, md.Table] = {}
 
             topo = list(ocol.toposort(tn_deps))
             for sup in topo:
                 for tn in sup:
-                    tar = tar_tns[tn]
-                    if tar.md is None:
-                        rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == tar.name)
+                    ele = ele_tns[tn]
+                    if ele.md is None:
+                        rows = check.single(rt for rt in ts if isinstance(rt, els.Rows) and rt.table == ele.name)
                         mdt = self.infer_table(rows.query, given_tables)
-                        mdt = dc.replace(mdt, name=tar.name)
-                        i = tn_idxs[tar.name]
+                        mdt = dc.replace(mdt, name=ele.name)
+                        i = tn_idxs[ele.name]
                         tsi = ts[i]
-                        ts[i] = dc.replace(tsi, md=mdt, anns={**tsi.anns, tars.Origin: tars.Origin(tsi)})
-                        given_tables[tar.name] = mdt
+                        ts[i] = dc.replace(tsi, md=mdt, anns={**tsi.anns, els.Origin: els.Origin(tsi)})
+                        given_tables[ele.name] = mdt
 
-            return tars.TargetSet.of(ts)
+            return els.ElementSet.of(ts)
 
         def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
             objs = []
@@ -140,8 +140,8 @@ class InferTableProcessor(tars.TargetProcessor):
                 [md.Column(n, t) for n, t in tt.columns],
             )
 
-    def matches(self, targets: tars.TargetSet) -> bool:
-        return any(isinstance(t, tars.Table) and t.md is None for t in targets)
+    def matches(self, elements: els.ElementSet) -> bool:
+        return any(isinstance(t, els.Table) and t.md is None for t in elements)
 
-    def process(self, targets: tars.TargetSet) -> tars.TargetSet:
-        return self.Instance(self, targets).output
+    def process(self, elements: els.ElementSet) -> els.ElementSet:
+        return self.Instance(self, elements).output

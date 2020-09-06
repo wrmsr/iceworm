@@ -8,7 +8,7 @@ TODO:
   - sql files could start with 'use <conn>'
   - * temp / scoped tables *
   - ** temp / scoped funcs - table and scalar **
-  - temp targets gc'd whenever possible, code to cleanup zombies
+  - temp elements gc'd whenever possible, code to cleanup zombies
   - make json comments the norm?
  - lib freestanding, cfg in monorepo? up to datasci really
  - pluggable mangling - users can write cifer$abc, run in datagrip goes to users schema, mangled at load by iw
@@ -36,7 +36,7 @@ TODO:
  - tok: 'push complexity to the plan' - obv cant as much, but still have ops to xform
   - but recursive as ops contain query trees
   - is there an equiv of 'jitfuncs'? basic blocks? everything between joins? everything between cross-conn joins?
-   - everything between *targets*?
+   - everything between *elements*?
   - can still split, is not opaque, can analyse into
   - simplifies viz
   - does split/merge happen on the fly? reactive coalescing?
@@ -76,7 +76,7 @@ from ..utils import serde
 
 
 T = ta.TypeVar('T"')
-TargetT = ta.TypeVar('TargetT', bound='Target')
+ElementT = ta.TypeVar('ElementT', bound='Element')
 RuleT = ta.TypeVar('RuleT', bound='Rule')
 
 
@@ -91,11 +91,11 @@ class Annotations(anns.Annotations[Annotation]):
         return Annotation
 
 
-class Target(dc.Enum, NodalDataclass['Target'], reorder=True):
+class Element(dc.Enum, NodalDataclass['Element'], reorder=True):
 
     @classmethod
-    def _nodal_cls(cls) -> ta.Type['Target']:
-        return Target
+    def _nodal_cls(cls) -> ta.Type['Element']:
+        return Element
 
     anns: Annotations = dc.field(
         (),
@@ -112,91 +112,91 @@ class Target(dc.Enum, NodalDataclass['Target'], reorder=True):
         return None
 
 
-class TargetRef(dc.Pure, ta.Generic[TargetT]):
+class ElementRef(dc.Pure, ta.Generic[ElementT]):
     name: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
 class Origin(Annotation):
-    target: Target
+    element: Element
 
 
-class Table(Target):
+class Table(Element):
     name: QualifiedName = dc.field(coerce=QualifiedName.of)
     md: ta.Optional[md_.Table] = dc.field(None, check=lambda o: o is None or isinstance(o, md_.Table))
 
     dc.check(lambda name, md: md is None or name == md.name)
 
 
-class Rows(Target):
+class Rows(Element):
     table: QualifiedName = dc.field(coerce=QualifiedName.of)
     query: str = dc.field(check=lambda o: isinstance(o, str))
 
     name: ta.Optional[QualifiedName] = dc.field(None, coerce=QualifiedName.of_optional, kwonly=True)
 
 
-class Function(Target):
+class Function(Element):
     name: QualifiedName = dc.field(coerce=QualifiedName.of)
 
 
-class Rule(Target, abstract=True):
+class Rule(Element, abstract=True):
     pass
 
 
-class TargetSet:
+class ElementSet:
 
-    def __init__(self, targets: ta.Iterable[Target]) -> None:
+    def __init__(self, elements: ta.Iterable[Element]) -> None:
         super().__init__()
 
-        self._targets = [check.isinstance(e, Target) for e in targets]
+        self._elements = [check.isinstance(e, Element) for e in elements]
 
-        self._target_set = ocol.IdentitySet(self._targets)
+        self._element_set = ocol.IdentitySet(self._elements)
         by_name = ocol.IdentityKeyDict()
-        for target in self._targets:
-            if target.name is not None:
-                check.not_in(target.name, by_name)
-                by_name[target.name] = target
-        self._targets_by_name: ta.Mapping[QualifiedName, Target] = by_name
-        self._target_sets_by_type: ta.Dict[type, ta.AbstractSet[Target]] = {}
+        for element in self._elements:
+            if element.name is not None:
+                check.not_in(element.name, by_name)
+                by_name[element.name] = element
+        self._elements_by_name: ta.Mapping[QualifiedName, Element] = by_name
+        self._element_sets_by_type: ta.Dict[type, ta.AbstractSet[Element]] = {}
 
     @classmethod
-    def of(cls, it: ta.Iterable[Target]) -> 'TargetSet':
+    def of(cls, it: ta.Iterable[Element]) -> 'ElementSet':
         if isinstance(it, cls):
             return it
         else:
             return cls(it)
 
-    def get_target_type_set(self, ty: ta.Type[T]) -> ta.AbstractSet[T]:
+    def get_element_type_set(self, ty: ta.Type[T]) -> ta.AbstractSet[T]:
         try:
-            return self._target_sets_by_type[ty]
+            return self._element_sets_by_type[ty]
         except KeyError:
-            ret = self._target_sets_by_type[ty] = ocol.IdentitySet(n for n in self._targets if isinstance(n, ty))
+            ret = self._element_sets_by_type[ty] = ocol.IdentitySet(n for n in self._elements if isinstance(n, ty))
             return ret
 
-    def __iter__(self) -> ta.Iterator[Target]:
-        return iter(self._targets)
+    def __iter__(self) -> ta.Iterator[Element]:
+        return iter(self._elements)
 
-    def __contains__(self, key: ta.Union[QualifiedName, Target, type]) -> bool:
+    def __contains__(self, key: ta.Union[QualifiedName, Element, type]) -> bool:
         if isinstance(key, QualifiedName):
-            return key in self._targets_by_name
-        elif isinstance(key, Target):
-            return key in self._target_set
+            return key in self._elements_by_name
+        elif isinstance(key, Element):
+            return key in self._element_set
         elif isinstance(key, type):
-            return bool(self.get_target_type_set(key))
+            return bool(self.get_element_type_set(key))
         else:
             raise TypeError(key)
 
-    def __getitem__(self, name: QualifiedName) -> Target:
-        return self._targets_by_name[check.isinstance(name, QualifiedName)]
+    def __getitem__(self, name: QualifiedName) -> Element:
+        return self._elements_by_name[check.isinstance(name, QualifiedName)]
 
 
-class TargetProcessor(lang.Abstract):
+class ElementProcessor(lang.Abstract):
 
     @abc.abstractmethod
-    def matches(self, targets: TargetSet) -> bool:
+    def matches(self, elements: ElementSet) -> bool:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def process(self, targets: TargetSet) -> TargetSet:
+    def process(self, elements: ElementSet) -> ElementSet:
         raise NotImplementedError
 
 
@@ -207,28 +207,28 @@ class RuleProcessor(lang.Abstract, ta.Generic[RuleT]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def process(self, rule: RuleT) -> ta.Iterable[Target]:
+    def process(self, rule: RuleT) -> ta.Iterable[Element]:
         raise NotImplementedError
 
 
-class RuleTargetProcessor(TargetProcessor, ta.Generic[RuleT]):
+class RuleElementProcessor(ElementProcessor, ta.Generic[RuleT]):
 
     def __init__(self, proc: RuleProcessor[RuleT]) -> None:
         super().__init__()
 
         self._proc = check.isinstance(proc, RuleProcessor)
 
-    def matches(self, targets: TargetSet) -> bool:
-        return any(isinstance(t, self._proc.rule_cls) for t in targets)
+    def matches(self, elements: ElementSet) -> bool:
+        return any(isinstance(t, self._proc.rule_cls) for t in elements)
 
-    def process(self, targets: TargetSet) -> TargetSet:
+    def process(self, elements: ElementSet) -> ElementSet:
         lst = []
-        for tar in targets:
-            if isinstance(tar, self._proc.rule_cls):
-                for sub in self._proc.process(tar):
+        for ele in elements:
+            if isinstance(ele, self._proc.rule_cls):
+                for sub in self._proc.process(ele):
                     if Origin not in sub.anns:
-                        sub = dc.replace(sub, anns={**sub.anns, Origin: Origin(tar)})
+                        sub = dc.replace(sub, anns={**sub.anns, Origin: Origin(ele)})
                     lst.append(sub)
             else:
-                lst.append(tar)
-        return TargetSet.of(lst)
+                lst.append(ele)
+        return ElementSet.of(lst)

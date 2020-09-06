@@ -1,5 +1,5 @@
-from .targets import Target
+from .elements import Element
 
 
-class Glob(Target):
+class Glob(Element):
     pass

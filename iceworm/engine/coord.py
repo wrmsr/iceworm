@@ -6,7 +6,7 @@ TODO:
  - scheduling pushed into db
   - ** interfaced ** - STILL HAVE IN-MEM DBG SCHED (+ STORE)
  - lol, push inval ranges into db?
-  - ** ROWS TARGETS CANNOT OVERLAP **
+  - ** ROWS ELEMENTS CANNOT OVERLAP **
   - would basically turn class Domain into tables - recursive cte for intersection
  - inval scheds - why? do-it-then-anyway? awaiting-multiple?
   - coalesce - do not rebuild every time, wait until optimal

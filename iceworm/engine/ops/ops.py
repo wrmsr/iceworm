@@ -1,6 +1,6 @@
 """
 TODO:
- - ** blurs line between task and target **
+ - ** blurs line between task and element **
  - 'merge'? refresh?
  - from alerts:
   - conditional? takes query?

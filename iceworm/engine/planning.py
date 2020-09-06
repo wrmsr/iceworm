@@ -5,26 +5,26 @@ from omnibus import dataclasses as dc
 
 from . import connectors as ctrs
 from . import ops
-from . import targets as tars
+from . import elements as els
 from .. import metadata as md
 from ..types import QualifiedName
 
 
-class TargetPlanner:
+class ElementPlanner:
 
     def __init__(
             self,
-            targets: ta.Iterable[tars.Target],
+            elements: ta.Iterable[els.Element],
             ctors: ta.Iterable[ctrs.Connector],
     ) -> None:
         super().__init__()
 
-        self._targets = tars.TargetSet.of(targets)
+        self._elements = els.ElementSet.of(elements)
         self._ctors = ctrs.ConnectorSet.of(ctors)
 
     @property
-    def targets(self) -> tars.TargetSet:
-        return self._targets
+    def elements(self) -> els.ElementSet:
+        return self._elements
 
     @property
     def ctors(self) -> ctrs.ConnectorSet:
@@ -34,17 +34,17 @@ class TargetPlanner:
         invalidated_tables = {check.isinstance(t, QualifiedName) for t in invalidated_tables}
         plan = []
 
-        for tar in self._targets:
-            if isinstance(tar, tars.Table):
-                if tar.name in invalidated_tables:
-                    mdt = check.isinstance(tar.md, md.Table)
+        for ele in self._elements:
+            if isinstance(ele, els.Table):
+                if ele.name in invalidated_tables:
+                    mdt = check.isinstance(ele.md, md.Table)
                     plan.extend([
-                        ops.DropTable(tar.name),
-                        ops.CreateTable(dc.replace(mdt, name=tar.name)),
+                        ops.DropTable(ele.name),
+                        ops.CreateTable(dc.replace(mdt, name=ele.name)),
                     ])
 
-            elif isinstance(tar, tars.Rows):
-                if tar.table in invalidated_tables:
-                    plan.append(ops.InsertIntoSelect(tar.table, tar.query))
+            elif isinstance(ele, els.Rows):
+                if ele.table in invalidated_tables:
+                    plan.append(ops.InsertIntoSelect(ele.table, ele.query))
 
         return ops.List(plan)

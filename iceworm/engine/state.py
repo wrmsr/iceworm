@@ -16,7 +16,7 @@ TODO:
 
 tables:
  - worlds
- - targets
+ - elements
   - one per type?
   - invalidations?
    - ranges?

@@ -21,7 +21,7 @@ from .. import invalidations as invs  # noqa
 from .. import planning as pln
 from .. import processing as proc
 from .. import rules as rls
-from .. import targets as tars
+from .. import elements as els
 from ... import domains as doms
 from ...tests.helpers import pg_engine  # noqa
 from ...tests.helpers import pg_url  # noqa  # FIXME: jesus christ pytest fucking sucks
@@ -75,7 +75,7 @@ CONNECTORS_SER.extend([
 
 ])
 
-TARGETS_YML = """
+ELEMENTS_YML = """
 
 - table_as_select:
     name: [pg, a]
@@ -105,10 +105,10 @@ TARGETS_YML = """
 
 """
 
-TARGETS_SER = yaml.safe_load(TARGETS_YML)
+ELEMENTS_SER = yaml.safe_load(ELEMENTS_YML)
 
 
-def get_task_dependencies(targets: ta.Iterable[tars.Target]) -> ta.Mapping[tars.Target, ta.AbstractSet[tars.Target]]:  # noqa
+def get_ele_dependencies(elements: ta.Iterable[els.Element]) -> ta.Mapping[els.Element, ta.AbstractSet[els.Element]]:  # noqa
     raise NotImplementedError
 
 
@@ -121,8 +121,8 @@ def test_ops(pg_engine):  # noqa
     # binder = inj.create_binder()
     # binder.bind(CONNECTORS)
     # binder.bind(inj.Key(ta.Iterable[ctrs.Connector]), to=ctrs.ConnectorSet)
-    # binder.bind(targets)
-    # binder.bind(inj.Key(ta.Iterable[tars.Target]), to=tars.TargetSet)
+    # binder.bind(elements)
+    # binder.bind(inj.Key(ta.Iterable[tars.Element]), to=tars.ElementSet)
     # injector = inj.create_injector(binder)  # noqa
 
     secrets = sec.Secrets({'pg_url': raw_pg_url()})
@@ -139,22 +139,22 @@ def test_ops(pg_engine):  # noqa
 
     connectors = ctrs.ConnectorSet.of(ctor_cfgs)
 
-    targets = tars.TargetSet.of(serde.deserialize(TARGETS_SER, ta.Sequence[tars.Target]))
+    elements = els.ElementSet.of(serde.deserialize(ELEMENTS_SER, ta.Sequence[els.Element]))
 
     tprocs = [
-        tars.RuleTargetProcessor(rls.TableAsSelectProcessor()),
+        els.RuleElementProcessor(rls.TableAsSelectProcessor()),
         proc.InferTableProcessor(connectors),
     ]
 
-    targets = list(targets)
+    elements = list(elements)
     while True:
-        print(list(targets))
-        mtps = [tp for tp in tprocs if tp.matches(targets)]
+        print(list(elements))
+        mtps = [tp for tp in tprocs if tp.matches(elements)]
         if not mtps:
             break
-        targets = mtps[0].process(targets)
+        elements = mtps[0].process(elements)
 
-    plan = pln.TargetPlanner(targets, connectors).plan(set(map(QualifiedName.of, [
+    plan = pln.ElementPlanner(elements, connectors).plan(set(map(QualifiedName.of, [
         ['pg', 'a'],
         ['pg', 'b'],
         ['pg', 'c'],

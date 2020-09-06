@@ -59,6 +59,7 @@ def populate_sa_tables(conn: sa.engine.Connection, metadata: sa.MetaData) -> Non
         ('customer', tpch.gens.CustomerGenerator(10, 1, 20)),
     ]:
         sat = check.single(t for t in metadata.tables.values() if t.name == n)
+        dcts = []
         for e in itertools.islice(g, 100):
             dct = {}
             for f in dc.fields(e):
@@ -67,4 +68,5 @@ def populate_sa_tables(conn: sa.engine.Connection, metadata: sa.MetaData) -> Non
                 except KeyError:
                     continue
                 dct[col.name] = getattr(e, f.name)
-            conn.execute(sat.insert(), [dct])
+            dcts.append(dct)
+        conn.execute(sat.insert(), dcts)

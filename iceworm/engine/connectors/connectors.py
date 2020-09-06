@@ -1,6 +1,6 @@
 """
 TODO:
- - ** are conn confs TARGETS? **
+ - ** are conn confs ELEMENTS? **
  - virtual vs physical tables
  - physical tables requiring refresh
  - incremental vs total physical tables

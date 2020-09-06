@@ -1,11 +1,11 @@
 """
 TODO:
  - all, backfill, ddl, check, ...
- - views are targets, goals are like backfill and day and ddl
-  - goals take targets and make ops, ops get rewritten and shit
+ - views are elements, goals are like backfill and day and ddl
+  - goals take elements and make ops, ops get rewritten and shit
   - ‘rules’?
   - ‘subsystems’? muh
-  - CreateTableAs = rule, 'create table foo as select * from …' = .. rule 'call'? 'instantiation'?, wo.View = target
+  - CreateTableAs = rule, 'create table foo as select * from …' = .. rule 'call'? 'instantiation'?, wo.View = element
 """
 import typing as ta
 
