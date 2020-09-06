@@ -8,6 +8,8 @@ TODO:
  - ** dataclass interop ** - dc->tbl, query
   - just return object refs? jsonize?
   - support snowflake json garbage on objects
+ - piecewise conf? csv mounts? ...
+  - *no*, but could have a csv_mount rule before ctor phase that rewrites the sole ctor cfg ele
 
 Def conns:
  - sql - snow + pg (+ incl internal state storage pg, 'self')

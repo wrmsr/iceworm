@@ -89,10 +89,10 @@ class RuleElementProcessor(els.ElementProcessor, ta.Generic[RuleT]):
 
         self._proc = check.isinstance(proc, RuleProcessor)
 
-    def matches(self, elements: els.ElementSet) -> bool:
-        return any(isinstance(t, self._proc.rule_cls) for t in elements)
+    def processes(self, elements: els.ElementSet) -> ta.AbstractSet[els.Id]:
+        return {t.id for t in elements.get_element_type_set(self._proc.rule_cls)}
 
-    def process(self, elements: els.ElementSet) -> els.ElementSet:
+    def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
         lst = []
         for ele in elements:
             if isinstance(ele, self._proc.rule_cls):

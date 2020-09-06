@@ -153,13 +153,13 @@ def test_ops(pg_engine):  # noqa
         proc.InferTableProcessor(connectors),
     ]
 
-    elements = list(elements)
+    elements = els.ElementSet.of(elements)
     while True:
         print(list(elements))
-        mtps = [tp for tp in tprocs if tp.matches(elements)]
+        mtps = [tp for tp in tprocs if tp.processes(elements)]
         if not mtps:
             break
-        elements = mtps[0].process(elements)
+        elements = els.ElementSet.of(mtps[0].process(elements))
 
     plan = pln.ElementPlanner(elements, connectors).plan({
         'pg/a',

@@ -149,8 +149,8 @@ class InferTableProcessor(els.ElementProcessor):
                 [md.Column(n, t) for n, t in tt.columns],
             )
 
-    def matches(self, elements: els.ElementSet) -> bool:
-        return any(isinstance(t, tars.Table) and t.md is None for t in elements)
+    def processes(self, elements: els.ElementSet) -> ta.AbstractSet[els.Id]:
+        return {t.id for t in elements.get_element_type_set(tars.Table) if t.md is None}
 
-    def process(self, elements: els.ElementSet) -> els.ElementSet:
+    def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
         return self.Instance(self, elements).output
