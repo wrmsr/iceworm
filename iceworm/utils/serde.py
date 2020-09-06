@@ -143,24 +143,25 @@ def build_subclass_map(
         if cur in seen:
             continue
         seen.add(cur)
-        n = None
-        if dc.is_dataclass(cls):
-            n = dc.metadatas_dict(cls).get(Name)
-            if callable(n):
-                n = n(cls)
-        if n is None:
-            n = name_formatter(cur)
-        check.isinstance(n, str)
-        check.not_empty(n)
-        try:
-            existing = dct[n]
-        except KeyError:
-            pass
-        else:
-            if existing is not cur:
-                raise NameError(n)
-        dct[n] = cur
-        dct[cur] = n
+        if lang.Abstract not in cur.__bases__:
+            n = None
+            if dc.is_dataclass(cur):
+                n = dc.metadatas_dict(cur).get(Name)
+                if callable(n):
+                    n = n(cur)
+            if n is None:
+                n = name_formatter(cur)
+            check.isinstance(n, str)
+            check.not_empty(n)
+            try:
+                existing = dct[n]
+            except KeyError:
+                pass
+            else:
+                if existing is not cur:
+                    raise NameError(n)
+            dct[n] = cur
+            dct[cur] = n
         todo.update(cur.__subclasses__())
     return dct
 

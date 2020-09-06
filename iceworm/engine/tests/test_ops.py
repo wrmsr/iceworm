@@ -33,13 +33,13 @@ from ...utils import serde
 
 CONNECTORS_YML = f"""
 
-- system: {{}}
+- system_connector: {{}}
 
-- sql:
+- sql_connector:
     name: pg
     url_secret: pg_url
 
-- file:
+- file_connector:
     name: csv
     mounts:
     - path: {os.path.join(os.path.dirname(__file__), 'csv')}
@@ -58,7 +58,7 @@ CONNECTORS_SER = yaml.safe_load(CONNECTORS_YML)
 
 CONNECTORS_SER.extend([
 
-    {'computed': {
+    {'computed_connector': {
         'name': 'cmp',
         'tables': [
             {
