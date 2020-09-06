@@ -93,8 +93,11 @@ ELEMENTS_YML = """
     table: [pg, nums]
     query: "select * from cmp.nums"
 
+- table:
+    id: system/notifications
+
 - materialization:
-    table: system/notification
+    table: system/notifications
     dst: [system, notifications]
 
 - rows:

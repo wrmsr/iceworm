@@ -45,6 +45,7 @@ TODO:
      select count(*) from (select null from things where ds = today() limit 5)) < 5
   - lol, system table of failures, insert into pagerduty.alerts select … from system.failures where table_name = ...
  - give everything a name? type:filename:line:col:seq?
+ - id lookup suggestion ( https://docs.python.org/3/library/difflib.html#difflib.get_close_matches )
 
 ** *NOT* nested **
 
@@ -129,7 +130,7 @@ _REF_CLS_CACHE: ta.MutableMapping[type, ta.Type['Ref']] = weakref.WeakKeyDiction
 
 
 @functools.total_ordering
-class Ref(dc.Frozen, ta.Generic[ElementT], repr=False, eq=False, order=False):
+class Ref(dc.Frozen, lang.Abstract, ta.Generic[ElementT], repr=False, eq=False, order=False):
     id: Id = dc.field(check=id_check)
 
     ele_cls: ta.ClassVar[type]
@@ -254,8 +255,16 @@ class ElementSet(ta.Generic[ElementT]):
         else:
             raise TypeError(key)
 
-    def __getitem__(self, id: Id) -> ElementT:
-        return self._elements_by_id[check.isinstance(id, Id)]
+    def __getitem__(self, key: ta.Union[Ref, Id]) -> ElementT:
+        if isinstance(key, Ref):
+            ele = self._elements_by_id[key.id]
+            if not isinstance(ele, key.ele_cls):
+                raise TypeError(ele, key)
+            return ele
+        elif isinstance(key, Id):
+            return self._elements_by_id[key]
+        else:
+            raise TypeError(key)
 
 
 class ElementProcessor(lang.Abstract):

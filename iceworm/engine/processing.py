@@ -47,10 +47,12 @@ class InferTableProcessor(els.ElementProcessor):
 
         @properties.stateful_cached
         def output(self) -> els.ElementSet:
-            ele_tns = unique_dict((ele.id, ele) for ele in self._input.get_element_type_set(tars.Table))
+            ele_tns = unique_dict(
+                (ele.dst, self._input[ele.table]) for ele in self._input.get_element_type_set(tars.Materialization))
+            tele_ids = unique_dict((ele.id, qn) for qn, ele in ele_tns.items())
 
             ts = els.ElementSet(self._input)
-            tn_deps = {}
+            tn_deps: ta.Dict[str, ta.Set[str]] = {}
             tn_idxs = {}
             for i, ele in enumerate(ts):
                 if isinstance(ele, tars.Table):
@@ -58,7 +60,10 @@ class InferTableProcessor(els.ElementProcessor):
                     # TODO: get single Materialization, do.. something..
                     rows = check.single(rt for rt in ts.get_element_type_set(tars.Rows) if rt.table == ele)
                     root = par.parse_statement(rows.query)
-                    deps = {n.name.name for n in ana.basic(root).get_node_type_set(no.Table) if n.name.name in ele_tns}
+                    deps = {
+                        ele_tns[n.name.name].id
+                        for n in ana.basic(root).get_node_type_set(no.Table) if n.name.name in ele_tns
+                    }
                     check.not_in(ele.id, tn_deps)
                     tn_deps[ele.id] = deps
 
@@ -68,15 +73,16 @@ class InferTableProcessor(els.ElementProcessor):
             topo = list(ocol.toposort(tn_deps))
             for sup in topo:
                 for tn in sup:
-                    ele = ele_tns[tn]
+                    ele: tars.Table = self._input[tn]
                     if ele.md is None:
-                        rows = check.single(rt for rt in ts if isinstance(rt, tars.Rows) and rt.table == ele.name)
+                        rows = check.single(rt for rt in self._input.get_element_type_set(tars.Rows) if rt.table == ele)
                         mdt = self.infer_table(rows.query, given_tables)
-                        mdt = dc.replace(mdt, name=ele.name)
-                        i = tn_idxs[ele.name]
+                        qn = tele_ids[ele.id]
+                        mdt = dc.replace(mdt, name=qn)
+                        i = tn_idxs[ele.id]
                         tsi = ts[i]
                         ts[i] = dc.replace(tsi, md=mdt, anns={**tsi.anns, els.Origin: els.Origin(tsi)})
-                        given_tables[ele.name] = mdt
+                        given_tables[qn] = mdt
 
             return els.ElementSet.of(ts)
 
