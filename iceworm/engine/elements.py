@@ -62,6 +62,7 @@ blob:
 import abc
 import operator
 import typing as ta
+import weakref
 
 from omnibus import check
 from omnibus import collections as ocol
@@ -76,6 +77,7 @@ from ..utils import serde
 
 T = ta.TypeVar('T"')
 ElementT = ta.TypeVar('ElementT', bound='Element')
+Self = ta.TypeVar('Self"')
 
 
 class Annotation(anns.Annotation, abstract=True):
@@ -110,8 +112,67 @@ class Element(dc.Enum, NodalDataclass['Element'], reorder=True):
         return None
 
 
-class ElementRef(dc.Pure, ta.Generic[ElementT]):
+_REF_CLS_CACHE: ta.MutableMapping[type, ta.Type['Ref']] = weakref.WeakKeyDictionary()
+
+
+class Ref(dc.Frozen, ta.Generic[ElementT], repr=False):
     name: QualifiedName = dc.field(coerce=QualifiedName.of)
+
+    ele_cls: ta.ClassVar[type]
+
+    def __repr__(self) -> str:
+        return '%s([%s])' % (self.__class__.__name__, ', '.join(map(repr, self.name.parts)),)
+
+    __str__ = __repr__
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__()
+
+        check.isinstance(cls.ele_cls, type)
+        check.issubclass(cls.ele_cls, Element)
+        check.state(lang.Final in cls.__bases__)
+        rc = cls.ele_cls
+        check.not_in(rc, _REF_CLS_CACHE)
+        _REF_CLS_CACHE[rc] = cls
+
+        class _Serde(serde.AutoSerde[cls]):  # noqa
+            _bind = cls
+
+            def serialize(self, obj: Ref) -> ta.Any:
+                return check.isinstance(obj, cls).name.parts
+
+            def deserialize(self, ser: ta.Any) -> Ref:
+                return cls(QualifiedName.of(ser))
+
+    def __class_getitem__(cls, arg: type) -> type:
+        check.isinstance(arg, type)
+        try:
+            ret = _REF_CLS_CACHE[arg]
+        except KeyError:
+            bc = super().__class_getitem__(arg)
+            ns = {
+                'ele_cls': arg,
+                '__class_getitem__': ta.Generic.__class_getitem__,
+            }
+            ret = lang.new_type(
+                f'{cls.__name__}[{arg.__name__}]',
+                (bc, lang.Final),
+                ns,
+                repr=False,
+            )
+        check.state(_REF_CLS_CACHE[arg] is ret)
+        return ret
+
+    @classmethod
+    def cls(cls, arg: type) -> type:
+        return cls[arg]
+
+    @classmethod
+    def of(cls: ta.Type[Self], obj: ta.Union['Ref', QualifiedName, ta.Iterable[str]]) -> Self:
+        if type(obj) is cls:
+            return obj
+        else:
+            return cls(QualifiedName.of(obj))
 
 
 class Origin(Annotation):

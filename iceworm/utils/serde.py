@@ -3,6 +3,7 @@ TODO:
  - strict mode
  - replace with builtin omni generic impl
  - extensible serde Contexts? want pluggable datatypes, -> Datatype.of
+ - recursive custom serde?
 """
 import abc
 import collections.abc
