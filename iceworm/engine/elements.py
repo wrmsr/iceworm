@@ -76,7 +76,6 @@ from ..utils import serde
 
 T = ta.TypeVar('T"')
 ElementT = ta.TypeVar('ElementT', bound='Element')
-RuleT = ta.TypeVar('RuleT', bound='Rule')
 
 
 class Annotation(anns.Annotation, abstract=True):
@@ -117,10 +116,6 @@ class ElementRef(dc.Pure, ta.Generic[ElementT]):
 
 class Origin(Annotation):
     element: Element
-
-
-class Rule(Element, abstract=True):
-    pass
 
 
 class ElementSet:
@@ -179,37 +174,3 @@ class ElementProcessor(lang.Abstract):
     @abc.abstractmethod
     def process(self, elements: ElementSet) -> ElementSet:
         raise NotImplementedError
-
-
-class RuleProcessor(lang.Abstract, ta.Generic[RuleT]):
-
-    @abc.abstractproperty
-    def rule_cls(self) -> ta.Type[RuleT]:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def process(self, rule: RuleT) -> ta.Iterable[Element]:
-        raise NotImplementedError
-
-
-class RuleElementProcessor(ElementProcessor, ta.Generic[RuleT]):
-
-    def __init__(self, proc: RuleProcessor[RuleT]) -> None:
-        super().__init__()
-
-        self._proc = check.isinstance(proc, RuleProcessor)
-
-    def matches(self, elements: ElementSet) -> bool:
-        return any(isinstance(t, self._proc.rule_cls) for t in elements)
-
-    def process(self, elements: ElementSet) -> ElementSet:
-        lst = []
-        for ele in elements:
-            if isinstance(ele, self._proc.rule_cls):
-                for sub in self._proc.process(ele):
-                    if Origin not in sub.anns:
-                        sub = dc.replace(sub, anns={**sub.anns, Origin: Origin(ele)})
-                    lst.append(sub)
-            else:
-                lst.append(ele)
-        return ElementSet.of(lst)

@@ -51,9 +51,12 @@ https://medium.com/hashmapinc/dont-do-analytics-engineering-in-snowflake-until-y
 https://github.com/fishtown-analytics/dbt
 https://docs.getdbt.com/docs/building-a-dbt-project/building-models/materializations/
 """
+import abc
 import typing as ta
 
+from omnibus import check
 from omnibus import dataclasses as dc
+from omnibus import lang
 
 from . import elements as els
 from . import targets as tars
@@ -61,14 +64,55 @@ from .. import metadata as md_
 from ..types import QualifiedName
 
 
-class TableAsSelect(els.Rule):
+RuleT = ta.TypeVar('RuleT', bound='Rule')
+
+
+class Rule(els.Element, abstract=True):
+    pass
+
+
+class RuleProcessor(lang.Abstract, ta.Generic[RuleT]):
+
+    @abc.abstractproperty
+    def rule_cls(self) -> ta.Type[RuleT]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def process(self, rule: RuleT) -> ta.Iterable[els.Element]:
+        raise NotImplementedError
+
+
+class RuleElementProcessor(els.ElementProcessor, ta.Generic[RuleT]):
+
+    def __init__(self, proc: RuleProcessor[RuleT]) -> None:
+        super().__init__()
+
+        self._proc = check.isinstance(proc, RuleProcessor)
+
+    def matches(self, elements: els.ElementSet) -> bool:
+        return any(isinstance(t, self._proc.rule_cls) for t in elements)
+
+    def process(self, elements: els.ElementSet) -> els.ElementSet:
+        lst = []
+        for ele in elements:
+            if isinstance(ele, self._proc.rule_cls):
+                for sub in self._proc.process(ele):
+                    if els.Origin not in sub.anns:
+                        sub = dc.replace(sub, anns={**sub.anns, els.Origin: els.Origin(ele)})
+                    lst.append(sub)
+            else:
+                lst.append(ele)
+        return els.ElementSet.of(lst)
+
+
+class TableAsSelect(Rule):
     name: QualifiedName = dc.field(coerce=QualifiedName.of)
     query: str = dc.field(check=lambda o: isinstance(o, str))
 
     md: ta.Optional[md_.Table] = dc.field(None, check=lambda o: o is None or isinstance(o, md_.Table), kwonly=True)
 
 
-class TableAsSelectProcessor(els.RuleProcessor[TableAsSelect]):
+class TableAsSelectProcessor(RuleProcessor[TableAsSelect]):
     rule_cls = TableAsSelect
 
     def process(self, rule: TableAsSelect) -> ta.Iterable[els.Element]:

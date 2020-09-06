@@ -142,7 +142,7 @@ def test_ops(pg_engine):  # noqa
     elements = els.ElementSet.of(serde.deserialize(ELEMENTS_SER, ta.Sequence[els.Element]))
 
     tprocs = [
-        els.RuleElementProcessor(rls.TableAsSelectProcessor()),
+        rls.RuleElementProcessor(rls.TableAsSelectProcessor()),
         proc.InferTableProcessor(connectors),
     ]
 
