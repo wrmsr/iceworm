@@ -8,13 +8,14 @@ import pytest
 
 
 T = ta.TypeVar('T')
+Self = ta.TypeVar('Self"')
 
 
 _REF_CLS_CACHE: ta.MutableMapping[type, ta.Type['Ref']] = weakref.WeakKeyDictionary()
 
 
 class Ref(dc.Frozen, ta.Generic[T]):
-    name: str
+    name: str = dc.field(check=lambda o: isinstance(o, str) and o)
 
     ref_cls: ta.ClassVar[type]
 
@@ -49,14 +50,26 @@ class Ref(dc.Frozen, ta.Generic[T]):
     def cls(cls, arg: type) -> type:
         return cls[arg]
 
+    @classmethod
+    def of(cls: ta.Type[Self], arg: ta.Union['Ref', str]) -> Self:
+        if isinstance(arg, str):
+            return cls(arg)
+        elif type(arg) is cls:
+            return arg
+        else:
+            raise TypeError(arg)
+
 
 class Thing(dc.Pure):
-    ref: Ref[int] = dc.field(check=lambda o: isinstance(o, Ref.cls(int)))
+    ref: Ref[int] = dc.field(coerce=Ref[int].of)
 
 
 def test_ref():
     thing = Thing(Ref[int]('hi'))
     assert thing.ref.name == 'hi'
 
-    with pytest.raises(dc.CheckException):
+    thing = Thing('hi')
+    assert thing.ref.name == 'hi'
+
+    with pytest.raises(TypeError):
         thing = Thing(Ref[str]('hi'))  # noqa
