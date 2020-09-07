@@ -7,6 +7,8 @@ TODO:
    - and later worker isolation? celery? :/ or just own fork server, spark style
     - also, pyspark/pyflink lol
   - re rpcs: if possible push into snowflake/spark/whatever (jvm support), if not do whole-table-at-a-time (rs accel?)
+  - ** valid and useful to invalidate functions - should be detected at migration and triggerable for opaque rpcs **
+   - optional rpc 'version' poller
 """
 import typing as ta
 
