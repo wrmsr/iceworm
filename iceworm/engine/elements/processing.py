@@ -12,6 +12,7 @@ TODO:
  - RULES phase - keep? serde already bound lol, can't load any dynamic rule types yet.. *yet*.. nuke serde ctx?
  - subphases - use to combine transforms and validations? like disable mutation in POST?
  - class Phase(dc.Pure): name: str, mutable_element_types: ta.AbstractSet[type], ...
+ - decompose? need to setup ctors before instantiating next phases lol..
 """
 import abc
 import typing as ta
@@ -63,7 +64,7 @@ class ElementProcessor(lang.Abstract):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def process(self, elements: ElementSet) -> ElementSet:
+    def process(self, elements: ElementSet) -> ta.Iterable[Element]:
         raise NotImplementedError
 
 

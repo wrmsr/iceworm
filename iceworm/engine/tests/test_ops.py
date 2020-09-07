@@ -113,6 +113,24 @@ def get_src_table_domain(query: str, src: QualifiedName, dom: doms.Domain) -> do
     raise NotImplementedError
 
 
+class UrlSecretsReplacer(els.ElementProcessor):
+
+    def __init__(self, secrets: sec.Secrets) -> None:
+        super().__init__()
+
+        self._secrets = check.isinstance(secrets, sec.Secrets)
+
+    def processes(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
+        return [e for e in elements.get_type_set(ctrs.sql.SqlConnector.Config) if e.url_secret]
+
+    def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
+        return [
+            e.fmap(lambda cfg: {'url': self._secrets[cfg.url_secret].value, 'url_secret': None})
+            if isinstance(e, ctrs.sql.SqlConnector.Config) else e
+            for e in elements
+        ]
+
+
 # @pytest.mark.xfail()
 def test_ops(pg_engine):  # noqa
     # binder = inj.create_binder()
@@ -126,13 +144,7 @@ def test_ops(pg_engine):  # noqa
 
     ctor_cfgs = serde.deserialize(CONNECTORS_SER, ta.Sequence[ctrs.Connector.Config])
 
-    def replace_url_secrets(cfg: ctrs.Connector.Config) -> ta.Mapping[str, ta.Any]:
-        if isinstance(cfg, ctrs.sql.SqlConnector.Config) and cfg.url_secret is not None:
-            return {'url': secrets[cfg.url_secret].value, 'url_secret': None}
-        else:
-            return {}
-
-    ctor_cfgs = [cfg.fmap(replace_url_secrets) for cfg in ctor_cfgs]
+    ctor_cfgs = els.ElementProcessingDriver([UrlSecretsReplacer(secrets)]).process(els.ElementSet.of(ctor_cfgs))
 
     connectors = ctrs.ConnectorSet.of(ctor_cfgs)
 
