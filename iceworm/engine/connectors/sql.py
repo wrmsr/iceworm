@@ -27,7 +27,7 @@ class SqlConnector(Connector['SqlConnector', 'SqlConnector.Config']):
         url: ta.Optional[str] = dc.field(None, check=lambda s: s is None or (isinstance(s, str) and s))
         url_secret: ta.Optional[secrets.SecretKey] = dc.field(None, coerce=secrets.SecretKey.of_optional)
 
-        dc.check(lambda url, url_secret: check.one_of([url, url_secret]))
+        dc.check(lambda url, url_secret: check.one_of([url, url_secret], not_none=True))
 
         kwargs: ta.Mapping[str, ta.Any] = dc.field(ocol.frozendict(), coerce=ocol.frozendict)
 

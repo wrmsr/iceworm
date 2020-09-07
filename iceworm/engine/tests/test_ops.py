@@ -119,7 +119,7 @@ class UrlSecretsReplacer(els.ElementProcessor):
 
     def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
         return [
-            e.fmap(lambda cfg: {'url': self._secrets[cfg.url_secret].value, 'url_secret': None})
+            dc.replace(e, url=self._secrets[e.url_secret].value, url_secret=None)
             if isinstance(e, ctrs.sql.SqlConnector.Config) else e
             for e in elements
         ]
