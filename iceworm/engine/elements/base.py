@@ -62,17 +62,14 @@ blob:
  - 'create connector'? borderline bad divergence from snowflake, but all-sql is powerful
  - really all sql with hot comments
 """
-import operator
 import typing as ta
 
 from omnibus import check
-from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import lang
 
-from ...utils.nodal import NodalDataclass
 from ...utils import annotations as anns
-from ...utils import serde
+from ...utils import nodal
 
 
 Id = str
@@ -97,32 +94,14 @@ class Annotations(anns.Annotations[Annotation]):
         return Annotation
 
 
-class Element(dc.Enum, NodalDataclass['Element'], reorder=True):
+class Element(dc.Enum, nodal.Nodal['Element'], reorder=True):
 
     @classmethod
     def _nodal_cls(cls) -> ta.Type['Element']:
         return Element
 
-    anns: Annotations = dc.field(
-        (),
-        kwonly=True,
-        repr=False,
-        hash=False,
-        compare=False,
-        coerce=Annotations,
-        metadata={serde.Ignore: operator.not_},
-    )
-
-    meta: ta.Mapping[ta.Any, ta.Any] = dc.field(
-        ocol.frozendict(),
-        kwonly=True,
-        repr=False,
-        hash=False,
-        compare=False,
-        coerce=ocol.frozendict,
-        check=lambda d: not any(isinstance(k, Annotation) for k in d),
-        metadata={serde.Ignore: True},
-    )
+    anns: Annotations = nodal.new_anns_field(Annotations)
+    meta: ta.Mapping[ta.Any, ta.Any] = nodal.new_meta_field(Annotation)
 
     id: ta.Optional[Id] = dc.field(None, check=optional_id_check, kwonly=True)
 

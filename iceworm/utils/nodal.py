@@ -5,12 +5,18 @@ TODO:
 """
 import abc
 import collections
+import operator
 import types
 import typing as ta
 
+from omnibus import check
+from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import reflect as rfl
+
+from . import annotations as anns
+from . import serde
 
 
 Self = ta.TypeVar('Self')
@@ -27,7 +33,13 @@ class _FieldsInfo(dc.Pure):
     flds: ta.Mapping[str, _FieldInfo]
 
 
-class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
+class Nodal(ta.Generic[NodalT], lang.Abstract):
+
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+
+        # Note: Cannot build fields info here as this is happening during class construction.
+        check.state(dc.is_dataclass(cls))
 
     @classmethod
     @abc.abstractmethod
@@ -55,7 +67,7 @@ class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
             if rfl.is_generic(fcls) and fcls.__origin__ is collections.abc.Sequence:
                 [fcls] = fcls.__args__
                 seq = True
-            if isinstance(fcls, type) and issubclass(fcls, NodalDataclass):
+            if isinstance(fcls, type) and issubclass(fcls, Nodal):
                 flds[f.name] = _FieldInfo(fcls, opt, seq)
         return _FieldsInfo(flds)
 
@@ -124,3 +136,30 @@ class NodalDataclass(ta.Generic[NodalT], lang.Abstract):
 
     def fmap(self: Self, fn: ta.Callable[[NodalT], ta.Mapping[str, ta.Any]]) -> Self:
         return self.map(fn, **fn(self))
+
+
+def new_anns_field(anns_cls: ta.Type[anns.Annotations]) -> dc.Field:
+    check.issubclass(anns_cls, anns.Annotations)
+    return dc.field(
+        (),
+        kwonly=True,
+        repr=False,
+        hash=False,
+        compare=False,
+        coerce=anns_cls,
+        metadata={serde.Ignore: operator.not_},
+    )
+
+
+def new_meta_field(ann_cls: ta.Type[anns.Annotation]) -> dc.Field:
+    check.issubclass(ann_cls, anns.Annotation)
+    return dc.field(
+        ocol.frozendict(),
+        kwonly=True,
+        repr=False,
+        hash=False,
+        compare=False,
+        coerce=ocol.frozendict,
+        check=lambda d: not any(isinstance(k, ann_cls) for k in d),
+        metadata={serde.Ignore: True},
+    )

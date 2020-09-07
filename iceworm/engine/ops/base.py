@@ -1,13 +1,10 @@
-import operator
 import typing as ta
 
-from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 
 from ...utils import annotations as anns
 from ...utils import build_dc_repr
-from ...utils import serde
-from ...utils.nodal import NodalDataclass
+from ...utils import nodal
 
 
 class Annotation(anns.Annotation, abstract=True):
@@ -21,28 +18,10 @@ class Annotations(anns.Annotations[Annotation]):
         return Annotation
 
 
-class Op(dc.Enum, NodalDataclass['Op'], reorder=True, repr=False):
+class Op(dc.Enum, nodal.Nodal['Op'], reorder=True, repr=False):
 
-    anns: Annotations = dc.field(
-        (),
-        kwonly=True,
-        repr=False,
-        hash=False,
-        compare=False,
-        coerce=Annotations,
-        metadata={serde.Ignore: operator.not_},
-    )
-
-    meta: ta.Mapping[ta.Any, ta.Any] = dc.field(
-        ocol.frozendict(),
-        kwonly=True,
-        repr=False,
-        hash=False,
-        compare=False,
-        coerce=ocol.frozendict,
-        check=lambda d: not any(isinstance(k, Annotation) for k in d),
-        metadata={serde.Ignore: True},
-    )
+    anns: Annotations = nodal.new_anns_field(Annotations)
+    meta: ta.Mapping[ta.Any, ta.Any] = nodal.new_meta_field(Annotation)
 
     __repr__ = build_dc_repr
 
