@@ -1,6 +1,5 @@
 """
 TODO:
- - ** are conn confs ELEMENTS? **
  - virtual vs physical tables
  - physical tables requiring refresh
  - incremental vs total physical tables
@@ -10,6 +9,8 @@ TODO:
   - support snowflake json garbage on objects
  - piecewise conf? csv mounts? ...
   - *no*, but could have a csv_mount rule before ctor phase that rewrites the sole ctor cfg ele
+ - ctors/conns as ctxmgrs?
+ - HeapConnector - writable
 
 Def conns:
  - sql - snow + pg (+ incl internal state storage pg, 'self')

@@ -1,6 +1,12 @@
 """
 TODO:
  - materialization conn: els.Ref[Connection.Config]
+ - functions: js, py, sql, rpc
+  - re py: isolation of gross pandas deps and shit..
+  - ** revision tagging of py ** - no src to sha, pin to 'this' / site code ver
+   - and later worker isolation? celery? :/ or just own fork server, spark style
+    - also, pyspark/pyflink lol
+  - re rpcs: if possible push into snowflake/spark/whatever (jvm support), if not do whole-table-at-a-time (rs accel?)
 """
 import typing as ta
 

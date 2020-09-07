@@ -435,7 +435,7 @@ class DeserializationException(Exception):
 _NO_RERAISE = False
 
 
-def deserialize(ser: Serialized, cls: ta.Type[T], no_reraise: bool = False, succinct: bool = False) -> T:
+def deserialize(ser: Serialized, cls: ta.Any, no_reraise: bool = False, succinct: bool = False) -> T:
     if no_reraise or _NO_RERAISE:
         return _deserialize(ser, cls, succinct=succinct)
     else:

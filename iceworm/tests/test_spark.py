@@ -6,6 +6,10 @@ TODO:
    - just ship a reqs.txt w/ git+http://?
   - dist?
 
+https://docs.snowflake.com/en/user-guide/spark-connector-overview.html ?
+
+https://spark.apache.org/docs/latest/sql-ref-syntax.html
+
 https://github.com/SherpaConsulting/PyHiveSpark/blob/master/pyhive/sqlalchemy_spark.py
 https://github.com/dropbox/PyHive/pull/247/files
 

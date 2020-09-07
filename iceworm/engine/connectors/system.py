@@ -33,7 +33,7 @@ class Table(lang.Abstract):
 class SystemConnector(Connector['SystemConnector', 'SystemConnector.Config']):
 
     class Config(Connector.Config):
-        id: els.Id = dc.field('system', check=lambda s: isinstance(s, els.Id) and s)
+        id: els.Id = dc.field('system', check=els.id_check)
 
     def __init__(self, config: Config = Config()) -> None:
         super().__init__(check.isinstance(config, SystemConnector.Config))
