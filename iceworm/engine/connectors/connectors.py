@@ -11,6 +11,7 @@ TODO:
   - *no*, but could have a csv_mount rule before ctor phase that rewrites the sole ctor cfg ele
  - ctors/conns as ctxmgrs?
  - HeapConnector - writable
+ - simpler dumber connector? where does sf query jit live?
 
 Def conns:
  - sql - snow + pg (+ incl internal state storage pg, 'self')
@@ -43,6 +44,7 @@ from ... import metadata as md
 from ...types import QualifiedName
 from ...utils import serde
 from ...utils import unique_dict
+
 
 ConnectorT = ta.TypeVar('ConnectorT', bound='Connector')
 ConnectorConfigT = ta.TypeVar('ConnectorConfigT', bound='Connector.Config')
