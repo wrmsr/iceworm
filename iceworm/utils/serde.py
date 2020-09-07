@@ -72,6 +72,10 @@ Serialized = ta.Union[
 
 class Serde(lang.Abstract, ta.Generic[T]):
 
+    @property
+    def handles_dataclass_polymorphism(self) -> bool:
+        return False
+
     @abc.abstractmethod
     def serialize(self, obj: T) -> ta.Any:
         raise NotImplementedError
@@ -239,18 +243,29 @@ def _get_dataclass_field_type_map(dcls: type) -> _DataclassFieldSerdeMap:
         return dct
 
 
-def serialize_dataclass(obj: T, *, fcls: ta.Optional[ta.Type] = None) -> Serialized:
-    dct = {}
+def serialize_dataclass_fields(obj: T) -> Serialized:
+    ser = {}
     for fn, fs in _get_dataclass_field_type_map(type(obj)).items():
         v = getattr(obj, fn)
         if fs.ignore_if is not None and fs.ignore_if(v):
             continue
-        dct[fn] = serialize(v, fcls=fs.cls)
+        ser[fn] = serialize(v, fcls=fs.cls)
+    return ser
+
+
+def serialize_dataclass(obj: T, *, fcls: ta.Optional[ta.Type] = None, no_custom: bool = False) -> Serialized:
+    custom = _STATE.serdes_by_cls.get(type(obj)) if not no_custom else None
+    if custom is not None:
+        if custom.handles_dataclass_polymorphism:
+            return custom.serialize(obj)
+        ser = custom.serialize(obj)
+    else:
+        ser = serialize_dataclass_fields(obj)
     if fcls is type(obj) and _is_monomorphic_dataclass(fcls):
-        return dct
+        return ser
     else:
         scm = get_subclass_map(type(obj))
-        return {check.isinstance(scm[type(obj)], str): dct}
+        return {check.isinstance(scm[type(obj)], str): ser}
 
 
 def serialize(obj: T, *, fcls: ta.Optional[ta.Type] = None) -> Serialized:
@@ -260,12 +275,12 @@ def serialize(obj: T, *, fcls: ta.Optional[ta.Type] = None) -> Serialized:
             raise TypeError(fcls)
         [fcls] = [a for a in args if a not in (None, type(None))]
 
-    if type(obj) in _STATE.serdes_by_cls:
+    if dc.is_dataclass(obj):
+        return serialize_dataclass(obj, fcls=fcls)
+
+    elif type(obj) in _STATE.serdes_by_cls:
         serde = _STATE.serdes_by_cls[type(obj)]
         return serde.serialize(obj)
-
-    elif dc.is_dataclass(obj):
-        return serialize_dataclass(obj, fcls=fcls)
 
     elif isinstance(obj, collections.abc.Mapping):
         if fcls is not None and rfl.is_generic(fcls) and fcls.__origin__ is collections.abc.Mapping:
@@ -291,16 +306,11 @@ def serialize(obj: T, *, fcls: ta.Optional[ta.Type] = None) -> Serialized:
         raise TypeError(obj)
 
 
-def deserialize_dataclass(ser: Serialized, cls: type, *, succinct: bool = False) -> T:
-    if succinct and _is_monomorphic_dataclass(cls):
-        dct = ser
-        dcls = cls
-    else:
-        [[n, dct]] = ser.items()
-        dcls = check.isinstance(get_subclass_map(cls)[n], type)
+def deserialize_dataclass_fields(ser: ta.Mapping[str, ta.Any], dcls: type) -> T:
+    check.isinstance(ser, ta.Mapping)
     fdct = _get_dataclass_field_type_map(dcls)
     kw = {}
-    for k, v in dct.items():
+    for k, v in ser.items():
         try:
             fs = fdct[k]
         except KeyError:
@@ -310,6 +320,23 @@ def deserialize_dataclass(ser: Serialized, cls: type, *, succinct: bool = False)
         return dcls(**kw)
     except Exception as e:  # noqa
         raise
+
+
+def deserialize_dataclass(ser: Serialized, cls: type, *, succinct: bool = False, no_custom: bool = False) -> T:
+    oser = ser  # noqa
+    custom = _STATE.serdes_by_cls.get(cls) if not no_custom else None
+    if custom is not None and custom.handles_dataclass_polymorphism:
+        return custom.deserialize(ser)
+    if succinct and _is_monomorphic_dataclass(cls):
+        dcls = cls
+    else:
+        [[n, ser]] = check.isinstance(ser, ta.Mapping).items()
+        dcls = check.isinstance(get_subclass_map(cls)[n], type)
+    custom = _STATE.serdes_by_cls.get(dcls) if not no_custom else None
+    if custom is not None:
+        return custom.deserialize(ser)
+    else:
+        return deserialize_dataclass_fields(ser, dcls)
 
 
 def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) -> T:
@@ -322,7 +349,10 @@ def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) ->
             return None
         cls = ecls
 
-    if isinstance(cls, type) and cls in _STATE.serdes_by_cls:
+    if dc.is_dataclass(cls):
+        return deserialize_dataclass(ser, cls, succinct=succinct)
+
+    elif isinstance(cls, type) and cls in _STATE.serdes_by_cls:
         serde = _STATE.serdes_by_cls[cls]
         return serde.deserialize(ser)
 
@@ -370,11 +400,6 @@ def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) ->
     elif not isinstance(cls, type):
         raise TypeError(cls)
 
-    elif dc.is_dataclass(cls):
-        if not isinstance(ser, collections.abc.Mapping):
-            raise TypeError(ser)
-        return deserialize_dataclass(ser, cls, succinct=succinct)
-
     elif issubclass(cls, enum.Enum):
         if isinstance(ser, str):
             return cls.__members__[ser]
@@ -407,8 +432,11 @@ class DeserializationException(Exception):
         return repr(self)
 
 
+_NO_RERAISE = False
+
+
 def deserialize(ser: Serialized, cls: ta.Type[T], no_reraise: bool = False, succinct: bool = False) -> T:
-    if no_reraise:
+    if no_reraise or _NO_RERAISE:
         return _deserialize(ser, cls, succinct=succinct)
     else:
         try:

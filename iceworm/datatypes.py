@@ -198,14 +198,18 @@ class Table(Datatype):
 
 class DatatypeSerde(serde.AutoSerde[Datatype]):
 
+    @property
+    def handles_dataclass_polymorphism(self) -> bool:
+        return True
+
     def serialize(self, obj: Datatype) -> ta.Any:
-        return serde.serialize_dataclass(obj)
+        return serde.serialize_dataclass(obj, no_custom=True)
 
     def deserialize(self, ser: ta.Any) -> Datatype:
         if isinstance(ser, str):
             cls = Datatype.CLS_MAP[ser]
             return cls()
-        return serde.deserialize_dataclass(ser, Datatype)
+        return serde.deserialize_dataclass(ser, Datatype, no_custom=True)
 
 
 @serde.subclass_map_resolver_for(Datatype)

@@ -7,6 +7,7 @@ from omnibus import dataclasses as dc
 import pytest
 
 from .. import serde
+from ... import types as ty
 
 
 class Pt(dc.Pure):
@@ -64,3 +65,32 @@ def test_serde():
     rt(datetime.datetime.now().time())
     rt(datetime.datetime.now())
     rt(uuid.uuid4())
+
+
+def test_code_serde():
+    src = 'x: x + 2'
+    lam = ty.Lambda(src)
+    assert lam.fn(420) == 422
+
+    assert serde.deserialize({'lambda': 'x: x + 10'}, ty.Lambda).fn(20) == 30
+
+    s = serde.serialize(lam)
+    assert s == {'lambda': {'src': src}}
+    d = serde.deserialize(s, ty.Lambda)
+    assert d.fn(422) == 424
+
+    class Thing0(dc.Pure):
+        code: ty.Code
+
+    s = serde.serialize(Thing0(lam))
+    assert s == {'thing0': {'code': {'lambda': {'src': src}}}}
+    d = serde.deserialize(s, Thing0)
+    assert d.code.fn(424) == 426
+
+    class Thing1(dc.Pure):
+        lam: ty.Lambda
+
+    s = serde.serialize(Thing1(lam))
+    assert s == {'thing1': {'lam': {'src': src}}}
+    d = serde.deserialize(s, Thing1)
+    assert d.lam.fn(426) == 428

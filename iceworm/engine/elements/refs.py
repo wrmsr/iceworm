@@ -63,6 +63,10 @@ class Ref(dc.Frozen, lang.Abstract, ta.Generic[ElementT], repr=False, eq=False, 
         class _RefSerde(serde.AutoSerde[cls]):  # noqa
             _bind = cls
 
+            @property
+            def handles_dataclass_polymorphism(self) -> bool:
+                return True
+
             def serialize(self, obj: Ref) -> ta.Any:
                 return check.isinstance(obj, cls).id
 

@@ -2,11 +2,13 @@
 TODO:
   - quoting - of_dottable
 """
+import abc
 import collections.abc
 import typing as ta
 
 from omnibus import check
 from omnibus import dataclasses as dc
+from omnibus import properties
 
 from .utils import seq
 from .utils import serde
@@ -84,3 +86,29 @@ class QualifiedNameSerde(serde.AutoSerde[QualifiedName]):
 
     def deserialize(self, ser: ta.Any) -> QualifiedName:
         return QualifiedName.of(ser)
+
+
+class Code(dc.Enum):
+
+    @abc.abstractproperty
+    def fn(self) -> ta.Callable:
+        raise NotImplementedError
+
+
+class Lambda(Code, allow_setattr=True):
+    src: str = dc.field(check=lambda s: isinstance(s, str) and ':' in s)
+
+    @properties.cached
+    def fn(self) -> ta.Callable:
+        return eval('lambda ' + self.src)
+
+
+class LambdaSerde(serde.AutoSerde[Lambda]):
+
+    def serialize(self, obj: Lambda) -> ta.Any:
+        return serde.serialize_dataclass_fields(obj)
+
+    def deserialize(self, ser: ta.Any) -> Lambda:
+        if isinstance(ser, str):
+            return Lambda(ser)
+        return serde.deserialize_dataclass_fields(ser, Lambda)
