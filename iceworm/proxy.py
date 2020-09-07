@@ -1,6 +1,9 @@
 """
 TODO:
- - rationale: reflection, including for connectors
+ - rationale:
+  - datagrip
+  - reflection, including for connectors
+  - special functions / lang extensions: drop, let, ...
  - alt: pretend to be snowflake but use presto driver?
 
 https://docs.snowflake.com/en/user-guide/snowsql-start.html#using-a-proxy-server

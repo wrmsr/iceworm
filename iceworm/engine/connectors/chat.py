@@ -4,6 +4,10 @@ TODO:
  - omni's iface?
  - schema: 2-deep max from sqla
   - channels table, messages table
+ - send only on commit
+  - could update/del then lol
+   - how to combine with reads?
+  - provided by a buffering conn wrapper (heap?)
 """
 import typing as ta
 

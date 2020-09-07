@@ -12,6 +12,7 @@ TODO:
  - ctors/conns as ctxmgrs?
  - HeapConnector - writable
  - simpler dumber connector? where does sf query jit live?
+ - 'union'? 'overlay'? wrap one by heap/pg to give txns?
 
 Def conns:
  - sql - snow + pg (+ incl internal state storage pg, 'self')
@@ -28,6 +29,7 @@ Alt conns:
  - gsheets
  - slack
  - github
+ - pandas? :/
 """
 import abc
 import typing as ta

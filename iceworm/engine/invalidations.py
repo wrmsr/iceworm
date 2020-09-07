@@ -2,10 +2,14 @@
 TODO:
  - DomainInvalidation
  - LookupInvalidation
+  - a Lookup invalidation is its own trigger..
  - sensors - s3, sftp, user
   - * codechange *
  - Invalidator takes an Invalidation
- - a Lookup invalidation is its own trigger..
+ - ** debouncer **
+  - rx-y? http://reactivex.io/documentation/operators.html
+ - kafka/cdc..
+  - ideally compile whole shebang to a single flink/spark job
 """
 from omnibus import dataclasses as dc
 from omnibus import lang

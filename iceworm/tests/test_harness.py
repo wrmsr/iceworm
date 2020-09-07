@@ -1,3 +1,12 @@
+"""
+TODO:
+ - pytest injector scopes: function, class, module, package, session
+  - lifecycle callbacks
+ - still use pytest for parameterization
+ - 'harness' dep?
+ - inj mods reg in conftests?
+  - watch imports
+"""
 from omnibus import inject as inj
 import pytest
 

@@ -1,7 +1,7 @@
 """
 FIXME:
- - caseless parsing, semicolon
- - termination
+ - caseless parsing (func kwargs? idents? use omni CaseInsens thing)
+ - semicolon termination
  - total parsing
  - builtin quoting
 
@@ -23,6 +23,7 @@ TODO:
  - special forms:
   - let, drop
  - $$, create func?
+ - ** flink, spark, catalyst in general **
 
 TODO ( https://calcite.apache.org/docs/reference.html ):
  - UNNEST '(' expression ')' [ WITH ORDINALITY ]
