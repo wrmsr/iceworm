@@ -13,6 +13,7 @@ TODO:
  - dc anns like nodal/serde, ignored for heap
  - atom? running txns?
  - codec? for heap referential vs serialized
+ - move dc mapping to utils, generalize out - historical state can stay here
 
 tables:
  - worlds

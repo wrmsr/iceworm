@@ -436,8 +436,8 @@ docker-invalidate:
 
 .PHONY: pg-repl
 pg-repl: venv
-	export PORT=$$(.venv/bin/python -c "import yaml; dct = yaml.safe_load(open('docker/docker-compose.yml', 'r').read()); print(dct['services']['iceworm-postgres']['ports'][0].split(':')[0])") ; \
-	PGPASSWORD=iceworm .venv/bin/pgcli --user iceworm --host localhost --port "$$PORT"
+	export $$(.venv/bin/python -c "import yaml; dct = yaml.safe_load(open('docker/docker-compose.yml', 'r').read()); cfg = dct['services']['iceworm-postgres']; print('PG_USER=' + cfg['environment']['POSTGRES_USER']); print('PG_PASSWORD=' + cfg['environment']['POSTGRES_PASSWORD']); print('PG_PORT=' + cfg['ports'][0].split(':')[0])" | xargs) && \
+	PGPASSWORD="$$PG_PASSWORD" .venv/bin/pgcli --user "$$PG_USER" --host localhost --port "$$PG_PORT"
 
 .PHONY: sf-repl
 sf-repl:

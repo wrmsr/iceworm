@@ -1,3 +1,4 @@
+# TODO: flink, kafka
 DOCKER_USER=wrmsr
 
 DOCKER_IMAGES:= \

@@ -1,3 +1,7 @@
+"""
+TODO:
+ - dialects: pg/sf/sqlite
+"""
 import typing as ta
 
 from omnibus import check
@@ -19,9 +23,6 @@ from .connectors import RowSource
 
 
 class SqlConnector(Connector['SqlConnector', 'SqlConnector.Config']):
-    """
-    postgres/mysql/snowflake
-    """
 
     class Config(Connector.Config):
         url: ta.Optional[str] = dc.field(None, check=lambda s: s is None or (isinstance(s, str) and s))

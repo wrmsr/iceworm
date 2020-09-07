@@ -15,6 +15,9 @@ TODO:
  - decompose? need to setup ctors before instantiating next phases lol..
  - secrets processor - url: str, url_secret: Secret = dc.field(metadata={els.SecretField: 'url')
  - phase inj scope?
+ - overlap w/ tree xforms? passes? no cuz flat?
+ - support / enforce els.Frozen
+  - added by phase * in addition to rejecting addition of phase-frozen types *
 """
 import abc
 import typing as ta

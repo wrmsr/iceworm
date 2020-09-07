@@ -1,4 +1,4 @@
-from omnibus import inject as inj
+from omnibus import inject as inj  # noqa
 
 
 # class

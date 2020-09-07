@@ -1,3 +1,7 @@
+"""
+TODO:
+ - ->omni ?
+"""
 import abc
 import enum
 import functools

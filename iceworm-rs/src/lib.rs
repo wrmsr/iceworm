@@ -1,3 +1,12 @@
+/*
+TODO:
+ - pumps
+ - cancel (poll in rs), get progress (generalized op status? + generic 'progress'?)
+ - parquet
+ - destructure
+  - embeds_one/embeds_many - -> table with fk
+  - has_and_belongs_to_many -> table of 2 fks
+*/
 use csv::Error;
 
 extern crate postgres;

@@ -67,6 +67,7 @@ import typing as ta
 from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
+from omnibus import lang
 
 from ...utils.nodal import NodalDataclass
 from ...utils import annotations as anns
@@ -131,3 +132,7 @@ class Element(dc.Enum, NodalDataclass['Element'], reorder=True):
 
 class Origin(Annotation):
     element: Element
+
+
+class Frozen(lang.Marker):
+    pass

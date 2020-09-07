@@ -1,4 +1,10 @@
 """
+FIXME:
+ - caseless parsing, semicolon
+ - termination
+ - total parsing
+ - builtin quoting
+
 TODO:
  - select * from table (f()) - currently parses table as ident?
  - double check nullsFunctionCall rewriting is correct
@@ -16,6 +22,7 @@ TODO:
   - trailing commas, 'and's, joins?
  - special forms:
   - let, drop
+ - $$, create func?
 
 TODO ( https://calcite.apache.org/docs/reference.html ):
  - UNNEST '(' expression ')' [ WITH ORDINALITY ]

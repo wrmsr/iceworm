@@ -3,6 +3,14 @@ TODO:
  - QualifiedName visitability.. somewhere
  - CreateOrReplaceTable (w/ prefixes)
  - batching for snowflake...
+ - helper against sqla inserts with nonexisting columns :/
+ - better string renderingg
+  - snowflake (json)
+  - pg (bytes)
+ - dialect abstraction, or elements?
+  - range gen:
+   - pg: `select i from generate_series(1, 5) s(i)`
+   - sf: `select seq4() i from table(generator(rowcount => 10))`
 """
 from omnibus import dataclasses as dc
 import sqlalchemy as sa

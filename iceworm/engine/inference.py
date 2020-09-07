@@ -1,6 +1,8 @@
 """
 TODO:
  - 'processed' sql query attribute?
+ - ** query elements get a Map[QualifiedName, Id] field (or att??)
+ - ** connector tables added to elements as Tables and r/o Materializations, given id's **
 """
 import contextlib
 import typing as ta
