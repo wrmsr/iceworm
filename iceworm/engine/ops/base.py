@@ -40,6 +40,7 @@ class Op(dc.Enum, NodalDataclass['Op'], reorder=True, repr=False):
         hash=False,
         compare=False,
         coerce=ocol.frozendict,
+        check=lambda d: not any(isinstance(k, Annotation) for k in d),
         metadata={serde.Ignore: True},
     )
 

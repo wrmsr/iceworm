@@ -120,6 +120,7 @@ class Element(dc.Enum, NodalDataclass['Element'], reorder=True):
         hash=False,
         compare=False,
         coerce=ocol.frozendict,
+        check=lambda d: not any(isinstance(k, Annotation) for k in d),
         metadata={serde.Ignore: True},
     )
 
