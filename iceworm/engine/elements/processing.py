@@ -10,6 +10,8 @@ TODO:
   - 'aspect_id' tagging equiv - 'ProcessedBy' attribute?
  - ProcessedBy allowed to be updated but only for self, added if not
  - RULES phase - keep? serde already bound lol, can't load any dynamic rule types yet.. *yet*.. nuke serde ctx?
+ - subphases - use to combine transforms and validations? like disable mutation in POST?
+ - class Phase(dc.Pure): name: str, mutable_element_types: ta.AbstractSet[type], ...
 """
 import abc
 import typing as ta
@@ -35,14 +37,26 @@ class Phase(lang.AutoEnum):
     TARGETS = ...
     FINALIZE = ...
 
+    @classmethod
+    def all(cls) -> ta.List['Phase']:
+        return list(cls.__members__.values())
+
 
 class SubPhase(lang.AutoEnum):
     PRE = ...
     MAIN = ...
     POST = ...
 
+    @classmethod
+    def all(cls) -> ta.List['SubPhase']:
+        return list(cls.__members__.values())
+
 
 class ElementProcessor(lang.Abstract):
+
+    @property
+    def phases(self) -> ta.Iterable[Phase]:
+        return Phase.all()
 
     @abc.abstractmethod
     def processes(self, elements: ElementSet) -> ta.Iterable[Element]:
@@ -60,12 +74,17 @@ class ElementProcessingDriver:
 
         lst = []
         seen = ocol.IdentitySet()
+        by_phase = {}
         for ep in processors:
             check.isinstance(ep, ElementProcessor)
             check.not_in(ep, seen)
             lst.append(ep)
+            for p in set(ep.phases):
+                check.isinstance(p, Phase)
+                by_phase.setdefault(p, []).append(ep)
             seen.add(ep)
         self._processors: ta.Sequence[ElementProcessor] = lst
+        self._processor_seqs_by_phase: ta.Mapping[Phase, ta.Sequence[ElementProcessor]] = by_phase
 
     @property
     def processors(self) -> ta.Sequence[ElementProcessor]:
@@ -74,38 +93,43 @@ class ElementProcessingDriver:
     def process(self, elements: ta.Iterable[Element]) -> ElementSet:
         elements = ElementSet.of(elements)
 
-        while True:
-            dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Element]] = ocol.IdentityKeyDict()
-            for ep in self._processors:
-                epes = ocol.IdentitySet(check.isinstance(e, Element) for e in ep.processes(elements))
-                if epes:
-                    dct[ep] = epes
-            if not dct:
-                break
+        for phase in Phase.all():
+            eps = self._processor_seqs_by_phase.get(phase, [])
+            if not eps:
+                continue
 
-            cur, cures = next(iter(dct.items()))
-            expected = [e for e in elements if e not in cures]
-            res = ElementSet.of(cur.process(elements))
+            while True:
+                dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Element]] = ocol.IdentityKeyDict()
+                for ep in eps:
+                    epes = ocol.IdentitySet(check.isinstance(e, Element) for e in ep.processes(elements))
+                    if epes:
+                        dct[ep] = epes
+                if not dct:
+                    break
 
-            missing = [e for e in expected if e not in res]
-            if missing:
-                raise ValueError(missing)
+                cur, cures = next(iter(dct.items()))
+                expected = [e for e in elements if e not in cures]
+                res = ElementSet.of(cur.process(elements))
 
-            swaps: ta.MutableMapping[Element, Element] = ocol.IdentityKeyDict()
+                missing = [e for e in expected if e not in res]
+                if missing:
+                    raise ValueError(missing)
 
-            added = [e for e in res if e not in elements]
-            removed = [e for e in elements if e not in res]  # noqa
-            for e in added:
-                pbs = e.meta.get(ProcessedBy)
-                if pbs is not None:
-                    check.state(check.single(pbs) is cur)
-                    continue
-                swaps[e] = dc.replace(e, meta={**e.meta, ProcessedBy: ocol.IdentitySet([cur])})
-            # TODO: tag matched but unmodified?
+                swaps: ta.MutableMapping[Element, Element] = ocol.IdentityKeyDict()
 
-            if swaps:
-                res = ElementSet.of(swaps.get(e, e) for e in res)
+                added = [e for e in res if e not in elements]
+                removed = [e for e in elements if e not in res]  # noqa
+                for e in added:
+                    pbs = e.meta.get(ProcessedBy)
+                    if pbs is not None:
+                        check.state(check.single(pbs) is cur)
+                        continue
+                    swaps[e] = dc.replace(e, meta={**e.meta, ProcessedBy: ocol.IdentitySet([cur])})
+                # TODO: tag matched but unmodified?
 
-            elements = res
+                if swaps:
+                    res = ElementSet.of(swaps.get(e, e) for e in res)
+
+                elements = res
 
         return elements
