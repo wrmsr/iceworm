@@ -69,6 +69,7 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 
 from ...utils import annotations as anns
+from ...utils import build_dc_repr
 from ...utils import nodal
 
 
@@ -96,19 +97,21 @@ class Annotations(anns.Annotations[Annotation]):
 
 class Element(dc.Enum, nodal.Nodal['Element'], reorder=True):
 
-    @classmethod
-    def _nodal_cls(cls) -> ta.Type['Element']:
-        return Element
-
-    anns: Annotations = nodal.new_anns_field(Annotations)
-    meta: ta.Mapping[ta.Any, ta.Any] = nodal.new_meta_field(Annotation)
-
     id: ta.Optional[Id] = dc.field(None, check=optional_id_check, kwonly=True)
 
     def __init_subclass__(cls, **kwargs) -> None:
         super().__init_subclass__(**kwargs)
         nf = dc.fields_dict(cls)['id']
         check.state(nf.type in (Id, ta.Optional[Id]))
+
+    anns: Annotations = nodal.new_anns_field(Annotations)
+    meta: ta.Mapping[ta.Any, ta.Any] = nodal.new_meta_field(Annotation)
+
+    @classmethod
+    def _nodal_cls(cls) -> ta.Type['Element']:
+        return Element
+
+    __repr__ = build_dc_repr
 
 
 class Origin(Annotation):
