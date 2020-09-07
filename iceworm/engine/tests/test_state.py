@@ -10,8 +10,8 @@ import pytest
 import sqlalchemy as sa
 
 from .. import state as st
-from ...tests.helpers import clean_pg
-from ...tests.helpers import pg_url  # noqa
+from ...sql.tests.helpers import clean_pg
+from ...sql.tests.helpers import pg_url  # noqa
 
 
 @dc.dataclass(frozen=True)

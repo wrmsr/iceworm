@@ -2,6 +2,7 @@
 TODO:
  - multi_exec for test parity
 """
+from .adapter import Adapter
 
 """
 do
@@ -26,3 +27,7 @@ $$
     end
 $$;
 """
+
+
+class PostgresAdapter(Adapter):
+    pass

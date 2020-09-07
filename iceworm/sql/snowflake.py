@@ -55,6 +55,8 @@ import typing as ta
 
 from omnibus import lang
 
+from .adapter import Adapter
+
 
 EXEC_MULTI_SP_SRC = """
 create or replace procedure exec_multi(stmts variant)
@@ -147,3 +149,7 @@ def get_url() -> str:
             '/' +
             (('?' + '&'.join(f'{k}={v}' for k, v in url_params.items())) if url_params else '')
     )
+
+
+class SnowflakeAdapter(Adapter):
+    pass

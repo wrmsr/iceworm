@@ -10,7 +10,7 @@ import pytest
 import sqlalchemy as sa
 
 from .. import tpch
-from .helpers import call_many_with_timeout
+from ...tests.helpers import call_many_with_timeout
 from .helpers import clean_pg
 from .helpers import pg_url  # noqa
 

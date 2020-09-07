@@ -9,7 +9,7 @@ import sqlalchemy as sa
 from .. import snowflake
 from .. import sql
 from .. import tpch
-from ..types import QualifiedName
+from ...types import QualifiedName
 
 
 @pytest.mark.xfail()

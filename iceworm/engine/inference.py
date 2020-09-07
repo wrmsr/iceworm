@@ -1,8 +1,8 @@
 """
 TODO:
+ - *** CONNECTOR TABLES ADDED TO ELEMENTS AS TABLES AND R/O MATERIALIZATIONS, GIVEN ID'S ***
  - 'processed' sql query attribute?
  - ** query elements get a Map[QualifiedName, Id] field (or att??)
- - ** connector tables added to elements as Tables and r/o Materializations, given id's **
 """
 import contextlib
 import typing as ta
@@ -61,7 +61,6 @@ class InferTableProcessor(els.ElementProcessor):
             for i, ele in enumerate(ts):
                 if isinstance(ele, tars.Table):
                     tn_idxs[ele.id] = i
-                    # TODO: get single Materialization, do.. something..
                     rows = check.single(rt for rt in ts.get_type_set(tars.Rows) if rt.table == ele)
                     root = par.parse_statement(rows.query)
                     deps = {

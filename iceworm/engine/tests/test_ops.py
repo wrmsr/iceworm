@@ -23,9 +23,9 @@ from .. import invalidations as invs  # noqa
 from .. import planning as pln
 from .. import rules as rls
 from ... import domains as doms
-from ...tests.helpers import pg_engine  # noqa
-from ...tests.helpers import pg_url  # noqa  # FIXME: jesus christ pytest fucking sucks
-from ...tests.helpers import raw_pg_url
+from ...sql.tests.helpers import pg_engine  # noqa
+from ...sql.tests.helpers import pg_url  # noqa  # FIXME: jesus christ pytest fucking sucks
+from ...sql.tests.helpers import raw_pg_url
 from ...types import QualifiedName  # noqa
 from ...utils import secrets as sec  # noqa
 from ...utils import serde
