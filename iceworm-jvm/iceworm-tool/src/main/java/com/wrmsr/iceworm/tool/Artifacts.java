@@ -51,6 +51,7 @@ public class Artifacts
         }
         File repository = new File(new File(m2Home), "repository");
         File cwd = new File(System.getProperty("user.dir"));
+        // File cwd = new File(System.getenv("PWD"));
 
         ArtifactResolver resolver = new ArtifactResolver(
                 ArtifactResolver.USER_LOCAL_REPO,
