@@ -200,4 +200,8 @@ def test_pg8000(pg_url):  # noqa
     with contextlib.ExitStack() as es:
         engine = es.enter_context(lang.disposing(sa.create_engine(pg_url)))
         conn = es.enter_context(engine.connect())
-        print(conn.scalar('select 1'))
+
+        stmt = sa.select([sa.literal('abcd')])
+        print(conn.scalar(stmt))
+
+        print(stmt.compile(compile_kwargs={"literal_binds": True}))

@@ -47,3 +47,7 @@ def visit_create_table_as(element: CreateTableAs, compiler, **kwargs):
         compiler.process(element.name),
         compiler.process(element.query),
     )
+
+
+def render_literal(stmt: sa.sql.visitors.Visitable) -> str:
+    return stmt.compile(compile_kwargs={'literal_binds': True})
