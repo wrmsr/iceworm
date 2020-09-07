@@ -6,6 +6,8 @@ TODO:
   - allows specifying hadoop dist
   - v8?
   - jdbc drivers
+ - ** instantiate jvm in cpy, pass protos without shutdown **
+  - in addition to cli - with 'run', 'stream', etc
 */
 package com.wrmsr.iceworm.tool;
 

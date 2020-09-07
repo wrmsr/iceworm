@@ -12,7 +12,7 @@ import router from './router'
 
 Vue.config.productionTip = false
 
-import { iceworm } from './proto/bundle'
+import { iceworm } from './protos/bundle'
 const { WebServiceStatus } = iceworm
 
 let message = WebServiceStatus.create({ uptime: 42. })
