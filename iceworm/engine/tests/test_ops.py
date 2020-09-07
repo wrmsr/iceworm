@@ -31,7 +31,7 @@ from ...utils import secrets as sec  # noqa
 from ...utils import serde
 
 
-CONNECTORS_YML = f"""
+ELEMENTS_YML = f"""
 
 - system_connector: {{}}
 
@@ -60,12 +60,6 @@ CONNECTORS_YML = f"""
         columns:
         - {{name: num, type: integer}}
       fn: {{lambda: ": [{{'num': i}} for i in range(10)]"}}
-
-"""
-
-CONNECTORS_SER = yaml.safe_load(CONNECTORS_YML)
-
-ELEMENTS_YML = """
 
 - table_as_select:
     table: [pg, a]
@@ -142,13 +136,11 @@ def test_ops(pg_engine):  # noqa
 
     secrets = sec.Secrets({'pg_url': raw_pg_url()})
 
-    ctor_cfgs = serde.deserialize(CONNECTORS_SER, ta.Sequence[ctrs.Connector.Config])
-
-    ctor_cfgs = els.ElementProcessingDriver([UrlSecretsReplacer(secrets)]).process(els.ElementSet.of(ctor_cfgs))
-
-    connectors = ctrs.ConnectorSet.of(ctor_cfgs)
-
     elements = els.ElementSet.of(serde.deserialize(ELEMENTS_SER, ta.Sequence[els.Element]))
+
+    elements = els.ElementProcessingDriver([UrlSecretsReplacer(secrets)]).process(elements)
+
+    connectors = ctrs.ConnectorSet.of(elements.get_type_set(ctrs.Connector.Config))
 
     tprocs = [
         rls.RuleElementProcessor(rls.TableAsSelectProcessor()),
