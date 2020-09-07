@@ -7,6 +7,9 @@ from ...utils import serde
 
 def test_refs():
     r = els.Ref[tars.Table]('hi')
+    assert isinstance(r, els.Ref)
+    assert isinstance(r, els.Ref[tars.Table])  # noqa
+    assert not isinstance(r, els.Ref[tars.Function])  # noqa
     assert repr(r) == "Ref[Table]('hi')"
 
     with pytest.raises(TypeError):
