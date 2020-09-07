@@ -7,8 +7,8 @@ import pytest
 import sqlalchemy as sa
 
 from .. import snowflake
-from .. import sql
 from .. import tpch
+from ... import sql
 from ...types import QualifiedName
 
 

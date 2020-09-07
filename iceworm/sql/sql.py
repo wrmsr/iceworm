@@ -4,7 +4,8 @@ TODO:
  - CreateOrReplaceTable (w/ prefixes)
  - batching for snowflake...
  - helper against sqla inserts with nonexisting columns :/
- - better string renderingg
+ - better string rendering
+  - https://stackoverflow.com/questions/5631078/sqlalchemy-print-the-actual-query
   - snowflake (json)
   - pg (bytes)
  - dialect abstraction, or elements?
@@ -12,50 +13,9 @@ TODO:
    - pg: `select i from generate_series(1, 5) s(i)`
    - sf: `select seq4() i from table(generator(rowcount => 10))`
 """
-from omnibus import dataclasses as dc
 import sqlalchemy as sa
 import sqlalchemy.ext.compiler  # noqa
 
-from ..types import QualifiedName
 
-
-@dc.dataclass(frozen=True)
-class QualifiedNameElement(sa.sql.expression.ClauseElement):
-    name: QualifiedName = dc.field(coerce=QualifiedName.of)
-
-
-@sa.ext.compiler.compiles(QualifiedNameElement)
-def visit_qualified_name(element: QualifiedNameElement, compiler, **kwargs):
-    return '%s' % (
-        '.'.join(compiler.preparer.quote(p) for p in element.name),
-    )
-
-
-@dc.dataclass(frozen=True)
-class DropTableIfExists(sa.sql.expression.Executable, sa.sql.expression.ClauseElement):
-    name: QualifiedName = dc.field(coerce=QualifiedName.of)
-
-
-@sa.ext.compiler.compiles(DropTableIfExists)
-def visit_drop_table_if_exists(element: DropTableIfExists, compiler, **kwargs):
-    return 'DROP TABLE IF EXISTS %s' % (
-        '.'.join(compiler.preparer.quote(p) for p in element.name),
-    )
-
-
-@dc.dataclass(frozen=True)
-class CreateTableAs(sa.sql.expression.Executable, sa.sql.expression.ClauseElement):
-    name: sa.sql.visitors.Visitable = dc.field(check=lambda o: isinstance(o, sa.sql.visitors.Visitable))
-    query: sa.sql.visitors.Visitable = dc.field(check=lambda o: isinstance(o, sa.sql.visitors.Visitable))
-
-
-@sa.ext.compiler.compiles(CreateTableAs)
-def visit_create_table_as(element: CreateTableAs, compiler, **kwargs):
-    return 'CREATE TABLE %s AS %s' % (
-        compiler.process(element.name),
-        compiler.process(element.query),
-    )
-
-
-def render_literal(stmt: sa.sql.visitors.Visitable) -> str:
+def render_query(stmt: sa.sql.visitors.Visitable) -> str:
     return stmt.compile(compile_kwargs={'literal_binds': True})

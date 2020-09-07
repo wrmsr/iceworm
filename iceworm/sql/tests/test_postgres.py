@@ -8,6 +8,8 @@ from omnibus import lang
 from omnibus import threading as othr
 import pytest
 import sqlalchemy as sa
+import sqlalchemy.ext.compiler  # noqa
+import sqlalchemy.sql.selectable  # noqa
 
 from .. import tpch
 from ...tests.helpers import call_many_with_timeout
@@ -205,3 +207,33 @@ def test_pg8000(pg_url):  # noqa
         print(conn.scalar(stmt))
 
         print(stmt.compile(compile_kwargs={"literal_binds": True}))
+
+
+class ColumnListAlias(sa.sql.selectable.Alias):
+
+    # __visit_name__ = "column_list_alias"
+
+    def _init(self, selectable, name, cols):
+        super()._init(selectable, name)
+        self.cols = cols
+
+    @classmethod
+    def _factory(cls, selectable, name, cols):
+        return cls._construct(sa.sql.selectable._interpret_as_from(selectable), name, cols)
+
+
+column_list_alias = ColumnListAlias._factory
+
+
+@sa.ext.compiler.compiles(ColumnListAlias)
+def visit_column_list_alias(element: ColumnListAlias, compiler, **kwargs):
+    breakpoint()
+    raise NotImplementedError
+
+
+def test_col_aliases():
+    t = sa.table('t')
+    at = t.alias('barf')
+    # at = column_list_alias(t, 'barf', ['a'])
+    stmt = sa.select('*').select_from(at)
+    print(stmt)

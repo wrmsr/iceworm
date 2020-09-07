@@ -1,7 +1,8 @@
-from . import adapter  # noqa
 from . import postgres  # noqa
 from . import snowflake  # noqa
 from . import tpch  # noqa
-from .sql import CreateTableAs  # noqa
-from .sql import DropTableIfExists   # noqa
-from .sql import QualifiedNameElement  # noqa
+from .adapter import Adapter  # noqa
+from .elements import CreateTableAs  # noqa
+from .elements import DropTableIfExists   # noqa
+from .elements import QualifiedNameElement  # noqa
+from .sql import render_query  # noqa

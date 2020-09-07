@@ -2,6 +2,9 @@
 TODO:
  - multi_exec for test parity
 """
+from omnibus import lang
+import sqlalchemy as sa
+
 from .adapter import Adapter
 
 """
@@ -30,4 +33,10 @@ $$;
 
 
 class PostgresAdapter(Adapter):
-    pass
+
+    @lang.override
+    def build_range(self, num):
+        # sa.alias
+        # select i from generate_series(1, 5) s(i)
+        # return sa.select([])
+        raise NotImplementedError
