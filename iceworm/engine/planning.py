@@ -8,6 +8,7 @@ from . import elements as els
 from . import ops
 from . import targets as tars
 from .. import metadata as md
+from ..types import QualifiedName
 
 
 class ElementPlanner:
@@ -36,7 +37,7 @@ class ElementPlanner:
 
         tbl_qn_sets_by_id = {}
         for mat in self._elements.get_type_set(tars.Materialization):
-            tbl_qn_sets_by_id.setdefault(mat.table.id, set()).add(mat.dst)
+            tbl_qn_sets_by_id.setdefault(mat.table.id, set()).add(QualifiedName([mat.connector.id, *mat.name]))
 
         for ele in self._elements:
             if isinstance(ele, tars.Table):

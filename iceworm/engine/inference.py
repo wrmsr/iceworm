@@ -49,8 +49,10 @@ class InferTableProcessor(els.ElementProcessor):
 
         @properties.stateful_cached
         def output(self) -> els.ElementSet:
-            ele_tns = unique_dict(
-                (ele.dst, self._input[ele.table]) for ele in self._input.get_type_set(tars.Materialization))
+            ele_tns: ta.Mapping[QualifiedName, tars.Table] = unique_dict(
+                (QualifiedName([ele.connector.id, *ele.name]), self._input[ele.table])
+                for ele in self._input.get_type_set(tars.Materialization)
+            )
             tele_ids = unique_dict((ele.id, qn) for qn, ele in ele_tns.items())
 
             ts = els.ElementSet(self._input)

@@ -12,6 +12,7 @@ TODO:
  - ctors/conns as ctxmgrs?
  - HeapConnector - writable
  - simpler dumber connector? where does sf query jit live?
+  - conns that support sql pushdown vs not..
  - 'union'? 'overlay'? wrap one by heap/pg to give txns?
 
 Def conns:

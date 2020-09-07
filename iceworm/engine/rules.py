@@ -120,6 +120,6 @@ class TableAsSelectProcessor(RuleProcessor[TableAsSelect]):
         ten = cn + '/' + tn
         return [
             tars.Table(ten, md=rule.md),
-            tars.Materialization(ten, rule.table),
+            tars.Materialization(ten, cn, [tn]),
             tars.Rows(ten, rule.query),
         ]

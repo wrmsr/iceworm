@@ -82,7 +82,8 @@ ELEMENTS_YML = f"""
 
 - materialization:
     table: system/notifications
-    dst: [system, notifications]
+    connector: system
+    name: [notifications]
 
 - rows:
     table: system/notifications

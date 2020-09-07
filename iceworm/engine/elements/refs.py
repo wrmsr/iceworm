@@ -101,8 +101,10 @@ class Ref(dc.Frozen, lang.Abstract, ta.Generic[ElementT], repr=False, eq=False, 
         return cls[arg]
 
     @classmethod
-    def of(cls: ta.Type[Self], obj: ta.Union['Ref', Id]) -> Self:
-        if type(obj) is cls:
+    def of(cls: ta.Type[Self], obj: ta.Union[ElementT, 'Ref', Id]) -> Self:
+        if isinstance(obj, cls.ele_cls):
+            return cls(obj.id)
+        elif type(obj) is cls:
             return obj
         elif isinstance(obj, Id):
             return cls(obj)

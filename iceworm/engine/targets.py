@@ -12,6 +12,7 @@ import typing as ta
 
 from omnibus import dataclasses as dc
 
+from . import connectors as ctrs
 from . import elements as els
 from .. import metadata as md_
 from ..types import QualifiedName
@@ -37,6 +38,7 @@ class Function(Target):
 
 class Materialization(Target):
     table: els.Ref[Table] = dc.field(coerce=els.Ref.cls(Table).of)
-    dst: QualifiedName = dc.field(coerce=QualifiedName.of)
+    connector: els.Ref[ctrs.Connector.Config] = dc.field(coerce=els.Ref.cls(ctrs.Connector.Config).of)
+    name: QualifiedName = dc.field(coerce=QualifiedName.of)
 
-    # TODO: writeable: bool = dc.field(False, kwonly=True)
+    readonly: bool = dc.field(False, kwonly=True)
