@@ -5,6 +5,7 @@ from omnibus import dataclasses as dc
 
 from ... import metadata as md
 from ...types import QualifiedName
+from ...types import Code
 from ...utils import seq
 from ..utils import parse_simple_select_table
 from .connectors import Connection
@@ -16,7 +17,7 @@ from .connectors import RowSource
 
 class Table(dc.Pure):
     md_table: md.Table
-    fn: ta.Callable[[], RowGen]
+    fn: Code  # [ta.Callable[[], RowGen]]
 
 
 class ComputedConnector(Connector['ComputedConnector', 'ComputedConnector.Config']):

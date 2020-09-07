@@ -269,7 +269,7 @@ def serialize_dataclass(obj: T, *, fcls: ta.Optional[ta.Type] = None, no_custom:
 
 
 def serialize(obj: T, *, fcls: ta.Optional[ta.Type] = None) -> Serialized:
-    if fcls is not None and rfl.is_generic(fcls) and fcls.__origin__ is ta.Union:
+    if fcls is not None and rfl.is_generic(fcls) and getattr(fcls, '__origin__', None) is ta.Union:
         args = fcls.__args__
         if len(args) != 2 or type(None) not in args:
             raise TypeError(fcls)
@@ -283,14 +283,14 @@ def serialize(obj: T, *, fcls: ta.Optional[ta.Type] = None) -> Serialized:
         return serde.serialize(obj)
 
     elif isinstance(obj, collections.abc.Mapping):
-        if fcls is not None and rfl.is_generic(fcls) and fcls.__origin__ is collections.abc.Mapping:
+        if fcls is not None and rfl.is_generic(fcls) and getattr(fcls, '__origin__', None) is collections.abc.Mapping:
             [kfcls, vfcls] = fcls.__args__
         else:
             kfcls = vfcls = None
         return [[serialize(k, fcls=kfcls), serialize(v, fcls=vfcls)] for k, v in obj.items()]
 
     elif isinstance(obj, (collections.abc.Sequence, collections.abc.Set)) and not isinstance(obj, str):
-        if fcls is not None and rfl.is_generic(fcls) and fcls.__origin__ is collections.abc.Sequence:
+        if fcls is not None and rfl.is_generic(fcls) and getattr(fcls, '__origin__', None) is collections.abc.Sequence:
             [efcls] = fcls.__args__
         else:
             efcls = None
@@ -340,7 +340,7 @@ def deserialize_dataclass(ser: Serialized, cls: type, *, succinct: bool = False,
 
 
 def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) -> T:
-    if rfl.is_generic(cls) and cls.__origin__ is ta.Union:
+    if rfl.is_generic(cls) and getattr(cls, '__origin__', None) is ta.Union:
         args = cls.__args__
         if len(args) != 2 or type(None) not in args:
             raise TypeError(cls)
@@ -356,7 +356,7 @@ def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) ->
         serde = _STATE.serdes_by_cls[cls]
         return serde.deserialize(ser)
 
-    elif rfl.is_generic(cls) and cls.__origin__ is collections.abc.Mapping:
+    elif rfl.is_generic(cls) and getattr(cls, '__origin__', None) is collections.abc.Mapping:
         [kcls, vcls] = cls.__args__
         dct = {}
         if isinstance(ser, str):
@@ -380,19 +380,19 @@ def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) ->
             raise TypeError(ser)
         return dct
 
-    elif rfl.is_generic(cls) and cls.__origin__ is collections.abc.Set:
+    elif rfl.is_generic(cls) and getattr(cls, '__origin__', None) is collections.abc.Set:
         [ecls] = cls.__args__
         if not isinstance(ser, collections.abc.Sequence):
             raise TypeError(ser)
         return {deserialize(e, ecls, succinct=succinct) for e in ser}
 
-    elif rfl.is_generic(cls) and cls.__origin__ is collections.abc.Sequence:
+    elif rfl.is_generic(cls) and getattr(cls, '__origin__', None) is collections.abc.Sequence:
         [ecls] = cls.__args__
         if not isinstance(ser, collections.abc.Sequence) or isinstance(ser, str):
             raise TypeError(ser)
         return [deserialize(e, ecls, succinct=succinct) for e in ser]
 
-    elif rfl.is_generic(cls) and cls.__origin__ is collections.abc.Callable:
+    elif rfl.is_generic(cls) and getattr(cls, '__origin__', None) is collections.abc.Callable:
         if not callable(ser):
             raise TypeError(ser)
         return ser

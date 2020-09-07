@@ -52,28 +52,18 @@ CONNECTORS_YML = f"""
       globs:
       - '*.csv'
 
+- computed_connector:
+    id: cmp
+    tables:
+    - md_table:
+        name: [nums]
+        columns:
+        - {{name: num, type: integer}}
+      fn: {{lambda: ": [{{'num': i}} for i in range(10)]"}}
+
 """
 
 CONNECTORS_SER = yaml.safe_load(CONNECTORS_YML)
-
-CONNECTORS_SER.extend([
-
-    {'computed_connector': {
-        'id': 'cmp',
-        'tables': [
-            {
-                'md_table': {
-                    'name': ['nums'],
-                    'columns': [
-                        {'name': 'num', 'type': 'integer'},
-                    ],
-                },
-                'fn': lambda: [{'num': i} for i in range(10)],
-            },
-        ],
-    }},
-
-])
 
 ELEMENTS_YML = """
 

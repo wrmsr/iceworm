@@ -1,6 +1,7 @@
 """
 TODO:
   - quoting - of_dottable
+  - disable Code unless explicitly enabled lols
 """
 import abc
 import collections.abc
@@ -93,6 +94,9 @@ class Code(dc.Enum):
     @abc.abstractproperty
     def fn(self) -> ta.Callable:
         raise NotImplementedError
+
+    def __call__(self, *args, **kwargs):
+        return self.fn(*args, **kwargs)
 
 
 class Lambda(Code, allow_setattr=True):
