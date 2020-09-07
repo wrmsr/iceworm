@@ -13,6 +13,8 @@ TODO:
  - subphases - use to combine transforms and validations? like disable mutation in POST?
  - class Phase(dc.Pure): name: str, mutable_element_types: ta.AbstractSet[type], ...
  - decompose? need to setup ctors before instantiating next phases lol..
+ - secrets processor - url: str, url_secret: Secret = dc.field(metadata={els.SecretField: 'url')
+ - phase inj scope?
 """
 import abc
 import typing as ta

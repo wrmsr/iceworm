@@ -16,12 +16,12 @@ import pytest  # noqa
 import yaml
 
 from .. import connectors as ctrs
+from .. import elements as els
 from .. import execution as exe
+from .. import inference as infr
 from .. import invalidations as invs  # noqa
 from .. import planning as pln
-from .. import processing as proc
 from .. import rules as rls
-from .. import elements as els
 from ... import domains as doms
 from ...tests.helpers import pg_engine  # noqa
 from ...tests.helpers import pg_url  # noqa  # FIXME: jesus christ pytest fucking sucks
@@ -144,7 +144,7 @@ def test_ops(pg_engine):  # noqa
 
     tprocs = [
         rls.RuleElementProcessor(rls.TableAsSelectProcessor()),
-        proc.InferTableProcessor(connectors),
+        infr.InferTableProcessor(connectors),
     ]
 
     elements = els.ElementProcessingDriver(tprocs).process(els.ElementSet.of(elements))
