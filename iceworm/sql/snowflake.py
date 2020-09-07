@@ -152,4 +152,7 @@ def get_url() -> str:
 
 
 class SnowflakeAdapter(Adapter):
-    pass
+
+    def build_range(self, num):
+        # select seq4() i from table(generator(rowcount => 10))
+        raise NotImplementedError

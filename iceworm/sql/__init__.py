@@ -2,7 +2,11 @@ from . import postgres  # noqa
 from . import snowflake  # noqa
 from . import tpch  # noqa
 from .adapter import Adapter  # noqa
+from .elements import ColumnListAlias  # noqa
 from .elements import CreateTableAs  # noqa
 from .elements import DropTableIfExists   # noqa
 from .elements import QualifiedNameElement  # noqa
-from .sql import render_query  # noqa
+from .elements import column_list_alias  # noqa
+from .elements import create_table_as  # noqa
+from .elements import drop_table_if_exists  # noqa
+from .elements import qualified_name  # noqa

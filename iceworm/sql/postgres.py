@@ -6,6 +6,8 @@ from omnibus import lang
 import sqlalchemy as sa
 
 from .adapter import Adapter
+from .elements import column_list_alias
+
 
 """
 do
@@ -36,7 +38,4 @@ class PostgresAdapter(Adapter):
 
     @lang.override
     def build_range(self, num):
-        # sa.alias
-        # select i from generate_series(1, 5) s(i)
-        # return sa.select([])
-        raise NotImplementedError
+        return sa.select([sa.column('i')]).select_from(column_list_alias(sa.func.generate_series(1, num), 's', ['i']))
