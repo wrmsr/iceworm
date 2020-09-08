@@ -1,24 +1,13 @@
-import typing as ta
-
 from omnibus import check
-import yaml
 
 from .. import connectors as ctrs
 from .. import elements as els
-from ...utils import serde
-
-
-ELEMENTS_YML = """
-
-- dual_connector: {}
-
-"""
-
-ELEMENTS_SER = yaml.safe_load(ELEMENTS_YML)
 
 
 def test_dual():
-    elements = els.ElementSet.of(serde.deserialize(ELEMENTS_SER, ta.Sequence[els.Element]))
+    elements = els.ElementSet.of([
+        ctrs.dual.DualConnector.Config(),
+    ])
 
     connectors = ctrs.ConnectorSet.of(elements.get_type_set(ctrs.Connector.Config))
 
