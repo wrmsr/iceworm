@@ -22,6 +22,7 @@ from .. import inference as infr
 from .. import invalidations as invs  # noqa
 from .. import planning as pln
 from .. import rules as rls
+from .. import sites  # noqa
 from ... import domains as doms
 from ...sql.tests.helpers import pg_engine  # noqa
 from ...sql.tests.helpers import pg_url  # noqa  # FIXME: jesus christ pytest fucking sucks

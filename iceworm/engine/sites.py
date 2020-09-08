@@ -14,8 +14,11 @@ TODO:
   - required for commit and prod, prod will not boot uncompiled
    - pre-commit, enforce at boot
 """
-from .elements import Element
+from omnibus import dataclasses as dc
+
+from . import elements as els
 
 
-class Site(Element):
-    pass
+class Site(els.Element):
+
+    dc.metadata({els.processing.PhaseFrozen: els.processing.PhaseFrozen(els.processing.Phases.SITES)})

@@ -20,6 +20,8 @@ TODO:
   - added by phase * in addition to rejecting addition of phase-frozen types *
 """
 import abc
+import functools
+import itertools
 import typing as ta
 
 from omnibus import check
@@ -36,8 +38,18 @@ class ProcessedBy(dc.Pure):
     processors: ta.AbstractSet['ElementProcessor'] = dc.field(check=lambda o: isinstance(o, ocol.IdentitySet))
 
 
-class Phase(dc.Pure, eq=False, sealed=True):
+_phase_seq = itertools.count()
+
+
+@functools.total_ordering
+class Phase(dc.Pure, eq=False, order=False):
     name: str
+
+    seq: int = dc.field(kwonly=True, default_factory=lambda: next(_phase_seq))
+
+    def __lt__(self, other: ta.Any) -> bool:
+        check.isinstance(other, Phase)
+        return self.seq < other.seq
 
 
 class Phases(lang.ValueEnum, ignore=['all']):
@@ -54,6 +66,12 @@ class Phases(lang.ValueEnum, ignore=['all']):
 
 
 check.state(all(n == v.name.upper() for n, v in Phases._by_name.items()))
+
+del _phase_seq
+
+
+class PhaseFrozen(dc.Pure):
+    phase: Phase = dc.field(check=lambda o: isinstance(o, Phase))
 
 
 class SubPhase(lang.AutoEnum):
