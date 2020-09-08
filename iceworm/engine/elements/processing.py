@@ -28,6 +28,7 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 
 from .base import Element
+from .base import Frozen
 from .collections import ElementSet
 
 
@@ -35,17 +36,24 @@ class ProcessedBy(dc.Pure):
     processors: ta.AbstractSet['ElementProcessor'] = dc.field(check=lambda o: isinstance(o, ocol.IdentitySet))
 
 
-class Phase(lang.AutoEnum):
-    BOOTSTRAP = ...
-    SITES = ...
-    RULES = ...
-    CONNECTORS = ...
-    TARGETS = ...
-    FINALIZE = ...
+class Phase(dc.Pure, eq=False, sealed=True):
+    name: str
+
+
+class Phases(lang.ValueEnum, ignore=['all']):
+    BOOTSTRAP = Phase('bootstrap')
+    SITES = Phase('sites')
+    RULES = Phase('rules')
+    CONNECTORS = Phase('connectors')
+    TARGETS = Phase('targets')
+    FINALIZE = Phase('finalize')
 
     @classmethod
     def all(cls) -> ta.List['Phase']:
-        return list(cls.__members__.values())
+        return list(cls._by_value)
+
+
+check.state(all(n == v.name.upper() for n, v in Phases._by_name.items()))
 
 
 class SubPhase(lang.AutoEnum):
@@ -62,7 +70,7 @@ class ElementProcessor(lang.Abstract):
 
     @property
     def phases(self) -> ta.Iterable[Phase]:
-        return Phase.all()
+        return Phases.all()
 
     @abc.abstractmethod
     def processes(self, elements: ElementSet) -> ta.Iterable[Element]:
@@ -99,7 +107,7 @@ class ElementProcessingDriver:
     def process(self, elements: ta.Iterable[Element]) -> ElementSet:
         elements = ElementSet.of(elements)
 
-        for phase in Phase.all():
+        for phase in Phases.all():
             eps = self._processor_seqs_by_phase.get(phase, [])
             if not eps:
                 continue
@@ -109,6 +117,7 @@ class ElementProcessingDriver:
                 for ep in eps:
                     epes = ocol.IdentitySet(check.isinstance(e, Element) for e in ep.processes(elements))
                     if epes:
+                        check.empty([e for e in epes if Frozen in e.meta])
                         dct[ep] = epes
                 if not dct:
                     break
