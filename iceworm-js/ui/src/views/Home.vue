@@ -18,8 +18,28 @@ import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 export default class Home extends Vue {
   @Prop({default: 0}) private num!: number;
 
+  public timer;
+  public list;
+
   public goBack(): void {
     window.history.length > 1 ? this.$router.go(-1) : this.$router.push('/')
+  }
+
+  created() {
+    this.fetchEventsList();
+    this.timer = setInterval(this.fetchEventsList, 300000)
+  }
+
+  fetchEventsList() {
+    // var self = this
+    this.$http.get('http://yelp.com/version', function (events) {
+      console.log(events);
+      // self.list = events;
+    }).bind(this);
+  }
+
+  beforeDestroy() {
+    clearInterval(this.timer)
   }
 
   beforeUpdate() {
