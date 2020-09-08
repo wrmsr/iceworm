@@ -49,8 +49,8 @@ class CreateTableAs(sa.sql.expression.Executable, sa.sql.expression.ClauseElemen
 @sa.ext.compiler.compiles(CreateTableAs)
 def visit_create_table_as(element: CreateTableAs, compiler, **kwargs):
     return 'CREATE TABLE %s AS %s' % (
-        compiler.process(element.name),
-        compiler.process(element.query),
+        compiler.process(element.name, **kwargs),
+        compiler.process(element.query, **kwargs),
     )
 
 
