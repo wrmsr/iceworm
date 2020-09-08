@@ -144,7 +144,12 @@ def test_ops(pg_engine):  # noqa
             nonlocal connectors
             connectors = ctrs.ConnectorSet.of(eles.get_type_set(ctrs.Connector.Config))
 
-        if phase == els.processing.Phases.CONNECTORS:
+        if phase == els.processing.Phases.SITES:
+            return [
+                sites.SiteProcessor(),
+            ]
+
+        elif phase == els.processing.Phases.CONNECTORS:
             return [
                 UrlSecretsReplacer(secrets),
             ]

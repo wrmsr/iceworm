@@ -14,6 +14,8 @@ TODO:
   - required for commit and prod, prod will not boot uncompiled
    - pre-commit, enforce at boot
 """
+import typing as ta
+
 from omnibus import dataclasses as dc
 
 from . import elements as els
@@ -22,3 +24,16 @@ from . import elements as els
 class Site(els.Element):
 
     dc.metadata({els.processing.PhaseFrozen: els.processing.PhaseFrozen(els.processing.Phases.SITES)})
+
+
+class SiteProcessor(els.ElementProcessor):
+
+    @classmethod
+    def phases(cls) -> ta.Iterable[els.processing.Phase]:
+        return [els.processing.Phases.SITES]
+
+    def processes(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
+        raise NotImplementedError
+
+    def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
+        raise NotImplementedError

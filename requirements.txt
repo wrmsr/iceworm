@@ -28,18 +28,6 @@ snowflake-sqlalchemy==1.2.3
 
 PyYAML==5.3.1
 jmespath==0.10.0
-pyspark==3.0.1
-
-
-## parquet deps
-
-fastparquet==0.4.1
-pyarrow==1.0.1
-python-snappy==0.5.4
-
-
-## experimental deps
-
 JPype1==1.0.2
 
 

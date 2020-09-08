@@ -2,6 +2,9 @@
 TODO:
  - expanded reflection - partitioning etc
  - https://docs.snowflake.com/en/sql-reference/functions/compress.html udf payloads? lol
+ - purge the dumbass arrow libs
+  - chunk_downloader.py -> from .arrow_context import ArrowConverterContext - fucking idiots
+   - ** lazy_import, do what omni does for mypy **
 
 show locks:
  resource
