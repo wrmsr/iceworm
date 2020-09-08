@@ -139,3 +139,12 @@ b
     tmpl = env.from_string(src)
 
     print(tmpl.render())
+
+
+def test_rewrap():
+    class Undefined(jinja2.Undefined):
+        def __str__(self):
+            return '{{ ' + self._undefined_name + ' }}'
+    env = jinja2.Environment(undefined=Undefined)
+    tmpl = env.from_string('{{ a }} {{ b }} {{ "{{ barf(abc) }}" }} {{ c }}')
+    assert tmpl.render({'a': 'A', 'c': 'C'}) == 'A {{ b }} {{ barf(abc) }} C'
