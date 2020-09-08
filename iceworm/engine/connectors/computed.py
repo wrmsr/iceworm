@@ -10,14 +10,14 @@ from ...utils import seq
 from ..utils import parse_simple_select_table
 from .connectors import Connection
 from .connectors import Connector
-from .connectors import RowGen
+from .connectors import Rows
 from .connectors import RowSink
 from .connectors import RowSource
 
 
 class Table(dc.Pure):
     md_table: md.Table
-    fn: Code  # [ta.Callable[[], RowGen]]
+    fn: Code  # [ta.Callable[[], Rows]]
 
 
 class ComputedConnector(Connector['ComputedConnector', 'ComputedConnector.Config']):
@@ -68,5 +68,5 @@ class ComputedRowSource(RowSource):
 
         self._table = table
 
-    def produce_rows(self) -> RowGen:
+    def produce_rows(self) -> Rows:
         return self._table.fn()

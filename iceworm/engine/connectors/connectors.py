@@ -53,13 +53,13 @@ ConnectorT = ta.TypeVar('ConnectorT', bound='Connector')
 ConnectorConfigT = ta.TypeVar('ConnectorConfigT', bound='Connector.Config')
 
 Row = ta.Mapping[str, ta.Any]
-RowGen = ta.Generator[Row, None, None]
+Rows = ta.Iterable[Row]
 
 
 class RowSource(lang.Abstract):
 
     @abc.abstractmethod
-    def produce_rows(self) -> RowGen:
+    def produce_rows(self) -> Rows:
         raise NotImplementedError
 
 
@@ -81,7 +81,7 @@ class ListRowSource(RowSource):
     def rows(self) -> ta.List[Row]:
         return self._rows
 
-    def produce_rows(self) -> RowGen:
+    def produce_rows(self) -> Rows:
         yield from self._rows
 
 

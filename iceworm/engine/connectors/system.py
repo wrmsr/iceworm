@@ -15,7 +15,7 @@ from ..utils import parse_simple_select_table
 from .connectors import Connection
 from .connectors import Connector
 from .connectors import Row
-from .connectors import RowGen
+from .connectors import Rows
 from .connectors import RowSink
 from .connectors import RowSource
 
@@ -84,7 +84,7 @@ class NotificationsTable(Table, RowSource, RowSink):
     def md_table(self) -> md.Table:
         return self.TABLE
 
-    def produce_rows(self) -> RowGen:
+    def produce_rows(self) -> Rows:
         raise NotImplementedError
 
     def consume_rows(self, rows: ta.Iterable[Row]) -> None:
