@@ -293,10 +293,13 @@ define do-dist
 		README.md \
 	\
 		build/
+
 	cp -rv \
 		LICENSE-* \
 	\
 		build/ || :
+
+	rm build/$(PROJECT)/conftest.py
 
 	cp setup.py build/setup.py
 	cp MANIFEST.in build/MANIFEST.in
