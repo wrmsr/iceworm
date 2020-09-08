@@ -23,6 +23,7 @@ import abc
 import functools
 import itertools
 import typing as ta
+import weakref
 
 from omnibus import check
 from omnibus import collections as ocol
@@ -72,6 +73,23 @@ del _phase_seq
 
 class PhaseFrozen(dc.Pure):
     phase: Phase = dc.field(check=lambda o: isinstance(o, Phase))
+
+
+_PHASE_FROZEN_CACHE = weakref.WeakKeyDictionary()
+
+
+def _phase_frozen(cls: type) -> ta.Optional[Phase]:
+    try:
+        return _PHASE_FROZEN_CACHE[cls]
+    except KeyError:
+        check.issubclass(cls, Element)
+        pfi = dc.metadatas_dict(cls).get(PhaseFrozen)
+        if pfi is not None:
+            pf = check.isinstance(pfi, PhaseFrozen).phase
+        else:
+            pf = None
+        _PHASE_FROZEN_CACHE[cls] = pf
+        return pf
 
 
 class SubPhase(lang.AutoEnum):
@@ -127,9 +145,6 @@ class ElementProcessingDriver:
 
         for phase in Phases.all():
             eps = self._processor_seqs_by_phase.get(phase, [])
-            if not eps:
-                continue
-
             while True:
                 dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Element]] = ocol.IdentityKeyDict()
                 for ep in eps:
@@ -148,21 +163,38 @@ class ElementProcessingDriver:
                 if missing:
                     raise ValueError(missing)
 
+                leftover = [e for e in cures if e in res]
+                if leftover:
+                    # Need to consume all matched or it'll inf loop..
+                    raise ValueError(leftover)
+
                 swaps: ta.MutableMapping[Element, Element] = ocol.IdentityKeyDict()
 
                 added = [e for e in res if e not in elements]
                 removed = [e for e in elements if e not in res]  # noqa
+
+                for e in itertools.chain(added, removed):
+                    pf = _phase_frozen(type(e))
+                    if pf is not None and pf < phase:
+                        raise ValueError(e, pf)
+
                 for e in added:
                     pbs = e.meta.get(ProcessedBy)
                     if pbs is not None:
                         check.state(check.single(pbs) is cur)
                         continue
                     swaps[e] = dc.replace(e, meta={**e.meta, ProcessedBy: ocol.IdentitySet([cur])})
-                # TODO: tag matched but unmodified?
 
                 if swaps:
                     res = ElementSet.of(swaps.get(e, e) for e in res)
 
                 elements = res
+
+            elements = ElementSet.of([
+                dc.replace(e, meta={**e.meta, Frozen: Frozen})
+                if pf is not None and phase == pf and Frozen not in e.meta else e
+                for e in elements
+                for pf in [_phase_frozen(type(e))]
+            ])
 
         return elements

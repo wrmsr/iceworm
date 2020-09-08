@@ -107,7 +107,7 @@ class Connector(lang.Abstract, ta.Generic[ConnectorT, ConnectorConfigT]):
 
     class Config(els.Element, abstract=True):
 
-        dc.metadata({els.processing.PhaseFrozen: els.processing.PhaseFrozen(els.processing.Phases.SITES)})
+        dc.metadata({els.processing.PhaseFrozen: els.processing.PhaseFrozen(els.processing.Phases.CONNECTORS)})
 
         _cls_name: ta.ClassVar[str]
 
