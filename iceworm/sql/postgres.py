@@ -1,6 +1,7 @@
 """
 TODO:
  - multi_exec for test parity
+  - json type?
 """
 from omnibus import lang
 import sqlalchemy as sa
@@ -10,27 +11,30 @@ from .elements import column_list_alias
 
 
 """
-do
+create or replace function multi_exec(stmts text[]) returns text[] as
 $$
-    declare
-        stmts text[] := array ['select 1 a, 2 b', 'select 3 c, 4 d, 5 e'];
-        stmt  text;
-        c     refcursor;
-        r     record;
-    begin
-        foreach stmt in array stmts
-            loop
-                open c for execute stmt;
-                fetch next from c into r;
-                while found
-                    loop
-                        raise notice '%', r;
-                        fetch next from c into r;
-                    end loop;
-                close c;
-            end loop;
-    end
-$$;
+declare
+    stmt  text;
+    c     refcursor;
+    r     record;
+    o     text[];
+begin
+    foreach stmt in array stmts
+        loop
+            open c for execute stmt;
+            fetch next from c into r;
+            while found
+                loop
+                    o := array_append(o, cast(row_to_json(r) as text));
+                    fetch next from c into r;
+                end loop;
+            close c;
+        end loop;
+    return o;
+end
+$$ language plpgsql;
+
+select multi_exec(array['select 1 x', 'select 2 y union select 3']);
 """
 
 
