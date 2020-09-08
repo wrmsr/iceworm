@@ -137,19 +137,30 @@ def test_ops(pg_engine):  # noqa
     # injector = inj.create_injector(binder)  # noqa
 
     secrets = sec.Secrets({'pg_url': raw_pg_url()})
+    connectors: ta.Optional[ctrs.ConnectorSet] = None
+
+    def epfac(eles, phase):
+        if phase == els.processing.Phases.CONNECTORS + 1:
+            nonlocal connectors
+            connectors = ctrs.ConnectorSet.of(eles.get_type_set(ctrs.Connector.Config))
+
+        if phase == els.processing.Phases.CONNECTORS:
+            return [
+                UrlSecretsReplacer(secrets),
+            ]
+
+        elif phase == els.processing.Phases.TARGETS:
+            return [
+                rls.RuleElementProcessor(rls.TableAsSelectProcessor()),
+                infr.InferTableProcessor(connectors),
+            ]
+
+        else:
+            return []
 
     elements = els.ElementSet.of(serde.deserialize(ELEMENTS_SER, ta.Sequence[els.Element]))
 
-    elements = els.ElementProcessingDriver.of([UrlSecretsReplacer(secrets)]).process(elements)
-
-    connectors = ctrs.ConnectorSet.of(elements.get_type_set(ctrs.Connector.Config))
-
-    tprocs = [
-        rls.RuleElementProcessor(rls.TableAsSelectProcessor()),
-        infr.InferTableProcessor(connectors),
-    ]
-
-    elements = els.ElementProcessingDriver.of(tprocs).process(els.ElementSet.of(elements))
+    elements = els.ElementProcessingDriver(epfac).process(elements)
 
     plan = pln.ElementPlanner(elements, connectors).plan({
         'pg/a',

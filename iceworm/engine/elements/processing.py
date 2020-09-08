@@ -52,6 +52,17 @@ class Phase(dc.Pure, eq=False, order=False):
         check.isinstance(other, Phase)
         return self.seq < other.seq
 
+    def __add__(self, i: int) -> 'Phase':
+        check.isinstance(i, int)
+        n = self.seq + i
+        return PHASES[n]
+
+    def __sub__(self, i: int) -> 'Phase':
+        check.isinstance(i, int)
+        n = self.seq - i
+        check.state(n >= 0)
+        return PHASES[n]
+
 
 class Phases(lang.ValueEnum, ignore=['all']):
     BOOTSTRAP = Phase('bootstrap')
@@ -69,6 +80,8 @@ class Phases(lang.ValueEnum, ignore=['all']):
 check.state(all(n == v.name.upper() for n, v in Phases._by_name.items()))
 
 del _phase_seq
+
+PHASES = Phases.all()
 
 
 class PhaseFrozen(dc.Pure):
@@ -104,8 +117,8 @@ class SubPhase(lang.AutoEnum):
 
 class ElementProcessor(lang.Abstract):
 
-    @property
-    def phases(self) -> ta.Iterable[Phase]:
+    @classmethod
+    def phases(cls) -> ta.Iterable[Phase]:
         return Phases.all()
 
     @abc.abstractmethod
@@ -128,7 +141,7 @@ class ElementProcessingDriver:
         self._processor_factory = check.callable(processor_factory)
 
     @classmethod
-    def of(cls, processors: ta.Iterable[ElementProcessor]) -> 'ElementProcessorDriver':
+    def build_factory(cls, processors: ta.Iterable[ElementProcessor]) -> ElementProcessorFactory:
         lst = []
         seen = ocol.IdentitySet()
         by_phase = {}
@@ -136,12 +149,12 @@ class ElementProcessingDriver:
             check.isinstance(ep, ElementProcessor)
             check.not_in(ep, seen)
             lst.append(ep)
-            for p in set(ep.phases):
+            for p in set(type(ep).phases()):
                 check.isinstance(p, Phase)
                 by_phase.setdefault(p, []).append(ep)
             seen.add(ep)
         processor_seqs_by_phase: ta.Mapping[Phase, ta.Sequence[ElementProcessor]] = by_phase
-        return cls(lambda es, phase: processor_seqs_by_phase.get(phase, []))
+        return lambda es, phase: processor_seqs_by_phase.get(phase, [])
 
     def process(self, elements: ta.Iterable[Element]) -> ElementSet:
         elements = ElementSet.of(elements)
@@ -151,7 +164,7 @@ class ElementProcessingDriver:
             seen = ocol.IdentitySet()
             for ep in eps:
                 check.not_in(ep, seen)
-                check.in_(phase, ep.phases)
+                check.in_(phase, type(ep).phases())
                 seen.add(ep)
 
             while True:
