@@ -3,6 +3,13 @@ import typing as ta
 
 from omnibus import lang
 
+from .tests.harness import _scope_listener_class  # noqa
+from .tests.harness import _scope_listener_function  # noqa
+from .tests.harness import _scope_listener_module  # noqa
+from .tests.harness import _scope_listener_package  # noqa
+from .tests.harness import _scope_listener_session  # noqa
+from .tests.harness import harness  # noqa
+
 
 # FIXME: gross
 @lang.cached_nullary

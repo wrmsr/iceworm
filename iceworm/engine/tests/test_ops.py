@@ -59,7 +59,7 @@ class UrlSecretsReplacer(els.ElementProcessor):
 
 
 # @pytest.mark.xfail()
-def test_ops(pg_engine):  # noqa
+def test_ops(pg_engine, harness):  # noqa
     # binder = inj.create_binder()
     # binder.bind(CONNECTORS)
     # binder.bind(inj.Key(ta.Iterable[ctrs.Connector]), to=ctrs.ConnectorSet)
@@ -67,6 +67,7 @@ def test_ops(pg_engine):  # noqa
     # binder.bind(inj.Key(ta.Iterable[tars.Element]), to=tars.ElementSet)
     # injector = inj.create_injector(binder)  # noqa
 
+    print(harness)
     with contextlib.ExitStack() as es:
         es.enter_context(oos.tmp_chdir(os.path.dirname(__file__)))
 
