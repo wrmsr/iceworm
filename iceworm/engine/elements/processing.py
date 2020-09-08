@@ -19,6 +19,7 @@ TODO:
  - support / enforce els.Frozen
   - added by phase * in addition to rejecting addition of phase-frozen types *
  - ** enforce origin propagation somehow - require for ids? auto-add for ids? **
+ - if mem is an issue strip origins unless explicitly kept
 """
 import abc
 import functools
