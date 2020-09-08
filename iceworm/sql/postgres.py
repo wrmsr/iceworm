@@ -38,4 +38,9 @@ class PostgresAdapter(Adapter):
 
     @lang.override
     def build_range(self, num):
-        return sa.select([sa.column('i')]).select_from(column_list_alias(sa.func.generate_series(1, num), 's', ['i']))
+        # select i from generate_series(1, 10) s(i)
+        return sa.select([
+            sa.column('i'),
+        ]).select_from(
+            column_list_alias(sa.func.generate_series(1, num), 's', ['i'])
+        )

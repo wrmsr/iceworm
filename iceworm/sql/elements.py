@@ -1,5 +1,8 @@
+"""
+TODO:
+ - fix
+"""
 from omnibus import check
-from omnibus import dataclasses as dc
 import sqlalchemy as sa
 import sqlalchemy.ext.compiler  # noqa
 import sqlalchemy.sql.selectable  # noqa
@@ -7,9 +10,11 @@ import sqlalchemy.sql.selectable  # noqa
 from ..types import QualifiedName
 
 
-@dc.dataclass(frozen=True)
 class QualifiedNameElement(sa.sql.expression.ClauseElement):
-    name: QualifiedName = dc.field(coerce=QualifiedName.of)
+
+    def __init__(self, name):
+        super().__init__()
+        self.name = QualifiedName.of(name)
 
 
 @sa.ext.compiler.compiles(QualifiedNameElement)
@@ -19,9 +24,11 @@ def visit_qualified_name(element: QualifiedNameElement, compiler, **kwargs):
     )
 
 
-@dc.dataclass(frozen=True)
 class DropTableIfExists(sa.sql.expression.Executable, sa.sql.expression.ClauseElement):
-    name: QualifiedName = dc.field(coerce=QualifiedName.of)
+
+    def __init__(self, name):
+        super().__init__()
+        self.name = QualifiedName.of(name)
 
 
 @sa.ext.compiler.compiles(DropTableIfExists)
@@ -31,10 +38,12 @@ def visit_drop_table_if_exists(element: DropTableIfExists, compiler, **kwargs):
     )
 
 
-@dc.dataclass(frozen=True)
 class CreateTableAs(sa.sql.expression.Executable, sa.sql.expression.ClauseElement):
-    name: sa.sql.visitors.Visitable = dc.field(check=lambda o: isinstance(o, sa.sql.visitors.Visitable))
-    query: sa.sql.visitors.Visitable = dc.field(check=lambda o: isinstance(o, sa.sql.visitors.Visitable))
+
+    def __init__(self, name, query):
+        super().__init__()
+        self.name = name
+        self.query = query
 
 
 @sa.ext.compiler.compiles(CreateTableAs)
@@ -49,7 +58,8 @@ class ColumnListAlias(sa.sql.selectable.Alias):
 
     def _init(self, selectable, name, cols):
         super()._init(selectable, name)
-        self.cols = [check.isinstance(c, str) for c in check.not_isinstance(cols, str)]
+        self.cols = [check.not_empty(check.isinstance(c, str)) for c in check.not_isinstance(cols, str)]
+
 
     @classmethod
     def _factory(cls, selectable, name, cols):

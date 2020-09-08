@@ -83,3 +83,9 @@ def test_exec_multi():
         stmt = sa.text(query).bindparams(*[sa.bindparam(k) for k in params])
         row = json.loads(check.single(check.single(conn.execute(stmt, params))))
         print(row)
+
+
+def test_range():
+    ada = snowflake.SnowflakeAdapter()
+    stmt = ada.build_range(5)
+    assert ada.render_query(stmt).split() == 'SELECT seq4() AS i FROM table(generator(rowcount => 5))'.split()

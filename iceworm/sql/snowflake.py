@@ -53,7 +53,11 @@ import io
 import os
 import typing as ta
 
+from omnibus import check
 from omnibus import lang
+import sqlalchemy as sa
+import sqlalchemy.ext.compiler  # noqa
+import sqlalchemy.sql.selectable  # noqa
 
 from .adapter import Adapter
 
@@ -151,8 +155,32 @@ def get_url() -> str:
     )
 
 
+class Kwarg(sa.sql.expression.ClauseElement):
+
+    def __init__(self, name, value):
+        super().__init__()
+        self.name = check.not_empty(check.isinstance(name, str))
+        self.value = value
+
+
+@sa.ext.compiler.compiles(Kwarg)
+def visit_kwarg(element: Kwarg, compiler, **kwargs):
+    return '%s => %s' % (
+        element.name,
+        compiler.process(element.value, **kwargs),
+    )
+
+
+kwarg = Kwarg
+
+
 class SnowflakeAdapter(Adapter):
 
+    @lang.override
     def build_range(self, num):
         # select seq4() i from table(generator(rowcount => 10))
-        raise NotImplementedError
+        return sa.select([
+            sa.func.seq4().label('i'),
+        ]).select_from(
+            sa.func.table(sa.func.generator(kwarg('rowcount', sa.literal(num))))
+        )
