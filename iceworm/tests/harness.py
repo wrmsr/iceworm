@@ -83,7 +83,7 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
                 'pytest_scope': pytest_scope,
                 '__module__': cls.__module__,
             },
-            )
+        )
         cls._subclass_map[s] = scls
         return scls
 
