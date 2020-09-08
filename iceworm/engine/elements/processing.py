@@ -18,6 +18,7 @@ TODO:
  - overlap w/ tree xforms? passes? no cuz flat?
  - support / enforce els.Frozen
   - added by phase * in addition to rejecting addition of phase-frozen types *
+ - ** enforce origin propagation somehow - require for ids? auto-add for ids? **
 """
 import abc
 import functools

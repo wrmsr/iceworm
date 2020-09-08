@@ -16,14 +16,25 @@ TODO:
 """
 import typing as ta
 
+from omnibus import check
 from omnibus import dataclasses as dc
+from omnibus import lang
+from omnibus.serde.objects import yaml as oyaml
 
 from . import elements as els
+from ..utils import serde
+
+
+class SourceLocation(els.Annotation):
+    path: str = dc.field(check=lambda s: isinstance(s, str) and s)
+    line: int = dc.field(check=lambda i: isinstance(i, int) and i >= 0)
 
 
 class Site(els.Element):
 
     dc.metadata({els.processing.PhaseFrozen: els.processing.PhaseFrozen(els.processing.Phases.SITES)})
+
+    path: str = dc.field(check=lambda s: isinstance(s, str) and s)
 
 
 class SiteProcessor(els.ElementProcessor):
@@ -33,7 +44,21 @@ class SiteProcessor(els.ElementProcessor):
         return [els.processing.Phases.SITES]
 
     def processes(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
-        raise NotImplementedError
+        return elements.get_type_set(Site)
 
     def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
-        raise NotImplementedError
+        def load(s: Site) -> ta.Iterable[els.Element]:
+            with open(s.path, 'r') as f:
+                src = f.read()
+            lst = []
+            with lang.disposing(oyaml.WrappedLoaders.base(src)) as loader:
+                while loader.check_data():
+                    node = loader.get_data()
+                    for child in check.isinstance(node.value, ta.Sequence):
+                        uchild = oyaml.unwrap(child)
+                        el = serde.deserialize(uchild, els.Element)
+                        sloc = SourceLocation(s.path, child.node.start_mark.line)
+                        el = dc.replace(el, anns={**el.anns, SourceLocation: sloc})
+                        lst.append(el)
+            return lst
+        return [r for e in elements for r in (load(e) if isinstance(e, Site) else [e])]

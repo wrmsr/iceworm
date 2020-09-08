@@ -1,0 +1,61 @@
+- system_connector: {}
+
+- sql_connector:
+    id: pg
+    url_secret: pg_url
+
+- file_connector:
+    id: csv
+    mounts:
+      - path: csv
+        schema:
+          provided:
+            columns:
+              - {name: id, type: integer, primary_key: true}
+              - {name: a, type: integer}
+              - {name: b, type: integer}
+        globs:
+          - '*.csv'
+
+- computed_connector:
+    id: cmp
+    tables:
+      - md_table:
+          name: [nums]
+          columns:
+            - {name: num, type: integer}
+        fn: {lambda: ": [{'num': i} for i in range(10)]"}
+
+- table_as_select:
+    table: [pg, a]
+    query: "select * from csv.a"
+
+- table_as_select:
+    table: [pg, b]
+    query: "select * from csv.b"
+
+- table_as_select:
+    table: [pg, c]
+    query: "select * from pg.b"
+
+- table_as_select:
+    table: [pg, nums]
+    query: "select * from cmp.nums"
+
+- table:
+    id: system/notifications
+
+- materialization:
+    table: system/notifications
+    connector: system
+    name: [notifications]
+
+- rows:
+    table: system/notifications
+    query: "select 'hi' as message"
+
+- invalidator:
+    target: pg/a
+    trigger:
+      scheduled:
+        spec: '0 1 * * *'
