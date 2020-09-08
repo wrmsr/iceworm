@@ -1,6 +1,6 @@
 """
 TODO:
- - fix
+ - fix args sa.sql.visitors.Visitable thing..
 """
 from omnibus import check
 import sqlalchemy as sa
@@ -59,7 +59,6 @@ class ColumnListAlias(sa.sql.selectable.Alias):
     def _init(self, selectable, name, cols):
         super()._init(selectable, name)
         self.cols = [check.not_empty(check.isinstance(c, str)) for c in check.not_isinstance(cols, str)]
-
 
     @classmethod
     def _factory(cls, selectable, name, cols):
