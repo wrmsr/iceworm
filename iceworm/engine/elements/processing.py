@@ -117,11 +117,18 @@ class ElementProcessor(lang.Abstract):
         raise NotImplementedError
 
 
+ElementProcessorFactory = ta.Callable[[ElementSet, Phase], ta.Iterable[ElementProcessor]]
+
+
 class ElementProcessingDriver:
 
-    def __init__(self, processors: ta.Iterable[ElementProcessor]) -> None:
+    def __init__(self, processor_factory: ta.Iterable[ElementProcessor]) -> None:
         super().__init__()
 
+        self._processor_factory = check.callable(processor_factory)
+
+    @classmethod
+    def of(cls, processors: ta.Iterable[ElementProcessor]) -> 'ElementProcessorDriver':
         lst = []
         seen = ocol.IdentitySet()
         by_phase = {}
@@ -133,18 +140,20 @@ class ElementProcessingDriver:
                 check.isinstance(p, Phase)
                 by_phase.setdefault(p, []).append(ep)
             seen.add(ep)
-        self._processors: ta.Sequence[ElementProcessor] = lst
-        self._processor_seqs_by_phase: ta.Mapping[Phase, ta.Sequence[ElementProcessor]] = by_phase
-
-    @property
-    def processors(self) -> ta.Sequence[ElementProcessor]:
-        return self._processors
+        processor_seqs_by_phase: ta.Mapping[Phase, ta.Sequence[ElementProcessor]] = by_phase
+        return cls(lambda es, phase: processor_seqs_by_phase.get(phase, []))
 
     def process(self, elements: ta.Iterable[Element]) -> ElementSet:
         elements = ElementSet.of(elements)
 
         for phase in Phases.all():
-            eps = self._processor_seqs_by_phase.get(phase, [])
+            eps = [check.isinstance(ep, ElementProcessor) for ep in self._processor_factory(elements, phase)]
+            seen = ocol.IdentitySet()
+            for ep in eps:
+                check.not_in(ep, seen)
+                check.in_(phase, ep.phases)
+                seen.add(ep)
+
             while True:
                 dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Element]] = ocol.IdentityKeyDict()
                 for ep in eps:

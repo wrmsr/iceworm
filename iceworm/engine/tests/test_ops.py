@@ -140,7 +140,7 @@ def test_ops(pg_engine):  # noqa
 
     elements = els.ElementSet.of(serde.deserialize(ELEMENTS_SER, ta.Sequence[els.Element]))
 
-    elements = els.ElementProcessingDriver([UrlSecretsReplacer(secrets)]).process(elements)
+    elements = els.ElementProcessingDriver.of([UrlSecretsReplacer(secrets)]).process(elements)
 
     connectors = ctrs.ConnectorSet.of(elements.get_type_set(ctrs.Connector.Config))
 
@@ -149,7 +149,7 @@ def test_ops(pg_engine):  # noqa
         infr.InferTableProcessor(connectors),
     ]
 
-    elements = els.ElementProcessingDriver(tprocs).process(els.ElementSet.of(elements))
+    elements = els.ElementProcessingDriver.of(tprocs).process(els.ElementSet.of(elements))
 
     plan = pln.ElementPlanner(elements, connectors).plan({
         'pg/a',
