@@ -23,6 +23,7 @@ from omnibus.serde.objects import yaml as oyaml
 
 from . import elements as els
 from ..utils import serde
+from ..utils import unique_dict
 
 
 class SourceLocation(els.Annotation):
@@ -30,11 +31,25 @@ class SourceLocation(els.Annotation):
     line: int = dc.field(check=lambda i: isinstance(i, int) and i >= 0)
 
 
+class Format(dc.Pure, eq=False):
+    name: str
+    extensions: ta.Collection[str] = dc.field(check=lambda s: not isinstance(s, str))
+
+
+class Formats(lang.ValueEnum):
+    YAML = Format('yaml', {'yml', 'yaml'})
+    SQL = Format('sql', {'sql'})
+
+
+FORMATS_BY_EXTENSION: ta.Mapping[str, Format] = unique_dict((e, f) for f in Formats._by_value for e in f.extensions)
+
+
 class Site(els.Element):
 
     dc.metadata({els.processing.PhaseFrozen: els.processing.PhaseFrozen(els.processing.Phases.SITES)})
 
     path: str = dc.field(check=lambda s: isinstance(s, str) and s)
+    format: ta.Optional[str] = None
 
 
 class SiteProcessor(els.ElementProcessor):
@@ -50,15 +65,27 @@ class SiteProcessor(els.ElementProcessor):
         def load(s: Site) -> ta.Iterable[els.Element]:
             with open(s.path, 'r') as f:
                 src = f.read()
-            lst = []
-            with lang.disposing(oyaml.WrappedLoaders.base(src)) as loader:
-                while loader.check_data():
-                    node = loader.get_data()
-                    for child in check.isinstance(node.value, ta.Sequence):
-                        uchild = oyaml.unwrap(child)
-                        el = serde.deserialize(uchild, els.Element)
-                        sloc = SourceLocation(s.path, child.node.start_mark.line)
-                        el = dc.replace(el, anns={**el.anns, SourceLocation: sloc})
-                        lst.append(el)
-            return lst
+
+            fmt = FORMATS_BY_EXTENSION[(s.format if s.format else s.path.split('.')[-1]).lower()]
+
+            if fmt is Formats.YAML:
+                lst = []
+                with lang.disposing(oyaml.WrappedLoaders.base(src)) as loader:
+                    while loader.check_data():
+                        node = loader.get_data()
+                        for child in check.isinstance(node.value, ta.Sequence):
+                            uchild = oyaml.unwrap(child)
+                            el = serde.deserialize(uchild, els.Element)
+                            sloc = SourceLocation(s.path, child.node.start_mark.line)
+                            el = dc.replace(el, anns={**el.anns, SourceLocation: sloc})
+                            lst.append(el)
+                return lst
+
+            elif fmt is Formats.SQL:
+                # from ..trees import parsing as par
+                raise NotImplementedError
+
+            else:
+                raise TypeError(fmt)
+
         return [r for e in elements for r in (load(e) if isinstance(e, Site) else [e])]
