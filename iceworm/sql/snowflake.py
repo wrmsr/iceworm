@@ -161,6 +161,7 @@ class Kwarg(sa.sql.expression.ClauseElement):
         super().__init__()
         self.name = check.not_empty(check.isinstance(name, str))
         self.value = value
+        check.arg(hasattr(value, '_compiler_dispatch'))  # FIXME: cast or some shit
 
 
 @sa.ext.compiler.compiles(Kwarg)
