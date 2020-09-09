@@ -33,19 +33,6 @@ class Scope(lang.AutoEnum):
     FUNCTION = ...
 
 
-def reset_injector(injector: inj.Injector) -> None:
-    injector._scopes = {cls: cls() for cls in injector._scopes}
-    seen = ocol.IdentitySet()
-    stack = [injector]
-    while stack:
-        cur = stack.pop()
-        if cur in seen:
-            continue
-        seen.add(cur)
-        cur._invalidate_self()
-        stack.extend(cur._children)
-
-
 class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
 
     def __init__(self) -> None:
@@ -119,6 +106,10 @@ class Harness:
         for pss in _InjectorScope._subclass_map.values():
             binder._elements.append(inj.types.ScopeBinding(pss))
             binder.bind(FixtureRequest, annotated_with=pss.pytest_scope(), in_=pss)
+
+        # FIXME: a layer of nested child injectors per pt scope, a single generic 'PytestScope' seeded with enum val,
+        #        reset via ctx mgr, *never rebuild injectors*. similarly, pass mgr has *non-nested* but still child
+        #        injectors per *phase*.
 
         @binder.bind_callable
         def most_specific_request() -> FixtureRequest:
