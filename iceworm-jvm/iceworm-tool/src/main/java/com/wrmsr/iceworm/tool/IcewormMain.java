@@ -8,6 +8,7 @@ TODO:
   - jdbc drivers
  - ** instantiate jvm in cpy, pass protos without shutdown **
   - in addition to cli - with 'run', 'stream', etc
+ - picocli? or just read jsons
 */
 package com.wrmsr.iceworm.tool;
 

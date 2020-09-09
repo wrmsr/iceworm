@@ -2,6 +2,7 @@
 TODO:
  - enums
  - record revision
+ - nodal/serde polymorphism -> https://stackoverflow.com/a/35748115 :/
 """
 import logging
 import os.path

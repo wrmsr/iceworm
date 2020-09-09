@@ -33,6 +33,19 @@ class Scope(lang.AutoEnum):
     FUNCTION = ...
 
 
+def reset_injector(injector: inj.Injector) -> None:
+    injector._scopes = {cls: cls() for cls in injector._scopes}
+    seen = ocol.IdentitySet()
+    stack = [injector]
+    while stack:
+        cur = stack.pop()
+        if cur in seen:
+            continue
+        seen.add(cur)
+        cur._invalidate_self()
+        stack.extend(cur._children)
+
+
 class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
 
     def __init__(self) -> None:
