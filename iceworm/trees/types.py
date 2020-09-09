@@ -28,7 +28,7 @@ class AstQuery(Query):
     root: Node = dc.field(check=lambda o: isinstance(o, Node))
 
 
-class DatatypeSerde(serde.AutoSerde[Query]):
+class QuerySerde(serde.AutoSerde[Query]):
 
     @property
     def handles_dataclass_polymorphism(self) -> bool:
