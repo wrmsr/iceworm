@@ -33,6 +33,9 @@ class Scope(lang.AutoEnum):
     FUNCTION = ...
 
 
+SCOPES: ta.Sequence[Scope] = list(Scope)
+
+
 class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
 
     def __init__(self) -> None:
@@ -51,6 +54,7 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
 
     def enter(self, request: FixtureRequest) -> None:
         check.none(self._state)
+        check.state(request.scope == self.pytest_scope().name.lower())
         self._state = self.State(request)
 
     def exit(self) -> None:
@@ -95,6 +99,69 @@ Class = _InjectorScope._subclass(Scope.CLASS)
 Function = _InjectorScope._subclass(Scope.FUNCTION)
 
 
+class _ScopeProvisionListener:
+
+    def __init__(self) -> None:
+        super().__init__()
+
+        self._stack = []
+
+    class Entry(ta.NamedTuple):
+        binding: inj.types.Binding
+        scope: ta.Optional[Scope]
+
+    def __call__(self, injector, key, fn):
+        binding = check.isinstance(injector.get_binding(key), inj.types.Binding)
+        if issubclass(binding.scoping, _InjectorScope):
+            scope = binding.scoping.pytest_scope()
+        else:
+            scope = None
+
+        if self._stack:
+            cur = self._stack[-1]
+            if scope is not None:
+                check.not_none(cur.scope)
+                if not (scope.value <= cur.scope.value):
+                    breakpoint()
+                check.state(scope.value <= cur.scope.value)
+                scope = min(scope, cur.scope, key=lambda s: s.value)
+            else:
+                if issubclass(binding.scoping, _CurrentInjectorScope):
+                    scope = check.not_none(cur.scope)
+
+        elif scope is not None:
+            # TODO: check early that scope is active
+            pass
+
+        else:
+            for iscope in injector._scopes.values():
+                if isinstance(iscope, _InjectorScope) and iscope._state is not None:
+                    ipscope = iscope.pytest_scope()
+                    if scope is None:
+                        scope = ipscope
+                    else:
+                        scope = max(scope, ipscope, key=lambda s: s.value)
+
+        ent = self.Entry(binding, scope)
+        self._stack.append(ent)
+        try:
+            return fn()
+        finally:
+            popped = self._stack.pop()
+            check.state(popped is ent)
+
+
+class _CurrentInjectorScope(inj.scopes.Scope, lang.Final):
+
+    def provide(self, binding: inj.types.Binding[T]) -> T:
+        check.state(binding.key.annotation is None)
+        injector = inj.Injector.current
+        spl = injector[_ScopeProvisionListener]
+        scope = check.not_none(spl._stack[-1].scope)
+        new_key = inj.Key(binding.key.type, scope)
+        return injector[new_key]
+
+
 class Harness:
 
     def __init__(self, *binders: inj.Binder) -> None:
@@ -107,13 +174,16 @@ class Harness:
             binder._elements.append(inj.types.ScopeBinding(pss))
             binder.bind(FixtureRequest, annotated_with=pss.pytest_scope(), in_=pss)
 
-        # FIXME: a layer of nested child injectors per pt scope, a single generic 'PytestScope' seeded with enum val,
-        #        reset via ctx mgr, *never rebuild injectors*. similarly, pass mgr has *non-nested* but still child
-        #        injectors per *phase*.
+        # @binder.bind_callable
+        # def most_specific_request() -> FixtureRequest:
+        #     return next(iter(s._state.request for s in reversed(list(self._scopes.values())) if s._state is not None))
 
-        @binder.bind_callable
-        def most_specific_request() -> FixtureRequest:
-            return next(iter(s._state.request for s in reversed(list(self._scopes.values())) if s._state is not None))
+        spl = _ScopeProvisionListener()
+        binder.bind(_ScopeProvisionListener, to_instance=spl)
+        binder.bind_provision_listener(spl)
+
+        binder._elements.append(inj.types.ScopeBinding(_CurrentInjectorScope))
+        binder.bind(FixtureRequest, in_=_CurrentInjectorScope)
 
         self._injector = inj.create_injector(binder, *binders)
 
@@ -146,9 +216,45 @@ class Harness:
             self._scopes[scope].exit()
 
 
+HARNESS_BINDERS = []
+
+
+_DockerBinder = inj.create_binder()
+
+
+class DockerManager:
+
+    @inj.annotate(session_request=Scope.SESSION)
+    def __init__(self, session_request: FixtureRequest) -> None:
+        super().__init__()
+
+        self._session_request = session_request
+        print(inj.Injector.current[FixtureRequest])
+
+
+_DockerBinder.bind(DockerManager, in_=Session)
+
+
+class FunctionDocker:
+
+    @inj.annotate(function_request=Scope.FUNCTION)
+    def __init__(self, function_request: FixtureRequest, docker_manager: DockerManager) -> None:
+        super().__init__()
+
+        self._function_request = function_request
+        self._docker_manager = docker_manager
+        print(inj.Injector.current[FixtureRequest])
+
+
+_DockerBinder.bind(FunctionDocker, in_=Function)
+
+
+HARNESS_BINDERS.append(_DockerBinder)
+
+
 @pytest.yield_fixture(scope='session', autouse=True)
 def harness() -> ta.Generator[Harness, None, None]:
-    with Harness() as harness:
+    with Harness(*HARNESS_BINDERS) as harness:
         yield harness
 
 
