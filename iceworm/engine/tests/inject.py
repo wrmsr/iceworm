@@ -63,7 +63,7 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
                 'phase': classmethod(lambda _: p),
                 '__module__': cls.__module__,
             },
-            )
+        )
         cls._subclass_map[p] = scls
         return scls
 
