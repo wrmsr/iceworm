@@ -1,4 +1,5 @@
-from omnibus import inject as inj  # noqa
+from . import inject  # noqa
 
 
-# class
+def test_inject():
+    pass

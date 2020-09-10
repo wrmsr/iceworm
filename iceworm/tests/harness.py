@@ -77,16 +77,13 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
 
     @classmethod
     def _subclass(cls, s: Scope):
-        @classmethod  # noqa
-        def pytest_scope(cls) -> Scope:  # noqa
-            return s
         check.isinstance(s, Scope)
         check.not_in(s, cls._subclass_map)
         scls = type(
             s.name.lower().capitalize() + cls.__name__,
             (cls, lang.Final),
             {
-                'pytest_scope': pytest_scope,
+                'pytest_scope': classmethod(lambda _: s),
                 '__module__': cls.__module__,
             },
         )
