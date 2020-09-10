@@ -12,6 +12,7 @@ from omnibus import inject as inj
 import omnibus.inject.scopes  # noqa
 import pytest
 
+from .docker import DockerManager
 from .harness import Harness
 from .harness import Scope
 
@@ -60,8 +61,11 @@ def test_harness_4(harness: Harness):
     print(dm)
 
 
-def test_harness_5(harness: Harness):
-    from .docker import DockerManager
+@pytest.mark.parametrize('x', [1, 2, 3])
+def test_harness_5(harness: Harness, x):
+    req = harness[FixtureRequest]
+    print(req)
+    print(id(req))
     dm = harness[DockerManager]
     print(dm)
     print(dm.get_container_tcp_endpoints([('iceworm-postgres', 5432)]))

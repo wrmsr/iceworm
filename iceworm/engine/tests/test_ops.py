@@ -8,7 +8,7 @@ TODO:
 """
 import contextlib
 import os.path
-import typing as ta  # noqa
+import typing as ta
 
 from omnibus import check  # noqa
 from omnibus import dataclasses as dc  # noqa

@@ -33,7 +33,7 @@ class InferTableProcessor(els.ElementProcessor):
 
     def __init__(
             self,
-            ctors: ta.Iterable[ctrs.Connector],
+            ctors: ctrs.ConnectorSet,
     ) -> None:
         super().__init__()
 
