@@ -4,11 +4,11 @@ asn1crypto==1.4.0
 attrs==20.2.0
 azure-common==1.1.25
 azure-core==1.8.1
-azure-storage-blob==12.4.0
+azure-storage-blob==12.5.0
 backcall==0.2.0
 bleach==3.1.5
-boto3==1.14.56
-botocore==1.17.56
+boto3==1.14.58
+botocore==1.17.58
 certifi==2020.6.20
 cffi==1.14.2
 chardet==3.0.4
@@ -49,10 +49,10 @@ mypy-extensions==0.4.3
 numba==0.51.2
 numpy==1.19.1
 oauthlib==3.1.0
-omnibus @ git+https://github.com/wrmsr/omnibus@48a23d760ab7ff1a50db17cacb6502f0d064d5dd
+omnibus @ git+https://github.com/wrmsr/omnibus@9e9cf12691fd25bfda777b002303be62abd837ee
 oscrypto==1.2.1
 packaging==20.4
-pandas==1.1.1
+pandas==1.1.2
 parso==0.7.1
 pexpect==4.8.0
 pg8000==1.16.5
