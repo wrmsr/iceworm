@@ -219,3 +219,8 @@ def test_harness(harness: har.Harness):
 def test_harness2(harness: har.Harness):
     dbm = harness[DbManager]
     print(dbm.pg_url)
+
+
+def test_ping(harness: har.Harness):
+    with harness[DbManager].pg_engine.connect() as conn:
+        assert conn.scalar('select 1') == 1
