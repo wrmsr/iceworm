@@ -7,13 +7,16 @@ from omnibus import lifecycles as lc
 from . import harness as har
 
 
-@har.bind(har.Session)
+@har.bind(har.Session, eager=True)
 class DockerManager(lc.ContextManageableLifecycle):
 
     def __init__(self) -> None:
         super().__init__()
 
         self._client = None
+
+    def _do_lifecycle_start(self) -> None:
+        super()._do_lifecycle_start()
 
     @property
     def client(self):

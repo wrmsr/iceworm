@@ -183,6 +183,10 @@ class _LifecycleRegistrar:
         return instance
 
 
+class _Eager(dc.Pure):
+    key: inj.Key
+
+
 class Harness:
 
     def __init__(self, *binders: inj.Binder) -> None:
@@ -195,7 +199,7 @@ class Harness:
             binder._elements.append(inj.types.ScopeBinding(pss))
             binder.bind(FixtureRequest, annotated_with=pss.pytest_scope(), in_=pss)
             binder.bind(lc.LifecycleManager, annotated_with=pss.pytest_scope(), in_=pss)
-            # binder.new_set_binder()
+            binder.new_set_binder(_Eager, annotated_with=pss.pytest_scope(), in_=pss)
 
         spl = _ScopeProvisionListener()
         binder.bind(_ScopeProvisionListener, to_instance=spl)
@@ -235,6 +239,9 @@ class Harness:
         try:
             lm = self._injector[inj.Key(lc.LifecycleManager, scope)]
             with lc.context_manage(lm):
+                eags = self._injector[inj.Key(ta.Set[_Eager], scope)]
+                for eag in eags:
+                    self._injector[eag.key]  # noqa
                 yield
         finally:
             self._scopes[scope].exit()
@@ -287,11 +294,14 @@ def register(obj: T) -> T:
     return obj
 
 
-def bind(scope: ta.Type[_InjectorScope]):
+def bind(scope: ta.Type[_InjectorScope], *, eager: bool = False):
     def inner(obj):
         check.isinstance(obj, type)
         binder = register(inj.create_binder())
         binder.bind(obj, in_=scope)
+        if eager:
+            sb = binder.new_set_binder(_Eager, annotated_with=scope.pytest_scope(), in_=scope)
+            sb.bind(to_instance=_Eager(inj.Key(obj)))
         return obj
     check.issubclass(scope, _InjectorScope)
     return inner
