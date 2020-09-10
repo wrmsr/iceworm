@@ -12,7 +12,7 @@ from omnibus import properties
 from . import harness as har
 
 
-@har.bind(har.Session, eager=True)
+@har.bind(har.Session)
 class DockerManager(lc.ContextManageableLifecycle):
 
     @properties.stateful_cached
