@@ -11,6 +11,7 @@ import abc
 import contextlib
 import typing as ta
 import warnings
+import weakref
 
 from _pytest.fixtures import FixtureRequest # noqa
 from omnibus import check
@@ -18,6 +19,7 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import inject as inj
 from omnibus import lang
+from omnibus import lifecycles as lc
 import omnibus.inject.scopes  # noqa
 import pytest
 
@@ -121,8 +123,6 @@ class _ScopeProvisionListener:
             cur = self._stack[-1]
             if scope is not None:
                 check.not_none(cur.scope)
-                if not (scope.value <= cur.scope.value):
-                    breakpoint()
                 check.state(scope.value <= cur.scope.value)
                 scope = min(scope, cur.scope, key=lambda s: s.value)
             else:
@@ -162,6 +162,27 @@ class _CurrentInjectorScope(inj.scopes.Scope, lang.Final):
         return injector[new_key]
 
 
+class _LifecycleRegistrar:
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._seen = weakref.WeakSet()
+
+    def __call__(self, injector: inj.Injector, key, fn):
+        instance = fn()
+        if (
+                isinstance(instance, lc.Lifecycle) and
+                not isinstance(instance, lc.LifecycleManager) and
+                instance not in self._seen
+        ):
+            binding = check.isinstance(injector.get_binding(key), inj.types.Binding)
+            scope = check.issubclass(binding.scoping, _InjectorScope)
+            man = injector.get(inj.Key(lc.LifecycleManager, scope.pytest_scope()))
+            man.add(instance)
+            self._seen.add(instance)
+        return instance
+
+
 class Harness:
 
     def __init__(self, *binders: inj.Binder) -> None:
@@ -173,17 +194,18 @@ class Harness:
         for pss in _InjectorScope._subclass_map.values():
             binder._elements.append(inj.types.ScopeBinding(pss))
             binder.bind(FixtureRequest, annotated_with=pss.pytest_scope(), in_=pss)
-
-        # @binder.bind_callable
-        # def most_specific_request() -> FixtureRequest:
-        #     return next(iter(s._state.request for s in reversed(list(self._scopes.values())) if s._state is not None))
+            binder.bind(lc.LifecycleManager, annotated_with=pss.pytest_scope(), in_=pss)
+            # binder.new_set_binder()
 
         spl = _ScopeProvisionListener()
         binder.bind(_ScopeProvisionListener, to_instance=spl)
         binder.bind_provision_listener(spl)
 
+        binder.bind_provision_listener(_LifecycleRegistrar())
+
         binder._elements.append(inj.types.ScopeBinding(_CurrentInjectorScope))
         binder.bind(FixtureRequest, in_=_CurrentInjectorScope)
+        binder.bind(lc.LifecycleManager, in_=_CurrentInjectorScope)
 
         self._injector = inj.create_injector(binder, *binders)
 
@@ -211,50 +233,16 @@ class Harness:
         check.isinstance(request, FixtureRequest)
         self._scopes[scope].enter(request)
         try:
-            yield
+            lm = self._injector[inj.Key(lc.LifecycleManager, scope)]
+            with lc.context_manage(lm):
+                yield
         finally:
             self._scopes[scope].exit()
 
 
-HARNESS_BINDERS = []
-
-
-_DockerBinder = inj.create_binder()
-
-
-class DockerManager:
-
-    @inj.annotate(session_request=Scope.SESSION)
-    def __init__(self, session_request: FixtureRequest) -> None:
-        super().__init__()
-
-        self._session_request = session_request
-        print(inj.Injector.current[FixtureRequest])
-
-
-_DockerBinder.bind(DockerManager, in_=Session)
-
-
-class FunctionDocker:
-
-    @inj.annotate(function_request=Scope.FUNCTION)
-    def __init__(self, function_request: FixtureRequest, docker_manager: DockerManager) -> None:
-        super().__init__()
-
-        self._function_request = function_request
-        self._docker_manager = docker_manager
-        print(inj.Injector.current[FixtureRequest])
-
-
-_DockerBinder.bind(FunctionDocker, in_=Function)
-
-
-HARNESS_BINDERS.append(_DockerBinder)
-
-
 @pytest.yield_fixture(scope='session', autouse=True)
 def harness() -> ta.Generator[Harness, None, None]:
-    with Harness(*HARNESS_BINDERS) as harness:
+    with Harness(*_HARNESS_BINDERS) as harness:
         yield harness
 
 
@@ -286,3 +274,24 @@ def _scope_listener_class(harness, request):
 def _scope_listener_function(harness, request):
     with harness.scope_manager(Scope.FUNCTION, request):
         yield
+
+
+_HARNESS_BINDERS = []
+
+
+def register(obj: T) -> T:
+    if isinstance(obj, inj.Binder):
+        _HARNESS_BINDERS.append(obj)
+    else:
+        raise TypeError(obj)
+    return obj
+
+
+def bind(scope: ta.Type[_InjectorScope]):
+    def inner(obj):
+        check.isinstance(obj, type)
+        binder = register(inj.create_binder())
+        binder.bind(obj, in_=scope)
+        return obj
+    check.issubclass(scope, _InjectorScope)
+    return inner

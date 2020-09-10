@@ -44,17 +44,6 @@ def test_harness_2(harness: Harness):
     req: FixtureRequest = harness[inj.Key(FixtureRequest, Scope.FUNCTION)]
     print(req.function)
 
-    # req2 = harness[FixtureRequest]
-    # assert req2 is req
-
-    from .harness import DockerManager
-    dm = harness[DockerManager]
-    print(dm)
-
-    from .harness import FunctionDocker
-    fd = harness[FunctionDocker]
-    print(fd)
-
     print(harness[FixtureRequest])
 
 
@@ -62,15 +51,17 @@ def test_harness_3(harness: Harness):
     req: FixtureRequest = harness[inj.Key(FixtureRequest, Scope.FUNCTION)]
     print(req.function)
 
-    # req2 = harness[FixtureRequest]
-    # assert req2 is req
+    print(harness[FixtureRequest])
 
-    from .harness import DockerManager
+
+def test_harness_4(harness: Harness):
+    from .docker import DockerManager
     dm = harness[DockerManager]
     print(dm)
 
-    from .harness import FunctionDocker
-    fd = harness[FunctionDocker]
-    print(fd)
 
-    print(harness[FixtureRequest])
+def test_harness_5(harness: Harness):
+    from .docker import DockerManager
+    dm = harness[DockerManager]
+    print(dm)
+    print(dm.get_container_tcp_endpoints([('docker_iceworm-postgres_1', 5432)]))
