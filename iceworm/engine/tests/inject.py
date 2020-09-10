@@ -111,6 +111,10 @@ def install(binder: inj.Binder) -> inj.Binder:
 
     binder.bind(rls.TableAsSelectProcessor, in_=Targets)
     binder.new_set_binder(rls.RuleProcessor, annotated_with=els.processing.Phases.TARGETS, in_=Targets).bind(to=rls.TableAsSelectProcessor)  # noqa
+    def provide_table_as_select_rule_element_processor(rp: rls.TableAsSelectProcessor) -> rls.RuleElementProcessor[rls.TableAsSelect]:  # noqa
+        return rls.RuleElementProcessor(rp)
+    binder.new_set_binder(els.ElementProcessor, annotated_with=els.processing.Phases.TARGETS, in_=Targets).bind(to_provider=rls.RuleElementProcessor[rls.TableAsSelect])  # noqa
+    binder.bind_callable(provide_table_as_select_rule_element_processor, in_=Targets)
 
     binder.bind(infr.InferTableProcessor, in_=Targets)
     binder.new_set_binder(els.ElementProcessor, annotated_with=els.processing.Phases.TARGETS, in_=Targets).bind(to=infr.InferTableProcessor)  # noqa
