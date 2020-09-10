@@ -166,20 +166,38 @@ class _LifecycleRegistrar:
 
     def __init__(self) -> None:
         super().__init__()
+
         self._seen = weakref.WeakSet()
+        self._stack: ta.List[_LifecycleRegistrar.State] = []
+
+    class State(dc.Pure):
+        key: inj.Key
+        dependencies: ta.List[ta.Tuple[inj.types.Binding, ta.Any]] = dc.field(default_factory=list)
 
     def __call__(self, injector: inj.Injector, key, fn):
-        instance = fn()
-        if (
-                isinstance(instance, lc.Lifecycle) and
-                not isinstance(instance, lc.LifecycleManager) and
-                instance not in self._seen
-        ):
+        st = self.State(key)
+        self._stack.append(st)
+        try:
+            instance = fn()
+        finally:
+            popped = self._stack.pop()
+            check.state(popped is st)
+
+        if isinstance(instance, lc.Lifecycle) and not isinstance(instance, lc.LifecycleManager):
             binding = check.isinstance(injector.get_binding(key), inj.types.Binding)
-            scope = check.issubclass(binding.scoping, _InjectorScope)
-            man = injector.get(inj.Key(lc.LifecycleManager, scope.pytest_scope()))
-            man.add(instance)
-            self._seen.add(instance)
+            if self._stack:
+                self._stack[-1].dependencies.append((binding, instance))
+
+            if instance not in self._seen:
+                scope = check.issubclass(binding.scoping, _InjectorScope)
+                man: lc.LifecycleManager = injector.get(inj.Key(lc.LifecycleManager, scope.pytest_scope()))
+                deps = [o for b, o in st.dependencies if b.scoping == binding.scoping]
+                man.add(instance, deps)
+                self._seen.add(instance)
+
+        elif self._stack:
+            self._stack[-1].dependencies.extend(st.dependencies)
+
         return instance
 
 
