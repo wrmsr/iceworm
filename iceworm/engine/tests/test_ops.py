@@ -25,9 +25,8 @@ from .. import planning as pln
 from .. import rules as rls
 from .. import sites  # noqa
 from ... import domains as doms
-from ...sql.tests.helpers import pg_engine  # noqa
-from ...sql.tests.helpers import pg_url  # noqa  # FIXME: jesus christ pytest fucking sucks
-from ...sql.tests.helpers import raw_pg_url
+from ...sql.tests.helpers import DbManager
+from ...tests import harness as har
 from ...types import QualifiedName  # noqa
 from ...utils import secrets as sec  # noqa
 
@@ -59,7 +58,7 @@ class UrlSecretsReplacer(els.ElementProcessor):
 
 
 # @pytest.mark.xfail()
-def test_ops(pg_engine, harness):  # noqa
+def test_ops(harness: har.Harness):  # noqa
     # binder = inj.create_binder()
     # binder.bind(CONNECTORS)
     # binder.bind(inj.Key(ta.Iterable[ctrs.Connector]), to=ctrs.ConnectorSet)
@@ -67,11 +66,10 @@ def test_ops(pg_engine, harness):  # noqa
     # binder.bind(inj.Key(ta.Iterable[tars.Element]), to=tars.ElementSet)
     # injector = inj.create_injector(binder)  # noqa
 
-    print(harness)
     with contextlib.ExitStack() as es:
         es.enter_context(oos.tmp_chdir(os.path.dirname(__file__)))
 
-        secrets = sec.Secrets({'pg_url': raw_pg_url()})
+        secrets = sec.Secrets({'pg_url': harness[DbManager].pg_url})
         connectors: ta.Optional[ctrs.ConnectorSet] = None
 
         def epfac(eles, phase):
@@ -114,7 +112,7 @@ def test_ops(pg_engine, harness):  # noqa
 
         exe.PlanExecutor(plan, connectors).execute()
 
-        with pg_engine.connect() as pg_conn:
+        with harness[DbManager].pg_engine.connect() as pg_conn:
             print(list(pg_conn.execute('select * from a')))
             print(list(pg_conn.execute('select * from b')))
             print(list(pg_conn.execute('select * from c')))

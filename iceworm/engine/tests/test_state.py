@@ -10,8 +10,8 @@ import pytest
 import sqlalchemy as sa
 
 from .. import state as st
-from ...sql.tests.helpers import clean_pg
-from ...sql.tests.helpers import pg_url  # noqa
+from ...sql.tests.helpers import DbManager
+from ...tests import harness as har
 
 
 @dc.dataclass(frozen=True)
@@ -35,12 +35,11 @@ def test_state():
 
 
 @pytest.mark.xfail()
-def test_state_script(pg_url):  # noqa
+def test_state_script(harness: har.Harness):  # noqa
     with open(os.path.join(os.path.dirname(__file__), 'state.sql'), 'r') as f:
         buf = f.read()
 
     engine: sa.engine.Engine
-    with lang.disposing(sa.create_engine(pg_url)) as engine:
-        clean_pg(engine)
+    with lang.disposing(sa.create_engine(harness[DbManager].pg_url)) as engine:
         with engine.connect() as conn:
             conn.execute(buf)

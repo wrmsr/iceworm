@@ -10,10 +10,10 @@ import pytest
 import sqlalchemy as sa
 
 from .. import tpch
+from ...tests import harness as har
 from ...tests.helpers import call_many_with_timeout
 from ..postgres import PostgresAdapter
-from .helpers import clean_pg
-from .helpers import pg_url  # noqa
+from .helpers import DbManager
 
 
 IS_NUMBER_JS = """
@@ -22,11 +22,10 @@ IS_NUMBER_JS = """
 
 
 @pytest.mark.xfail()
-def test_docker_postgres(pg_url):  # noqa
+def test_docker_postgres(harness: har.Harness):  # noqa
     engine: sa.engine.Engine
     with contextlib.ExitStack() as es:
-        engine = es.enter_context(lang.disposing(sa.create_engine(pg_url)))
-        clean_pg(engine)
+        engine = es.enter_context(lang.disposing(sa.create_engine(harness[DbManager].pg_url)))
 
         conn = es.enter_context(engine.connect())
         print(conn.scalar(sa.select([sa.func.version()])))
@@ -86,11 +85,10 @@ def test_docker_postgres(pg_url):  # noqa
 
 
 @pytest.mark.xfail()
-def test_postgres_locks(pg_url):  # noqa
+def test_postgres_locks(harness: har.Harness):  # noqa
     engine: sa.engine.Engine
     with contextlib.ExitStack() as es:
-        engine = es.enter_context(lang.disposing(sa.create_engine(pg_url)))
-        clean_pg(engine)
+        engine = es.enter_context(lang.disposing(sa.create_engine(harness[DbManager].pg_url)))
 
         print()
 
@@ -178,11 +176,10 @@ def test_postgres_locks(pg_url):  # noqa
 
 
 @pytest.mark.xfail()
-def test_tpch(pg_url):  # noqa
+def test_tpch(harness: har.Harness):  # noqa
     engine: sa.engine.Engine
     with contextlib.ExitStack() as es:
-        engine = es.enter_context(lang.disposing(sa.create_engine(pg_url)))
-        clean_pg(engine)
+        engine = es.enter_context(lang.disposing(sa.create_engine(harness[DbManager].pg_url)))
 
         metadata = sa.MetaData()
         sats = tpch.build_sa_tables(metadata=metadata)
@@ -194,8 +191,8 @@ def test_tpch(pg_url):  # noqa
 
 
 @pytest.mark.xfail()
-def test_pg8000(pg_url):  # noqa
-    pg_url = urllib.parse.urlunparse(urllib.parse.urlparse(pg_url)._replace(scheme='postgresql+pg8000'))
+def test_pg8000(harness: har.Harness):  # noqa
+    pg_url = urllib.parse.urlunparse(urllib.parse.urlparse(harness[DbManager].pg_url)._replace(scheme='postgresql+pg8000'))  # noqa
 
     engine: sa.engine.Engine
     with contextlib.ExitStack() as es:
@@ -212,3 +209,13 @@ def test_range():
     ada = PostgresAdapter()
     stmt = ada.build_range(5)
     assert ada.render_query(stmt).split() == 'SELECT i FROM generate_series(1, 5) AS s(i)'.split()
+
+
+def test_harness(harness: har.Harness):
+    dbm = harness[DbManager]
+    print(dbm.pg_url)
+
+
+def test_harness2(harness: har.Harness):
+    dbm = harness[DbManager]
+    print(dbm.pg_url)

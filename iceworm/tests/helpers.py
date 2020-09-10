@@ -6,36 +6,11 @@ TODO:
 import threading
 import typing as ta
 
-from omnibus import check
-from omnibus import code as oco
-import pytest
-
 
 T = ta.TypeVar('T')
 
 
 DEFAULT_TIMEOUT_S = 30
-
-
-def pytest_callable_fixture(*fxargs, **fxkwargs):
-    """Fuck off pytest."""
-
-    def inner(fn):
-        fixture = pytest.fixture(*fxargs, **fxkwargs)(fn)
-
-        def override(*args, **kwargs):
-            nonlocal fn
-            return 1(*args, **kwargs)  # noqa
-
-        code = override.__code__
-        check.state(code.co_consts == (None, 1))
-        newcodeargs = [getattr(code, f'co_{a}') for a in oco.CODE_ARGS]
-        newcodeargs[oco.CODE_ARGS.index('consts')] = (None, fn)
-        fixture.__code__ = type(code)(*newcodeargs)
-
-        return fixture
-
-    return inner
 
 
 def call_many_with_timeout(

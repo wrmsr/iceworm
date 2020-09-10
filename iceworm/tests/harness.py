@@ -189,6 +189,8 @@ class _Eager(dc.Pure):
 
 class Harness:
 
+    _ACTIVE = ocol.IdentitySet()
+
     def __init__(self, *binders: inj.Binder) -> None:
         super().__init__()
 
@@ -219,12 +221,14 @@ class Harness:
         }
 
     def __enter__(self):
+        self._ACTIVE.add(self)
         return self
 
     def __exit__(self, et, e, tb):
         for s in self._scopes.values():
             if s._state is not None:
                 warnings.warn(f'Scope {s.pytest_scope()} is still active')
+        self._ACTIVE.remove(self)
 
     def __getitem__(
             self,
@@ -287,6 +291,7 @@ _HARNESS_BINDERS = []
 
 
 def register(obj: T) -> T:
+    check.empty(Harness._ACTIVE)
     if isinstance(obj, inj.Binder):
         _HARNESS_BINDERS.append(obj)
     else:

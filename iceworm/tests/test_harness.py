@@ -64,4 +64,4 @@ def test_harness_5(harness: Harness):
     from .docker import DockerManager
     dm = harness[DockerManager]
     print(dm)
-    print(dm.get_container_tcp_endpoints([('docker_iceworm-postgres_1', 5432)]))
+    print(dm.get_container_tcp_endpoints([('iceworm-postgres', 5432)]))

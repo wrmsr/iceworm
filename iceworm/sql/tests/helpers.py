@@ -1,54 +1,33 @@
-import typing as ta
-
-from omnibus import docker
 from omnibus import lang
-import pytest
+from omnibus import lifecycles as lc
+from omnibus import properties
 import sqlalchemy as sa
 
-from ...tests.helpers import pytest_callable_fixture
+from ...tests import harness as har
+from ...tests.docker import DockerManager
 
 
-class HostPort(ta.NamedTuple):
-    host: str
-    port: int
+@har.bind(har.Function)
+class DbManager(lc.ContextManageableLifecycle):
 
+    def __init__(self, dm: DockerManager) -> None:
+        super().__init__()
 
-@pytest_callable_fixture()
-@lang.cached_nullary
-def pg_host_port() -> HostPort:
-    if docker.is_in_docker():
-        (host, port) = 'iceworm-postgres', 5432
+        self._dm = dm
 
-    else:
-        with docker.client_context() as client:
-            eps = docker.get_container_tcp_endpoints(
-                client,
-                [('docker_iceworm-postgres_1', 5432)])
+    @properties.stateful_cached
+    @property
+    def pg_url(self) -> str:
+        [(host, port)] = self._dm.get_container_tcp_endpoints([('iceworm-postgres', 5432)]).values()
+        url = f'postgresql+psycopg2://iceworm:iceworm@{host}:{port}'
+        with lang.disposing(sa.engine.create_engine(url)) as engine:
+            clean_pg(engine)
+        return url
 
-        [(host, port)] = eps.values()
-
-    return HostPort(host, port)
-
-
-@pytest_callable_fixture()
-@lang.cached_nullary
-def raw_pg_url() -> str:
-    hp = pg_host_port()
-    return f'postgresql+psycopg2://iceworm:iceworm@{hp.host}:{hp.port}'
-
-
-@pytest.fixture()
-def pg_url() -> str:
-    url = raw_pg_url()
-    with lang.disposing(sa.engine.create_engine(url)) as engine:
-        clean_pg(engine)
-    return url
-
-
-@pytest.yield_fixture()
-def pg_engine(pg_url):  # noqa
-    with lang.disposing(sa.engine.create_engine(pg_url)) as engine:
-        yield engine
+    @properties.stateful_cached
+    @property
+    def pg_engine(self) -> sa.engine.Engine:
+        return self._lifecycle_exit_stack.enter_context(lang.disposing(sa.engine.create_engine(self.pg_url)))
 
 
 def clean_pg(engine: sa.engine.Engine) -> None:
