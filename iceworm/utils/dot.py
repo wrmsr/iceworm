@@ -19,7 +19,7 @@ from omnibus import os as oos
 from .collections import seq
 
 
-class Item(dc.Enum):
+class Item(dc.Enum, sealed=True):
     pass
 
 

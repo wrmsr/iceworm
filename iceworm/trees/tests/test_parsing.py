@@ -17,6 +17,25 @@ from ...utils import serde
 from .._antlr.IceSqlParser import IceSqlParserConfig
 
 
+def do_dot(root: no.Node) -> None:
+    def rec(n: no.Node) -> None:
+        title = f'{n.__class__.__name__}@{hex(id(n))[2:]}'
+        if isinstance(n, no.Identifier):
+            body = [[title], [n.name]]
+        else:
+            body = title
+        stmts.append(dot.Node(str(id(n)), {'label': body}))
+        for c in n.children:
+            rec(c)
+            stmts.append(dot.Edge(str(id(n)), str(id(c))))
+
+    stmts = []
+    rec(root)
+    gv = dot.render(dot.Graph(stmts))
+    print(gv)
+    # dot.open_dot(gv)
+
+
 def _assert_query(query: str, *, config: ta.Optional[IceSqlParserConfig] = None) -> ta.Optional[no.Node]:
     query = query.strip(' \r\n;')
     if not query:
@@ -123,20 +142,4 @@ def test_interval_units():
 def test_dot():
     root = parsing.parse_stmt('select * from a left outer join b on a.id = b.id where foo >= 10')
     print(root)
-
-    def rec(n: no.Node) -> None:
-        title = f'{n.__class__.__name__}@{hex(id(n))[2:]}'
-        if isinstance(n, no.Identifier):
-            body = [[title], [n.name]]
-        else:
-            body = title
-        stmts.append(dot.Node(str(id(n)), {'label': body}))
-        for c in n.children:
-            rec(c)
-            stmts.append(dot.Edge(str(id(n)), str(id(c))))
-
-    stmts = []
-    rec(root)
-    gv = dot.render(dot.Graph(stmts))
-    print(gv)
-    dot.open_dot(gv)
+    do_dot(root)
