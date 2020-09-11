@@ -172,7 +172,7 @@ public class JdbcProxyTest
         {
             try {
                 return method.invoke(target, args);
-            } catch (final InvocationTargetException e) {
+            } catch (InvocationTargetException e) {
                 throw e.getCause();
             }
         }
