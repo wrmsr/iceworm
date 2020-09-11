@@ -194,8 +194,9 @@ class Renderer(disp.Class):
                 if i:
                     self._out.write(', ')
                 self._out.write(k)
-                self._out.write('=')
+                self._out.write('=<')
                 self(v)
+                self._out.write('>')
             self._out.write(']')
 
     def __call__(self, item: Edge) -> None:  # noqa
@@ -256,12 +257,18 @@ def test_dot():
     print(render(Value.of('hi')))
     print(render(Value.of([['a', 'b'], ['c', 'd']])))
 
-    print(render(Graph(
+    def print_and_open(no):
+        print(no)
+        gv = render(no)
+        print(gv)
+        open_dot(gv)
+
+    print_and_open(Graph(
         [
-            Node('a'),
-            Node('b'),
+            Node('a', {'shape': 'box'}),
+            Node('b', {'label': [['a', 'b'], ['c', 'd']]}),
         ],
         [
             Edge('a', 'b'),
         ],
-    )))
+    ))
