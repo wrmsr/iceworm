@@ -36,7 +36,6 @@ from .base import Frozen
 from .collections import ElementSet
 from .phases import PHASES
 from .phases import Phase
-from .phases import Phases
 
 
 class ProcessedBy(dc.Pure):

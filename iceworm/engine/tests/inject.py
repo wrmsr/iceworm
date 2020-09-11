@@ -54,18 +54,18 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
     _subclass_map: ta.Mapping[els.PhasePair, ta.Type['_InjectorScope']] = {}
 
     @classmethod
-    def _subclass_one(cls, p: els.PhasePair) -> ta.Type['_InjectorScope']:
-        check.isinstance(p, els.PhasePair)
-        check.not_in(p, cls._subclass_map)
+    def _subclass_one(cls, pp: els.PhasePair) -> ta.Type['_InjectorScope']:
+        check.isinstance(pp, els.PhasePair)
+        check.not_in(pp, cls._subclass_map)
         scls = type(
-            p.name + '_' + cls.__name__,
+            pp.name + '_' + cls.__name__,
             (cls, lang.Final,),
             {
-                'phase_pair': classmethod(lambda _: p),
+                'phase_pair': classmethod(lambda _: pp),
                 '__module__': cls.__module__,
             },
         )
-        cls._subclass_map[p] = scls
+        cls._subclass_map[pp] = scls
         return scls
 
     @classmethod
@@ -93,11 +93,11 @@ PreFinalize, Finalize, PostFinalize = _InjectorScope._subclass(els.Phases.FINALI
 
 def run(*binders: inj.Binder) -> None:
     ib = inj.create_binder()
-    for p in _InjectorScope._subclass_map.values():
-        ib._elements.append(inj.types.ScopeBinding(p))
-        for a in [p.phase_pair().phase] if p.phase_pair().sub_phase == els.SubPhases.MAIN else []:
-            ib.new_set_binder(els.ElementProcessor, annotated_with=a, in_=p)
-            ib.new_set_binder(rls.RuleProcessor, annotated_with=a, in_=p)
+    for s in _InjectorScope._subclass_map.values():
+        ib._elements.append(inj.types.ScopeBinding(s))
+        for a in [s.phase_pair().phase] if s.phase_pair().sub_phase == els.SubPhases.MAIN else []:
+            ib.new_set_binder(els.ElementProcessor, annotated_with=a, in_=s)
+            ib.new_set_binder(rls.RuleProcessor, annotated_with=a, in_=s)
 
     injector = inj.create_injector(ib, *binders)
 
@@ -118,20 +118,20 @@ def run(*binders: inj.Binder) -> None:
 
 def install(binder: inj.Binder) -> inj.Binder:
     binder.bind(sites.SiteProcessor, in_=Sites)
-    binder.new_set_binder(els.ElementProcessor, annotated_with=els.processing.Phases.SITES, in_=Sites).bind(to=sites.SiteProcessor)  # noqa
+    binder.new_set_binder(els.ElementProcessor, annotated_with=els.Phases.SITES, in_=Sites).bind(to=sites.SiteProcessor)  # noqa
 
     binder.bind(UrlSecretsReplacer, in_=Connectors)
-    binder.new_set_binder(els.ElementProcessor, annotated_with=els.processing.Phases.CONNECTORS, in_=Connectors).bind(to=UrlSecretsReplacer)  # noqa
+    binder.new_set_binder(els.ElementProcessor, annotated_with=els.Phases.CONNECTORS, in_=Connectors).bind(to=UrlSecretsReplacer)  # noqa
 
     binder.bind(rls.TableAsSelectProcessor, in_=Targets)
-    binder.new_set_binder(rls.RuleProcessor, annotated_with=els.processing.Phases.TARGETS, in_=Targets).bind(to=rls.TableAsSelectProcessor)  # noqa
+    binder.new_set_binder(rls.RuleProcessor, annotated_with=els.Phases.TARGETS, in_=Targets).bind(to=rls.TableAsSelectProcessor)  # noqa
     def provide_table_as_select_rule_element_processor(rp: rls.TableAsSelectProcessor) -> rls.RuleElementProcessor[rls.TableAsSelect]:  # noqa
         return rls.RuleElementProcessor(rp)
-    binder.new_set_binder(els.ElementProcessor, annotated_with=els.processing.Phases.TARGETS, in_=Targets).bind(to_provider=rls.RuleElementProcessor[rls.TableAsSelect])  # noqa
+    binder.new_set_binder(els.ElementProcessor, annotated_with=els.Phases.TARGETS, in_=Targets).bind(to_provider=rls.RuleElementProcessor[rls.TableAsSelect])  # noqa
     binder.bind_callable(provide_table_as_select_rule_element_processor, in_=Targets)
 
     binder.bind(infr.InferTableProcessor, in_=Targets)
-    binder.new_set_binder(els.ElementProcessor, annotated_with=els.processing.Phases.TARGETS, in_=Targets).bind(to=infr.InferTableProcessor)  # noqa
+    binder.new_set_binder(els.ElementProcessor, annotated_with=els.Phases.TARGETS, in_=Targets).bind(to=infr.InferTableProcessor)  # noqa
 
     binder.bind_callable(lambda: lang.raise_(Exception), key=inj.Key(ctrs.ConnectorSet))
 

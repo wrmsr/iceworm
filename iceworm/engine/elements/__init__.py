@@ -16,4 +16,6 @@ from .phases import SubPhase  # noqa
 from .phases import SubPhases  # noqa
 from .processing import ElementProcessingDriver  # noqa
 from .processing import ElementProcessor  # noqa
+from .processing import PhaseFrozen  # noqa
+from .processing import ProcessedBy  # noqa
 from .refs import Ref  # noqa

@@ -46,7 +46,7 @@ FORMATS_BY_EXTENSION: ta.Mapping[str, Format] = unique_dict((e, f) for f in Form
 
 class Site(els.Element):
 
-    dc.metadata({els.processing.PhaseFrozen: els.processing.PhaseFrozen(els.processing.Phases.SITES)})
+    dc.metadata({els.PhaseFrozen: els.PhaseFrozen(els.Phases.SITES)})
 
     path: str = dc.field(check=lambda s: isinstance(s, str) and s)
     format: ta.Optional[str] = None
@@ -55,8 +55,8 @@ class Site(els.Element):
 class SiteProcessor(els.ElementProcessor):
 
     @classmethod
-    def phases(cls) -> ta.Iterable[els.processing.Phase]:
-        return [els.processing.Phases.SITES]
+    def phases(cls) -> ta.Iterable[els.Phase]:
+        return [els.Phases.SITES]
 
     def processes(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
         return elements.get_type_set(Site)
