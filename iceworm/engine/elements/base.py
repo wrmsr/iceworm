@@ -104,6 +104,13 @@ class Element(dc.Enum, nodal.Nodal['Element'], reorder=True):
         nf = dc.fields_dict(cls)['id']
         check.state(nf.type in (Id, ta.Optional[Id]))
 
+    @classmethod
+    def _build_fields_info(cls) -> nodal._FieldsInfo:
+        fi = super()._build_fields_info()
+        if fi.flds:
+            raise TypeError(f'Element type {cls} has nested elements. Elements cannot be nested - use refs instead.')
+        return fi
+
     anns: Annotations = nodal.new_anns_field(Annotations)
     meta: ta.Mapping[ta.Any, ta.Any] = nodal.new_meta_field(Annotation)
 
