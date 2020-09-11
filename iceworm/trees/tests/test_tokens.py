@@ -26,7 +26,7 @@ def test_comments():
         -- end
        """),
     ]:
-        root = parsing.parse_statement(sql)
+        root = parsing.parse_stmt(sql)
         print(root)
 
         ser = serde.serialize(root)  # noqa
@@ -36,7 +36,7 @@ def test_comments():
         rendered = rendering.render(root)
         print(rendered)
 
-        reparsed = parsing.parse_statement(rendered + ';')
+        reparsed = parsing.parse_stmt(rendered + ';')
         assert reparsed == root
 
         tok_ana = toks.TokenAnalysis(root)

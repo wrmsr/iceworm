@@ -499,7 +499,7 @@ def create_parser(buf: str, *, config: ta.Optional[IceSqlParserConfig] = None) -
     return parser
 
 
-def parse_statement(buf: str, **kwargs) -> no.Node:
+def parse_stmt(buf: str, **kwargs) -> no.Node:
     parser = create_parser(buf, **kwargs)
     node = _ParseVisitor().visit(parser.singleStatement())
     return check.isinstance(node, no.Node)

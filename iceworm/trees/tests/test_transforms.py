@@ -38,7 +38,7 @@ def test_expand_selects():
         'select * from t1',
         'select * from t0, t1',
     ]:
-        root = parsing.parse_statement(s)
+        root = parsing.parse_stmt(s)
 
         print(rendering.render(root))
 

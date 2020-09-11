@@ -112,7 +112,7 @@ class InsertIntoSelectExecutor(ConnsExecutor[ops.InsertIntoSelect]):
             except ValueError:
                 pass
             else:
-                root = tpar.parse_statement(op.query)
+                root = tpar.parse_stmt(op.query)
                 src = ctrs.ListRowSource(teval.StmtEvaluator().eval(root))
 
         if src is None:

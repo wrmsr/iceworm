@@ -59,14 +59,14 @@ class Cli(oap.Cli):
 
             try:
                 start = time.time()
-                root = parsing.parse_statement(txt)  # noqa
+                root = parsing.parse_stmt(txt)  # noqa
                 end = time.time()
 
                 basic = analysis.basic(root)
                 log.info(f'Parsed {len(basic.nodes)} nodes after {(end - start) * 1000.:0.02f} ms')
 
                 rendered = rendering.render(root)
-                reparsed = parsing.parse_statement(rendered + ';')
+                reparsed = parsing.parse_stmt(rendered + ';')
                 if reparsed != root:
                     raise ValueError('Reparse failed')
 

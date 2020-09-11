@@ -15,7 +15,7 @@ def is_simple_select(root: no.Select) -> bool:
 
 
 def parse_simple_select_tables(query: str) -> ta.AbstractSet[QualifiedName]:
-    root = check.isinstance(par.parse_statement(query), no.Select)
+    root = check.isinstance(par.parse_stmt(query), no.Select)
     if not is_simple_select(root):
         raise ValueError(root)
     basic = tana.basic(root)
@@ -25,7 +25,7 @@ def parse_simple_select_tables(query: str) -> ta.AbstractSet[QualifiedName]:
 
 
 def parse_simple_select_table(query: str, *, star: bool = False) -> QualifiedName:
-    root = check.isinstance(par.parse_statement(query), no.Select)
+    root = check.isinstance(par.parse_stmt(query), no.Select)
     if not is_simple_select(root):
         raise ValueError(root)
     basic = tana.basic(root)

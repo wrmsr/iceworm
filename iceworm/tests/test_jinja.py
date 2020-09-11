@@ -82,7 +82,7 @@ class Parser(jinja2.parser.Parser):
         node = jinja2.nodes.Macro(lineno=next(self.stream).lineno)
         node.name = self.parse_assign_target(name_only=True).name
         self.parse_signature(node)
-        node.body = self.parse_statements(('name:endmacro',), drop_needle=True)
+        node.body = self.parse_stmts(('name:endmacro',), drop_needle=True)
         return node
 
 

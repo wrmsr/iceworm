@@ -62,7 +62,7 @@ class InferTableProcessor(els.ElementProcessor):
                 if isinstance(ele, tars.Table):
                     tn_idxs[ele.id] = i
                     rows = check.single(rt for rt in ts.get_type_set(tars.Rows) if rt.table == ele)
-                    root = par.parse_statement(rows.query)
+                    root = par.parse_stmt(rows.query)
                     deps = {
                         ele_tns[n.name.name].id
                         for n in ana.basic(root).get_node_type_set(no.Table) if n.name.name in ele_tns
@@ -108,7 +108,7 @@ class InferTableProcessor(els.ElementProcessor):
             return objs
 
         def infer_table(self, query: str, given_tables: ta.Mapping[QualifiedName, md.Table]) -> md.Table:
-            root = par.parse_statement(query)
+            root = par.parse_stmt(query)
 
             table_names = {
                 tn.name.name

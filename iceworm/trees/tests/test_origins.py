@@ -29,7 +29,7 @@ def test_origins():
         # 'select f(t0.a + 1) + t0.b + 2 from t0',
         'select 5 v',
     ]:
-        root = parsing.parse_statement(s)
+        root = parsing.parse_stmt(s)
         print(rendering.render(root))
 
         root = tfm.AliasRelationsTransformer(root)(root)

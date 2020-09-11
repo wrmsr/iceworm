@@ -12,6 +12,7 @@ import pytest
 from .. import nodes as no
 from .. import parsing
 from .. import rendering
+from ...utils import dot
 from ...utils import serde
 from .._antlr.IceSqlParser import IceSqlParserConfig
 
@@ -23,7 +24,7 @@ def _assert_query(query: str, *, config: ta.Optional[IceSqlParserConfig] = None)
 
     print(query)
 
-    node = parsing.parse_statement(query + ';', config=config)
+    node = parsing.parse_stmt(query + ';', config=config)
     print(node)
 
     hash(node)
@@ -36,7 +37,7 @@ def _assert_query(query: str, *, config: ta.Optional[IceSqlParserConfig] = None)
     rendered = rendering.render(node)
     print(rendered)
 
-    reparsed = parsing.parse_statement(rendered + ';', config=config)
+    reparsed = parsing.parse_stmt(rendered + ';', config=config)
     try:
         assert reparsed == node
     except Exception:
@@ -117,3 +118,25 @@ def test_interval_units():
         else:
             assert it.label is None
             assert ie.unit == no.IntervalUnit.DAY
+
+
+def test_dot():
+    root = parsing.parse_stmt('select * from a left outer join b on a.id = b.id where foo >= 10')
+    print(root)
+
+    def rec(n: no.Node) -> None:
+        title = f'{n.__class__.__name__}@{hex(id(n))[2:]}'
+        if isinstance(n, no.Identifier):
+            body = [[title], [n.name]]
+        else:
+            body = title
+        stmts.append(dot.Node(str(id(n)), {'label': body}))
+        for c in n.children:
+            rec(c)
+            stmts.append(dot.Edge(str(id(n)), str(id(c))))
+
+    stmts = []
+    rec(root)
+    gv = dot.render(dot.Graph(stmts))
+    print(gv)
+    dot.open_dot(gv)
