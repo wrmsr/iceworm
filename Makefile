@@ -11,6 +11,7 @@ PYENV_BIN:=$(shell if [ -f "$${HOME}/.pyenv/bin/pyenv" ] ; then echo "$${HOME}/.
 PIP_ARGS:=
 
 PYENV_BREW_DEPS:= \
+	graphviz \
 	libyaml \
 	openssl \
 	readline \
