@@ -1,4 +1,5 @@
 import abc
+import functools
 import typing as ta
 
 from omnibus import check
@@ -15,7 +16,13 @@ from .. import rules as rls
 from .. import sites
 from .test_ops import UrlSecretsReplacer
 
+
 T = ta.TypeVar('T')
+
+
+class PhasePair(dc.Pure):
+    phase: els.processing.Phase = dc.field(check=lambda o: isinstance(o, els.processing.Phase))
+    sub_phase: els.processing.SubPhase = dc.field(check=lambda o: isinstance(o, els.processing.SubPhase))
 
 
 class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
@@ -29,7 +36,7 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
         values: ta.MutableMapping[inj.types.Binding, ta.Any] = dc.field(default_factory=ocol.IdentityKeyDict)
 
     @abc.abstractclassmethod
-    def phase(cls) -> els.processing.Phase:
+    def phase_pair(cls) -> PhasePair:
         raise NotImplementedError
 
     def enter(self) -> None:
@@ -43,59 +50,72 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
     def provide(self, binding: inj.types.Binding[T]) -> T:
         check.not_none(self._state)
         if binding.key == inj.Key(els.processing.Phase):
-            return self.phase()
+            return self.phase_pair().phase
         try:
             return self._state.values[binding]
         except KeyError:
             value = self._state.values[binding] = binding.provider()
             return value
 
-    _subclass_map: ta.Mapping[els.processing.Phase, ta.Type['_InjectorScope']] = {}
+    _subclass_map: ta.Mapping[PhasePair, ta.Type['_InjectorScope']] = {}
 
     @classmethod
-    def _subclass(cls, p: els.processing.Phase):
-        check.isinstance(p, els.processing.Phase)
+    def _subclass_one(cls, p: PhasePair) -> ta.Type['_InjectorScope']:
+        check.isinstance(p, PhasePair)
         check.not_in(p, cls._subclass_map)
         scls = type(
-            p.name.lower().capitalize() + cls.__name__,
+            p.phase.name.lower().capitalize() + '_' + p.sub_phase.name.lower().capitalize() + '_' + cls.__name__,
             (cls, lang.Final),
             {
-                'phase': classmethod(lambda _: p),
+                'phase_pair': classmethod(lambda _: p),
                 '__module__': cls.__module__,
             },
         )
         cls._subclass_map[p] = scls
         return scls
 
+    @classmethod
+    def _subclass(
+            cls,
+            p: els.processing.Phase,
+    ) -> ta.Tuple[
+        ta.Type['_InjectorScope'],
+        ta.Type['_InjectorScope'],
+        ta.Type['_InjectorScope'],
+    ]:
+        return tuple(
+            cls._subclass_one(PhasePair(p, sp))
+            for sp in els.processing.SubPhase.all()
+        )
 
-Bootstrap = _InjectorScope._subclass(els.processing.Phases.BOOTSTRAP)
-Sites = _InjectorScope._subclass(els.processing.Phases.SITES)
-Rules = _InjectorScope._subclass(els.processing.Phases.RULES)
-Connectors = _InjectorScope._subclass(els.processing.Phases.CONNECTORS)
-Targets = _InjectorScope._subclass(els.processing.Phases.TARGETS)
-Finalize = _InjectorScope._subclass(els.processing.Phases.FINALIZE)
+
+PreBootstrap, Bootstrap, PostBootstrap = _InjectorScope._subclass(els.processing.Phases.BOOTSTRAP)
+PreSites, Sites, PostSites = _InjectorScope._subclass(els.processing.Phases.SITES)
+PreRules, Rules, PostRules = _InjectorScope._subclass(els.processing.Phases.RULES)
+PreConnectors, Connectors, PostConnectors = _InjectorScope._subclass(els.processing.Phases.CONNECTORS)
+PreTargets, Targets, PostTargets = _InjectorScope._subclass(els.processing.Phases.TARGETS)
+PreFinalize, Finalize, PostFinalize = _InjectorScope._subclass(els.processing.Phases.FINALIZE)
 
 
 def run(*binders: inj.Binder) -> None:
     ib = inj.create_binder()
     for p in _InjectorScope._subclass_map.values():
         ib._elements.append(inj.types.ScopeBinding(p))
-        ib.new_set_binder(els.ElementProcessor, annotated_with=p.phase(), in_=p)
-        ib.new_set_binder(rls.RuleProcessor, annotated_with=p.phase(), in_=p)
+        for a in [p.phase_pair().phase] if p.phase_pair().sub_phase == els.processing.SubPhase.MAIN else []:
+            ib.new_set_binder(els.ElementProcessor, annotated_with=a, in_=p)
+            ib.new_set_binder(rls.RuleProcessor, annotated_with=a, in_=p)
 
     injector = inj.create_injector(ib, *binders)
 
-    print(injector)
-
-    scopes: ta.Mapping[els.processing.Phase, _InjectorScope] = {
-        s.phase(): injector._scopes[s]
+    scopes: ta.Mapping[PhasePair, _InjectorScope] = {
+        s.phase_pair(): injector._scopes[s]
         for s in _InjectorScope._subclass_map.values()
     }
 
     for s in scopes.values():
         s.enter()
         try:
-            eps = injector[inj.Key(ta.Set[els.ElementProcessor], s.phase())]
+            eps = injector[inj.Key(ta.Set[els.ElementProcessor], s.phase_pair())]
             for ep in eps:
                 print(ep)
         finally:

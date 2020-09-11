@@ -22,7 +22,6 @@ TODO:
  - if mem is an issue strip origins unless explicitly kept
 """
 import abc
-import functools
 import itertools
 import typing as ta
 import weakref
@@ -39,51 +38,6 @@ from .collections import ElementSet
 
 class ProcessedBy(dc.Pure):
     processors: ta.AbstractSet['ElementProcessor'] = dc.field(check=lambda o: isinstance(o, ocol.IdentitySet))
-
-
-_phase_seq = itertools.count()
-
-
-@functools.total_ordering
-class Phase(dc.Pure, eq=False, order=False):
-    name: str
-
-    seq: int = dc.field(kwonly=True, default_factory=lambda: next(_phase_seq))
-
-    def __lt__(self, other: ta.Any) -> bool:
-        check.isinstance(other, Phase)
-        return self.seq < other.seq
-
-    def __add__(self, i: int) -> 'Phase':
-        check.isinstance(i, int)
-        n = self.seq + i
-        return PHASES[n]
-
-    def __sub__(self, i: int) -> 'Phase':
-        check.isinstance(i, int)
-        n = self.seq - i
-        check.state(n >= 0)
-        return PHASES[n]
-
-
-class Phases(lang.ValueEnum, ignore=['all']):
-    BOOTSTRAP = Phase('bootstrap')
-    SITES = Phase('sites')
-    RULES = Phase('rules')
-    CONNECTORS = Phase('connectors')
-    TARGETS = Phase('targets')
-    FINALIZE = Phase('finalize')
-
-    @classmethod
-    def all(cls) -> ta.List['Phase']:
-        return list(cls._by_value)
-
-
-check.state(all(n == v.name.upper() for n, v in Phases._by_name.items()))
-
-del _phase_seq
-
-PHASES = Phases.all()
 
 
 class PhaseFrozen(dc.Pure):
@@ -105,16 +59,6 @@ def _phase_frozen(cls: type) -> ta.Optional[Phase]:
             pf = None
         _PHASE_FROZEN_CACHE[cls] = pf
         return pf
-
-
-class SubPhase(lang.AutoEnum):
-    PRE = ...
-    MAIN = ...
-    POST = ...
-
-    @classmethod
-    def all(cls) -> ta.List['SubPhase']:
-        return list(cls.__members__.values())
 
 
 class ElementProcessor(lang.Abstract):
