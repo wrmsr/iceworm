@@ -35,9 +35,6 @@ class Phase(dc.Pure, eq=False, order=False):
         return PHASES[n]
 
 
-del _seq
-
-
 class Phases(lang.ValueEnum, ignore=['all']):
     BOOTSTRAP = Phase('bootstrap')
     SITES = Phase('sites')
@@ -51,6 +48,7 @@ class Phases(lang.ValueEnum, ignore=['all']):
         return list(cls._by_value)
 
 
+del _seq
 check.state(all(n == v.name.upper() for n, v in Phases._by_name.items()))
 PHASES = Phases.all()
 
@@ -79,9 +77,6 @@ class SubPhase(dc.Pure, eq=False, order=False):
         return SUB_PHASES[n]
 
 
-del _seq
-
-
 class SubPhases(lang.ValueEnum, ignore=['all']):
     PRE = SubPhase('Pre')
     MAIN = SubPhase('Main')
@@ -92,10 +87,18 @@ class SubPhases(lang.ValueEnum, ignore=['all']):
         return list(cls._by_value)
 
 
-check.state(all(n == v.name.upper() for n, v in SubPhase._by_name.items()))
+del _seq
+check.state(all(n == v.name.upper() for n, v in SubPhases._by_name.items()))
 SUB_PHASES = SubPhases.all()
 
 
 class PhasePair(dc.Pure):
     phase: Phase = dc.field(check=lambda o: isinstance(o, Phase))
     sub_phase: SubPhase = dc.field(check=lambda o: isinstance(o, SubPhase))
+
+    @property
+    def name(self) -> str:
+        return (
+            (self.sub_phase.name.lower().capitalize() if self.sub_phase is not SubPhases.MAIN else '') +
+            self.phase.name.lower().capitalize()
+        )

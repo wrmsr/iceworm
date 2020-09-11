@@ -34,6 +34,8 @@ from omnibus import lang
 from .base import Element
 from .base import Frozen
 from .collections import ElementSet
+from .phases import Phase
+from .phases import Phases
 
 
 class ProcessedBy(dc.Pure):
