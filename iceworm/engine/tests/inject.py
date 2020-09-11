@@ -1,4 +1,5 @@
 import abc
+import contextlib
 import typing as ta
 
 from omnibus import check
@@ -95,9 +96,9 @@ def run(*binders: inj.Binder) -> None:
     ib = inj.create_binder()
     for s in _InjectorScope._subclass_map.values():
         ib._elements.append(inj.types.ScopeBinding(s))
-        for a in [s.phase_pair().phase] if s.phase_pair().sub_phase == els.SubPhases.MAIN else []:
-            ib.new_set_binder(els.ElementProcessor, annotated_with=a, in_=s)
-            ib.new_set_binder(rls.RuleProcessor, annotated_with=a, in_=s)
+        if s.phase_pair().sub_phase == els.SubPhases.MAIN:
+            ib.new_set_binder(els.ElementProcessor, annotated_with=s.phase_pair().phase, in_=s)
+            ib.new_set_binder(rls.RuleProcessor, annotated_with=s.phase_pair().phase, in_=s)
 
     injector = inj.create_injector(ib, *binders)
 
@@ -106,14 +107,23 @@ def run(*binders: inj.Binder) -> None:
         for s in _InjectorScope._subclass_map.values()
     }
 
-    for s in scopes.values():
-        s.enter()
-        try:
-            eps = injector[inj.Key(ta.Set[els.ElementProcessor], s.phase_pair())]
-            for ep in eps:
-                print(ep)
-        finally:
-            s.exit()
+    with contextlib.ExitStack() as es:
+        for p in els.PHASES:
+            spre = scopes[els.PhasePair(p, els.SubPhases.PRE)]
+            s = scopes[els.PhasePair(p, els.SubPhases.MAIN)]
+            spost = scopes[els.PhasePair(p, els.SubPhases.POST)]
+
+            spre.enter()
+            with lang.defer(spre.exit):
+                for i in range(3):
+                    s.enter()
+                    with lang.defer(s.exit):
+                        eps = injector[inj.Key(ta.Set[els.ElementProcessor], p)]
+                        for ep in eps:
+                            print(ep)
+
+                spost.enter()
+                es.enter_context(lang.defer(spost.exit))
 
 
 def install(binder: inj.Binder) -> inj.Binder:
