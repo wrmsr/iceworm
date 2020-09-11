@@ -1,5 +1,4 @@
 import abc
-import functools
 import typing as ta
 
 from omnibus import check
@@ -80,7 +79,7 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
     ]:
         return tuple(
             cls._subclass_one(els.PhasePair(p, sp))
-            for sp in els.SubPhases.all()
+            for sp in els.SUB_PHASES
         )
 
 

@@ -34,6 +34,7 @@ from omnibus import lang
 from .base import Element
 from .base import Frozen
 from .collections import ElementSet
+from .phases import PHASES
 from .phases import Phase
 from .phases import Phases
 
@@ -67,7 +68,7 @@ class ElementProcessor(lang.Abstract):
 
     @classmethod
     def phases(cls) -> ta.Iterable[Phase]:
-        return Phases.all()
+        return PHASES
 
     @abc.abstractmethod
     def processes(self, elements: ElementSet) -> ta.Iterable[Element]:
@@ -107,7 +108,7 @@ class ElementProcessingDriver:
     def process(self, elements: ta.Iterable[Element]) -> ElementSet:
         elements = ElementSet.of(elements)
 
-        for phase in Phases.all():
+        for phase in PHASES:
             eps = [check.isinstance(ep, ElementProcessor) for ep in self._processor_factory(elements, phase)]
             seen = ocol.IdentitySet()
             for ep in eps:

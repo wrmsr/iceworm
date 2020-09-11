@@ -1,4 +1,3 @@
-import abc
 import functools
 import itertools
 import typing as ta
@@ -6,9 +5,6 @@ import typing as ta
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
-
-from .base import Element
-from .collections import ElementSet
 
 
 _seq = itertools.count()
@@ -35,7 +31,7 @@ class Phase(dc.Pure, eq=False, order=False):
         return PHASES[n]
 
 
-class Phases(lang.ValueEnum, ignore=['all']):
+class Phases(lang.ValueEnum):
     BOOTSTRAP = Phase('bootstrap')
     SITES = Phase('sites')
     RULES = Phase('rules')
@@ -43,14 +39,10 @@ class Phases(lang.ValueEnum, ignore=['all']):
     TARGETS = Phase('targets')
     FINALIZE = Phase('finalize')
 
-    @classmethod
-    def all(cls) -> ta.List[Phase]:
-        return list(cls._by_value)
-
 
 del _seq
 check.state(all(n == v.name.upper() for n, v in Phases._by_name.items()))
-PHASES = Phases.all()
+PHASES = list(Phases._by_value)
 
 
 _seq = itertools.count()
@@ -77,19 +69,15 @@ class SubPhase(dc.Pure, eq=False, order=False):
         return SUB_PHASES[n]
 
 
-class SubPhases(lang.ValueEnum, ignore=['all']):
+class SubPhases(lang.ValueEnum):
     PRE = SubPhase('Pre')
     MAIN = SubPhase('Main')
     POST = SubPhase('Post')
 
-    @classmethod
-    def all(cls) -> ta.List[SubPhase]:
-        return list(cls._by_value)
-
 
 del _seq
 check.state(all(n == v.name.upper() for n, v in SubPhases._by_name.items()))
-SUB_PHASES = SubPhases.all()
+SUB_PHASES = list(SubPhases._by_value)
 
 
 class PhasePair(dc.Pure):
