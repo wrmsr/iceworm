@@ -73,21 +73,21 @@ def test_ops(harness: har.Harness):  # noqa
         connectors: ta.Optional[ctrs.ConnectorSet] = None
 
         def epfac(eles, phase):
-            if phase == els.processing.Phases.CONNECTORS + 1:
+            if phase == els.Phases.CONNECTORS + 1:
                 nonlocal connectors
                 connectors = ctrs.ConnectorSet.of(eles.get_type_set(ctrs.Connector.Config))
 
-            if phase == els.processing.Phases.SITES:
+            if phase == els.Phases.SITES:
                 return [
                     sites.SiteProcessor(),
                 ]
 
-            elif phase == els.processing.Phases.CONNECTORS:
+            elif phase == els.Phases.CONNECTORS:
                 return [
                     UrlSecretsReplacer(secrets),
                 ]
 
-            elif phase == els.processing.Phases.TARGETS:
+            elif phase == els.Phases.TARGETS:
                 return [
                     rls.RuleElementProcessor(rls.TableAsSelectProcessor()),
                     infr.InferTableProcessor(connectors),

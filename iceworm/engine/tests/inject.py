@@ -72,7 +72,7 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
     @classmethod
     def _subclass(
             cls,
-            p: els.processing.Phase,
+            p: els.Phase,
     ) -> ta.Tuple[
         ta.Type['_InjectorScope'],
         ta.Type['_InjectorScope'],
@@ -92,20 +92,40 @@ PreTargets, Targets, PostTargets = _InjectorScope._subclass(els.Phases.TARGETS)
 PreFinalize, Finalize, PostFinalize = _InjectorScope._subclass(els.Phases.FINALIZE)
 
 
-def run(*binders: inj.Binder) -> None:
-    ib = inj.create_binder()
-    for s in _InjectorScope._subclass_map.values():
-        ib._elements.append(inj.types.ScopeBinding(s))
-        if s.phase_pair().sub_phase == els.SubPhases.MAIN:
-            ib.new_set_binder(els.ElementProcessor, annotated_with=s.phase_pair().phase, in_=s)
-            ib.new_set_binder(rls.RuleProcessor, annotated_with=s.phase_pair().phase, in_=s)
+class _CurrentInjectorScope(inj.scopes.Scope, lang.Final):
 
-    injector = inj.create_injector(ib, *binders)
+    def provide(self, binding: inj.types.Binding[T]) -> T:
+        raise NotImplementedError
+
+
+class _Eager(dc.Pure):
+    key: inj.Key
+
+
+def run(*binders: inj.Binder) -> None:
+    binder = inj.create_binder()
+    for s in _InjectorScope._subclass_map.values():
+        binder._elements.append(inj.types.ScopeBinding(s))
+        binder.new_set_binder(_Eager, annotated_with=s.phase_pair(), in_=s)
+        if s.phase_pair().sub_phase == els.SubPhases.MAIN:
+            binder.new_set_binder(els.ElementProcessor, annotated_with=s.phase_pair().phase, in_=s)
+            binder.new_set_binder(rls.RuleProcessor, annotated_with=s.phase_pair().phase, in_=s)
+
+    binder._elements.append(inj.types.ScopeBinding(_CurrentInjectorScope))
+    binder.bind(els.ElementSet, in_=_CurrentInjectorScope)
+
+    injector = inj.create_injector(binder, *binders)
 
     scopes: ta.Mapping[els.PhasePair, _InjectorScope] = {
         s.phase_pair(): injector._scopes[s]
         for s in _InjectorScope._subclass_map.values()
     }
+
+    def enter(s: _InjectorScope) -> None:
+        s.enter()
+        eags = injector[inj.Key(ta.Set[_Eager], s.phase_pair())]
+        for eag in eags:
+            injector[eag.key]  # noqa
 
     with contextlib.ExitStack() as es:
         for p in els.PHASES:
@@ -135,14 +155,17 @@ def install(binder: inj.Binder) -> inj.Binder:
 
     binder.bind(rls.TableAsSelectProcessor, in_=Targets)
     binder.new_set_binder(rls.RuleProcessor, annotated_with=els.Phases.TARGETS, in_=Targets).bind(to=rls.TableAsSelectProcessor)  # noqa
+    binder.new_set_binder(els.ElementProcessor, annotated_with=els.Phases.TARGETS, in_=Targets).bind(to_provider=rls.RuleElementProcessor[rls.TableAsSelect])  # noqa
+
     def provide_table_as_select_rule_element_processor(rp: rls.TableAsSelectProcessor) -> rls.RuleElementProcessor[rls.TableAsSelect]:  # noqa
         return rls.RuleElementProcessor(rp)
-    binder.new_set_binder(els.ElementProcessor, annotated_with=els.Phases.TARGETS, in_=Targets).bind(to_provider=rls.RuleElementProcessor[rls.TableAsSelect])  # noqa
     binder.bind_callable(provide_table_as_select_rule_element_processor, in_=Targets)
 
     binder.bind(infr.InferTableProcessor, in_=Targets)
     binder.new_set_binder(els.ElementProcessor, annotated_with=els.Phases.TARGETS, in_=Targets).bind(to=infr.InferTableProcessor)  # noqa
 
-    binder.bind_callable(lambda: lang.raise_(Exception), key=inj.Key(ctrs.ConnectorSet))
+    def provide_connector_set(es: els.ElementSet) -> ctrs.ConnectorSet:
+        raise NotImplementedError
+    binder.bind_callable(provide_connector_set, in_=PostConnectors)
 
     return binder

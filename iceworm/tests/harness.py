@@ -27,7 +27,7 @@ import pytest
 T = ta.TypeVar('T')
 
 
-class Scope(lang.AutoEnum):
+class PytestScope(lang.AutoEnum):
     SESSION = ...
     PACKAGE = ...
     MODULE = ...
@@ -35,7 +35,7 @@ class Scope(lang.AutoEnum):
     FUNCTION = ...
 
 
-SCOPES: ta.Sequence[Scope] = list(Scope)
+PYTEST_SCOPES: ta.Sequence[PytestScope] = list(PytestScope)
 
 
 class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
@@ -51,7 +51,7 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
         values: ta.MutableMapping[inj.types.Binding, ta.Any] = dc.field(default_factory=ocol.IdentityKeyDict)
 
     @abc.abstractclassmethod
-    def pytest_scope(cls) -> Scope:
+    def pytest_scope(cls) -> PytestScope:
         raise NotImplementedError
 
     def enter(self, request: FixtureRequest) -> None:
@@ -73,29 +73,29 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
             value = self._state.values[binding] = binding.provider()
             return value
 
-    _subclass_map: ta.Mapping[Scope, ta.Type['_InjectorScope']] = {}
+    _subclass_map: ta.Mapping[PytestScope, ta.Type['_InjectorScope']] = {}
 
     @classmethod
-    def _subclass(cls, s: Scope):
-        check.isinstance(s, Scope)
-        check.not_in(s, cls._subclass_map)
+    def _subclass(cls, ps: PytestScope):
+        check.isinstance(ps, PytestScope)
+        check.not_in(ps, cls._subclass_map)
         scls = type(
-            s.name.lower().capitalize() + cls.__name__,
+            ps.name.lower().capitalize() + cls.__name__,
             (cls, lang.Final),
             {
-                'pytest_scope': classmethod(lambda _: s),
+                'pytest_scope': classmethod(lambda _: ps),
                 '__module__': cls.__module__,
             },
         )
-        cls._subclass_map[s] = scls
+        cls._subclass_map[ps] = scls
         return scls
 
 
-Session = _InjectorScope._subclass(Scope.SESSION)
-Packagee = _InjectorScope._subclass(Scope.PACKAGE)
-Module = _InjectorScope._subclass(Scope.MODULE)
-Class = _InjectorScope._subclass(Scope.CLASS)
-Function = _InjectorScope._subclass(Scope.FUNCTION)
+Session = _InjectorScope._subclass(PytestScope.SESSION)
+Packagee = _InjectorScope._subclass(PytestScope.PACKAGE)
+Module = _InjectorScope._subclass(PytestScope.MODULE)
+Class = _InjectorScope._subclass(PytestScope.CLASS)
+Function = _InjectorScope._subclass(PytestScope.FUNCTION)
 
 
 class _ScopeProvisionListener:
@@ -107,39 +107,39 @@ class _ScopeProvisionListener:
 
     class Entry(ta.NamedTuple):
         binding: inj.types.Binding
-        scope: ta.Optional[Scope]
+        pytest_scope: ta.Optional[PytestScope]
 
     def __call__(self, injector, key, fn):
         binding = check.isinstance(injector.get_binding(key), inj.types.Binding)
         if issubclass(binding.scoping, _InjectorScope):
-            scope = binding.scoping.pytest_scope()
+            pytest_scope = binding.scoping.pytest_scope()
         else:
-            scope = None
+            pytest_scope = None
 
         if self._stack:
             cur = self._stack[-1]
-            if scope is not None:
-                check.not_none(cur.scope)
-                check.state(scope.value <= cur.scope.value)
-                scope = min(scope, cur.scope, key=lambda s: s.value)
+            if pytest_scope is not None:
+                check.not_none(cur.pytest_scope)
+                check.state(pytest_scope.value <= cur.pytest_scope.value)
+                pytest_scope = min(pytest_scope, cur.pytest_scope, key=lambda s: s.value)
             else:
                 if issubclass(binding.scoping, _CurrentInjectorScope):
-                    scope = check.not_none(cur.scope)
+                    pytest_scope = check.not_none(cur.pytest_scope)
 
-        elif scope is not None:
-            # TODO: check early that scope is active
+        elif pytest_scope is not None:
+            # TODO: check early that pytest_scope is active
             pass
 
         else:
-            for iscope in injector._scopes.values():
-                if isinstance(iscope, _InjectorScope) and iscope._state is not None:
-                    ipscope = iscope.pytest_scope()
-                    if scope is None:
-                        scope = ipscope
+            for inj_scope in injector._scopes.values():
+                if isinstance(inj_scope, _InjectorScope) and inj_scope._state is not None:
+                    inj_pytest_scope = inj_scope.pytest_scope()
+                    if pytest_scope is None:
+                        pytest_scope = inj_pytest_scope
                     else:
-                        scope = max(scope, ipscope, key=lambda s: s.value)
+                        pytest_scope = max(pytest_scope, inj_pytest_scope, key=lambda s: s.value)
 
-        ent = self.Entry(binding, scope)
+        ent = self.Entry(binding, pytest_scope)
         self._stack.append(ent)
         try:
             return fn()
@@ -154,8 +154,8 @@ class _CurrentInjectorScope(inj.scopes.Scope, lang.Final):
         check.state(binding.key.annotation is None)
         injector = inj.Injector.current
         spl = injector[_ScopeProvisionListener]
-        scope = check.not_none(spl._stack[-1].scope)
-        new_key = inj.Key(binding.key.type, scope)
+        pytest_scope = check.not_none(spl._stack[-1].pytest_scope)
+        new_key = inj.Key(binding.key.type, pytest_scope)
         return injector[new_key]
 
 
@@ -186,8 +186,8 @@ class _LifecycleRegistrar:
                 self._stack[-1].dependencies.append((binding, instance))
 
             if instance not in self._seen:
-                scope = check.issubclass(binding.scoping, _InjectorScope)
-                man: lc.LifecycleManager = injector.get(inj.Key(lc.LifecycleManager, scope.pytest_scope()))
+                inj_scope = check.issubclass(binding.scoping, _InjectorScope)
+                man: lc.LifecycleManager = injector.get(inj.Key(lc.LifecycleManager, inj_scope.pytest_scope()))
                 deps = [o for b, o in st.dependencies if b.scoping == binding.scoping]
                 man.add(instance, deps)
                 self._seen.add(instance)
@@ -212,11 +212,11 @@ class Harness:
         binder = inj.create_binder()
         binder.bind(Harness, to_instance=self)
 
-        for pss in _InjectorScope._subclass_map.values():
-            binder._elements.append(inj.types.ScopeBinding(pss))
-            binder.bind(FixtureRequest, annotated_with=pss.pytest_scope(), in_=pss)
-            binder.bind(lc.LifecycleManager, annotated_with=pss.pytest_scope(), in_=pss)
-            binder.new_set_binder(_Eager, annotated_with=pss.pytest_scope(), in_=pss)
+        for inj_scope in _InjectorScope._subclass_map.values():
+            binder._elements.append(inj.types.ScopeBinding(inj_scope))
+            binder.bind(FixtureRequest, annotated_with=inj_scope.pytest_scope(), in_=inj_scope)
+            binder.bind(lc.LifecycleManager, annotated_with=inj_scope.pytest_scope(), in_=inj_scope)
+            binder.new_set_binder(_Eager, annotated_with=inj_scope.pytest_scope(), in_=inj_scope)
 
         spl = _ScopeProvisionListener()
         binder.bind(_ScopeProvisionListener, to_instance=spl)
@@ -230,7 +230,7 @@ class Harness:
 
         self._injector = inj.create_injector(binder, *binders)
 
-        self._scopes: ta.Mapping[Scope, _InjectorScope] = {
+        self._inj_scopes_by_pytest_scope: ta.Mapping[PytestScope, _InjectorScope] = {
             s.pytest_scope(): self._injector._scopes[s]
             for s in _InjectorScope._subclass_map.values()
         }
@@ -240,7 +240,7 @@ class Harness:
         return self
 
     def __exit__(self, et, e, tb):
-        for s in self._scopes.values():
+        for s in self._inj_scopes_by_pytest_scope.values():
             if s._state is not None:
                 warnings.warn(f'Scope {s.pytest_scope()} is still active')
         self._ACTIVE.remove(self)
@@ -252,18 +252,22 @@ class Harness:
         return self._injector[target]
 
     @contextlib.contextmanager
-    def scope_manager(self, scope: Scope, request: FixtureRequest) -> ta.Generator[None, None, None]:
+    def pytest_scope_manager(
+            self,
+            pytest_scope: PytestScope,
+            request: FixtureRequest,
+    ) -> ta.Generator[None, None, None]:
         check.isinstance(request, FixtureRequest)
-        self._scopes[scope].enter(request)
+        self._inj_scopes_by_pytest_scope[pytest_scope].enter(request)
         try:
-            lm = self._injector[inj.Key(lc.LifecycleManager, scope)]
+            lm = self._injector[inj.Key(lc.LifecycleManager, pytest_scope)]
             with lc.context_manage(lm):
-                eags = self._injector[inj.Key(ta.Set[_Eager], scope)]
+                eags = self._injector[inj.Key(ta.Set[_Eager], pytest_scope)]
                 for eag in eags:
                     self._injector[eag.key]  # noqa
                 yield
         finally:
-            self._scopes[scope].exit()
+            self._inj_scopes_by_pytest_scope[pytest_scope].exit()
 
 
 @pytest.yield_fixture(scope='session', autouse=True)
@@ -274,31 +278,31 @@ def harness() -> ta.Generator[Harness, None, None]:
 
 @pytest.yield_fixture(scope='session', autouse=True)
 def _scope_listener_session(harness, request):
-    with harness.scope_manager(Scope.SESSION, request):
+    with harness.pytest_scope_manager(PytestScope.SESSION, request):
         yield
 
 
 @pytest.yield_fixture(scope='package', autouse=True)
 def _scope_listener_package(harness, request):
-    with harness.scope_manager(Scope.PACKAGE, request):
+    with harness.pytest_scope_manager(PytestScope.PACKAGE, request):
         yield
 
 
 @pytest.yield_fixture(scope='module', autouse=True)
 def _scope_listener_module(harness, request):
-    with harness.scope_manager(Scope.MODULE, request):
+    with harness.pytest_scope_manager(PytestScope.MODULE, request):
         yield
 
 
 @pytest.yield_fixture(scope='class', autouse=True)
 def _scope_listener_class(harness, request):
-    with harness.scope_manager(Scope.CLASS, request):
+    with harness.pytest_scope_manager(PytestScope.CLASS, request):
         yield
 
 
 @pytest.yield_fixture(scope='function', autouse=True)
 def _scope_listener_function(harness, request):
-    with harness.scope_manager(Scope.FUNCTION, request):
+    with harness.pytest_scope_manager(PytestScope.FUNCTION, request):
         yield
 
 
@@ -314,14 +318,13 @@ def register(obj: T) -> T:
     return obj
 
 
-def bind(scope: ta.Type[_InjectorScope], *, eager: bool = False):
+def bind(inj_scope: ta.Type[_InjectorScope], *, eager: bool = False):
     def inner(obj):
         check.isinstance(obj, type)
         binder = register(inj.create_binder())
-        binder.bind(obj, in_=scope)
+        binder.bind(obj, in_=inj_scope)
         if eager:
-            sb = binder.new_set_binder(_Eager, annotated_with=scope.pytest_scope(), in_=scope)
-            sb.bind(to_instance=_Eager(inj.Key(obj)))
+            binder.new_set_binder(_Eager, annotated_with=inj_scope.pytest_scope(), in_=inj_scope).bind(to_instance=_Eager(inj.Key(obj)))  # noqa
         return obj
-    check.issubclass(scope, _InjectorScope)
+    check.issubclass(inj_scope, _InjectorScope)
     return inner

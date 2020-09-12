@@ -10,7 +10,7 @@ from ...tests.docker import DockerManager
 @har.bind(har.Function)
 class DbManager(lc.ContextManageableLifecycle):
 
-    def __init__(self, dm: DockerManager) -> None:
+    def __init__(self, dm: DockerManager, request: har.FixtureRequest) -> None:
         super().__init__()
 
         self._dm = dm

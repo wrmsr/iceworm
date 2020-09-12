@@ -14,7 +14,7 @@ import pytest
 
 from .docker import DockerManager
 from .harness import Harness
-from .harness import Scope
+from .harness import PytestScope
 
 
 def provider():
@@ -42,14 +42,14 @@ def test_harness():
 
 
 def test_harness_2(harness: Harness):
-    req: FixtureRequest = harness[inj.Key(FixtureRequest, Scope.FUNCTION)]
+    req: FixtureRequest = harness[inj.Key(FixtureRequest, PytestScope.FUNCTION)]
     print(req.function)
 
     print(harness[FixtureRequest])
 
 
 def test_harness_3(harness: Harness):
-    req: FixtureRequest = harness[inj.Key(FixtureRequest, Scope.FUNCTION)]
+    req: FixtureRequest = harness[inj.Key(FixtureRequest, PytestScope.FUNCTION)]
     print(req.function)
 
     print(harness[FixtureRequest])
