@@ -39,7 +39,8 @@ from .phases import Phase
 
 
 class ProcessedBy(dc.Pure):
-    processors: ta.AbstractSet['ElementProcessor'] = dc.field(check=lambda o: isinstance(o, ocol.IdentitySet))
+    processors: ta.AbstractSet['ElementProcessor'] = dc.field(
+        check=lambda o: isinstance(o, ocol.IdentitySet) and all(isinstance(e, ElementProcessor) for e in o))
 
 
 class PhaseFrozen(dc.Pure):
@@ -166,9 +167,12 @@ class ElementProcessingDriver:
                 for e in added:
                     pbs = e.meta.get(ProcessedBy)
                     if pbs is not None:
-                        check.state(check.single(pbs) is cur)
-                        continue
-                    swaps[e] = dc.replace(e, meta={**e.meta, ProcessedBy: ocol.IdentitySet([cur])})
+                        npbs = check.isinstance(pbs, ProcessedBy).processors
+                        if cur in npbs:
+                            continue
+                    else:
+                        npbs = []
+                    swaps[e] = dc.replace(e, meta={**e.meta, ProcessedBy: ProcessedBy(ocol.IdentitySet([*npbs, cur]))})
 
                 if swaps:
                     res = ElementSet.of(swaps.get(e, e) for e in res)

@@ -8,6 +8,9 @@ from . import elements as els
 from . import ops
 from . import targets as tars
 from .. import metadata as md
+from ..trees import rendering as ren
+from ..trees.types import AstQuery
+from ..trees.types import StrQuery
 from ..types import QualifiedName
 
 
@@ -55,6 +58,12 @@ class ElementPlanner:
             elif isinstance(ele, tars.Rows):
                 if ele.table.id in invalidated_tables:
                     for dst in tbl_qn_sets_by_id.get(ele.table.id, []):
-                        plan.append(ops.InsertIntoSelect(dst, ele.query))
+                        if isinstance(ele.query, AstQuery):
+                            q = ren.render(ele.query.root)
+                        elif isinstance(ele.query, StrQuery):
+                            q = ele.query.src
+                        else:
+                            raise TypeError(ele.query)
+                        plan.append(ops.InsertIntoSelect(dst, q))
 
         return ops.List(plan)

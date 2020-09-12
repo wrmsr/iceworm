@@ -53,6 +53,7 @@ class UrlSecretsReplacer(els.ElementProcessor):
 
 def install_element_processors(binder: inj.Binder) -> inj.Binder:
     els.inject.bind_element_processor(binder, UrlSecretsReplacer, els.Phases.CONNECTORS)
+    els.inject.bind_element_processor(binder, els.queries.QueryBasicAnalysisElementProcesor, els.Phases.TARGETS)
     els.inject.bind_element_processor(binder, els.queries.QueryParsingElementProcessor, els.Phases.TARGETS)
     els.inject.bind_element_processor(binder, infr.InferTableProcessor, els.Phases.TARGETS)
     els.inject.bind_element_processor(binder, sites.SiteProcessor, els.Phases.SITES)

@@ -122,7 +122,7 @@ class Element(dc.Enum, nodal.Nodal['Element'], reorder=True):
     __repr__ = build_dc_repr
 
 
-class Origin(Annotation):
+class Origin(dc.Pure):
     element: Element
 
 

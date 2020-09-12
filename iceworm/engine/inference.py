@@ -21,10 +21,10 @@ from ..trees import analysis as ana
 from ..trees import datatypes as tdatatypes
 from ..trees import nodes as no
 from ..trees import origins
-from ..trees import parsing as par
 from ..trees import rendering  # noqa
 from ..trees import symbols
 from ..trees import transforms as ttfm
+from ..trees.types import AstQuery
 from ..types import QualifiedName
 from ..utils import unique_dict
 
@@ -41,7 +41,7 @@ class InferTableProcessor(els.ElementProcessor):
 
     @classmethod
     def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
-        return {*super().dependencies(), els.queries.QueryParsingElementProcessor}
+        return {*super().dependencies(), els.queries.QueryBasicAnalysisElementProcesor}
 
     class Instance:
 
@@ -66,8 +66,10 @@ class InferTableProcessor(els.ElementProcessor):
                 if isinstance(ele, tars.Table):
                     tn_idxs[ele.id] = i
                     rows = check.single(rt for rt in ts.get_type_set(tars.Rows) if rt.table == ele)
-                    root = par.parse_stmt(rows.query)
-                    all_dep_qns = {n.name.name for n in ana.basic(root).get_node_type_set(no.Table)}
+                    all_dep_qns = {
+                        n.name.name
+                        for n in els.queries.get_basic(rows, rows.query).get_node_type_set(no.Table)
+                    }
                     deps = {ele_tns[qn].id for qn in all_dep_qns if qn in ele_tns}
                     check.not_in(ele.id, tn_deps)
                     tn_deps[ele.id] = deps
@@ -81,12 +83,12 @@ class InferTableProcessor(els.ElementProcessor):
                     ele: tars.Table = self._input[tn]
                     if ele.md is None:
                         rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
-                        mdt = self.infer_table(rows.query, given_tables)
+                        mdt = self.infer_table(check.isinstance(rows.query, AstQuery).root, given_tables)
                         qn = tele_ids[ele.id]
                         mdt = dc.replace(mdt, name=qn)
                         i = tn_idxs[ele.id]
                         tsi = ts[i]
-                        ts[i] = dc.replace(tsi, md=mdt, anns={**tsi.anns, els.Origin: els.Origin(tsi)})
+                        ts[i] = dc.replace(tsi, md=mdt, meta={**tsi.meta, els.Origin: els.Origin(tsi)})
                         given_tables[qn] = mdt
 
             return els.ElementSet.of(ts)
@@ -109,9 +111,7 @@ class InferTableProcessor(els.ElementProcessor):
 
             return objs
 
-        def infer_table(self, query: str, given_tables: ta.Mapping[QualifiedName, md.Table]) -> md.Table:
-            root = par.parse_stmt(query)
-
+        def infer_table(self, root: no.Node, given_tables: ta.Mapping[QualifiedName, md.Table]) -> md.Table:
             table_names = {
                 tn.name.name
                 for tn in ana.basic(root).get_node_type_set(no.Table)

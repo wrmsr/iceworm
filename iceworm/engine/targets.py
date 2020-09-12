@@ -17,6 +17,7 @@ from omnibus import dataclasses as dc
 from . import connectors as ctrs
 from . import elements as els
 from .. import metadata as md_
+from ..trees.types import Query
 from ..types import QualifiedName
 
 
@@ -31,7 +32,7 @@ class Table(Target):
 
 class Rows(Target):
     table: els.Ref[Table] = dc.field(coerce=els.Ref.cls(Table).of)
-    query: str = dc.field(check=lambda o: isinstance(o, str))
+    query: Query = dc.field(coerce=Query.of)
 
 
 class Function(Target):
