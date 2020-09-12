@@ -8,8 +8,8 @@ from .... import datatypes as dt
 from .... import metadata as md
 from ....types import QualifiedName
 from ...utils import parse_simple_select_table
-from ..base import Connection
-from ..base import Connector
+from ..base import Connection as _Connection
+from ..base import Connector as _Connector
 from ..base import RowSink
 from ..base import RowSource
 from ..base import Rows
@@ -23,9 +23,9 @@ TABLE = md.Table(
 )
 
 
-class DualConnector(Connector['DualConnector', 'DualConnector.Config']):
+class DualConnector(_Connector['DualConnector', 'DualConnector.Config']):
 
-    class Config(Connector.Config):
+    class Config(_Connector.Config):
         id: els.Id = dc.field('dual', check=lambda s: isinstance(s, els.Id) and s)
 
     def __init__(self, config: Config) -> None:
@@ -35,7 +35,7 @@ class DualConnector(Connector['DualConnector', 'DualConnector.Config']):
         return DualConnection(self)
 
 
-class DualConnection(Connection[DualConnector]):
+class DualConnection(_Connection[DualConnector]):
 
     def __init__(self, connector: DualConnector) -> None:
         super().__init__(connector)

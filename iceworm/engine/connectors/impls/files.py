@@ -20,8 +20,8 @@ from .... import metadata as md
 from ....types import QualifiedName
 from ....utils import seq
 from ...utils import parse_simple_select_table
-from ..base import Connection
-from ..base import Connector
+from ..base import Connection as _Connection
+from ..base import Connector as _Connector
 from ..base import RowSink
 from ..base import RowSource
 from ..base import Rows
@@ -51,9 +51,9 @@ class Table(dc.Pure):
     path: str
 
 
-class FileConnector(Connector['FileConnector', 'FileConnector.Config']):
+class FileConnector(_Connector['FileConnector', 'FileConnector.Config']):
 
-    class Config(Connector.Config):
+    class Config(_Connector.Config):
         mounts: ta.Sequence[Mount] = dc.field(coerce=seq, check=lambda l: all(isinstance(e, Mount) for e in l))
 
     def __init__(self, config: Config) -> None:
@@ -87,7 +87,7 @@ class FileConnector(Connector['FileConnector', 'FileConnector.Config']):
         return FileConnection(self)
 
 
-class FileConnection(Connection[FileConnector]):
+class FileConnection(_Connection[FileConnector]):
 
     def __init__(self, connector: FileConnector) -> None:
         super().__init__(connector)

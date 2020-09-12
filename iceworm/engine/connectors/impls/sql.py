@@ -14,17 +14,17 @@ from .... import metadata as md
 from ....types import QualifiedName
 from ....utils import secrets
 from ...utils import parse_simple_select_table
-from ..base import Connection
-from ..base import Connector
+from ..base import Connection as _Connection
+from ..base import Connector as _Connector
 from ..base import Row
 from ..base import RowSink
 from ..base import RowSource
 from ..base import Rows
 
 
-class SqlConnector(Connector['SqlConnector', 'SqlConnector.Config']):
+class SqlConnector(_Connector['SqlConnector', 'SqlConnector.Config']):
 
-    class Config(Connector.Config):
+    class Config(_Connector.Config):
         url: ta.Optional[str] = dc.field(None, check=lambda s: s is None or (isinstance(s, str) and s), kwonly=True)
         url_secret: ta.Optional[secrets.SecretKey] = dc.field(None, coerce=secrets.SecretKey.of_optional, kwonly=True)
 
@@ -54,7 +54,7 @@ class SqlConnector(Connector['SqlConnector', 'SqlConnector.Config']):
             self._engine.dispose()
 
 
-class SqlConnection(Connection[SqlConnector]):
+class SqlConnection(_Connection[SqlConnector]):
 
     def __init__(self, connector: SqlConnector, conn: sa.engine.Connection) -> None:
         super().__init__(connector)

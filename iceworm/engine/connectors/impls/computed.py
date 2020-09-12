@@ -8,8 +8,8 @@ from ....types import Code
 from ....types import QualifiedName
 from ....utils import seq
 from ...utils import parse_simple_select_table
-from ..base import Connection
-from ..base import Connector
+from ..base import Connection as _Connection
+from ..base import Connector as _Connector
 from ..base import RowSink
 from ..base import RowSource
 from ..base import Rows
@@ -20,9 +20,9 @@ class Table(dc.Pure):
     fn: Code  # [ta.Callable[[], Rows]]
 
 
-class ComputedConnector(Connector['ComputedConnector', 'ComputedConnector.Config']):
+class ComputedConnector(_Connector['ComputedConnector', 'ComputedConnector.Config']):
 
-    class Config(Connector.Config):
+    class Config(_Connector.Config):
         tables: ta.Sequence[Table] = dc.field(coerce=seq)
 
     def __init__(self, config: Config) -> None:
@@ -34,7 +34,7 @@ class ComputedConnector(Connector['ComputedConnector', 'ComputedConnector.Config
         return ComputedConnection(self)
 
 
-class ComputedConnection(Connection[ComputedConnector]):
+class ComputedConnection(_Connection[ComputedConnector]):
 
     def __init__(self, connector: ComputedConnector) -> None:
         super().__init__(connector)

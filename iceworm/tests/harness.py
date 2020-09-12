@@ -38,7 +38,7 @@ class PytestScope(lang.AutoEnum):
 PYTEST_SCOPES: ta.Sequence[PytestScope] = list(PytestScope)
 
 
-class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
+class _InjectorScope(inj.Scope, lang.Abstract, lang.Sealed):
 
     def __init__(self) -> None:
         super().__init__()
@@ -48,7 +48,7 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
 
     class State(dc.Pure):
         request: FixtureRequest
-        values: ta.MutableMapping[inj.types.Binding, ta.Any] = dc.field(default_factory=ocol.IdentityKeyDict)
+        values: ta.MutableMapping[inj.Binding, ta.Any] = dc.field(default_factory=ocol.IdentityKeyDict)
 
     @abc.abstractclassmethod
     def pytest_scope(cls) -> PytestScope:
@@ -63,7 +63,7 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
         check.not_none(self._state)
         self._state = None
 
-    def provide(self, binding: inj.types.Binding[T]) -> T:
+    def provide(self, binding: inj.Binding[T]) -> T:
         check.not_none(self._state)
         if binding.key == self._request_key:
             return self._state.request
@@ -106,11 +106,11 @@ class _ScopeProvisionListener:
         self._stack = []
 
     class Entry(ta.NamedTuple):
-        binding: inj.types.Binding
+        binding: inj.Binding
         pytest_scope: ta.Optional[PytestScope]
 
     def __call__(self, injector, key, fn):
-        binding = check.isinstance(injector.get_binding(key), inj.types.Binding)
+        binding = check.isinstance(injector.get_binding(key), inj.Binding)
         if issubclass(binding.scoping, _InjectorScope):
             pytest_scope = binding.scoping.pytest_scope()
         else:
@@ -148,9 +148,9 @@ class _ScopeProvisionListener:
             check.state(popped is ent)
 
 
-class _CurrentInjectorScope(inj.scopes.Scope, lang.Final):
+class _CurrentInjectorScope(inj.Scope, lang.Final):
 
-    def provide(self, binding: inj.types.Binding[T]) -> T:
+    def provide(self, binding: inj.Binding[T]) -> T:
         check.state(binding.key.annotation is None)
         injector = inj.Injector.current
         spl = injector[_ScopeProvisionListener]
@@ -169,7 +169,7 @@ class _LifecycleRegistrar:
 
     class State(dc.Pure):
         key: inj.Key
-        dependencies: ta.List[ta.Tuple[inj.types.Binding, ta.Any]] = dc.field(default_factory=list)
+        dependencies: ta.List[ta.Tuple[inj.Binding, ta.Any]] = dc.field(default_factory=list)
 
     def __call__(self, injector: inj.Injector, key, fn):
         st = self.State(key)
@@ -181,7 +181,7 @@ class _LifecycleRegistrar:
             check.state(popped is st)
 
         if isinstance(instance, lc.Lifecycle) and not isinstance(instance, lc.LifecycleManager):
-            binding = check.isinstance(injector.get_binding(key), inj.types.Binding)
+            binding = check.isinstance(injector.get_binding(key), inj.Binding)
             if self._stack:
                 self._stack[-1].dependencies.append((binding, instance))
 

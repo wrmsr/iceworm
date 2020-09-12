@@ -15,15 +15,15 @@ from omnibus import check
 
 from .... import metadata as md
 from ....types import QualifiedName
-from ..base import Connection
-from ..base import Connector
+from ..base import Connection as _Connection
+from ..base import Connector as _Connector
 from ..base import RowSink
 from ..base import RowSource
 
 
-class ChatConnector(Connector['ChatConnector', 'ChatConnector.Config']):
+class ChatConnector(_Connector['ChatConnector', 'ChatConnector.Config']):
 
-    class Config(Connector.Config):
+    class Config(_Connector.Config):
         pass
 
     def __init__(self, config: Config) -> None:
@@ -33,7 +33,7 @@ class ChatConnector(Connector['ChatConnector', 'ChatConnector.Config']):
         return ChatConnection(self)
 
 
-class ChatConnection(Connection[ChatConnector]):
+class ChatConnection(_Connection[ChatConnector]):
 
     def __init__(self, connector: ChatConnector) -> None:
         super().__init__(connector)

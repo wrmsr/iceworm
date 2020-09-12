@@ -22,17 +22,17 @@ from .processing import ElementProcessor
 T = ta.TypeVar('T')
 
 
-class _Scope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
+class _Scope(inj.Scope, lang.Abstract, lang.Sealed):
 
     class State(dc.Data, final=True):
-        values: ta.MutableMapping[inj.types.Binding, ta.Any] = dc.field(default_factory=ocol.IdentityKeyDict, frozen=True)  # noqa
+        values: ta.MutableMapping[inj.Binding, ta.Any] = dc.field(default_factory=ocol.IdentityKeyDict, frozen=True)  # noqa
         frozen: bool = False
 
     @abc.abstractclassmethod
     def phase_pair(cls) -> PhasePair:
         raise NotImplementedError
 
-    def provide(self, binding: inj.types.Binding[T]) -> T:
+    def provide(self, binding: inj.Binding[T]) -> T:
         drv = inj.Injector.current[Driver]
         state = drv._scope_states[self]
         if binding.key == inj.Key(Phase):
@@ -84,9 +84,9 @@ PreTargets, Targets, PostTargets = _Scope._subclass(Phases.TARGETS)
 PreFinalize, Finalize, PostFinalize = _Scope._subclass(Phases.FINALIZE)
 
 
-class _CurrentScope(inj.scopes.Scope, lang.Final):
+class _CurrentScope(inj.Scope, lang.Final):
 
-    def provide(self, binding: inj.types.Binding[T]) -> T:
+    def provide(self, binding: inj.Binding[T]) -> T:
         if binding.key == inj.Key(ElementSet):
             return check.isinstance(inj.Injector.current[Driver]._elements, ElementSet)
         else:
@@ -173,7 +173,7 @@ class Driver:
         return elements
 
 
-def get_scope(phase_pair: PhasePair) -> ta.Type[inj.types.Scope]:
+def get_scope(phase_pair: PhasePair) -> ta.Type[inj.Scope]:
     check.isinstance(phase_pair, PhasePair)
     return _Scope._subclass_map[phase_pair]
 

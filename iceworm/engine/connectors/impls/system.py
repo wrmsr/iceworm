@@ -12,8 +12,8 @@ from .... import metadata as md
 from ....types import QualifiedName
 from ....utils import unique_dict
 from ...utils import parse_simple_select_table
-from ..base import Connection
-from ..base import Connector
+from ..base import Connection as _Connection
+from ..base import Connector as _Connector
 from ..base import Row
 from ..base import RowSink
 from ..base import RowSource
@@ -30,9 +30,9 @@ class Table(lang.Abstract):
         raise NotImplementedError
 
 
-class SystemConnector(Connector['SystemConnector', 'SystemConnector.Config']):
+class SystemConnector(_Connector['SystemConnector', 'SystemConnector.Config']):
 
-    class Config(Connector.Config):
+    class Config(_Connector.Config):
         id: els.Id = dc.field('system', check=els.id_check)
 
     def __init__(self, config: Config = Config()) -> None:
@@ -46,7 +46,7 @@ class SystemConnector(Connector['SystemConnector', 'SystemConnector.Config']):
         return SystemConnection(self)
 
 
-class SystemConnection(Connection[SystemConnector]):
+class SystemConnection(_Connection[SystemConnector]):
 
     def __init__(self, connector: SystemConnector) -> None:
         super().__init__(connector)
