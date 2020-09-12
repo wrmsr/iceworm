@@ -112,7 +112,7 @@ def run(*binders: inj.Binder) -> None:
             binder.new_set_binder(rls.RuleProcessor, annotated_with=s.phase_pair().phase, in_=s)
 
     binder._elements.append(inj.types.ScopeBinding(_CurrentInjectorScope))
-    binder.bind(els.ElementSet, in_=_CurrentInjectorScope)
+    binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(els.ElementSet), in_=_CurrentInjectorScope)
 
     injector = inj.create_injector(binder, *binders)
 
@@ -133,16 +133,16 @@ def run(*binders: inj.Binder) -> None:
             s = scopes[els.PhasePair(p, els.SubPhases.MAIN)]
             spost = scopes[els.PhasePair(p, els.SubPhases.POST)]
 
-            spre.enter()
+            enter(spre)
             with lang.defer(spre.exit):
                 for i in range(3):
-                    s.enter()
+                    enter(s)
                     with lang.defer(s.exit):
                         eps = injector[inj.Key(ta.Set[els.ElementProcessor], p)]
                         for ep in eps:
                             print(ep)
 
-                spost.enter()
+                enter(spost)
                 es.enter_context(lang.defer(spost.exit))
 
 

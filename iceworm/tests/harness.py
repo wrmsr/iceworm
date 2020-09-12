@@ -225,8 +225,9 @@ class Harness:
         binder.bind_provision_listener(_LifecycleRegistrar())
 
         binder._elements.append(inj.types.ScopeBinding(_CurrentInjectorScope))
-        binder.bind(FixtureRequest, in_=_CurrentInjectorScope)
-        binder.bind(lc.LifecycleManager, in_=_CurrentInjectorScope)
+
+        binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(FixtureRequest), in_=_CurrentInjectorScope)
+        binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(lc.LifecycleManager), in_=_CurrentInjectorScope)  # noqa
 
         self._injector = inj.create_injector(binder, *binders)
 
