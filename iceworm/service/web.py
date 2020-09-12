@@ -12,8 +12,9 @@ import typing as ta
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import http
+from omnibus import lifecycles as lc
+from omnibus import lang
 from omnibus import logs
-from omnibus.http.types import Self
 
 from . import resources
 from .. import protos
@@ -63,14 +64,14 @@ class ServiceWebStatus(dc.Pure):
     uptime: float
 
 
-class StatusApp(http.App):
+class StatusApp(lc.ContextManageableLifecycle):
 
     def __init__(self) -> None:
         super().__init__()
 
         self._start_time: ta.Optional[float] = None
 
-    def __enter__(self: Self) -> Self:
+    def __enter__(self: lang.Self) -> lang.Self:
         super().__enter__()
         self._start_time = time.time()
         return self
@@ -106,7 +107,7 @@ class FaviconApp:
         return [response_body]
 
 
-class App(http.App):
+class App(lc.ContextManageableLifecycle):
 
     def __init__(self, handlers: ta.Iterable[Handler]) -> None:
         super().__init__()
@@ -134,7 +135,7 @@ class App(http.App):
 
 
 @contextlib.contextmanager
-def build_app_context() -> App:
+def build_app_context() -> ta.Generator[App, None, None]:
     with contextlib.ExitStack() as es:
         yield es.enter_context(App([
             Handler([('GET', '/ok')], OkApp()),
