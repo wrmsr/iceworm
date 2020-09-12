@@ -188,9 +188,10 @@ def bind_element_processor(binder: inj.Binder, cls: ta.Type[ElementProcessor], p
     binder.new_set_binder(ElementProcessor, annotated_with=phase, in_=scope).bind(to=cls)
 
 
-def bind_post_eager(binder: inj.Binder, key: inj.Key, phase: Phase) -> None:
+def bind_post_eager(binder: inj.Binder, key: ta.Union[inj.Key, ta.Type], phase: Phase) -> None:
     check.isinstance(binder, inj.Binder)
-    check.isinstance(key, inj.Key)
+    if not isinstance(key, inj.Key):
+        key = inj.Key(key)
     check.isinstance(phase, Phase)
     phase_pair = PhasePair(phase, SubPhases.POST)
     scope = get_scope(phase_pair)

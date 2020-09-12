@@ -11,6 +11,6 @@ def install(binder: inj.Binder) -> inj.Binder:
         return ctrs.ConnectorSet.of(es.get_type_set(ctrs.Connector.Config))
 
     binder.bind_callable(provide_connector_set, in_=els.inject.PostConnectors)
-    els.inject.bind_post_eager(binder, inj.Key(ctrs.ConnectorSet), els.Phases.CONNECTORS)
+    els.inject.bind_post_eager(binder, ctrs.ConnectorSet, els.Phases.CONNECTORS)
 
     return binder
