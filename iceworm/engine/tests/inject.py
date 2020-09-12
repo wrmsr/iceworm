@@ -161,9 +161,9 @@ class _Driver:
         epd = els.ElementProcessingDriver(fac)
         elements = epd.process(elements)
 
-        for s in reversed(list(self._scopes.values())):
-            if s._state is not None:
-                s.exit()
+        # for s in reversed(list(self._scopes.values())):
+        #     if s._state is not None:
+        #         s.exit()
 
         return elements
 

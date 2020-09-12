@@ -8,6 +8,7 @@ import pytest
 
 from . import inject  # noqa
 from .. import connectors as ctrs
+from .. import execution as exe
 from .. import planning as pln
 from .. import sites  # noqa
 from ...sql.tests.helpers import DbManager
