@@ -190,5 +190,6 @@ def install(binder: inj.Binder) -> inj.Binder:
     def provide_connector_set(es: els.ElementSet) -> ctrs.ConnectorSet:
         return ctrs.ConnectorSet.of(es.get_type_set(ctrs.Connector.Config))
     binder.bind_callable(provide_connector_set, in_=PostConnectors)
+    binder.new_set_binder(_Eager, annotated_with=els.PhasePair(els.Phases.CONNECTORS, els.SubPhases.POST), in_=PostConnectors).bind(to_instance=_Eager(inj.Key(ctrs.ConnectorSet)))  # noqa
 
     return binder
