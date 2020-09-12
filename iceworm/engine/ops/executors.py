@@ -18,7 +18,7 @@ from ... import sql
 from ...trees import eval as teval
 from ...trees import parsing as tpar
 from ...types import QualifiedName
-from ..connectors.sql import SqlConnection
+from ..connectors.impls.sql import SqlConnection
 from ..utils import parse_simple_select_table
 from ..utils import parse_simple_select_tables
 

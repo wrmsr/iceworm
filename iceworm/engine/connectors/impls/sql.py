@@ -9,17 +9,17 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 import sqlalchemy as sa
 
-from ... import alchemy as alch
-from ... import metadata as md
-from ...types import QualifiedName
-from ...utils import secrets
-from ..utils import parse_simple_select_table
-from .connectors import Connection
-from .connectors import Connector
-from .connectors import Row
-from .connectors import Rows
-from .connectors import RowSink
-from .connectors import RowSource
+from .... import alchemy as alch
+from .... import metadata as md
+from ....types import QualifiedName
+from ....utils import secrets
+from ...utils import parse_simple_select_table
+from ..base import Connection
+from ..base import Connector
+from ..base import Row
+from ..base import RowSink
+from ..base import RowSource
+from ..base import Rows
 
 
 class SqlConnector(Connector['SqlConnector', 'SqlConnector.Config']):

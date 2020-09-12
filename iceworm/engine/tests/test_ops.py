@@ -47,12 +47,12 @@ class UrlSecretsReplacer(els.ElementProcessor):
         self._secrets = check.isinstance(secrets, sec.Secrets)
 
     def processes(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
-        return [e for e in elements.get_type_set(ctrs.sql.SqlConnector.Config) if e.url_secret]
+        return [e for e in elements.get_type_set(ctrs.impls.sql.SqlConnector.Config) if e.url_secret]
 
     def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
         return [
             dc.replace(e, url=self._secrets[e.url_secret].value, url_secret=None)
-            if isinstance(e, ctrs.sql.SqlConnector.Config) else e
+            if isinstance(e, ctrs.impls.sql.SqlConnector.Config) else e
             for e in elements
         ]
 

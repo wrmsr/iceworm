@@ -44,7 +44,7 @@ class ElementPlanner:
                 if ele.id in invalidated_tables:
                     for dst in tbl_qn_sets_by_id.get(ele.id, []):
                         ctr = self._ctors[dst[0]]
-                        if not isinstance(ctr, ctrs.sql.SqlConnector):
+                        if not isinstance(ctr, ctrs.impls.sql.SqlConnector):
                             continue
                         mdt = check.isinstance(ele.md, md.Table)
                         plan.extend([

@@ -13,12 +13,12 @@ import typing as ta
 
 from omnibus import check
 
-from ... import metadata as md
-from ...types import QualifiedName
-from .connectors import Connection
-from .connectors import Connector
-from .connectors import RowSink
-from .connectors import RowSource
+from .... import metadata as md
+from ....types import QualifiedName
+from ..base import Connection
+from ..base import Connector
+from ..base import RowSink
+from ..base import RowSource
 
 
 class ChatConnector(Connector['ChatConnector', 'ChatConnector.Config']):

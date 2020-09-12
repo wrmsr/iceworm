@@ -16,15 +16,15 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import properties
 
-from ... import metadata as md
-from ...types import QualifiedName
-from ...utils import seq
-from ..utils import parse_simple_select_table
-from .connectors import Connection
-from .connectors import Connector
-from .connectors import Rows
-from .connectors import RowSink
-from .connectors import RowSource
+from .... import metadata as md
+from ....types import QualifiedName
+from ....utils import seq
+from ...utils import parse_simple_select_table
+from ..base import Connection
+from ..base import Connector
+from ..base import RowSink
+from ..base import RowSource
+from ..base import Rows
 
 
 class SchemaPolicy(dc.Enum):

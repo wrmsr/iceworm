@@ -6,18 +6,18 @@ from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
 
-from .. import elements as els
-from ... import datatypes as dt
-from ... import metadata as md
-from ...types import QualifiedName
-from ...utils import unique_dict
-from ..utils import parse_simple_select_table
-from .connectors import Connection
-from .connectors import Connector
-from .connectors import Row
-from .connectors import Rows
-from .connectors import RowSink
-from .connectors import RowSource
+from ... import elements as els
+from .... import datatypes as dt
+from .... import metadata as md
+from ....types import QualifiedName
+from ....utils import unique_dict
+from ...utils import parse_simple_select_table
+from ..base import Connection
+from ..base import Connector
+from ..base import Row
+from ..base import RowSink
+from ..base import RowSource
+from ..base import Rows
 
 
 log = logging.getLogger(__name__)
