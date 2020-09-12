@@ -21,34 +21,24 @@ T = ta.TypeVar('T')
 
 class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
 
-    def __init__(self) -> None:
-        super().__init__()
-
-        self._state: ta.Optional[_InjectorScope.State] = None
-
-    class State(dc.Pure):
-        values: ta.MutableMapping[inj.types.Binding, ta.Any] = dc.field(default_factory=ocol.IdentityKeyDict)
+    class State(dc.Data, final=True):
+        values: ta.MutableMapping[inj.types.Binding, ta.Any] = dc.field(default_factory=ocol.IdentityKeyDict, frozen=True)  # noqa
+        frozen: bool = False
 
     @abc.abstractclassmethod
     def phase_pair(cls) -> els.PhasePair:
         raise NotImplementedError
 
-    def enter(self) -> None:
-        check.none(self._state)
-        self._state = self.State()
-
-    def exit(self) -> None:
-        check.not_none(self._state)
-        self._state = None
-
     def provide(self, binding: inj.types.Binding[T]) -> T:
-        check.not_none(self._state)
+        drv = inj.Injector.current[_Driver]
+        state = drv._scope_states[self]
         if binding.key == inj.Key(els.Phase):
             return self.phase_pair().phase
         try:
-            return self._state.values[binding]
+            return state.values[binding]
         except KeyError:
-            value = self._state.values[binding] = binding.provider()
+            check.state(not state.frozen)
+            value = state.values[binding] = binding.provider()
             return value
 
     _subclass_map: ta.Mapping[els.PhasePair, ta.Type['_InjectorScope']] = {}
@@ -59,7 +49,7 @@ class _InjectorScope(inj.scopes.Scope, lang.Abstract, lang.Sealed):
         check.not_in(pp, cls._subclass_map)
         scls = type(
             pp.name + '_' + cls.__name__,
-            (cls, lang.Final,),
+            (cls, lang.Final),
             {
                 'phase_pair': classmethod(lambda _: pp),
                 '__module__': cls.__module__,
@@ -128,15 +118,25 @@ class _Driver:
             s.phase_pair(): self._injector._scopes[s]
             for s in _InjectorScope._subclass_map.values()
         }
+        self._scope_states: ta.Mapping[_InjectorScope, _InjectorScope.State] = {}
 
         self._elements: ta.Optional[els.ElementSet] = None
 
     def run(self, elements: ta.Iterable[els.Element]) -> els.ElementSet:
         def enter(s: _InjectorScope) -> None:
-            s.enter()
+            check.not_in(s, self._scope_states)
+            self._scope_states[s] = _InjectorScope.State()
             eags = self._injector[inj.Key(ta.Set[_Eager], s.phase_pair())]
             for eag in eags:
                 self._injector[eag.key]  # noqa
+
+        def freeze(s: _InjectorScope) -> None:
+            state = self._scope_states[s]
+            check.state(not state.frozen)
+            state.frozen = True
+
+        def exit(s: _InjectorScope) -> None:
+            del self._scope_states[s]
 
         cur_phase: ta.Optional[els.Phase] = None
 
@@ -147,9 +147,10 @@ class _Driver:
                 self._elements = elements
                 enter(self._scopes[els.PhasePair(cur_phase, els.SubPhases.POST)])
                 self._elements = None
+                freeze(self._scopes[els.PhasePair(cur_phase, els.SubPhases.POST)])
 
-                self._scopes[els.PhasePair(cur_phase, els.SubPhases.MAIN)].exit()
-                self._scopes[els.PhasePair(cur_phase, els.SubPhases.PRE)].exit()
+                exit(self._scopes[els.PhasePair(cur_phase, els.SubPhases.MAIN)])
+                exit(self._scopes[els.PhasePair(cur_phase, els.SubPhases.PRE)])
 
             cur_phase = phase
 
@@ -160,10 +161,6 @@ class _Driver:
 
         epd = els.ElementProcessingDriver(fac)
         elements = epd.process(elements)
-
-        # for s in reversed(list(self._scopes.values())):
-        #     if s._state is not None:
-        #         s.exit()
 
         return elements
 
