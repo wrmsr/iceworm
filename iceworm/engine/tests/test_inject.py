@@ -2,22 +2,51 @@ import contextlib
 import os.path
 import typing as ta  # noqa
 
+from omnibus import check
+from omnibus import dataclasses as dc
 from omnibus import inject as inj
+from omnibus import lang  # noqa
 from omnibus import os as oos  # noqa
 import pytest  # noqa
 
 from .. import connectors as ctrs
 from .. import elements as els
-from .. import execution as exe
 from .. import inference as infr
+from .. import ops
 from .. import planning as pln
 from .. import rules as rls
 from .. import sites
+from ... import domains as doms
 from ...sql.tests.helpers import DbManager
 from ...tests import harness as har
 from ...types import QualifiedName  # noqa
 from ...utils import secrets as sec  # noqa
-from .test_ops import UrlSecretsReplacer
+
+
+def get_ele_dependencies(elements: ta.Iterable[els.Element]) -> ta.Mapping[els.Element, ta.AbstractSet[els.Element]]:  # noqa
+    raise NotImplementedError
+
+
+def get_src_table_domain(query: str, src: QualifiedName, dom: doms.Domain) -> doms.Domain:  # noqa
+    raise NotImplementedError
+
+
+class UrlSecretsReplacer(els.ElementProcessor):
+
+    def __init__(self, secrets: sec.Secrets) -> None:
+        super().__init__()
+
+        self._secrets = check.isinstance(secrets, sec.Secrets)
+
+    def processes(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
+        return [e for e in elements.get_type_set(ctrs.impls.sql.SqlConnector.Config) if e.url_secret]
+
+    def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
+        return [
+            dc.replace(e, url=self._secrets[e.url_secret].value, url_secret=None)
+            if isinstance(e, ctrs.impls.sql.SqlConnector.Config) else e
+            for e in elements
+        ]
 
 
 def install(binder: inj.Binder) -> inj.Binder:
@@ -40,8 +69,8 @@ def test_inject(harness: har.Harness):
 
         binder = inj.create_binder()
         binder.bind(sec.Secrets, to_instance=secrets)
-
-        drv = els.inject.Driver(binder, install(inj.create_binder()))
+        install(binder)
+        drv = els.inject.Driver(binder)
         elements = drv.run([
             sites.Site('site0.yml'),
         ])
@@ -49,7 +78,7 @@ def test_inject(harness: har.Harness):
         print(elements)
 
         connectors = drv[ctrs.ConnectorSet]
-
+        conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(connectors)))
         plan = pln.ElementPlanner(elements, connectors).plan({
             'pg/a',
             'pg/b',
@@ -58,7 +87,12 @@ def test_inject(harness: har.Harness):
             'system/notifications',
         })
 
-        exe.PlanExecutor(plan, connectors).execute()
+        binder = inj.create_binder()
+        binder.bind(ctrs.ConnectorSet, to_instance=connectors)
+        binder.bind(ctrs.ConnectionSet, to_instance=conns)
+        ops.inject.install(binder)
+        injector = inj.create_injector(binder)
+        injector[ops.OpExecutionDriver].execute(plan)
 
         with harness[DbManager].pg_engine.connect() as pg_conn:
             print(list(pg_conn.execute('select * from a')))

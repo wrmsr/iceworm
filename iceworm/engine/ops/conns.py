@@ -1,8 +1,3 @@
-"""
-TODO:
- - def handles? strategies? InsertIntoFrom?
-  - aot ops rewriting is more powerful than feuding greedy executors
-"""
 import abc
 import typing as ta
 
@@ -12,35 +7,37 @@ from omnibus import lang
 import sqlalchemy as sa
 
 from .. import connectors as ctrs
-from .. import ops
 from ... import alchemy as alch
+from ... import metadata as md
 from ... import sql
 from ...trees import eval as teval
 from ...trees import parsing as tpar
 from ...types import QualifiedName
+from ...utils import abs_set
 from ..connectors.impls.sql import SqlConnection
 from ..utils import parse_simple_select_table
 from ..utils import parse_simple_select_tables
+from .base import Op
+from .base import OpExecutor
+from .base import OpGen
 
 
-OpT = ta.TypeVar('OpT', bound=ops.Op)
-OpGen = ta.Generator[ops.Op, None, None]
+OpT = ta.TypeVar('OpT', bound=Op)
+ConnsOpT = ta.TypeVar('ConnsOpT', bound='ConnsOp')
 
 
-class Executor(lang.Abstract, ta.Generic[OpT]):
+class ConnsOp(Op, abstract=True):
+    pass
 
-    @abc.abstractmethod
-    def execute(self, op: OpT) -> ta.Optional[OpGen]:
+
+class ConnOp(ConnsOp, abstract=True):
+
+    @abc.abstractproperty
+    def conn(self) -> str:
         raise NotImplementedError
 
 
-class ListExecutor(Executor[ops.List]):
-
-    def execute(self, op: ops.List) -> OpGen:
-        yield from op.ops
-
-
-class ConnsExecutor(Executor[OpT], lang.Abstract):
+class ConnsOpExecutor(OpExecutor[ConnsOpT], lang.Abstract):
 
     def __init__(self, conns: ctrs.ConnectionSet) -> None:
         super().__init__()
@@ -48,9 +45,14 @@ class ConnsExecutor(Executor[OpT], lang.Abstract):
         self._conns = check.isinstance(conns, ctrs.ConnectionSet)
 
 
-class TransactionExecutor(ConnsExecutor[ops.Transaction]):
+class Transaction(Op):
+    conns: ta.AbstractSet[str] = dc.field(coerce=abs_set, check=lambda l: all(isinstance(o, str) for o in l))
+    op: Op
 
-    def execute(self, op: ops.Transaction) -> OpGen:
+
+class TransactionExecutor(ConnsOpExecutor[Transaction]):
+
+    def execute(self, op: Transaction) -> OpGen:
         sa_conn = check.isinstance(self._conns[check.single(op.conns)], SqlConnection).sa_conn
         with sa_conn.begin() as txn:
             try:
@@ -61,26 +63,51 @@ class TransactionExecutor(ConnsExecutor[ops.Transaction]):
                 raise
 
 
-class DropTableExecutor(ConnsExecutor[ops.DropTable]):
+class DropTable(ConnOp):
+    name: QualifiedName = dc.field(coerce=QualifiedName.of, check=lambda n: len(n) > 1)
 
-    def execute(self, op: ops.DropTable) -> None:
+    @property
+    def conn(self) -> str:
+        return self.name[0]
+
+
+class DropTableExecutor(ConnsOpExecutor[DropTable]):
+
+    def execute(self, op: DropTable) -> None:
         sa_conn = check.isinstance(self._conns[op.name[0]], SqlConnection).sa_conn
         sa_conn.execute(
             sql.DropTableIfExists(
                 QualifiedName(op.name[1:])))
 
 
-class CreateTableExecutor(ConnsExecutor[ops.CreateTable]):
+class CreateTable(ConnOp):
+    table: md.Table = dc.field(check=lambda o: isinstance(o, md.Table) and len(o.name) > 1)
 
-    def execute(self, op: ops.CreateTable) -> None:
+    @property
+    def conn(self) -> str:
+        return self.table.name[0]
+
+
+class CreateTableExecutor(ConnsOpExecutor[CreateTable]):
+
+    def execute(self, op: CreateTable) -> None:
         sa_conn = check.isinstance(self._conns[op.table.name[0]], SqlConnection).sa_conn
         table = alch.FromInternal(sa.MetaData())(dc.replace(op.table, name=op.table.name[1:]))
         table.create(sa_conn)
 
 
-class AtomicCreateTableAsExecutor(ConnsExecutor[ops.AtomicCreateTableAs]):
+class CreateTableAs(ConnOp):
+    name: QualifiedName = dc.field(coerce=QualifiedName.of)
+    query: str = dc.field(check=lambda o: isinstance(o, str))
 
-    def execute(self, op: ops.AtomicCreateTableAs) -> None:
+    @property
+    def conn(self) -> str:
+        return self.name[0]
+
+
+class CreateTableAsExecutor(ConnsOpExecutor[CreateTableAs]):
+
+    def execute(self, op: CreateTableAs) -> None:
         sa_conn = check.isinstance(self._conns[op.name[0]], SqlConnection).sa_conn
         sa_conn.execute(
             sql.CreateTableAs(
@@ -89,9 +116,14 @@ class AtomicCreateTableAsExecutor(ConnsExecutor[ops.AtomicCreateTableAs]):
                 sa.text(op.query)))
 
 
-class InsertIntoSelectExecutor(ConnsExecutor[ops.InsertIntoSelect]):
+class InsertIntoSelect(ConnsOp):
+    dst: QualifiedName = dc.field(coerce=QualifiedName.of)
+    query: str = dc.field(check=lambda o: isinstance(o, str))
 
-    def execute(self, op: ops.InsertIntoSelect) -> None:
+
+class InsertIntoSelectExecutor(ConnsOpExecutor[InsertIntoSelect]):
+
+    def execute(self, op: InsertIntoSelect) -> None:
         src = None
 
         if src is None:
@@ -121,3 +153,8 @@ class InsertIntoSelectExecutor(ConnsExecutor[ops.InsertIntoSelect]):
         dst_conn = self._conns[op.dst[0]]
         dst = dst_conn.create_row_sink(QualifiedName(op.dst[1:]))
         dst.consume_rows(src.produce_rows())
+
+
+class CopyTable(Op):
+    dst: QualifiedName = dc.field(coerce=QualifiedName.of)
+    src: QualifiedName = dc.field(coerce=QualifiedName.of)

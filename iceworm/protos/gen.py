@@ -3,6 +3,8 @@ TODO:
  - enums
  - record revision
  - nodal/serde polymorphism -> https://stackoverflow.com/a/35748115 :/
+ - ** auto-name with CamelCased package name **
+  - unless overridden w a anno
 """
 import logging
 import os.path

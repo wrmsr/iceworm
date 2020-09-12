@@ -1,3 +1,7 @@
+"""
+TODO:
+ - lifecycle
+"""
 import typing as ta
 
 from omnibus import check

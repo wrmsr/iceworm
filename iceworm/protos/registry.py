@@ -1,6 +1,9 @@
 """
 TODO:
  - ** decree: QUARANTINE DEP - lazy_import, not required for core **
+  - protos *do not* leak out of module - serdes through here
+   - forbid import? warn?
+ - field_idx (or whatever) annotation
 """
 import typing as ta
 
