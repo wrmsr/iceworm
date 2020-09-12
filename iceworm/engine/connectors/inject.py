@@ -1,5 +1,6 @@
 import typing as ta  # noqa
 
+from omnibus import check
 from omnibus import inject as inj
 
 from . import impls
@@ -9,11 +10,16 @@ from .collections import ConnectorSet
 
 
 def bind_connector_factory(binder: inj.Binder, cls: ta.Type[Connector]) -> None:
+    check.isinstance(binder, inj.Binder)
+    check.issubclass(cls, Connector)
+
     binder.bind_class(cls, assists={'config'})
     binder.new_dict_binder(ta.Type[Connector.Config], ta.Callable[..., Connector]).bind(cls.Config, to_provider=ta.Callable[..., cls])  # noqa
 
 
 def install(binder: inj.Binder) -> inj.Binder:
+    check.isinstance(binder, inj.Binder)
+
     binder.new_dict_binder(ta.Type[Connector.Config], ta.Callable[..., Connector])
 
     bind_connector_factory(binder, impls.computed.ComputedConnector)
