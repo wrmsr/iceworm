@@ -95,55 +95,66 @@ PreFinalize, Finalize, PostFinalize = _InjectorScope._subclass(els.Phases.FINALI
 class _CurrentInjectorScope(inj.scopes.Scope, lang.Final):
 
     def provide(self, binding: inj.types.Binding[T]) -> T:
-        raise NotImplementedError
+        if binding.key == inj.Key(els.ElementSet):
+            return inj.Injector.current[_Driver]._elements
+        else:
+            raise NotImplementedError
 
 
 class _Eager(dc.Pure):
     key: inj.Key
 
 
-def run(*binders: inj.Binder) -> None:
-    binder = inj.create_binder()
-    for s in _InjectorScope._subclass_map.values():
-        binder._elements.append(inj.types.ScopeBinding(s))
-        binder.new_set_binder(_Eager, annotated_with=s.phase_pair(), in_=s)
-        if s.phase_pair().sub_phase == els.SubPhases.MAIN:
-            binder.new_set_binder(els.ElementProcessor, annotated_with=s.phase_pair().phase, in_=s)
-            binder.new_set_binder(rls.RuleProcessor, annotated_with=s.phase_pair().phase, in_=s)
+class _Driver:
 
-    binder._elements.append(inj.types.ScopeBinding(_CurrentInjectorScope))
-    binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(els.ElementSet), in_=_CurrentInjectorScope)
+    def __init__(self, *binders: inj.Binder) -> None:
+        super().__init__()
 
-    injector = inj.create_injector(binder, *binders)
+        binder = inj.create_binder()
+        for s in _InjectorScope._subclass_map.values():
+            binder._elements.append(inj.types.ScopeBinding(s))
+            binder.new_set_binder(_Eager, annotated_with=s.phase_pair(), in_=s)
+            if s.phase_pair().sub_phase == els.SubPhases.MAIN:
+                binder.new_set_binder(els.ElementProcessor, annotated_with=s.phase_pair().phase, in_=s)
+                binder.new_set_binder(rls.RuleProcessor, annotated_with=s.phase_pair().phase, in_=s)
 
-    scopes: ta.Mapping[els.PhasePair, _InjectorScope] = {
-        s.phase_pair(): injector._scopes[s]
-        for s in _InjectorScope._subclass_map.values()
-    }
+        binder.bind(_Driver, to_instance=self)
 
-    def enter(s: _InjectorScope) -> None:
-        s.enter()
-        eags = injector[inj.Key(ta.Set[_Eager], s.phase_pair())]
-        for eag in eags:
-            injector[eag.key]  # noqa
+        binder._elements.append(inj.types.ScopeBinding(_CurrentInjectorScope))
+        binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(els.ElementSet), in_=_CurrentInjectorScope)
 
-    with contextlib.ExitStack() as es:
-        for p in els.PHASES:
-            spre = scopes[els.PhasePair(p, els.SubPhases.PRE)]
-            s = scopes[els.PhasePair(p, els.SubPhases.MAIN)]
-            spost = scopes[els.PhasePair(p, els.SubPhases.POST)]
+        self._injector = inj.create_injector(binder, *binders)
 
-            enter(spre)
-            with lang.defer(spre.exit):
-                for i in range(3):
-                    enter(s)
-                    with lang.defer(s.exit):
-                        eps = injector[inj.Key(ta.Set[els.ElementProcessor], p)]
-                        for ep in eps:
-                            print(ep)
+        self._scopes: ta.Mapping[els.PhasePair, _InjectorScope] = {
+            s.phase_pair(): self._injector._scopes[s]
+            for s in _InjectorScope._subclass_map.values()
+        }
 
-                enter(spost)
-                es.enter_context(lang.defer(spost.exit))
+    def run(self, elements: ta.Iterable[els.Element]) -> None:
+        def enter(s: _InjectorScope) -> None:
+            s.enter()
+            eags = self._injector[inj.Key(ta.Set[_Eager], s.phase_pair())]
+            for eag in eags:
+                self._injector[eag.key]  # noqa
+
+        self._elements = els.ElementSet.of(elements)
+        with contextlib.ExitStack() as es:
+            for p in els.PHASES:
+                spre = self._scopes[els.PhasePair(p, els.SubPhases.PRE)]
+                s = self._scopes[els.PhasePair(p, els.SubPhases.MAIN)]
+                spost = self._scopes[els.PhasePair(p, els.SubPhases.POST)]
+
+                enter(spre)
+                with lang.defer(spre.exit):
+                    for i in range(3):
+                        enter(s)
+                        with lang.defer(s.exit):
+                            eps = self._injector[inj.Key(ta.Set[els.ElementProcessor], p)]
+                            for ep in eps:
+                                print(ep)
+
+                    enter(spost)
+                    es.enter_context(lang.defer(spost.exit))
 
 
 def install(binder: inj.Binder) -> inj.Binder:
@@ -165,7 +176,7 @@ def install(binder: inj.Binder) -> inj.Binder:
     binder.new_set_binder(els.ElementProcessor, annotated_with=els.Phases.TARGETS, in_=Targets).bind(to=infr.InferTableProcessor)  # noqa
 
     def provide_connector_set(es: els.ElementSet) -> ctrs.ConnectorSet:
-        raise NotImplementedError
+        return ctrs.ConnectorSet.of(es.get_type_set(ctrs.Connector.Config))
     binder.bind_callable(provide_connector_set, in_=PostConnectors)
 
     return binder

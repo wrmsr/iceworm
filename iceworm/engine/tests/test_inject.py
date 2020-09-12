@@ -7,6 +7,7 @@ from omnibus import os as oos  # noqa
 import pytest
 
 from . import inject  # noqa
+from .. import connectors as ctrs
 from ...sql.tests.helpers import DbManager
 from ...tests import harness as har
 from ...types import QualifiedName  # noqa
@@ -23,4 +24,6 @@ def test_inject(harness: har.Harness):
         binder = inj.create_binder()
         binder.bind(sec.Secrets, to_instance=secrets)
 
-        inject.run(binder, inject.install(inj.create_binder()))
+        inject._Driver(binder, inject.install(inj.create_binder())).run([
+            ctrs.system.SystemConnector.Config(),
+        ])
