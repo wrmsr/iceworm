@@ -4,7 +4,7 @@ import typing as ta  # noqa
 
 from omnibus import inject as inj
 from omnibus import os as oos  # noqa
-import pytest
+import pytest  # noqa
 
 from .. import connectors as ctrs
 from .. import elements as els

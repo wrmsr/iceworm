@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from .... import alchemy as alch
 from .... import metadata as md
 from ....types import QualifiedName
-from ....utils import secrets
+from ....utils import secrets as sec
 from ...utils import parse_simple_select_table
 from ..base import Connection as _Connection
 from ..base import Connector as _Connector
@@ -26,7 +26,7 @@ class SqlConnector(_Connector['SqlConnector', 'SqlConnector.Config']):
 
     class Config(_Connector.Config):
         url: ta.Optional[str] = dc.field(None, check=lambda s: s is None or (isinstance(s, str) and s), kwonly=True)
-        url_secret: ta.Optional[secrets.SecretKey] = dc.field(None, coerce=secrets.SecretKey.of_optional, kwonly=True)
+        url_secret: ta.Optional[sec.SecretKey] = dc.field(None, coerce=sec.SecretKey.of_optional, kwonly=True)
 
         dc.check(lambda url, url_secret: check.one_of([url, url_secret], not_none=True))
 
