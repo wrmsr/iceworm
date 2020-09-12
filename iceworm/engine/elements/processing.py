@@ -69,6 +69,10 @@ class ElementProcessor(lang.Abstract):
     def phases(cls) -> ta.Iterable[Phase]:
         return PHASES
 
+    @classmethod
+    def dependencies(cls) -> ta.Iterable[ta.Type['ElementProcessor']]:
+        return []
+
     @abc.abstractmethod
     def processes(self, elements: ElementSet) -> ta.Iterable[Element]:
         raise NotImplementedError
@@ -109,11 +113,22 @@ class ElementProcessingDriver:
 
         for phase in PHASES:
             eps = [check.isinstance(ep, ElementProcessor) for ep in self._processor_factory(elements, phase)]
-            seen = ocol.IdentitySet()
+            ep_dep_tys = {}
+            ep_sets_by_mro_cls = {}
             for ep in eps:
-                check.not_in(ep, seen)
+                check.not_in(ep, ep_dep_tys)
                 check.in_(phase, type(ep).phases())
-                seen.add(ep)
+                ep_dep_tys[ep] = {check.issubclass(d, ElementProcessor) for d in type(ep).dependencies()}
+                for mro_cls in type(ep).__mro__:
+                    if issubclass(mro_cls, ElementProcessor) and mro_cls != ElementProcessor:
+                        ep_sets_by_mro_cls.setdefault(mro_cls, set()).add(ep)
+            if ep_dep_tys:
+                ep_deps = {
+                    ep: {dep for dt in dts for dep in check.not_empty(ep_sets_by_mro_cls[dt])}
+                    for ep, dts in ep_dep_tys.items()
+                }
+                topo = list(ocol.toposort(ep_deps))
+                eps = [e for step in topo for e in step]
 
             while True:
                 dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Element]] = ocol.IdentityKeyDict()

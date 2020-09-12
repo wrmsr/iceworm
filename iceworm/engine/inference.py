@@ -39,6 +39,10 @@ class InferTableProcessor(els.ElementProcessor):
 
         self._ctors = ctrs.ConnectorSet.of(ctors)
 
+    @classmethod
+    def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
+        return {*super().dependencies(), els.queries.QueryParsingElementProcessor}
+
     class Instance:
 
         def __init__(self, owner: 'InferTableProcessor', input: els.ElementSet) -> None:
