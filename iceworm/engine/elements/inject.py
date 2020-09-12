@@ -124,6 +124,12 @@ class Driver:
 
         self._elements: ta.Optional[ElementSet] = None
 
+    def __getitem__(
+            self,
+            target: ta.Union[inj.Key[T], ta.Type[T]],
+    ) -> T:
+        return self._injector[target]
+
     def run(self, elements: ta.Iterable[Element]) -> ElementSet:
         def enter(s: _Scope) -> None:
             check.not_in(s, self._scope_states)

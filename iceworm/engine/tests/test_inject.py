@@ -51,7 +51,7 @@ def test_inject(harness: har.Harness):
 
         print(elements)
 
-        connectors = drv._injector[ctrs.ConnectorSet]
+        connectors = drv[ctrs.ConnectorSet]
 
         plan = pln.ElementPlanner(elements, connectors).plan({
             'pg/a',
