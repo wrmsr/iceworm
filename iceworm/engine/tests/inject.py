@@ -96,7 +96,7 @@ class _CurrentInjectorScope(inj.scopes.Scope, lang.Final):
 
     def provide(self, binding: inj.types.Binding[T]) -> T:
         if binding.key == inj.Key(els.ElementSet):
-            return inj.Injector.current[_Driver]._elements
+            return check.isinstance(inj.Injector.current[_Driver]._elements, els.ElementSet)
         else:
             raise NotImplementedError
 
@@ -130,31 +130,43 @@ class _Driver:
             for s in _InjectorScope._subclass_map.values()
         }
 
-    def run(self, elements: ta.Iterable[els.Element]) -> None:
+        self._elements: ta.Optional[els.ElementSet] = None
+
+    def run(self, elements: ta.Iterable[els.Element]) -> els.ElementSet:
         def enter(s: _InjectorScope) -> None:
             s.enter()
             eags = self._injector[inj.Key(ta.Set[_Eager], s.phase_pair())]
             for eag in eags:
                 self._injector[eag.key]  # noqa
 
-        self._elements = els.ElementSet.of(elements)
-        with contextlib.ExitStack() as es:
-            for p in els.PHASES:
-                spre = self._scopes[els.PhasePair(p, els.SubPhases.PRE)]
-                s = self._scopes[els.PhasePair(p, els.SubPhases.MAIN)]
-                spost = self._scopes[els.PhasePair(p, els.SubPhases.POST)]
+        cur_phase: ta.Optional[els.Phase] = None
 
-                enter(spre)
-                with lang.defer(spre.exit):
-                    for i in range(3):
-                        enter(s)
-                        with lang.defer(s.exit):
-                            eps = self._injector[inj.Key(ta.Set[els.ElementProcessor], p)]
-                            for ep in eps:
-                                print(ep)
+        def fac(elements: els.ElementSet, phase: els.Phase) -> ta.Iterable[els.ElementProcessor]:
+            nonlocal cur_phase
 
-                    enter(spost)
-                    es.enter_context(lang.defer(spost.exit))
+            if cur_phase is not None:
+                self._elements = elements
+                enter(self._scopes[els.PhasePair(cur_phase, els.SubPhases.POST)])
+                self._elements = None
+
+                self._scopes[els.PhasePair(cur_phase, els.SubPhases.MAIN)].exit()
+                self._scopes[els.PhasePair(cur_phase, els.SubPhases.PRE)].exit()
+
+            cur_phase = phase
+
+            enter(self._scopes[els.PhasePair(cur_phase, els.SubPhases.PRE)])
+            enter(self._scopes[els.PhasePair(cur_phase, els.SubPhases.MAIN)])
+
+            return self._injector[inj.Key(ta.Set[els.ElementProcessor], phase)]
+
+        epd = els.ElementProcessingDriver(fac)
+        elements = epd.process(elements)
+
+        for s in reversed(list(self._scopes.values())):
+            if s._state is not None:
+                s.exit()
+
+        return elements
 
 
 def install(binder: inj.Binder) -> inj.Binder:

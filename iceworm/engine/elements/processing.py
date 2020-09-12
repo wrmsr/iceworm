@@ -83,7 +83,7 @@ ElementProcessorFactory = ta.Callable[[ElementSet, Phase], ta.Iterable[ElementPr
 
 class ElementProcessingDriver:
 
-    def __init__(self, processor_factory: ta.Iterable[ElementProcessor]) -> None:
+    def __init__(self, processor_factory: ElementProcessorFactory) -> None:
         super().__init__()
 
         self._processor_factory = check.callable(processor_factory)
