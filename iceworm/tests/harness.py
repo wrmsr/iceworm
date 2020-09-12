@@ -214,7 +214,7 @@ class Harness:
 
         for inj_scope in _InjectorScope._subclass_map.values():
             binder._elements.append(inj.types.ScopeBinding(inj_scope))
-            binder.bind(FixtureRequest, annotated_with=inj_scope.pytest_scope(), in_=inj_scope)
+            binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(FixtureRequest, inj_scope.pytest_scope()), in_=inj_scope)  # noqa
             binder.bind(lc.LifecycleManager, annotated_with=inj_scope.pytest_scope(), in_=inj_scope)
             binder.new_set_binder(_Eager, annotated_with=inj_scope.pytest_scope(), in_=inj_scope)
 

@@ -31,7 +31,7 @@ def install(binder: inj.Binder) -> inj.Binder:
     return binder
 
 
-@pytest.mark.xfail()
+# @pytest.mark.xfail()
 def test_inject(harness: har.Harness):
     with contextlib.ExitStack() as es:
         es.enter_context(oos.tmp_chdir(os.path.dirname(__file__)))
