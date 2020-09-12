@@ -26,10 +26,7 @@ def install(binder: inj.Binder) -> inj.Binder:
     rls.inject.bind_rule_processor(binder, rls.TableAsSelectProcessor, els.Phases.TARGETS)
     els.inject.bind_element_processor(binder, infr.InferTableProcessor, els.Phases.TARGETS)
 
-    def provide_connector_set(es: els.ElementSet) -> ctrs.ConnectorSet:
-        return ctrs.ConnectorSet.of(es.get_type_set(ctrs.Connector.Config))
-    binder.bind_callable(provide_connector_set, in_=els.inject.PostConnectors)
-    els.inject.bind_post_eager(binder, inj.Key(ctrs.ConnectorSet), els.Phases.CONNECTORS)
+    ctrs.inject.install(binder)
 
     return binder
 

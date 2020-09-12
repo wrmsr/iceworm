@@ -2,7 +2,6 @@ import typing as ta
 
 from omnibus import check
 from omnibus import inject as inj
-import omnibus.inject.scopes  # noqa
 
 from .. import elements as els
 from .base import RuleElementProcessor

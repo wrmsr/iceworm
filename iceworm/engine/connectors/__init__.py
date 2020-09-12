@@ -1,4 +1,5 @@
 from . import impls  # noqa
+from . import inject  # noqa
 from .base import Connection  # noqa
 from .base import Connector  # noqa
 from .base import ListRowSink  # noqa
