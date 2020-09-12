@@ -25,8 +25,8 @@ from ..base import Rows
 class SqlConnector(Connector['SqlConnector', 'SqlConnector.Config']):
 
     class Config(Connector.Config):
-        url: ta.Optional[str] = dc.field(None, check=lambda s: s is None or (isinstance(s, str) and s))
-        url_secret: ta.Optional[secrets.SecretKey] = dc.field(None, coerce=secrets.SecretKey.of_optional)
+        url: ta.Optional[str] = dc.field(None, check=lambda s: s is None or (isinstance(s, str) and s), kwonly=True)
+        url_secret: ta.Optional[secrets.SecretKey] = dc.field(None, coerce=secrets.SecretKey.of_optional, kwonly=True)
 
         dc.check(lambda url, url_secret: check.one_of([url, url_secret], not_none=True))
 
