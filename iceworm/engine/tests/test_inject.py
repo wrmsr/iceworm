@@ -19,6 +19,8 @@ from .. import sites
 from ... import domains as doms
 from ...sql.tests.helpers import DbManager
 from ...tests import harness as har
+from ...trees import nodes as no
+from ...trees import parsing as par
 from ...types import QualifiedName  # noqa
 from ...utils import secrets as sec  # noqa
 
@@ -49,11 +51,14 @@ class UrlSecretsReplacer(els.ElementProcessor):
         ]
 
 
-def install(binder: inj.Binder) -> inj.Binder:
-    els.inject.bind_element_processor(binder, sites.SiteProcessor, els.Phases.SITES)
+def install_element_processors(binder: inj.Binder) -> inj.Binder:
     els.inject.bind_element_processor(binder, UrlSecretsReplacer, els.Phases.CONNECTORS)
-    rls.inject.bind_rule_processor(binder, rls.TableAsSelectProcessor, els.Phases.TARGETS)
+    els.inject.bind_element_processor(binder, els.queries.QueryParsingElementProcessor, els.Phases.TARGETS)
     els.inject.bind_element_processor(binder, infr.InferTableProcessor, els.Phases.TARGETS)
+    els.inject.bind_element_processor(binder, sites.SiteProcessor, els.Phases.SITES)
+    rls.inject.bind_rule_processor(binder, rls.TableAsSelectProcessor, els.Phases.TARGETS)
+
+    binder.bind(inj.Key(ta.Callable[[str], no.Node]), to_instance=par.parse_stmt)
 
     ctrs.inject.install(binder)
 
@@ -69,7 +74,7 @@ def test_inject(harness: har.Harness):
 
         binder = inj.create_binder()
         binder.bind(sec.Secrets, to_instance=secrets)
-        install(binder)
+        install_element_processors(binder)
         drv = els.inject.Driver(binder)
         elements = drv.run([
             sites.Site('site0.yml'),

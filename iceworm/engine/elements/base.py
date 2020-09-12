@@ -47,6 +47,7 @@ TODO:
  - give everything a name? type:filename:line:col:seq?
  - id lookup suggestion ( https://docs.python.org/3/library/difflib.html#difflib.get_close_matches )
  - custom datatypes, desugared to binary + udfs? proto?
+ - FIXME: origin is meta not ann?
 
 ** *NOT* nested **
 
