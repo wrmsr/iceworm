@@ -5,8 +5,8 @@ package iceworm;
 option java_package = "com.wrmsr.iceworm";
 
 
-// iceworm.service.web.WebServiceStatus
-message WebServiceStatus {
+// iceworm.service.web.ServiceWebStatus
+message ServiceWebStatus {
   float uptime = 1;
 }
 

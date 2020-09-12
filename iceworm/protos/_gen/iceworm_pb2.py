@@ -21,21 +21,21 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='iceworm',
   syntax='proto3',
   serialized_options=_b('\n\021com.wrmsr.iceworm'),
-  serialized_pb=_b('\n\riceworm.proto\x12\x07iceworm\"\"\n\x10WebServiceStatus\x12\x0e\n\x06uptime\x18\x01 \x01(\x02\"\x15\n\x05_Stub\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\tB\x13\n\x11\x63om.wrmsr.icewormb\x06proto3')
+  serialized_pb=_b('\n\riceworm.proto\x12\x07iceworm\"\"\n\x10ServiceWebStatus\x12\x0e\n\x06uptime\x18\x01 \x01(\x02\"\x15\n\x05_Stub\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\tB\x13\n\x11\x63om.wrmsr.icewormb\x06proto3')
 )
 
 
 
 
-_WEBSERVICESTATUS = _descriptor.Descriptor(
-  name='WebServiceStatus',
-  full_name='iceworm.WebServiceStatus',
+_SERVICEWEBSTATUS = _descriptor.Descriptor(
+  name='ServiceWebStatus',
+  full_name='iceworm.ServiceWebStatus',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='uptime', full_name='iceworm.WebServiceStatus.uptime', index=0,
+      name='uptime', full_name='iceworm.ServiceWebStatus.uptime', index=0,
       number=1, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -88,16 +88,16 @@ __STUB = _descriptor.Descriptor(
   serialized_end=83,
 )
 
-DESCRIPTOR.message_types_by_name['WebServiceStatus'] = _WEBSERVICESTATUS
+DESCRIPTOR.message_types_by_name['ServiceWebStatus'] = _SERVICEWEBSTATUS
 DESCRIPTOR.message_types_by_name['_Stub'] = __STUB
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-WebServiceStatus = _reflection.GeneratedProtocolMessageType('WebServiceStatus', (_message.Message,), dict(
-  DESCRIPTOR = _WEBSERVICESTATUS,
+ServiceWebStatus = _reflection.GeneratedProtocolMessageType('ServiceWebStatus', (_message.Message,), dict(
+  DESCRIPTOR = _SERVICEWEBSTATUS,
   __module__ = 'iceworm_pb2'
-  # @@protoc_insertion_point(class_scope:iceworm.WebServiceStatus)
+  # @@protoc_insertion_point(class_scope:iceworm.ServiceWebStatus)
   ))
-_sym_db.RegisterMessage(WebServiceStatus)
+_sym_db.RegisterMessage(ServiceWebStatus)
 
 _Stub = _reflection.GeneratedProtocolMessageType('_Stub', (_message.Message,), dict(
   DESCRIPTOR = __STUB,
