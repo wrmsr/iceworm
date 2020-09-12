@@ -8,6 +8,8 @@ import pytest
 
 from . import inject  # noqa
 from .. import connectors as ctrs
+from .. import planning as pln
+from .. import sites  # noqa
 from ...sql.tests.helpers import DbManager
 from ...tests import harness as har
 from ...types import QualifiedName  # noqa
@@ -24,6 +26,27 @@ def test_inject(harness: har.Harness):
         binder = inj.create_binder()
         binder.bind(sec.Secrets, to_instance=secrets)
 
-        inject._Driver(binder, inject.install(inj.create_binder())).run([
-            ctrs.system.SystemConnector.Config(),
+        drv = inject._Driver(binder, inject.install(inj.create_binder()))
+        elements = drv.run([
+            sites.Site('site0.yml'),
         ])
+
+        print(elements)
+
+        connectors = drv._injector[ctrs.ConnectorSet]
+
+        plan = pln.ElementPlanner(elements, connectors).plan({
+            'pg/a',
+            'pg/b',
+            'pg/c',
+            'pg/nums',
+            'system/notifications',
+        })
+
+        exe.PlanExecutor(plan, connectors).execute()
+
+        with harness[DbManager].pg_engine.connect() as pg_conn:
+            print(list(pg_conn.execute('select * from a')))
+            print(list(pg_conn.execute('select * from b')))
+            print(list(pg_conn.execute('select * from c')))
+            print(list(pg_conn.execute('select * from nums')))
