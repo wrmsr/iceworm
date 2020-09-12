@@ -1,3 +1,4 @@
+from . import inject  # noqa
 from .base import Annotation  # noqa
 from .base import Annotations  # noqa
 from .base import Element  # noqa
