@@ -10,7 +10,7 @@ from .collections import Connector
 from .collections import ConnectorSet
 
 
-def bind_connector_factory(binder: inj.Binder, impl_cls: ta.Type[Connector]) -> None:
+def bind_connector_impl(binder: inj.Binder, impl_cls: ta.Type[Connector]) -> None:
     check.isinstance(binder, inj.Binder)
     check.issubclass(impl_cls, Connector)
 
@@ -22,11 +22,11 @@ def install(binder: inj.Binder) -> inj.Binder:
 
     cfgabl.bind_dict(binder, Connector)
 
-    bind_connector_factory(binder, impls.computed.ComputedConnector)
-    bind_connector_factory(binder, impls.dual.DualConnector)
-    bind_connector_factory(binder, impls.files.FileConnector)
-    bind_connector_factory(binder, impls.sql.SqlConnector)
-    bind_connector_factory(binder, impls.system.SystemConnector)
+    bind_connector_impl(binder, impls.computed.ComputedConnector)
+    bind_connector_impl(binder, impls.dual.DualConnector)
+    bind_connector_impl(binder, impls.files.FileConnector)
+    bind_connector_impl(binder, impls.sql.SqlConnector)
+    bind_connector_impl(binder, impls.system.SystemConnector)
 
     def provide_connector_set(
             es: els.ElementSet,
