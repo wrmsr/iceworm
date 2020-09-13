@@ -51,47 +51,80 @@ class InferTableProcessor(els.ElementProcessor):
             self._owner = check.isinstance(owner, InferTableProcessor)
             self._input = check.isinstance(input, els.ElementSet)
 
-        @properties.stateful_cached
-        def output(self) -> els.ElementSet:
-            ele_tns: ta.Mapping[QualifiedName, tars.Table] = unique_dict(
+        @properties.cached
+        @property
+        def tables_by_name(self) -> ta.Mapping[QualifiedName, tars.Table]:
+            return unique_dict(
                 (QualifiedName([ele.connector.id, *ele.name]), self._input[ele.table])
                 for ele in self._input.get_type_set(tars.Materialization)
             )
-            tele_ids = unique_dict((ele.id, qn) for qn, ele in ele_tns.items())
 
-            ts = els.ElementSet(self._input)
-            tn_deps: ta.Dict[str, ta.Set[str]] = {}
-            tn_idxs = {}
-            for i, ele in enumerate(ts):
-                if isinstance(ele, tars.Table):
-                    tn_idxs[ele.id] = i
-                    rows = check.single(rt for rt in ts.get_type_set(tars.Rows) if rt.table == ele)
-                    all_dep_qns = {
-                        n.name.name
-                        for n in els.queries.get_basic(rows, rows.query).get_node_type_set(no.Table)
-                    }
-                    deps = {ele_tns[qn].id for qn in all_dep_qns if qn in ele_tns}
-                    check.not_in(ele.id, tn_deps)
-                    tn_deps[ele.id] = deps
+        @properties.cached
+        @property
+        def table_names_by_id(self) -> ta.Mapping[els.Id, QualifiedName]:
+            return unique_dict((ele.id, name) for name, ele in self.tables_by_name.items())
 
-            given_tables: ta.Mapping[QualifiedName, md.Table] = {}
+        @properties.cached
+        @property
+        def ele_seq(self) -> ta.Sequence[els.Element]:
+            return list(self._input)
 
-            ts = list(ts)
-            topo = list(ocol.toposort(tn_deps))
-            for sup in topo:
-                for tn in sup:
-                    ele: tars.Table = self._input[tn]
-                    if ele.md is None:
-                        rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
-                        mdt = self.infer_table(check.isinstance(rows.query, AstQuery).root, given_tables)
-                        qn = tele_ids[ele.id]
-                        mdt = dc.replace(mdt, name=qn)
-                        i = tn_idxs[ele.id]
-                        tsi = ts[i]
-                        ts[i] = dc.replace(tsi, md=mdt, meta={**tsi.meta, els.Origin: els.Origin(tsi)})
-                        given_tables[qn] = mdt
+        @properties.cached
+        @property
+        def idxs_by_id(self):
+            return {e.id: i for i, e in enumerate(self.ele_seq)}
 
-            return els.ElementSet.of(ts)
+        @properties.cached
+        @property
+        def id_dep_sets_by_id(self) -> ta.Mapping[str, ta.AbstractSet[str]]:
+            dct: ta.Dict[str, ta.Set[str]] = {}
+            for ele in self._input:
+                if not isinstance(ele, tars.Table):
+                    continue
+
+                rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
+                deps = {
+                    self.tables_by_name[name].id
+                    for n in els.queries.get_basic(rows, rows.query).get_node_type_set(no.Table)
+                    for name in [n.name.name]
+                    if name in self.tables_by_name
+                }
+
+                check.not_in(ele.id, dct)
+                dct[ele.id] = deps
+
+            return dct
+
+        @properties.stateful_cached
+        def output(self) -> els.ElementSet:
+            topo = [
+                check.isinstance(self._input[id], tars.Table)
+                for step in ocol.toposort({k: set(v) for k, v in self.id_dep_sets_by_id.items()})
+                for id in step
+            ]
+
+            given_tables: ta.Dict[QualifiedName, md.Table] = {}
+            lst = list(self._input)
+            for ele in topo:
+                if ele.md is not None:
+                    continue
+
+                rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
+
+                name = self.table_names_by_id[ele.id]
+                md_table = self.infer_table(
+                    check.isinstance(rows.query, AstQuery).root,
+                    given_tables,
+                    name=name,
+                )
+
+                idx = self.idxs_by_id[ele.id]
+                check.state(lst[idx] is ele)
+                lst[idx] = dc.replace(ele, md=md_table, meta={**ele.meta, els.Origin: els.Origin(ele)})
+
+                given_tables[name] = md_table
+
+            return els.ElementSet.of(lst)
 
         def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
             objs = []
@@ -111,7 +144,13 @@ class InferTableProcessor(els.ElementProcessor):
 
             return objs
 
-        def infer_table(self, root: no.Node, given_tables: ta.Mapping[QualifiedName, md.Table]) -> md.Table:
+        def infer_table(
+                self,
+                root: no.Node,
+                given_tables: ta.Mapping[QualifiedName, md.Table],
+                *,
+                name: ta.Optional[QualifiedName] = None,
+        ) -> md.Table:
             table_names = {
                 tn.name.name
                 for tn in ana.basic(root).get_node_type_set(no.Table)
@@ -150,7 +189,7 @@ class InferTableProcessor(els.ElementProcessor):
 
             # FIXME: pg.c defined in terms of generated pg.b, need iterativity
             return md.Table(
-                ['$anon'],
+                name if name is not None else ['$anon'],
                 [md.Column(n, t) for n, t in tt.columns],
             )
 
