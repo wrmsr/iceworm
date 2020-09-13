@@ -134,7 +134,7 @@ class InjectionElementProcessingDriver:
         def enter(s: _Scope) -> None:
             check.not_in(s, self._scope_states)
             self._scope_states[s] = _Scope.State()
-            eags = self._injector[inj.Key(ta.Set[_Eager], s.phase_pair())]
+            eags = self._injector[inj.Key(ta.AbstractSet[_Eager], s.phase_pair())]
             for eag in eags:
                 self._injector[eag.key]  # noqa
 
@@ -165,7 +165,7 @@ class InjectionElementProcessingDriver:
             enter(self._scopes[PhasePair(cur_phase, SubPhases.PRE)])
             enter(self._scopes[PhasePair(cur_phase, SubPhases.MAIN)])
 
-            return self._injector[inj.Key(ta.Set[ElementProcessor], phase)]
+            return self._injector[inj.Key(ta.AbstractSet[ElementProcessor], phase)]
 
         epd = ElementProcessingDriver(fac)
         elements = epd.process(elements)

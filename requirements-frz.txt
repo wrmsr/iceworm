@@ -49,7 +49,7 @@ mypy-extensions==0.4.3
 numba==0.51.2
 numpy==1.19.2
 oauthlib==3.1.0
-omnibus @ git+https://github.com/wrmsr/omnibus@7404c55fce758faf73e9feed343392b709d604df
+omnibus @ git+https://github.com/wrmsr/omnibus@4091b2e52097cd9c19ad3621cccb6efb80119827
 oscrypto==1.2.1
 packaging==20.4
 pandas==1.1.2

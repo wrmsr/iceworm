@@ -30,7 +30,7 @@ def install(binder: inj.Binder) -> inj.Binder:
 
     def provide_connector_set(
             es: els.ElementSet,
-            facs: ta.Dict[ta.Type[Connector.Config], ta.Callable[..., Connector]],
+            facs: ta.Mapping[ta.Type[Connector.Config], ta.Callable[..., Connector]],
     ) -> ConnectorSet:
         lst = []
         for cfg in es.get_type_set(Connector.Config):

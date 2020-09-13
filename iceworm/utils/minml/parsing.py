@@ -2,7 +2,7 @@
 TODO:
  - codify yaml interop - special idents?
   - ** REJECT ** ambiguous idents? also yaml control codes and shit
- - json5?
+ - json5? https://json5.org/ - doesn't do default_object_value tho
  - -> omni?
 
 https://golang.org/pkg/reflect/#StructTag lol

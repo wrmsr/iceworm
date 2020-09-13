@@ -263,7 +263,7 @@ class Harness:
         try:
             lm = self._injector[inj.Key(lc.LifecycleManager, pytest_scope)]
             with lc.context_manage(lm):
-                eags = self._injector[inj.Key(ta.Set[_Eager], pytest_scope)]
+                eags = self._injector[inj.Key(ta.AbstractSet[_Eager], pytest_scope)]
                 for eag in eags:
                     self._injector[eag.key]  # noqa
                 yield

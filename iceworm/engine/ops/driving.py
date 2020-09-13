@@ -9,7 +9,7 @@ from .base import OpExecutor
 
 class OpExecutionDriver:
 
-    def __init__(self, op_executors: ta.Dict[ta.Type[Op], OpExecutor]) -> None:
+    def __init__(self, op_executors: ta.Mapping[ta.Type[Op], OpExecutor]) -> None:
         super().__init__()
 
         self._op_executors = {
