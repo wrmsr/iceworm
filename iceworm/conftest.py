@@ -14,29 +14,31 @@ from .tests.harness.fixtures import harness  # noqa
 
 _TEST_FAILED_INCREMENTAL: ta.Dict[str, ta.Dict[ta.Tuple[int, ...], str]] = {}
 
+_TEST_SWITCHES = [
+    'docker',
+    'online',
+    'slow',
+]
+
 
 def pytest_addoption(parser):
-    parser.addoption('--no-slow', action='store_true', default=False, help='disable slow tests')
-    parser.addoption('--no-online', action='store_true', default=False, help='disable online tests')
+    for sw in _TEST_SWITCHES:
+        parser.addoption(f'--no-{sw}', action='store_true', default=False, help=f'disable {sw} tests')
 
 
 def pytest_configure(config):
-    config.addinivalue_line('markers', 'slow: mark test as slow')
-    config.addinivalue_line('markers', 'online: mark test as online only')
+    for sw in _TEST_SWITCHES:
+        config.addinivalue_line('markers', f'{sw}: mark test as {sw}')
 
 
 def pytest_collection_modifyitems(config, items):
-    if config.getoption('--no-slow'):
-        skip_slow = pytest.mark.skip(reason='omit --no-slow to run')
+    for sw in _TEST_SWITCHES:
+        if not config.getoption(f'--no-{sw}'):
+            continue
+        skip = pytest.mark.skip(reason=f'omit --no-{sw} to run')
         for item in items:
-            if 'slow' in item.keywords:
-                item.add_marker(skip_slow)
-
-    if config.getoption('--no-online'):
-        skip_online = pytest.mark.skip(reason='omit --no-online to run')
-        for item in items:
-            if 'online' in item.keywords:
-                item.add_marker(skip_online)
+            if sw in item.keywords:
+                item.add_marker(skip)
 
 
 def pytest_runtest_setup(item):
