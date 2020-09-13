@@ -211,6 +211,12 @@ kwarg = Kwarg
 
 class SnowflakeAdapter(Adapter):
 
+    class Config(Adapter.Config):
+        pass
+
+    def __init__(self, config: Config = Config()) -> None:
+        super().__init__(config)
+
     @lang.override
     def build_range(self, num):
         # select seq4() i from table(generator(rowcount => 10))

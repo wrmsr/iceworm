@@ -9,10 +9,26 @@ TODO:
   - snowflake (json)
   - pg (bytes)
 """
+import typing as ta
+
+from omnibus import dataclasses as dc
+from omnibus import lang
 import sqlalchemy as sa  # noqa
 
+from ..utils import configable as cfgable
 
-class Adapter:
+
+AdapterT = ta.TypeVar('AdapterT', bound='Adapter')
+AdapterConfigT = ta.TypeVar('AdapterConfigT', bound='Adapter.Config')
+
+
+class Adapter(cfgable.Configable[AdapterConfigT], lang.Abstract):
+
+    class Config(dc.Enum, cfgable.Configable.Config):
+        pass
+
+    def __init__(self, config: AdapterConfigT) -> None:
+        super().__init__(config)
 
     def build_range(self, num):
         raise NotImplementedError
