@@ -32,6 +32,7 @@
             <artifactId>protobuf-java-util</artifactId>
         </dependency>
 
+        <!--
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
@@ -61,16 +62,14 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-guava</artifactId>
         </dependency>
+        -->
 
-        <dependency>
-            <groupId>org.apache.parquet</groupId>
-            <artifactId>parquet-tools</artifactId>
-        </dependency>
-
+        <!--
         <dependency>
             <groupId>io.burt</groupId>
             <artifactId>jmespath-core</artifactId>
         </dependency>
+        -->
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -95,16 +94,6 @@
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.eclipsesource.j2v8</groupId>
-            <artifactId>j2v8_macosx_x86_64</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mozilla</groupId>
-            <artifactId>rhino</artifactId>
         </dependency>
 
         <dependency>

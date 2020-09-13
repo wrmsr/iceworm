@@ -28,7 +28,7 @@ class DockerManager(lc.ContextManageableLifecycle):
             name_port_pairs: ta.Iterable[ta.Tuple[str, int]],
     ) -> ta.Dict[ta.Tuple[str, int], ta.Tuple[str, int]]:
         if docker.is_in_docker():
-            return {(h, p): (self.PREFI + h, p) for h, p in name_port_pairs}
+            return {(h, p): (self.PREFIX + h, p) for h, p in name_port_pairs}
         ret = {}
         lut = {}
         for h, p in name_port_pairs:
