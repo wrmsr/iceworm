@@ -184,8 +184,8 @@ class InferTableProcessor(els.ElementProcessor):
             dts = tdatatypes.analyze(root, oris, cat)
             tt = check.isinstance(dts.dts_by_node[root], dt.Table)
 
-            # ren = rendering.render(root)
-            # print(ren)  # FIXME: update query
+            ren = rendering.render(root)
+            print(ren)  # FIXME: update query
 
             # FIXME: pg.c defined in terms of generated pg.b, need iterativity
             return md.Table(
