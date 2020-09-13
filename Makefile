@@ -298,6 +298,20 @@ dep-cyaml: venv
 		"$$P/.venv/bin/pip" install ./pyyaml.tgz --global-option="--with-libyaml" \
 	)
 
+.PHONY: dep-setup
+dep-setup: venv
+	echo -e "\n\
+with open('setup.py', 'r') as f: \n\
+    lines = [l.rstrip() for l in f.readlines()] \n\
+[pos] = [i for i, l in enumerate(lines) if l.strip() == '# @omnibus-dep@'] \n\
+import subprocess \n\
+[dep] = [l for l in subprocess.check_output(['.venv/bin/pip', 'freeze']).decode('utf-8').splitlines() for l in [l.strip()] if l.startswith('omnibus ')] \n\
+print(dep) \n\
+lines[pos+1] = '    ' + chr(39) + dep + chr(39) + ',' \n\
+with open('setup.py', 'w') as f: \n\
+    f.write('\\\\n'.join(lines + [''])) \n\
+" | .venv/bin/python -
+
 
 ### Dist
 

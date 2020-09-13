@@ -48,9 +48,13 @@ PACKAGE_DATA = [
 
 
 INSTALL_REQUIRES = [
+
     'Jinja2>=2.11',
     'SQLAlchemy>=1.3',
-    'omnibus>=0.100',
+
+    # @omnibus-dep@
+    'omnibus @ git+https://github.com/wrmsr/omnibus@7404c55fce758faf73e9feed343392b709d604df',
+
 ]
 
 EXTRAS_REQUIRE = {
