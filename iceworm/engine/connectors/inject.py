@@ -5,22 +5,22 @@ from omnibus import inject as inj
 
 from . import impls
 from .. import elements as els
+from ...utils import configable as cfgabl
 from .collections import Connector
 from .collections import ConnectorSet
 
 
-def bind_connector_factory(binder: inj.Binder, cls: ta.Type[Connector]) -> None:
+def bind_connector_factory(binder: inj.Binder, impl_cls: ta.Type[Connector]) -> None:
     check.isinstance(binder, inj.Binder)
-    check.issubclass(cls, Connector)
+    check.issubclass(impl_cls, Connector)
 
-    binder.bind_class(cls, assists={'config'})
-    binder.new_dict_binder(ta.Type[Connector.Config], ta.Callable[..., Connector]).bind(cls.Config, to_provider=ta.Callable[..., cls])  # noqa
+    cfgabl.bind_impl(binder, Connector, impl_cls)
 
 
 def install(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
-    binder.new_dict_binder(ta.Type[Connector.Config], ta.Callable[..., Connector])
+    cfgabl.bind_dict(binder, Connector)
 
     bind_connector_factory(binder, impls.computed.ComputedConnector)
     bind_connector_factory(binder, impls.dual.DualConnector)

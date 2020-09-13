@@ -1,12 +1,12 @@
 """
 TODO:
- - ensure nodal interop
- - injection helper
+ - scoping?
 """
 import typing as ta
 import weakref
 
 from omnibus import check
+from omnibus import inject as inj
 from omnibus import lang
 
 
@@ -46,3 +46,19 @@ def get_impl(cfg: ta.Union[ta.Type[Configable.Config], Configable.Config]) -> ta
     else:
         raise TypeError(cfg)
     return _CFG_CLS_MAP[cfg_cls]
+
+
+def bind_impl(binder: inj.Binder, cls: ta.Type[Configable], impl_cls: ta.Type[Configable]) -> None:
+    check.isinstance(binder, inj.Binder)
+    check.issubclass(cls, Configable)
+    check.issubclass(impl_cls, cls)
+
+    binder.bind_class(impl_cls, assists={'config'})
+    binder.new_dict_binder(ta.Type[cls.Config], ta.Callable[..., cls]).bind(impl_cls.Config, to_provider=ta.Callable[..., impl_cls])  # noqa
+
+
+def bind_dict(binder: inj.Binder, cls: ta.Type[Configable]) -> None:
+    check.isinstance(binder, inj.Binder)
+    check.issubclass(cls, Configable)
+
+    binder.new_dict_binder(ta.Type[cls.Config], ta.Callable[..., cls])
