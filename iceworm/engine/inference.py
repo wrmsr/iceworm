@@ -99,7 +99,7 @@ class InferTableProcessor(els.ElementProcessor):
         def output(self) -> els.ElementSet:
             topo = [
                 check.isinstance(self._input[id], tars.Table)
-                for step in ocol.toposort({k: set(v) for k, v in self.id_dep_sets_by_id.items()})
+                for step in ocol.toposort(self.id_dep_sets_by_id)
                 for id in step
             ]
 
