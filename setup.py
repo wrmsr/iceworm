@@ -50,6 +50,8 @@ PACKAGE_DATA = [
 INSTALL_REQUIRES = [
 
     'Jinja2>=2.11',
+    'protobuf>=3.13',
+    'PyYAML>=5.3',
     'SQLAlchemy>=1.3',
 
     # @omnibus-dep@
