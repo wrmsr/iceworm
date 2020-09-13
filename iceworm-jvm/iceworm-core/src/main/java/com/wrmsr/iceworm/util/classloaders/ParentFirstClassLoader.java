@@ -65,7 +65,8 @@ public class ParentFirstClassLoader
                 try {
                     Class<?> clazz = findClass(name);
                     return resolveClass(clazz, resolve);
-                } catch (ClassNotFoundException ignored) {
+                }
+                catch (ClassNotFoundException ignored) {
                 }
             }
 
@@ -73,7 +74,8 @@ public class ParentFirstClassLoader
                 try {
                     Class<?> clazz = getParent().loadClass(name);
                     return resolveClass(clazz, resolve);
-                } catch (ClassNotFoundException ignored) {
+                }
+                catch (ClassNotFoundException ignored) {
                 }
             }
 

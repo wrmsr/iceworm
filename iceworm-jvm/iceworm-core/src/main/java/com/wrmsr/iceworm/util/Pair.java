@@ -33,7 +33,6 @@ public interface Pair<K, V>
         return getSecond();
     }
 
-    @javax.annotation.concurrent.Immutable
     final class Immutable<K, V>
             implements Pair<K, V>
     {

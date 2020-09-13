@@ -22,7 +22,8 @@ public final class DelegatingClassLoader
         if (getParent() != null) {
             try {
                 return getParent().loadClass(clazz);
-            } catch (ClassNotFoundException cnfe) {
+            }
+            catch (ClassNotFoundException cnfe) {
             }
         }
 
@@ -30,7 +31,8 @@ public final class DelegatingClassLoader
         for (ClassLoader delegate : delegates) {
             try {
                 return delegate.loadClass(clazz);
-            } catch (ClassNotFoundException ncfe) {
+            }
+            catch (ClassNotFoundException ncfe) {
                 if (firstFail == null) {
                     firstFail = ncfe;
                 }

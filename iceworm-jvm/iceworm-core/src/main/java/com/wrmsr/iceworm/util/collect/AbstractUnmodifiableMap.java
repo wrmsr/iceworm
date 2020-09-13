@@ -1,12 +1,10 @@
 package com.wrmsr.iceworm.util.collect;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-@Immutable
 public abstract class AbstractUnmodifiableMap<K, V>
         extends AbstractMap<K, V>
 {

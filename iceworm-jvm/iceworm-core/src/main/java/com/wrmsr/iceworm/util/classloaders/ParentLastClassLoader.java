@@ -53,7 +53,8 @@ public class ParentLastClassLoader
         {
             try {
                 return super.findClass(name);
-            } catch (ClassNotFoundException e) {
+            }
+            catch (ClassNotFoundException e) {
                 return realParent.loadClass(name);
             }
         }
@@ -74,7 +75,8 @@ public class ParentLastClassLoader
     {
         try {
             return childClassLoader.findClass(name);
-        } catch (ClassNotFoundException e) {
+        }
+        catch (ClassNotFoundException e) {
             return super.loadClass(name, resolve);
         }
     }

@@ -134,9 +134,11 @@ public final class MoreFunctions
             Method method = cls.getDeclaredMethod(name, args);
             MethodHandle handle = MethodHandles.lookup().unreflect(method);
             return Optional.of(handle);
-        } catch (NoSuchMethodException e) {
+        }
+        catch (NoSuchMethodException e) {
             return Optional.empty();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

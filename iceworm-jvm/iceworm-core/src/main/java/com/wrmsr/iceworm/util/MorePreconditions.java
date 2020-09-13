@@ -11,8 +11,8 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.wrmsr.iceworm.util.MoreCollectors.toCheckSingle;
+import static com.wrmsr.iceworm.util.MoreCollectors.toImmutableList;
 
 public final class MorePreconditions
 {

@@ -12,7 +12,8 @@ public interface ThrowingSupplier<T>
     {
         try {
             return supplier.get();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

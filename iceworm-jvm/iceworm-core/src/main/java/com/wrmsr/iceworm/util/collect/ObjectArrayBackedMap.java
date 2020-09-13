@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.wrmsr.iceworm.util.Pair;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
@@ -21,9 +20,9 @@ import java.util.stream.StreamSupport;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.wrmsr.iceworm.util.MoreCollections.immutableMapItems;
 import static com.wrmsr.iceworm.util.MoreCollectors.toImmutableMap;
+import static com.wrmsr.iceworm.util.MoreCollectors.toImmutableSet;
 import static com.wrmsr.iceworm.util.MorePreconditions.checkUnique;
 import static java.util.function.Function.identity;
 
@@ -31,7 +30,6 @@ import static java.util.function.Function.identity;
 public final class ObjectArrayBackedMap<K>
         implements Map<K, Object>, Ordered
 {
-    @Immutable
     public static final class Shape<K>
             implements Set<K>
     {

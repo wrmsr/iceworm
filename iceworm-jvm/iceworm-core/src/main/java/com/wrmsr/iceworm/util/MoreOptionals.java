@@ -59,7 +59,8 @@ public final class MoreOptionals
         if (value.isPresent()) {
             Integer ret = fn.apply(value.getAsInt());
             return ret == null ? OptionalInt.empty() : OptionalInt.of(ret);
-        } else {
+        }
+        else {
             return OptionalInt.empty();
         }
     }
@@ -86,7 +87,8 @@ public final class MoreOptionals
     {
         if (o.isPresent()) {
             return ImmutableList.of(o.get());
-        } else {
+        }
+        else {
             return ImmutableList.of();
         }
     }
@@ -95,7 +97,8 @@ public final class MoreOptionals
     {
         if (o.isPresent()) {
             return ImmutableSet.of(o.get());
-        } else {
+        }
+        else {
             return ImmutableSet.of();
         }
     }
@@ -104,7 +107,8 @@ public final class MoreOptionals
     {
         if (o.isPresent()) {
             return Stream.of(o.get());
-        } else {
+        }
+        else {
             return Stream.empty();
         }
     }
@@ -113,7 +117,8 @@ public final class MoreOptionals
     {
         if (o.isPresent()) {
             return IntStream.of(o.getAsInt());
-        } else {
+        }
+        else {
             return IntStream.empty();
         }
     }
@@ -123,7 +128,8 @@ public final class MoreOptionals
     {
         if (cls.isInstance(obj)) {
             return Optional.of((T) obj);
-        } else {
+        }
+        else {
             return Optional.empty();
         }
     }
@@ -132,7 +138,8 @@ public final class MoreOptionals
     {
         if (optional.isPresent()) {
             ifPresent.accept(optional.get());
-        } else {
+        }
+        else {
             orElse.run();
         }
     }
@@ -141,7 +148,8 @@ public final class MoreOptionals
     {
         if (optional.isPresent()) {
             return ifPresent.apply(optional.get());
-        } else {
+        }
+        else {
             return orElse.get();
         }
     }

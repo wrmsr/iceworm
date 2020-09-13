@@ -12,7 +12,8 @@ public interface ThrowingConsumer<T>
     {
         try {
             consumer.accept(t);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

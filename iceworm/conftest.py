@@ -12,6 +12,9 @@ from .tests.harness.fixtures import _scope_listener_session  # noqa
 from .tests.harness.fixtures import harness  # noqa
 
 
+_TEST_FAILED_INCREMENTAL: ta.Dict[str, ta.Dict[ta.Tuple[int, ...], str]] = {}
+
+
 def pytest_addoption(parser):
     parser.addoption('--no-slow', action='store_true', default=False, help='disable slow tests')
     parser.addoption('--no-online', action='store_true', default=False, help='disable online tests')
@@ -34,6 +37,25 @@ def pytest_collection_modifyitems(config, items):
         for item in items:
             if 'online' in item.keywords:
                 item.add_marker(skip_online)
+
+
+def pytest_runtest_setup(item):
+    if 'incremental' in item.keywords:
+        cls_name = str(item.cls)
+        if cls_name in _TEST_FAILED_INCREMENTAL:
+            parametrize_index = tuple(item.callspec.indices.values()) if hasattr(item, 'callspec') else ()
+            test_name = _TEST_FAILED_INCREMENTAL[cls_name].get(parametrize_index, None)
+            if test_name is not None:
+                pytest.xfail('previous test failed ({})'.format(test_name))
+
+
+def pytest_runtest_makereport(item, call):
+    if 'incremental' in item.keywords:
+        if call.excinfo is not None:
+            cls_name = str(item.cls)
+            parametrize_index = tuple(item.callspec.indices.values()) if hasattr(item, 'callspec') else ()
+            test_name = item.originalname or item.name
+            _TEST_FAILED_INCREMENTAL.setdefault(cls_name, {}).setdefault(parametrize_index, test_name)
 
 
 # FIXME: gross

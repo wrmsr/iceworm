@@ -21,7 +21,8 @@ public final class MoreSystem
             Object current = cls.getDeclaredMethod("current").invoke(null);
             long pid = (long) cls.getDeclaredMethod("pid").invoke(current);
             return OptionalLong.of(pid);
-        } catch (ReflectiveOperationException e) {
+        }
+        catch (ReflectiveOperationException e) {
             return OptionalLong.empty();
         }
     }
@@ -50,7 +51,8 @@ public final class MoreSystem
                 while (!Thread.currentThread().isInterrupted() && (line = br.readLine()) != null) {
                     lines.add(line);
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });

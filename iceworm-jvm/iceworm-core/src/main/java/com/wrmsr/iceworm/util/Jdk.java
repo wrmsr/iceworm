@@ -15,9 +15,11 @@ public final class Jdk
         String[] parts = spec.split("\\.");
         if (parts.length == 1) {
             return Integer.parseInt(spec);
-        } else if (parts.length == 2 && parts[0].equals("1")) {
+        }
+        else if (parts.length == 2 && parts[0].equals("1")) {
             return Integer.parseInt(parts[1]);
-        } else {
+        }
+        else {
             throw new IllegalArgumentException(spec);
         }
     }

@@ -12,9 +12,11 @@ public interface ThrowableThrowingSupplier<T>
     {
         try {
             return supplier.get();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new RuntimeException(e);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e) {
             Thread.currentThread().getUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
             throw new RuntimeException(e);
         }

@@ -33,6 +33,24 @@ public final class MoreCollectors
     {
     }
 
+    public static <E> Collector<E, ?, ImmutableList<E>> toImmutableList()
+    {
+        return Collector.<E, ImmutableList.Builder<E>, ImmutableList<E>>of(
+                ImmutableList::builder,
+                ImmutableList.Builder::add,
+                (left, right) -> left.addAll(right.build()),
+                ImmutableList.Builder::build);
+    }
+
+    public static <E> Collector<E, ?, ImmutableSet<E>> toImmutableSet()
+    {
+        return Collector.<E, ImmutableSet.Builder<E>, ImmutableSet<E>>of(
+                ImmutableSet::builder,
+                ImmutableSet.Builder::add,
+                (left, right) -> left.addAll(right.build()),
+                ImmutableSet.Builder::build);
+    }
+
     public static <T> Collector<T, ?, ImmutableMultiset<T>> toImmutableMultiset()
     {
         return Collector.<T, ImmutableMultiset.Builder<T>, ImmutableMultiset<T>>of(
@@ -238,12 +256,20 @@ public final class MoreCollectors
             Function<? super T, ? extends K> keyFunction,
             Function<? super T, ? extends V> valueFunction)
     {
-        return ImmutableMap.toImmutableMap(keyFunction, valueFunction);
+        return Collector.of(
+                ImmutableMap::builder,
+                (ImmutableMap.Builder<K, V> map, T in) -> map.put(keyFunction.apply(in), valueFunction.apply(in)),
+                (ImmutableMap.Builder<K, V> left, ImmutableMap.Builder<K, V> right) -> {
+                    left.putAll(right.build());
+                    return left;
+                },
+                ImmutableMap.Builder::build,
+                Collector.Characteristics.UNORDERED);
     }
 
     public static <K, V> Collector<Map.Entry<K, V>, ?, ImmutableMap<K, V>> toImmutableMap()
     {
-        return ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue);
+        return toImmutableMap(Map.Entry::getKey, Map.Entry::getValue);
     }
 
     public static <T, K, V> Collector<T, ?, ImmutableMap<K, V>> toImmutableMap(
@@ -251,7 +277,37 @@ public final class MoreCollectors
             Function<? super T, ? extends V> valueFunction,
             BinaryOperator<V> mergeFunction)
     {
-        return ImmutableMap.toImmutableMap(keyFunction, valueFunction, mergeFunction);
+        return Collector.of(
+                HashMap::new,
+                (HashMap<K, V> map, T in) -> {
+                    K key = keyFunction.apply(in);
+                    V value = valueFunction.apply(in);
+                    if (map.containsKey(key)) {
+                        V curValue = map.get(key);
+                        V newValue = mergeFunction.apply(curValue, value);
+                        map.put(key, newValue);
+                    }
+                    else {
+                        map.put(key, value);
+                    }
+                },
+                (HashMap<K, V> left, HashMap<K, V> right) -> {
+                    for (Map.Entry<K, V> item : right.entrySet()) {
+                        K key = item.getKey();
+                        V value = item.getValue();
+                        if (left.containsKey(key)) {
+                            V curValue = left.get(key);
+                            V newValue = mergeFunction.apply(curValue, value);
+                            left.put(key, newValue);
+                        }
+                        else {
+                            left.put(key, value);
+                        }
+                    }
+                    return left;
+                },
+                ImmutableMap::copyOf,
+                Collector.Characteristics.UNORDERED);
     }
 
     public static <T, K> Collector<T, ?, Map<K, Set<T>>> groupingBySet(Function<? super T, ? extends K> classifier)

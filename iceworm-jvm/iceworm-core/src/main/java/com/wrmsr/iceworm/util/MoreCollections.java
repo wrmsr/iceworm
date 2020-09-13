@@ -1,11 +1,9 @@
 package com.wrmsr.iceworm.util;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Streams;
 import com.wrmsr.iceworm.util.collect.Ordered;
 
 import java.lang.reflect.Array;
@@ -30,11 +28,11 @@ import java.util.stream.StreamSupport;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newIdentityHashSet;
+import static com.wrmsr.iceworm.util.MoreCollectors.toImmutableList;
 import static com.wrmsr.iceworm.util.MoreCollectors.toImmutableMap;
+import static com.wrmsr.iceworm.util.MoreCollectors.toImmutableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 
@@ -67,9 +65,11 @@ public final class MoreCollections
 
         if (aCompType.isAssignableFrom(bCompType)) {
             resCompType = aCompType;
-        } else if (bCompType.isAssignableFrom(aCompType)) {
+        }
+        else if (bCompType.isAssignableFrom(aCompType)) {
             resCompType = bCompType;
-        } else {
+        }
+        else {
             throw new IllegalArgumentException();
         }
 
@@ -124,7 +124,8 @@ public final class MoreCollections
         V value = fn.apply(key);
         if (map.containsKey(key)) {
             checkState(map.get(key).equals(value));
-        } else {
+        }
+        else {
             map.put(key, value);
         }
         return value;
@@ -247,10 +248,10 @@ public final class MoreCollections
         @Override
         public String toString()
         {
-            return MoreObjects.toStringHelper(this)
-                    .add("index", index)
-                    .add("item", item)
-                    .toString();
+            return "EnumeratedElement{" +
+                    "index=" + index +
+                    ", item=" + item +
+                    '}';
         }
 
         public int getIndex()
@@ -338,7 +339,7 @@ public final class MoreCollections
 
     public static <T> Map<T, Integer> buildListIndexMap(List<T> list)
     {
-        return Streams.zip(
+        return MoreStreams.zip(
                 IntStream.range(0, list.size()).boxed(), list.stream(), (i, n) -> new Pair.Immutable<>(n, i)
         ).collect(toImmutableMap());
     }
@@ -464,7 +465,8 @@ public final class MoreCollections
         for (T item : items) {
             if (delimit) {
                 delimiter.run();
-            } else {
+            }
+            else {
                 delimit = true;
             }
             consumer.accept(item);

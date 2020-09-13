@@ -12,9 +12,11 @@ public interface ThrowableThrowingConsumer<T>
     {
         try {
             consumer.accept(t);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new RuntimeException(e);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e) {
             Thread.currentThread().getUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
             throw new RuntimeException(e);
         }

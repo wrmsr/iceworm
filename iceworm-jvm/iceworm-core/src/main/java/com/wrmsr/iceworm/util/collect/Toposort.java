@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.wrmsr.iceworm.util.MoreCollectors.toImmutableSet;
 import static java.util.function.Function.identity;
 
 public final class Toposort
