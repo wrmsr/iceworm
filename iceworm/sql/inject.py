@@ -1,18 +1,27 @@
+import typing as ta
+
 from omnibus import check
 from omnibus import inject as inj
 
+from . import postgres
+from . import snowflake
+from ..utils import configable as cfgabl
 from .adapter import Adapter
 
 
-def bind_adapter_factory(binder: inj.Binder, cls: ta.Type[Adapter]) -> None:
+def bind_adapter_impl(binder: inj.Binder, cls: ta.Type[Adapter]) -> None:
     check.isinstance(binder, inj.Binder)
     check.issubclass(cls, Adapter)
 
-    binder.bind_class(cls, assists={'config'})
-    binder.new_dict_binder(ta.Type[Adapter.Config], ta.Callable[..., Connector]).bind(cls.Config, to_provider=ta.Callable[..., cls])  # noqa
+    cfgabl.bind_impl(binder, Adapter, cls)
 
 
 def install(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
+
+    bind_adapter_impl(binder, postgres.PostgresAdapter)
+    bind_adapter_impl(binder, snowflake.SnowflakeAdapter)
+
+    cfgabl.bind_factory(binder, Adapter)
 
     return binder

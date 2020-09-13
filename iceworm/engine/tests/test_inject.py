@@ -17,6 +17,7 @@ from .. import planning as pln
 from .. import rules as rls
 from .. import sites
 from ... import domains as doms
+from ... import sql
 from ...sql.tests.helpers import DbManager
 from ...tests import harness as har
 from ...trees import nodes as no
@@ -76,6 +77,7 @@ def test_inject(harness: har.Harness):
 
         binder = inj.create_binder()
         binder.bind(sec.Secrets, to_instance=secrets)
+        sql.inject.install(binder)
         install_element_processors(binder)
         drv = els.inject.InjectionElementProcessingDriver(binder)
         elements = drv.run([

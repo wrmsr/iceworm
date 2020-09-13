@@ -11,6 +11,7 @@ import sqlalchemy as sa
 
 from .... import alchemy as alch
 from .... import metadata as md
+from .... import sql
 from ....types import QualifiedName
 from ....utils import secrets as sec
 from ...utils import parse_simple_select_table
@@ -32,8 +33,12 @@ class SqlConnector(_Connector['SqlConnector', 'SqlConnector.Config']):
 
         kwargs: ta.Mapping[str, ta.Any] = dc.field(ocol.frozendict(), coerce=ocol.frozendict)
 
-    def __init__(self, config: Config) -> None:
+        adapter: sql.Adapter.Config = dc.field(sql.postgres.PostgresAdapter.Config(), check=lambda o: isinstance(o, sql.Adapter.Config))  # noqa
+
+    def __init__(self, config: Config, adapter: sql.Adapter) -> None:
         super().__init__(check.isinstance(config, SqlConnector.Config))
+
+        self._adapter = check.isinstance(adapter, sql.Adapter)
 
         self._engine: ta.Optional[sa.engine.Engine] = None
 

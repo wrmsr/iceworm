@@ -6,7 +6,7 @@ TODO:
 from omnibus import lang
 import sqlalchemy as sa
 
-from .adapter import Adapter
+from .adapter import Adapter as _Adapter
 from .elements import column_list_alias
 
 
@@ -38,9 +38,9 @@ select multi_exec(array['select 1 x', 'select 2 y union select 3']);
 """
 
 
-class PostgresAdapter(Adapter):
+class PostgresAdapter(_Adapter):
 
-    class Config(Adapter.Config):
+    class Config(_Adapter.Config):
         pass
 
     def __init__(self, config: Config = Config()) -> None:

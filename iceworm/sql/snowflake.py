@@ -62,7 +62,7 @@ import sqlalchemy as sa
 import sqlalchemy.ext.compiler  # noqa
 import sqlalchemy.sql.selectable  # noqa
 
-from .adapter import Adapter
+from .adapter import Adapter as _Adapter
 
 
 EXEC_MULTI_SP_SRC = """
@@ -209,9 +209,9 @@ def visit_kwarg(element: Kwarg, compiler, **kwargs):
 kwarg = Kwarg
 
 
-class SnowflakeAdapter(Adapter):
+class SnowflakeAdapter(_Adapter):
 
-    class Config(Adapter.Config):
+    class Config(_Adapter.Config):
         pass
 
     def __init__(self, config: Config = Config()) -> None:

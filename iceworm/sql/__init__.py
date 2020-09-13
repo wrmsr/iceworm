@@ -1,3 +1,4 @@
+from . import inject  # noqa
 from . import postgres  # noqa
 from . import snowflake  # noqa
 from . import tpch  # noqa
