@@ -1,13 +1,15 @@
 """
 TODO:
- - read docker-compose.yml
  - abstract project name
 """
+import os.path
 import typing as ta
 
+from omnibus import check
 from omnibus import docker
 from omnibus import lifecycles as lc
 from omnibus import properties
+import yaml
 
 from . import harness as har
 
@@ -41,4 +43,16 @@ class DockerManager(lc.ContextManageableLifecycle):
             res = {lut[k]: v for k, v in dct.items()}
             ret.update(res)
             self._container_tcp_endpoints.update(res)
+        return ret
+
+    @properties.cached
+    @property
+    def compose_config(self) -> ta.Mapping[str, ta.Any]:
+        with open(os.path.join(os.path.dirname(__file__), '../../docker/docker-compose.yml'), 'r') as f:
+            buf = f.read()
+        dct = yaml.safe_load(buf)
+        ret = {}
+        for n, c in dct['services'].items():
+            check.state(n.startswith(self.PREFIX))
+            ret[n[len(self.PREFIX):]] = c
         return ret

@@ -19,7 +19,8 @@ class DbManager(lc.ContextManageableLifecycle):
     @property
     def pg_url(self) -> str:
         [(host, port)] = self._dm.get_container_tcp_endpoints([('postgres', 5432)]).values()
-        url = f'postgresql+psycopg2://iceworm:iceworm@{host}:{port}'
+        env = self._dm.compose_config['postgres']['environment']
+        url = f"postgresql+psycopg2://{env['POSTGRES_USER']}:{env['POSTGRES_PASSWORD']}@{host}:{port}"
         with lang.disposing(sa.engine.create_engine(url)) as engine:
             clean_pg(engine)
         return url
