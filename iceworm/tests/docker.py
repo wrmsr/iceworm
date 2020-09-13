@@ -17,6 +17,11 @@ from . import harness as har
 @har.bind(har.Session)
 class DockerManager(lc.ContextManageableLifecycle):
 
+    def __init__(self, *, request: ta.Optional[har.FixtureRequest] = None) -> None:
+        super().__init__()
+
+        self._request = check.isinstance(request, (har.FixtureRequest, None))
+
     PREFIX = 'iceworm-'
 
     @properties.stateful_cached

@@ -59,6 +59,12 @@ def pytest_runtest_makereport(item, call):
             test_name = item.originalname or item.name
             _TEST_FAILED_INCREMENTAL.setdefault(cls_name, {}).setdefault(parametrize_index, test_name)
 
+    # if call.excinfo is not None:
+    #     from .tests.helpers import XfailException
+    #     if call.excinfo.type == XfailException:
+    #         from _pytest.reports import TestReport
+    #         return TestReport.from_item_and_call(item, call)
+
 
 # FIXME: gross
 @lang.cached_nullary
