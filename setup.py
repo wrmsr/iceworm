@@ -86,7 +86,11 @@ if __name__ == '__main__':
         package_data={PROJECT: PACKAGE_DATA},
         include_package_data=True,
 
-        entry_points={},
+        entry_points={
+            'console_scripts': [
+                f'{PROJECT} = {PROJECT}.cli:main',
+            ],
+        },
 
         install_requires=INSTALL_REQUIRES,
         extras_require=EXTRAS_REQUIRE,
