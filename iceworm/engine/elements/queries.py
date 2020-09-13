@@ -35,7 +35,7 @@ class QueryParsingElementProcessor(ElementProcessor):
 
         self._parser = check.callable(parser)
 
-    def processes(self, elements: ElementSet) -> ta.Iterable[Element]:
+    def match(self, elements: ElementSet) -> ta.Iterable[Element]:
         return [
             e
             for e in elements
@@ -81,7 +81,7 @@ class QueryBasicAnalysisElementProcesor(ElementProcessor):
     def dependencies(cls) -> ta.Iterable[ta.Type['ElementProcessor']]:
         return {*super().dependencies(), QueryParsingElementProcessor}
 
-    def processes(self, elements: ElementSet) -> ta.Iterable[Element]:
+    def match(self, elements: ElementSet) -> ta.Iterable[Element]:
         return [
             e
             for e in elements

@@ -41,7 +41,7 @@ class UrlSecretsReplacer(els.ElementProcessor):
 
         self._secrets = check.isinstance(secrets, sec.Secrets)
 
-    def processes(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
+    def match(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
         return [e for e in elements.get_type_set(ctrs.impls.sql.SqlConnector.Config) if e.url_secret]
 
     def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:

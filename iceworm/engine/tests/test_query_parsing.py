@@ -15,8 +15,8 @@ def test_query_element():
     print(e)
 
     ep = els.queries.QueryParsingElementProcessor(par.parse_stmt)
-    assert ep.processes(els.ElementSet.of([e]))
+    assert ep.match(els.ElementSet.of([e]))
     r = list(ep.process(els.ElementSet.of([e])))
     print(r)
     assert isinstance(e.query, StrQuery)
-    assert not ep.processes(els.ElementSet.of(r))
+    assert not ep.match(els.ElementSet.of(r))

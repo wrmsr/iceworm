@@ -58,7 +58,7 @@ class SiteProcessor(els.ElementProcessor):
     def phases(cls) -> ta.Iterable[els.Phase]:
         return [els.Phases.SITES]
 
-    def processes(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
+    def match(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
         return elements.get_type_set(Site)
 
     def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:

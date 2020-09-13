@@ -75,7 +75,7 @@ class ElementProcessor(lang.Abstract):
         return []
 
     @abc.abstractmethod
-    def processes(self, elements: ElementSet) -> ta.Iterable[Element]:
+    def match(self, elements: ElementSet) -> ta.Iterable[Element]:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -134,7 +134,7 @@ class ElementProcessingDriver:
             while True:
                 dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Element]] = ocol.IdentityKeyDict()
                 for ep in eps:
-                    epes = ocol.IdentitySet(check.isinstance(e, Element) for e in ep.processes(elements))
+                    epes = ocol.IdentitySet(check.isinstance(e, Element) for e in ep.match(elements))
                     if epes:
                         check.empty([e for e in epes if Frozen in e.meta])
                         dct[ep] = epes
