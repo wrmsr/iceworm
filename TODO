@@ -1,4 +1,5 @@
 - offline test switch (no snowflake)
  - no docker?
 - dc compilation keyed by srcfile hash
+- ppci to scratch
 
