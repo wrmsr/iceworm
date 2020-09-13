@@ -33,7 +33,7 @@ class _Scope(inj.Scope, lang.Abstract, lang.Sealed):
         raise NotImplementedError
 
     def provide(self, binding: inj.Binding[T]) -> T:
-        drv = inj.Injector.current[Driver]
+        drv = inj.Injector.current[InjectionElementProcessingDriver]
         state = drv._scope_states[self]
         if binding.key == inj.Key(Phase):
             return self.phase_pair().phase
@@ -88,7 +88,7 @@ class _CurrentScope(inj.Scope, lang.Final):
 
     def provide(self, binding: inj.Binding[T]) -> T:
         if binding.key == inj.Key(ElementSet):
-            return check.isinstance(inj.Injector.current[Driver]._elements, ElementSet)
+            return check.isinstance(inj.Injector.current[InjectionElementProcessingDriver]._elements, ElementSet)
         else:
             raise NotImplementedError
 
@@ -97,7 +97,7 @@ class _Eager(dc.Pure):
     key: inj.Key
 
 
-class Driver:
+class InjectionElementProcessingDriver:
 
     def __init__(self, *binders: inj.Binder) -> None:
         super().__init__()
@@ -109,7 +109,7 @@ class Driver:
             if s.phase_pair().sub_phase == SubPhases.MAIN:
                 binder.new_set_binder(ElementProcessor, annotated_with=s.phase_pair().phase, in_=s)
 
-        binder.bind(Driver, to_instance=self)
+        binder.bind(InjectionElementProcessingDriver, to_instance=self)
 
         binder._elements.append(inj.types.ScopeBinding(_CurrentScope))
         binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(ElementSet), in_=_CurrentScope)

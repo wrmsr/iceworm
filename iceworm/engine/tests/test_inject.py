@@ -76,7 +76,7 @@ def test_inject(harness: har.Harness):
         binder = inj.create_binder()
         binder.bind(sec.Secrets, to_instance=secrets)
         install_element_processors(binder)
-        drv = els.inject.Driver(binder)
+        drv = els.inject.InjectionElementProcessingDriver(binder)
         elements = drv.run([
             sites.Site('site0.yml'),
         ])
