@@ -1,6 +1,9 @@
 """
 TODO:
  - scoping?
+ - ** config field inspection like w/ eles... **
+  - config field names get injected with their injected impls
+  - just make configs nodal?
 """
 import typing as ta
 import weakref
