@@ -34,7 +34,6 @@ Alt conns:
 """
 import abc
 import typing as ta
-import weakref
 
 from omnibus import check
 from omnibus import dataclasses as dc
@@ -44,6 +43,7 @@ from omnibus import lang
 from .. import elements as els
 from ... import metadata as md
 from ...types import QualifiedName
+from ...utils import configable as cfgabl
 from ...utils import serde
 
 
@@ -101,45 +101,19 @@ class ListRowSink(RowSink):
         self._rows.extend(rows)
 
 
-class Connector(lang.Abstract, ta.Generic[ConnectorT, ConnectorConfigT]):
+class Connector(ta.Generic[ConnectorT, ConnectorConfigT], cfgabl.Configable[ConnectorConfigT], lang.Abstract):
 
-    class Config(els.Element, abstract=True):
+    class Config(els.Element, cfgabl.Configable.Config, abstract=True):
 
-        dc.metadata({els.PhaseFrozen: els.PhaseFrozen(els.Phases.CONNECTORS)})
-
-        _cls_name: ta.ClassVar[str]
-
-        def __init_subclass__(cls, **kwargs) -> None:
-            super().__init_subclass__(**kwargs)
-
-            check.state(cls.__name__ == 'Config')
-            ocn, _ = cls.__qualname__.split('.')
-            check.state(ocn.endswith('Connector'))
-            cls._cls_name = lang.decamelize(ocn)
-
-        dc.metadata({serde.Name: lambda cls: cls._cls_name})
+        dc.metadata({
+            els.PhaseFrozen: els.PhaseFrozen(els.Phases.CONNECTORS),
+            serde.Name: lambda cls: lang.decamelize(cfgabl.get_impl(cls).__name__),
+        })
 
         id: els.Id = dc.field(check=lambda s: isinstance(s, els.Id) and s)
 
-    CLS_MAP: ta.ClassVar[ta.Mapping[str, ta.Type['Connector']]] = weakref.WeakValueDictionary()
-    CONFIG_CLS_MAP: ta.ClassVar[ta.Mapping[ta.Type[Config], ta.Type['Connector']]] = weakref.WeakValueDictionary()
-
-    def __init_subclass__(cls, **kwargs) -> None:
-        super().__init_subclass__(**kwargs)
-
-        if lang.Abstract not in cls.__bases__:
-            check.state(cls.__name__.endswith('Connector'))
-            n = check.not_empty(lang.decamelize(cls.__name__))
-            check.not_in(n, Connector.CLS_MAP)
-            cfcls = check.issubclass(cls.Config, Connector.Config)
-            check.not_in(cfcls, Connector.CONFIG_CLS_MAP)
-            Connector.CLS_MAP[n] = cls
-            Connector.CONFIG_CLS_MAP[cfcls] = cls
-
     def __init__(self, config: ConnectorConfigT) -> None:
-        super().__init__()
-
-        self._config: ConnectorConfigT = check.isinstance(config, Connector.Config)
+        super().__init__(config)
 
     defs.repr('id')
 
@@ -163,7 +137,7 @@ class Connector(lang.Abstract, ta.Generic[ConnectorT, ConnectorConfigT]):
         if isinstance(obj, Connector):
             return obj
         elif isinstance(obj, Connector.Config):
-            return cls.CONFIG_CLS_MAP[type(obj)](obj)
+            return check.isinstance(check.issubclass(cfgabl.get_impl(obj), cls)(obj), Connector)
         else:
             raise TypeError(obj)
 

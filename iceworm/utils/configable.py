@@ -36,3 +36,13 @@ class Configable(ta.Generic[ConfigableConfigT], lang.Abstract):
         super().__init__()
 
         self._config: ConfigableConfigT = check.isinstance(config, self.Config)
+
+
+def get_impl(cfg: ta.Union[ta.Type[Configable.Config], Configable.Config]) -> ta.Type[Configable]:
+    if isinstance(cfg, type):
+        cfg_cls = check.issubclass(cfg, Configable.Config)
+    elif isinstance(cfg, Configable.Config):
+        cfg_cls = type(cfg)
+    else:
+        raise TypeError(cfg)
+    return _CFG_CLS_MAP[cfg_cls]

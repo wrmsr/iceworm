@@ -22,4 +22,5 @@ class BThing(Thing['BThing.Config']):
 
 
 def test_configable():
-    pass
+    assert cfgabl.get_impl(AThing.Config) is AThing
+    assert cfgabl.get_impl(BThing.Config()) is BThing
