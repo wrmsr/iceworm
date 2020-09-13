@@ -65,3 +65,19 @@ def bind_dict(binder: inj.Binder, cls: ta.Type[Configable]) -> None:
     check.issubclass(cls, Configable)
 
     binder.new_dict_binder(ta.Type[cls.Config], ta.Callable[..., cls])
+
+
+def bind_factory(binder: inj.Binder, cls: ta.Type[Configable]) -> None:
+    check.isinstance(binder, inj.Binder)
+    check.issubclass(cls, Configable)
+
+    bind_dict(binder, cls)
+
+    def provide(
+            config: cls.Config,
+            facs: ta.Mapping[ta.Type[cls.Config], ta.Callable[..., cls]],
+    ) -> cls:
+        fac = facs[type(config)]
+        return fac(config=config)
+
+    binder.bind_callable(provide, assists={'config'})

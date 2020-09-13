@@ -20,7 +20,7 @@ def bind_connector_impl(binder: inj.Binder, impl_cls: ta.Type[Connector]) -> Non
 def install(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
-    cfgabl.bind_dict(binder, Connector)
+    cfgabl.bind_factory(binder, Connector)
 
     bind_connector_impl(binder, impls.computed.ComputedConnector)
     bind_connector_impl(binder, impls.dual.DualConnector)
@@ -30,11 +30,10 @@ def install(binder: inj.Binder) -> inj.Binder:
 
     def provide_connector_set(
             es: els.ElementSet,
-            facs: ta.Mapping[ta.Type[Connector.Config], ta.Callable[..., Connector]],
+            fac: ta.Callable[..., Connector],
     ) -> ConnectorSet:
         lst = []
         for cfg in es.get_type_set(Connector.Config):
-            fac = facs[type(cfg)]
             ctor = fac(config=cfg)
             lst.append(ctor)
         return ConnectorSet.of(lst)
