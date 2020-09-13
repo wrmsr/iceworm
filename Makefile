@@ -246,6 +246,10 @@ typecheck: venv
 test: build
 	.venv/bin/pytest -v $(PROJECT)
 
+.PHONY: test-offline
+test-offline: build
+	.venv/bin/pytest -v --no-online $(PROJECT)
+
 .PHONY: test-38
 test-38: build-38
 	.venv-38/bin/pytest -v -n auto $(PROJECT)

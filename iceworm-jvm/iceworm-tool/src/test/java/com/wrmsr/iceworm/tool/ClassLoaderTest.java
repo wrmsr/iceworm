@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.wrmsr.iceworm.util.Jdk;
-import com.wrmsr.iceworm.util.ParentFirstClassLoader;
+import com.wrmsr.iceworm.util.classloaders.ParentFirstClassLoader;
 import io.airlift.resolver.ArtifactResolver;
 import io.airlift.resolver.DefaultArtifact;
 import junit.framework.TestCase;

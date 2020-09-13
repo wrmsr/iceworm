@@ -13,20 +13,27 @@ from .tests.harness.fixtures import harness  # noqa
 
 
 def pytest_addoption(parser):
-    parser.addoption('--offline', action='store_true', default=False, help='disable online tests')
+    parser.addoption('--no-slow', action='store_true', default=False, help='disable slow tests')
+    parser.addoption('--no-online', action='store_true', default=False, help='disable online tests')
 
 
 def pytest_configure(config):
+    config.addinivalue_line('markers', 'slow: mark test as slow')
     config.addinivalue_line('markers', 'online: mark test as online only')
 
 
 def pytest_collection_modifyitems(config, items):
-    if not config.getoption('--offline'):
-        return
-    skip_online = pytest.mark.skip(reason='omit --offline to run')
-    for item in items:
-        if 'online' in item.keywords:
-            item.add_marker(skip_online)
+    if config.getoption('--no-slow'):
+        skip_slow = pytest.mark.skip(reason='omit --no-slow to run')
+        for item in items:
+            if 'slow' in item.keywords:
+                item.add_marker(skip_slow)
+
+    if config.getoption('--no-online'):
+        skip_online = pytest.mark.skip(reason='omit --no-online to run')
+        for item in items:
+            if 'online' in item.keywords:
+                item.add_marker(skip_online)
 
 
 # FIXME: gross

@@ -1,4 +1,4 @@
-package com.wrmsr.iceworm.util;
+package com.wrmsr.iceworm.util.classloaders;
 
 import java.net.URL;
 import java.net.URLClassLoader;

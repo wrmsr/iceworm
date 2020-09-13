@@ -1,4 +1,4 @@
-package com.wrmsr.iceworm.util;
+package com.wrmsr.iceworm.util.classloaders;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;

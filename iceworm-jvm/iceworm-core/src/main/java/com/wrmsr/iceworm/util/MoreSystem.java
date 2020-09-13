@@ -50,8 +50,7 @@ public final class MoreSystem
                 while (!Thread.currentThread().isInterrupted() && (line = br.readLine()) != null) {
                     lines.add(line);
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
