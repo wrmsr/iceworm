@@ -12,7 +12,8 @@ from ... import sql
 from ...types import QualifiedName
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail
+@pytest.mark.online
 def test_conns():
     with contextlib.ExitStack() as es:
         engine = es.enter_context(lang.disposing(sa.create_engine(snowflake.get_url())))
@@ -34,7 +35,8 @@ def test_conns():
         print(metadata.tables['test'])
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail
+@pytest.mark.online
 def test_tpch():
     engine: sa.engine.Engine
     with contextlib.ExitStack() as es:
@@ -56,7 +58,8 @@ def test_tpch():
         tpch.populate_sa_tables(conn, metadata)
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail
+@pytest.mark.online
 def test_exec_multi():
     engine: sa.engine.Engine
     with contextlib.ExitStack() as es:

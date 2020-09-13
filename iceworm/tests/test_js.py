@@ -23,7 +23,7 @@ function add2(x, y) {
 """
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail
 def test_fallback_js(tmpdir):
     loop = js.build_loop('function(s){ return s + "!" }')
     proc = js.launch_node(loop)

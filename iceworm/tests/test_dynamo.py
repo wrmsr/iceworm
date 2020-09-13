@@ -3,7 +3,7 @@ import boto3.dynamodb.conditions
 import pytest
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail
 def test_docker_dynamo():
     if docker.is_in_docker():
         (host, port) = 'iceworm-dynamodb', 8000

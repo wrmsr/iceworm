@@ -92,7 +92,7 @@ class _InjectorScope(inj.Scope, lang.Abstract, lang.Sealed):
 
 
 Session = _InjectorScope._subclass(PytestScope.SESSION)
-Packagee = _InjectorScope._subclass(PytestScope.PACKAGE)
+Package = _InjectorScope._subclass(PytestScope.PACKAGE)
 Module = _InjectorScope._subclass(PytestScope.MODULE)
 Class = _InjectorScope._subclass(PytestScope.CLASS)
 Function = _InjectorScope._subclass(PytestScope.FUNCTION)

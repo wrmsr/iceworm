@@ -3,7 +3,7 @@ import pymongo
 import pytest
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail
 def test_docker_mongo():
     if docker.is_in_docker():
         (host, port) = 'iceworm-mongo', 27017

@@ -6,6 +6,7 @@ from omnibus import dataclasses as dc
 
 from ...utils import build_enum_value_map
 from ...utils import seq
+from ...utils import seq_or_none
 from ...utils import serde
 from .base import Expr
 from .base import Identifier
@@ -53,7 +54,7 @@ class Join(Relation):
     type: JoinType
     right: Relation
     condition: ta.Optional[Expr] = None
-    using: ta.Optional[ta.Sequence[Identifier]] = dc.field(None, coerce=seq)
+    using: ta.Optional[ta.Sequence[Identifier]] = dc.field(None, coerce=seq_or_none)
 
 
 class Pivot(Relation):
@@ -131,7 +132,7 @@ class Select(Selectable, Stmt):
     group_by: ta.Optional[Grouping] = dc.field(None, metadata={serde.Ignore: operator.not_})
     having: ta.Optional[Expr] = dc.field(None, metadata={serde.Ignore: operator.not_})
     qualify: ta.Optional[Expr] = dc.field(None, metadata={serde.Ignore: operator.not_})
-    order_by: ta.Optional[ta.Sequence[SortItem]] = dc.field(None, coerce=seq, metadata={serde.Ignore: operator.not_})
+    order_by: ta.Optional[ta.Sequence[SortItem]] = dc.field(None, coerce=seq_or_none, metadata={serde.Ignore: operator.not_})  # noqa
     limit: ta.Optional[int] = dc.field(None, metadata={serde.Ignore: operator.not_})
 
 

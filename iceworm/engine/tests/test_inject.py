@@ -23,6 +23,7 @@ from ...trees import nodes as no
 from ...trees import parsing as par
 from ...types import QualifiedName  # noqa
 from ...utils import secrets as sec  # noqa
+from ...utils import serde
 
 
 def get_ele_dependencies(elements: ta.Iterable[els.Element]) -> ta.Mapping[els.Element, ta.AbstractSet[els.Element]]:  # noqa
@@ -82,6 +83,9 @@ def test_inject(harness: har.Harness):
         ])
 
         print(elements)
+        selements = serde.serialize(list(elements))
+        delements = els.ElementSet.of(serde.deserialize(selements, ta.Sequence[els.Element]))
+        assert list(delements) == list(elements)
 
         connectors = drv[ctrs.ConnectorSet]
         conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(connectors)))

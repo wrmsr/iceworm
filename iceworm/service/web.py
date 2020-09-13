@@ -116,6 +116,11 @@ class App(lc.ContextManageableLifecycle):
         self._handlers_by_endpoint = unique_dict((e, h) for h in self._handlers for e in h.endpoints)
         self._all_paths = {e.path for h in self._handlers for e in h.endpoints}
 
+    def __enter__(self: lang.Self) -> lang.Self:
+        super().__enter__()
+        log.info('App started')
+        return self
+
     def __call__(self, environ: http.Environ, start_response: http.StartResponse) -> ta.Iterable[bytes]:
         method = environ.get('REQUEST_METHOD')
         path = environ.get('PATH_INFO')

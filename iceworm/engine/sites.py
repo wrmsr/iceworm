@@ -77,7 +77,11 @@ class SiteProcessor(els.ElementProcessor):
                             uchild = oyaml.unwrap(child)
                             el = serde.deserialize(uchild, els.Element)
                             sloc = SourceLocation(s.path, child.node.start_mark.line)
-                            el = dc.replace(el, anns={**el.anns, SourceLocation: sloc})
+                            el = dc.replace(
+                                el,
+                                anns={**el.anns, SourceLocation: sloc},
+                                meta={els.Origin: els.Origin(s)},
+                            )
                             lst.append(el)
                 return lst
 

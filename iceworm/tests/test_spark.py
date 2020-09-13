@@ -95,7 +95,7 @@ def test_local_launcher():
     launcher.launch()
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail
 def test_sql():
     # conn = hive.Connection(host='localhost', port=10000)
     # cur = conn.cursor()

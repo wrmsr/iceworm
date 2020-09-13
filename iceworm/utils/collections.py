@@ -27,6 +27,21 @@ def seq(it: ta.Optional[ta.Iterable[T]]) -> ta.Optional[ta.Sequence[T]]:
         return tuple(it)
 
 
+def seq_or_none(it: ta.Optional[ta.Iterable[T]]) -> ta.Optional[ta.Sequence[T]]:
+    if it is None:
+        return None
+    elif isinstance(it, str):
+        raise TypeError(it)
+    if isinstance(it, tuple):
+        ret = it
+    else:
+        ret = tuple(it)
+    if not ret:
+        return None
+    else:
+        return ret
+
+
 def mapping(obj: ta.Union[ta.Mapping[K, V], ta.Iterable[ta.Tuple[K, V]], None]) -> ta.Optional[ta.Mapping[K, V]]:
     if obj is None:
         return None
@@ -45,6 +60,21 @@ def abs_set(it: ta.Optional[ta.Iterable[T]]) -> ta.Optional[ta.AbstractSet[T]]:
         return it
     else:
         return frozenset(it)
+
+
+def abs_set_or_none(it: ta.Optional[ta.Iterable[T]]) -> ta.Optional[ta.AbstractSet[T]]:
+    if it is None:
+        return None
+    elif isinstance(it, str):
+        raise TypeError(it)
+    if isinstance(it, frozenset):
+        ret = it
+    else:
+        ret = frozenset(it)
+    if not ret:
+        return None
+    else:
+        return ret
 
 
 class IndexedSeq(ta.Sequence[T]):

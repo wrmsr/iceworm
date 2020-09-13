@@ -7,7 +7,7 @@ import tempfile
 import pytest
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail
 def test_pyarrow_parquet():
     import pyarrow as pa
     import pyarrow.parquet as pq
@@ -44,7 +44,7 @@ def test_pyarrow_parquet():
     print(list(table2))
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail
 def test_fastparquet_parquet():
     import pandas as pd
     import fastparquet

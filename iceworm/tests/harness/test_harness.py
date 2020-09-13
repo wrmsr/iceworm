@@ -12,7 +12,6 @@ from omnibus import inject as inj
 import omnibus.inject.scopes  # noqa
 import pytest
 
-from .docker import DockerManager
 from .harness import Harness
 from .harness import PytestScope
 
@@ -31,7 +30,7 @@ def some_url() -> str:
     return 'a url'
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail
 def test_harness():
     bnd = inj.create_binder()
     bnd.bind(some_url)
@@ -53,19 +52,3 @@ def test_harness_3(harness: Harness):
     print(req.function)
 
     print(harness[FixtureRequest])
-
-
-def test_harness_4(harness: Harness):
-    from .docker import DockerManager
-    dm = harness[DockerManager]
-    print(dm)
-
-
-@pytest.mark.parametrize('x', [1, 2, 3])
-def test_harness_5(harness: Harness, x):
-    req = harness[FixtureRequest]
-    print(req)
-    print(id(req))
-    dm = harness[DockerManager]
-    print(dm)
-    print(dm.get_container_tcp_endpoints([('iceworm-postgres', 5432)]))

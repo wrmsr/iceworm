@@ -34,7 +34,7 @@ def test_state():
     assert store.get(WorldState, store.key(wos[0])) == wos[0]
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail
 def test_state_script(harness: har.Harness):  # noqa
     with open(os.path.join(os.path.dirname(__file__), 'state.sql'), 'r') as f:
         buf = f.read()
