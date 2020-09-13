@@ -18,6 +18,7 @@ _TEST_SWITCHES = [
     'docker',
     'online',
     'slow',
+    'spark',
 ]
 
 

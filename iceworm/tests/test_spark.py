@@ -86,6 +86,7 @@ class Driver:
             self.context.stop()
 
 
+@pytest.mark.spark
 @skip_if_cant_import('pyspark')
 def test_local_launcher():
     launcher = sl.LocalLauncher(textwrap.dedent(f"""
@@ -95,6 +96,7 @@ def test_local_launcher():
     launcher.launch()
 
 
+@pytest.mark.spark
 @pytest.mark.xfail
 def test_sql():
     # conn = hive.Connection(host='localhost', port=10000)
