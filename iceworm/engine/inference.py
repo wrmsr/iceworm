@@ -74,22 +74,23 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
         @properties.cached
         @property
         def matches(self) -> ta.AbstractSet[els.Element]:
-            ret = ocol.IdentitySet()
-
-            for ele in self._input:
-                if isinstance(ele, tars.Table) and ele.md is None:
-                    rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
-                    ret.add(ele)
-                    ret.add(rows)
-
-                elif isinstance(ele, tars.Rows):
-                    root = check.isinstance(ele.query, AstQuery).root
-                    table_names = {
-                        tn.name.name
-                        for tn in els.queries.get_basic(ele, ele.query).get_node_type_set(no.Table)
-                    }
-
-            return ret
+            # ret = ocol.IdentitySet()
+            #
+            # for ele in self._input:
+            #     if isinstance(ele, tars.Table) and ele.md is None:
+            #         rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
+            #         ret.add(ele)
+            #         ret.add(rows)
+            #
+            #     elif isinstance(ele, tars.Rows):
+            #         root = check.isinstance(ele.query, AstQuery).root
+            #         table_names = {
+            #             tn.name.name
+            #             for tn in els.queries.get_basic(ele, ele.query).get_node_type_set(no.Table)
+            #         }
+            #
+            # return ret
+            return set()
 
         @properties.stateful_cached
         @property
