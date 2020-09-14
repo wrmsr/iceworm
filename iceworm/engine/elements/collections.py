@@ -24,7 +24,7 @@ T = ta.TypeVar('T')
 V = ta.TypeVar('V')
 
 
-class Analysis(dc.Enum, Dependable, allow_setattr=True):
+class Analysis(dc.Frozen, Dependable, abstract=True, allow_setattr=True):
     elements: 'ElementSet' = dc.field(check=lambda o: isinstance(o, ElementSet))
 
 

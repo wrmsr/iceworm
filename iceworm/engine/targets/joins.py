@@ -4,8 +4,8 @@ from omnibus import dataclasses as dc
 from omnibus import properties
 
 from .. import elements as els
+from .analyses import StrictTableDependenciesAnalysis
 from .reflect import ReflectReferencedTablesProcessor
-from .reflect import TableDependenciesAnalysis
 from .targets import Rows
 
 
@@ -13,7 +13,11 @@ class JoinSplittingProcessor(els.InstanceElementProcessor):
 
     @classmethod
     def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.ElementProcessor]]:
-        return {*super().cls_dependencies(), ReflectReferencedTablesProcessor, TableDependenciesAnalysis}
+        return {
+            *super().cls_dependencies(),
+            ReflectReferencedTablesProcessor,
+            StrictTableDependenciesAnalysis,
+        }
 
     class Instance(els.InstanceElementProcessor.Instance['JoinSplittingProcessor']):
 
@@ -22,7 +26,7 @@ class JoinSplittingProcessor(els.InstanceElementProcessor):
             return els.ElementMap(
                 (e, cids)
                 for e in self.input.get_type_set(Rows)
-                for deps in [self.input.analyze(TableDependenciesAnalysis)[e]]
+                for deps in [self.input.analyze(StrictTableDependenciesAnalysis)[e]]
                 for cids in [{qn[0] for qns in deps.name_sets_by_table.values() for qn in qns}]
             )
 
