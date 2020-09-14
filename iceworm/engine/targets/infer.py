@@ -84,7 +84,7 @@ class InferTableProcessor(els.InstanceElementProcessor):
 
                 deps = {
                     self.tables_by_name[name].id
-                    for n in els.queries.get_basic(rows, rows.query).get_node_type_set(no.Table)
+                    for n in self.input.analyze(els.queries.QueryBasicAnalysis)[rows][rows.query].get_node_type_set(no.Table)  # noqa
                     for name in [n.name.name]
                     if name in self.tables_by_name
                 }
@@ -153,7 +153,7 @@ class InferTableProcessor(els.InstanceElementProcessor):
 
             table_names = {
                 tn.name.name
-                for tn in els.queries.get_basic(rows, rows.query).get_node_type_set(no.Table)
+                for tn in self.input.analyze(els.queries.QueryBasicAnalysis)[rows][rows.query].get_node_type_set(no.Table)  # noqa
             }
 
             alias_sets_by_tbl: ta.MutableMapping[md.Object, ta.Set[QualifiedName]] = ocol.IdentityKeyDict()

@@ -9,6 +9,8 @@ from .base import Inherited  # noqa
 from .base import Origin  # noqa
 from .base import id_check  # noqa
 from .base import optional_id_check  # noqa
+from .collections import Analysis  # noqa
+from .collections import ElementMap  # noqa
 from .collections import ElementSet  # noqa
 from .phases import PHASES  # noqa
 from .phases import Phase  # noqa

@@ -4,6 +4,7 @@ import weakref
 from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
+from omnibus import properties
 
 from ...trees import analysis as ana
 from ...trees import nodes as no
@@ -12,6 +13,8 @@ from ...trees.types import Query
 from ...trees.types import StrQuery
 from .base import Element
 from .base import Origin
+from .collections import Analysis
+from .collections import ElementMap
 from .collections import ElementSet
 from .processing import ElementProcessor
 
@@ -62,52 +65,35 @@ class QueryParsingElementProcessor(ElementProcessor):
         return ret
 
 
-class QueryBasicAnalyses(dc.Pure):
-    basics_by_query: ta.Mapping[no.Node, ana.BasicAnalysis]
+class QueryBasics(dc.Pure):
+    by_query: ta.Mapping[no.Node, ana.BasicAnalysis]
 
-    def __getitem__(self, obj: ta.Union[AstQuery, no.Node]):
+    def __getitem__(self, obj: ta.Union[Query, no.Node]):
         if isinstance(obj, AstQuery):
             root = obj.root
         elif isinstance(obj, no.Node):
             root = obj
         else:
             raise TypeError(obj)
-        return self.basics_by_query[root]
+        return self.by_query[root]
 
 
-class QueryBasicAnalysisElementProcessor(ElementProcessor):
+class QueryBasicAnalysis(Analysis):
 
-    @classmethod
-    def dependencies(cls) -> ta.Iterable[ta.Type['ElementProcessor']]:
-        return {*super().dependencies(), QueryParsingElementProcessor}
+    @properties.cached
+    @property
+    def by_element(self) -> ta.Mapping[Element, QueryBasics]:
+        return ElementMap(
+            (e, QueryBasics(ocol.IdentityKeyDict(
+                (root, ana.basic(root))
+                for f in qf
+                for q in [getattr(e, f)]
+                for root in [check.isinstance(q, AstQuery).root]
+            )))
+            for e in self.elements
+            for qf in [_get_query_fields(type(e))]
+            if qf
+        )
 
-    def match(self, elements: ElementSet) -> ta.Iterable[Element]:
-        return [
-            e
-            for e in elements
-            if _get_query_fields(type(e)) and QueryBasicAnalyses not in e.meta
-        ]
-
-    def process(self, elements: ElementSet) -> ta.Iterable[Element]:
-        ret = []
-        for e in elements:
-            fs = _get_query_fields(type(e))
-            if fs and QueryBasicAnalyses not in e.meta:
-                ret.append(dc.replace(e, meta={
-                    **e.meta,
-                    Origin: Origin(e),
-                    QueryBasicAnalyses: QueryBasicAnalyses(ocol.IdentityKeyDict(
-                        (root, ana.basic(root))
-                        for f in fs
-                        for q in [getattr(e, f)]
-                        for root in [check.isinstance(q, AstQuery).root]
-                    ))
-                }))
-            else:
-                ret.append(e)
-        return ret
-
-
-def get_basic(ele: Element, obj: ta.Any) -> ana.BasicAnalysis:
-    check.isinstance(ele, Element)
-    return ele.meta[QueryBasicAnalyses][obj]
+    def __getitem__(self, ele: Element) -> QueryBasics:
+        return self.by_element[ele]

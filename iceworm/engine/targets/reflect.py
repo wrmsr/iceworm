@@ -53,7 +53,7 @@ class ReflectTablesProcessor(els.InstanceElementProcessor):
 
     @classmethod
     def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
-        return {*super().dependencies(), els.queries.QueryBasicAnalysisElementProcessor}
+        return {*super().dependencies(), els.queries.QueryParsingElementProcessor}
 
     class Instance(els.InstanceElementProcessor.Instance['ReflectTablesProcessor']):
 
@@ -107,7 +107,7 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
             return ocol.IdentityKeyDict(
                 (ele, {
                     tn.name.name
-                    for tn in els.queries.get_basic(ele, ele.query).get_node_type_set(no.Table)
+                    for tn in self.input.analyze(els.queries.QueryBasicAnalysis)[ele][ele.query].get_node_type_set(no.Table)  # noqa
                 })
                 for ele in self.input.get_type_set(Rows)
             )
@@ -213,7 +213,7 @@ class TableDependenciesProcessor(els.InstanceElementProcessor):
             lst = []
             for ele in self.input:
                 if isinstance(ele, Rows) and TableDependencies not in ele.meta:
-                    qns = {t.name.name for t in els.queries.get_basic(ele, ele.query).get_node_type_set(no.Table)}
+                    qns = {t.name.name for t in self.input.analyze(els.queries.QueryBasicAnalysis)[ele][ele.query].get_node_type_set(no.Table)}  # noqa
                     deps = TableDependencies({qn: self.tables_by_name[qn] for qn in qns})
                     new = dc.replace(
                         ele,

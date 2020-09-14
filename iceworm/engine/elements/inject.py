@@ -230,7 +230,6 @@ def bind_post_eager(
 def install(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
-    bind_element_processor(binder, queries.QueryBasicAnalysisElementProcessor, Phases.TARGETS)
     bind_element_processor(binder, queries.QueryParsingElementProcessor, Phases.TARGETS)
     bind_element_processor(binder, processors.IdGeneratorProcessor, PHASES)
 

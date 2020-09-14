@@ -95,6 +95,7 @@ class ElementSet(ta.Generic[ElementT]):
             raise TypeError(key)
 
     def analyze(self, cls: ta.Type[AnalysisT]) -> AnalysisT:
+        check.issubclass(cls, Analysis)
         try:
             return self._analyses[cls]
         except KeyError:
@@ -111,7 +112,7 @@ class ElementMap(ta.Mapping[Element, V]):
         self._dct: ta.Dict[Ref, V] = {}
         for e, v in ocol.yield_dict_init(*args, **kwargs):
             r = Ref.of(e)
-            check.not_in(self._dct, r)
+            check.not_in(r, self._dct)
             self._dct[r] = v
 
     def __len__(self) -> int:
