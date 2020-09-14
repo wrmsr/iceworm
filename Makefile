@@ -13,7 +13,9 @@ PIP_ARGS:=
 PYENV_BREW_DEPS:= \
 	graphviz \
 	libyaml \
+	node \
 	openssl \
+	pipx \
 	readline \
 	sqlite3 \
 	zlib \

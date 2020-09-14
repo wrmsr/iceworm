@@ -6,7 +6,6 @@ import dataclasses as dc
 import os.path
 
 from omnibus import lang
-import pytest
 import sqlalchemy as sa
 
 from .. import state as st
@@ -34,7 +33,6 @@ def test_state():
     assert store.get(WorldState, store.key(wos[0])) == wos[0]
 
 
-@pytest.mark.xfail
 def test_state_script(harness: har.Harness):  # noqa
     with open(os.path.join(os.path.dirname(__file__), 'state.sql'), 'r') as f:
         buf = f.read()

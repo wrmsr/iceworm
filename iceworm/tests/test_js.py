@@ -1,7 +1,6 @@
 import io
 
 from omnibus import iterables as it
-import pytest
 
 from .. import js
 
@@ -23,7 +22,6 @@ function add2(x, y) {
 """
 
 
-@pytest.mark.xfail
 def test_fallback_js(tmpdir):
     loop = js.build_loop('function(s){ return s + "!" }')
     proc = js.launch_node(loop)

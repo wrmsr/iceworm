@@ -7,7 +7,7 @@ import pytest
 import yaml
 
 
-@pytest.mark.xfail
+@pytest.mark.online
 def test_docker_s3():
     if docker.is_in_docker():
         (host, port) = 'iceworm-minio', 9000

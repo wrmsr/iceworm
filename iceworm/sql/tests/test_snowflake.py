@@ -2,7 +2,6 @@ import contextlib
 import json
 
 from omnibus import check
-import pytest
 import sqlalchemy as sa
 
 from .. import snowflake
@@ -13,7 +12,6 @@ from ...types import QualifiedName
 from .helpers import DbManager
 
 
-@pytest.mark.xfail
 def test_conns(harness: har.Harness):
     with contextlib.ExitStack() as es:
         conn = es.enter_context(harness[DbManager].snowflake_engine.connect())
@@ -34,7 +32,6 @@ def test_conns(harness: har.Harness):
         print(metadata.tables['test'])
 
 
-@pytest.mark.xfail
 def test_tpch(harness: har.Harness):
     with contextlib.ExitStack() as es:
         engine = harness[DbManager].snowflake_engine
@@ -55,7 +52,6 @@ def test_tpch(harness: har.Harness):
         tpch.populate_sa_tables(conn, metadata)
 
 
-@pytest.mark.xfail
 def test_exec_multi(harness: har.Harness):
     with contextlib.ExitStack() as es:
         engine = harness[DbManager].snowflake_engine

@@ -4,10 +4,10 @@ https://arrow.apache.org/docs/python/parquet.html
 import os.path
 import tempfile
 
-import pytest
+from omnibus.dev.testing.helpers import skip_if_cant_import
 
 
-@pytest.mark.xfail
+@skip_if_cant_import('pyarrow')
 def test_pyarrow_parquet():
     import pyarrow as pa
     import pyarrow.parquet as pq
@@ -44,10 +44,10 @@ def test_pyarrow_parquet():
     print(list(table2))
 
 
-@pytest.mark.xfail
+@skip_if_cant_import('fastparquet')
 def test_fastparquet_parquet():
-    import pandas as pd
     import fastparquet
+    import pandas as pd
 
     d = {'col1': [1, 2], 'col2': [3, 4]}
     df = pd.DataFrame(data=d)

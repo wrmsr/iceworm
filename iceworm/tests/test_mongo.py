@@ -1,20 +1,11 @@
-from omnibus import docker
 import pymongo
-import pytest
+
+from . import harness as har
+from .docker import DockerManager
 
 
-@pytest.mark.xfail
-def test_docker_mongo():
-    if docker.is_in_docker():
-        (host, port) = 'iceworm-mongo', 27017
-
-    else:
-        with docker.client_context() as client:
-            eps = docker.get_container_tcp_endpoints(
-                client,
-                [('docker_iceworm-mongo_1', 27017)])
-
-        [(host, port)] = eps.values()
+def test_docker_mongo(harness: har.Harness):
+    [(host, port)] = harness[DockerManager].get_container_tcp_endpoints([('mongo', 27017)]).values()
 
     client = pymongo.MongoClient(f'mongodb://root:iceworm@{host}:{port}')
     db = client['test-database']

@@ -6,7 +6,6 @@ import urllib.parse
 
 from omnibus import lang
 from omnibus import threading as othr
-import pytest
 import sqlalchemy as sa
 
 from .. import tpch
@@ -21,7 +20,6 @@ IS_NUMBER_JS = """
 """  # noqa
 
 
-@pytest.mark.xfail
 def test_docker_postgres(harness: har.Harness):  # noqa
     engine: sa.engine.Engine
     with contextlib.ExitStack() as es:
@@ -84,7 +82,6 @@ def test_docker_postgres(harness: har.Harness):  # noqa
         print(tbl)
 
 
-@pytest.mark.xfail
 def test_postgres_locks(harness: har.Harness):  # noqa
     engine: sa.engine.Engine
     with contextlib.ExitStack() as es:
@@ -175,7 +172,6 @@ def test_postgres_locks(harness: har.Harness):  # noqa
             c.execute("select 1")
 
 
-@pytest.mark.xfail
 def test_tpch(harness: har.Harness):  # noqa
     engine: sa.engine.Engine
     with contextlib.ExitStack() as es:
@@ -190,7 +186,6 @@ def test_tpch(harness: har.Harness):  # noqa
         tpch.populate_sa_tables(conn, metadata)
 
 
-@pytest.mark.xfail
 def test_pg8000(harness: har.Harness):  # noqa
     pg_url = urllib.parse.urlunparse(urllib.parse.urlparse(harness[DbManager].pg_url)._replace(scheme='postgresql+pg8000'))  # noqa
 

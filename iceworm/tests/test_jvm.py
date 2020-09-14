@@ -1,9 +1,6 @@
 import os
 
-import pytest
 
-
-@pytest.mark.xfail
 def test_jpype():
     os.environ['JAVA_HOME'] = '/Library/Java/JavaVirtualMachines/jdk1.8.0_261.jdk/Contents/Home'
     import jpype

@@ -30,7 +30,6 @@ def some_url() -> str:
     return 'a url'
 
 
-@pytest.mark.xfail
 def test_harness():
     bnd = inj.create_binder()
     bnd.bind(some_url)

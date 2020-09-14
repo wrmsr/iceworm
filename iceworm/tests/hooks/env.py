@@ -6,7 +6,7 @@ from omnibus import lang
 
 @lang.cached_nullary
 def _load_dot_env() -> ta.Optional[ta.Mapping[str, str]]:
-    fp = os.path.join(os.path.dirname(os.path.dirname(__file__)), '../../../.env')
+    fp = os.path.join(os.path.dirname(os.path.dirname(__file__)), '../../.env')
     if not os.path.isfile(fp):
         return None
     with open(fp, 'r') as f:
