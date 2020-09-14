@@ -82,8 +82,10 @@ def bind_impl(binder: inj.Binder, cls: ta.Type[Configable], impl_cls: ta.Type[Co
     @inj.annotate(factory=_UNDERLYING)
     def provide(config, __factory, **kwargs) -> impl_cls:
         fac_kwargs = {
-            k: v(config=getattr(config, k))
+            k: v(config=cfg)
             for k, v in kwargs.items()
+            for cfg in [getattr(config, k)]
+            if cfg is not None
         }
         return __factory(config=config, **fac_kwargs)
 
