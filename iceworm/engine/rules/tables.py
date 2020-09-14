@@ -28,3 +28,19 @@ class TableAsSelectProcessor(RuleProcessor[TableAsSelect]):
             tars.Materialization(ten, cn, [tn]),
             tars.Rows(ten, rule.query),
         ]
+
+
+class InsertedRows(Rule):
+    table: QualifiedName = dc.field(coerce=QualifiedName.of)
+    query: str = dc.field(check=lambda o: isinstance(o, str))
+
+
+class InsertedRowsProcessor(RuleProcessor[InsertedRows]):
+    rule_cls = InsertedRows
+
+    def process(self, rule: InsertedRows) -> ta.Iterable[els.Element]:
+        cn, tn = rule.table
+        ten = cn + '/' + tn
+        return [
+            tars.Rows(ten, rule.query),
+        ]

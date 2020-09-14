@@ -76,7 +76,7 @@ class SiteProcessor(els.ElementProcessor):
                         for child in check.isinstance(node.value, ta.Sequence):
                             uchild = oyaml.unwrap(child)
                             el = serde.deserialize(uchild, els.Element)
-                            sloc = SourceLocation(s.path, child.node.start_mark.line)
+                            sloc = SourceLocation(s.path, child.node.start_mark.line + 1)
                             el = dc.replace(
                                 el,
                                 anns={**el.anns, SourceLocation: sloc},

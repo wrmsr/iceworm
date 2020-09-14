@@ -6,6 +6,7 @@ from omnibus import inject as inj
 from .. import elements as els
 from .base import RuleElementProcessor
 from .base import RuleProcessor
+from .tables import InsertedRowsProcessor
 from .tables import TableAsSelectProcessor
 
 
@@ -28,6 +29,7 @@ def bind_rule_processor(binder: inj.Binder, cls: ta.Type[RuleProcessor], phase: 
 def install(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
+    bind_rule_processor(binder, InsertedRowsProcessor, els.Phases.TARGETS)
     bind_rule_processor(binder, TableAsSelectProcessor, els.Phases.TARGETS)
 
     return binder

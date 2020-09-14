@@ -56,8 +56,8 @@
     connector: system
     name: [notifications]
 
-- rows:
-    table: system/notifications
+- inserted_rows:
+    table: [system, notifications]
     query: "select 'hi' as message"
 
 - invalidator:
