@@ -13,7 +13,6 @@ from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import http
 from omnibus import lifecycles as lc
-from omnibus import lang
 from omnibus import logs
 
 from . import resources
@@ -45,6 +44,8 @@ class Handler(dc.Pure):
 
 
 class OkApp:
+    ENDPOINTS = [Endpoint('GET', '/ok')]
+
     def __call__(self, environ: http.Environ, start_response: http.StartResponse) -> ta.Iterable[bytes]:
         start_response(http.consts.STATUS_OK, [])
         return []
@@ -55,6 +56,11 @@ class BoomException(Exception):
 
 
 class BoomApp:
+    ENDPOINTS = [
+        Endpoint('GET', '/boom'),
+        Endpoint('POST', '/boom'),
+    ]
+
     def __call__(self, environ: http.Environ, start_response: http.StartResponse) -> ta.Iterable[bytes]:
         raise BoomException
 
@@ -65,16 +71,16 @@ class ServiceWebStatus(dc.Pure):
 
 
 class StatusApp(lc.ContextManageableLifecycle):
+    ENDPOINTS = [Endpoint('GET', '/status')]
 
     def __init__(self) -> None:
         super().__init__()
 
         self._start_time: ta.Optional[float] = None
 
-    def __enter__(self: lang.Self) -> lang.Self:
-        super().__enter__()
+    def _do_lifecycle_start(self) -> None:
+        super()._do_lifecycle_start()
         self._start_time = time.time()
-        return self
 
     def __call__(self, environ: http.Environ, start_response: http.StartResponse) -> ta.Iterable[bytes]:
         status = ServiceWebStatus(time.time() - self._start_time)
@@ -97,6 +103,8 @@ class StatusApp(lc.ContextManageableLifecycle):
 
 
 class FaviconApp:
+    ENDPOINTS = [Endpoint('GET', '/favicon.ico')]
+
     def __call__(self, environ: http.Environ, start_response: http.StartResponse) -> ta.Iterable[bytes]:
         response_body = resources.favicon()
         response_headers = [
@@ -109,17 +117,16 @@ class FaviconApp:
 
 class App(lc.ContextManageableLifecycle):
 
-    def __init__(self, handlers: ta.Iterable[Handler]) -> None:
+    def __init__(self, handlers: ta.AbstractSet[Handler]) -> None:
         super().__init__()
 
         self._handlers = [check.isinstance(h, Handler) for h in handlers]
         self._handlers_by_endpoint = unique_dict((e, h) for h in self._handlers for e in h.endpoints)
         self._all_paths = {e.path for h in self._handlers for e in h.endpoints}
 
-    def __enter__(self: lang.Self) -> lang.Self:
-        super().__enter__()
+    def _do_lifecycle_start(self) -> None:
+        super()._do_lifecycle_start()
         log.info('App started')
-        return self
 
     def __call__(self, environ: http.Environ, start_response: http.StartResponse) -> ta.Iterable[bytes]:
         method = environ.get('REQUEST_METHOD')
@@ -142,12 +149,12 @@ class App(lc.ContextManageableLifecycle):
 @contextlib.contextmanager
 def build_app_context() -> ta.Generator[App, None, None]:
     with contextlib.ExitStack() as es:
-        yield es.enter_context(App([
-            Handler([('GET', '/ok')], OkApp()),
-            Handler([('GET', '/boom'), ('POST', '/boom')], BoomApp()),
-            Handler([('GET', '/favicon.ico')], FaviconApp()),
-            Handler([('GET', '/status')], es.enter_context(StatusApp())),
-        ]))
+        yield es.enter_context(App({
+            Handler(OkApp.ENDPOINTS, OkApp()),
+            Handler(BoomApp.ENDPOINTS, BoomApp()),
+            Handler(FaviconApp.ENDPOINTS, FaviconApp()),
+            Handler(StatusApp.ENDPOINTS, es.enter_context(StatusApp())),
+        }))
 
 
 def main():

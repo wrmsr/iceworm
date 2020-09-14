@@ -1,4 +1,5 @@
 from . import annotations  # noqa
+from . import inject  # noqa
 from . import nodal  # noqa
 from . import secrets  # noqa
 from . import serde  # noqa
