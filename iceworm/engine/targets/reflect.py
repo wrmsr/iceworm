@@ -52,7 +52,7 @@ class ReflectTablesProcessor(els.InstanceElementProcessor):
         self._reflector = Reflector(self._ctors)
 
     @classmethod
-    def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
+    def dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
         return {*super().dependencies(), els.queries.QueryParsingElementProcessor}
 
     class Instance(els.InstanceElementProcessor.Instance['ReflectTablesProcessor']):
@@ -96,7 +96,7 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
         self._reflector = Reflector(self._ctors)
 
     @classmethod
-    def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
+    def dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
         return {*super().dependencies(), ReflectTablesProcessor}
 
     class Instance(els.InstanceElementProcessor.Instance['ReflectReferencedTablesProcessor']):
@@ -188,47 +188,31 @@ class TableDependencies(dc.Frozen, allow_setattr=True):
         return ret
 
 
-class TableDependenciesProcessor(els.InstanceElementProcessor):
+class TableDependenciesAnalysis(els.Analysis):
 
     @classmethod
-    def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
+    def dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
         return {*super().dependencies(), ReflectTablesProcessor, ReflectReferencedTablesProcessor}
 
-    class Instance(els.InstanceElementProcessor.Instance['TableDependenciesProcessor']):
+    @properties.cached
+    @property
+    def tables_by_name(self) -> ta.Mapping[QualifiedName, Table]:
+        return unique_dict(
+            (QualifiedName([ele.connector.id, *ele.name]), self.elements[ele.table])
+            for ele in self.elements.get_type_set(Materialization)
+        )
 
-        @properties.cached
-        @property
-        def tables_by_name(self) -> ta.Mapping[QualifiedName, Table]:
-            return unique_dict(
-                (QualifiedName([ele.connector.id, *ele.name]), self.input[ele.table])
-                for ele in self.input.get_type_set(Materialization)
-            )
+    @properties.cached
+    @property
+    def by_element(self) -> ta.Mapping[els.Element, TableDependencies]:
+        return els.ElementMap(
+            (ele, TableDependencies({qn: self.tables_by_name[qn] for qn in qns}))
+            for ele in self.elements.get_type_set(Rows)
+            for qns in [{
+                t.name.name
+                for t in self.elements.analyze(els.queries.QueryBasicAnalysis)[ele][ele.query].get_node_type_set(no.Table)  # noqa
+            }]
+        )
 
-        @properties.cached
-        def matches(self) -> ta.Iterable[els.Element]:
-            return [e for e in self.input.get_type_set(Rows) if TableDependencies not in e.meta]
-
-        @properties.cached
-        def output(self) -> els.ElementSet:
-            lst = []
-            for ele in self.input:
-                if isinstance(ele, Rows) and TableDependencies not in ele.meta:
-                    qns = {t.name.name for t in self.input.analyze(els.queries.QueryBasicAnalysis)[ele][ele.query].get_node_type_set(no.Table)}  # noqa
-                    deps = TableDependencies({qn: self.tables_by_name[qn] for qn in qns})
-                    new = dc.replace(
-                        ele,
-                        meta={
-                            **ele.meta,
-                            TableDependencies: deps,
-                            els.Origin: els.Origin(ele),
-                        },
-                    )
-                    lst.append(new)
-                else:
-                    lst.append(ele)
-            return els.ElementSet.of(lst)
-
-
-def get_rows_table_deps(ele: Rows) -> TableDependencies:
-    check.isinstance(ele, Rows)
-    return check.isinstance(ele.meta[TableDependencies], TableDependencies)
+    def __getitem__(self, ele: els.Element) -> TableDependencies:
+        return self.by_element[ele]

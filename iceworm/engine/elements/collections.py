@@ -12,6 +12,7 @@ from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 
+from .base import Dependable
 from .base import Element
 from .base import Id
 from .refs import Ref
@@ -23,7 +24,7 @@ T = ta.TypeVar('T')
 V = ta.TypeVar('V')
 
 
-class Analysis(dc.Enum, allow_setattr=True):
+class Analysis(dc.Enum, Dependable, allow_setattr=True):
     elements: 'ElementSet' = dc.field(check=lambda o: isinstance(o, ElementSet))
 
 

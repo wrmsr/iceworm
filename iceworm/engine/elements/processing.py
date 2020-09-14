@@ -33,6 +33,7 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import properties
 
+from .base import Dependable
 from .base import Element
 from .base import Frozen
 from .collections import ElementSet
@@ -84,15 +85,11 @@ def has_processed(ep: 'ElementProcessor', e: Element) -> bool:
         return ep in check.isinstance(pb, ProcessedBy).processors
 
 
-class ElementProcessor(lang.Abstract):
+class ElementProcessor(Dependable, lang.Abstract):
 
     @classmethod
     def phases(cls) -> ta.Iterable[Phase]:
         return PHASES
-
-    @classmethod
-    def dependencies(cls) -> ta.Iterable[ta.Type['ElementProcessor']]:
-        return []
 
     @abc.abstractmethod
     def match(self, elements: ElementSet) -> ta.Iterable[Element]:

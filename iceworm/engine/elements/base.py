@@ -85,6 +85,26 @@ def optional_id_check(obj: ta.Any) -> bool:
     return obj is None or (isinstance(obj, Id) and obj)
 
 
+class Dependable(lang.Abstract):
+
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+        for mc in reversed(cls.__mro__):
+            try:
+                deps = mc.__dict__['dependencies']
+            except KeyError:
+                continue
+            else:
+                break
+        else:
+            raise TypeError
+        check.isinstance(deps, classmethod)
+
+    @classmethod
+    def dependencies(cls) -> ta.Iterable[ta.Type['Dependable']]:
+        return []
+
+
 class Annotation(anns.Annotation, abstract=True):
     pass
 
