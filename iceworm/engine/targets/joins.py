@@ -1,7 +1,5 @@
 import typing as ta
 
-from omnibus import check
-from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import properties
 
@@ -9,7 +7,6 @@ from .. import elements as els
 from .reflect import ReflectReferencedTablesProcessor
 from .reflect import TableDependenciesAnalysis
 from .targets import Rows
-from .targets import Table
 
 
 class JoinSplittingProcessor(els.InstanceElementProcessor):
@@ -47,4 +44,5 @@ class JoinSplittingProcessor(els.InstanceElementProcessor):
             return lst
 
         def split_join(self, ele: Rows) -> ta.Sequence[els.Element]:
-            return [ele]
+            # return [ele]
+            raise NotImplementedError

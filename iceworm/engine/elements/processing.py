@@ -167,7 +167,7 @@ class ElementProcessingDriver:
             self,
             processor_factory: ElementProcessorFactory,
             *,
-            config = Config(),
+            config: Config = Config(),
     ) -> None:
         super().__init__()
 

@@ -193,7 +193,7 @@ class TableDependenciesAnalysis(els.Analysis):
 
     @classmethod
     def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
-        return {*super().dependencies(), ReflectTablesProcessor, ReflectReferencedTablesProcessor}
+        return {*super().cls_dependencies(), ReflectTablesProcessor, ReflectReferencedTablesProcessor}
 
     @properties.cached
     @property
