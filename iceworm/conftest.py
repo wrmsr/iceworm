@@ -8,6 +8,7 @@ from .tests.harness.fixtures import _scope_listener_session  # noqa
 from .tests.harness.fixtures import harness  # noqa
 from .tests.hooks import env
 from .tests.hooks import incremental
+from .tests.hooks import pycharm  # noqa
 from .tests.hooks import switches
 
 
@@ -33,3 +34,8 @@ def pytest_runtest_setup(item):
 
 def pytest_runtest_makereport(item, call):
     incremental.Hooks.runtest_makereport(item, call)
+
+
+def pytest_exception_interact(node, call, report):
+    return pycharm.Hooks.exception_interact(node, call, report)
+    # return report

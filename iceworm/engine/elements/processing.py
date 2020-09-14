@@ -175,21 +175,26 @@ class ElementProcessingDriver:
                 for mro_cls in type(ep).__mro__:
                     if issubclass(mro_cls, ElementProcessor) and mro_cls != ElementProcessor:
                         ep_sets_by_mro_cls.setdefault(mro_cls, set()).add(ep)
+
             if ep_dep_tys:
                 ep_deps = {
                     ep: {dep for dt in dts for dep in check.not_empty(ep_sets_by_mro_cls[dt])}
                     for ep, dts in ep_dep_tys.items()
                 }
-                topo = list(ocol.toposort(ep_deps))
-                eps = [e for step in topo for e in step]
+                steps = list(ocol.toposort(ep_deps))
+            else:
+                steps = [eps]
 
             while True:
                 dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Element]] = ocol.IdentityKeyDict()
-                for ep in eps:
-                    epes = ocol.IdentitySet(check.isinstance(e, Element) for e in ep.match(elements))
-                    if epes:
-                        check.empty([e for e in epes if Frozen in e.meta])
-                        dct[ep] = epes
+                for step in steps:
+                    for ep in step:
+                        epes = ocol.IdentitySet(check.isinstance(e, Element) for e in ep.match(elements))
+                        if epes:
+                            check.empty([e for e in epes if Frozen in e.meta])
+                            dct[ep] = epes
+                    if dct:
+                        break
                 if not dct:
                     break
 
@@ -224,7 +229,13 @@ class ElementProcessingDriver:
                             continue
                     else:
                         npbs = []
-                    swaps[e] = dc.replace(e, meta={**e.meta, ProcessedBy: ProcessedBy(ocol.IdentitySet([*npbs, cur]))})
+                    swaps[e] = dc.replace(
+                        e,
+                        meta={
+                            **e.meta,
+                            ProcessedBy: ProcessedBy(ocol.IdentitySet([*npbs, cur])),
+                        },
+                    )
 
                 if swaps:
                     res = ElementSet.of(swaps.get(e, e) for e in res)

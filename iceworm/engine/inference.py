@@ -39,7 +39,7 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
 
     @classmethod
     def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
-        return {*super().dependencies(), els.queries.QueryBasicAnalysisElementProcesor}
+        return {*super().dependencies(), els.queries.QueryBasicAnalysisElementProcessor}
 
     class Instance(els.InstanceElementProcessor.Instance['ReflectReferencedTablesProcessor']):
 
@@ -74,23 +74,12 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
         @properties.cached
         @property
         def matches(self) -> ta.AbstractSet[els.Element]:
-            # ret = ocol.IdentitySet()
-            #
-            # for ele in self._input:
-            #     if isinstance(ele, tars.Table) and ele.md is None:
-            #         rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
-            #         ret.add(ele)
-            #         ret.add(rows)
-            #
-            #     elif isinstance(ele, tars.Rows):
-            #         root = check.isinstance(ele.query, AstQuery).root
-            #         table_names = {
-            #             tn.name.name
-            #             for tn in els.queries.get_basic(ele, ele.query).get_node_type_set(no.Table)
-            #         }
-            #
-            # return ret
-            return set()
+            ret = ocol.IdentitySet()
+            for table_name, rows_eles in self.rows_ele_sets_by_table_name.items():
+                if table_name in self.tables_by_name:
+                    continue
+                ret.update(rows_eles)
+            return ret
 
         @properties.stateful_cached
         @property

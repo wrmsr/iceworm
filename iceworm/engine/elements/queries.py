@@ -55,7 +55,7 @@ class QueryParsingElementProcessor(ElementProcessor):
                     for q in [getattr(e, f)]
                     if not isinstance(q, AstQuery)
                 }
-                new = dc.replace(e, **kw, meta={**e.meta, Origin: Origin(e)})
+                new = dc.replace(e, **kw, meta={Origin: Origin(e)})
                 ret.append(new)
             else:
                 ret.append(e)
@@ -75,7 +75,7 @@ class QueryBasicAnalyses(dc.Pure):
         return self.basics_by_query[root]
 
 
-class QueryBasicAnalysisElementProcesor(ElementProcessor):
+class QueryBasicAnalysisElementProcessor(ElementProcessor):
 
     @classmethod
     def dependencies(cls) -> ta.Iterable[ta.Type['ElementProcessor']]:

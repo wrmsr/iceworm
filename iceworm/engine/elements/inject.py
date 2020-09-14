@@ -1,3 +1,8 @@
+"""
+TODO:
+ - Driver * does not create injector *
+  - EngineScope? SiteScope? seeded with ConnectionSet?
+"""
 import abc
 import typing as ta
 
