@@ -5,6 +5,7 @@ TODO:
   - config field names get injected with their injected impls
   - just make configs nodal?
 """
+import inspect
 import typing as ta
 import weakref
 
@@ -66,6 +67,12 @@ def bind_impl(binder: inj.Binder, cls: ta.Type[Configable], impl_cls: ta.Type[Co
         '__factory': inj.Key(ta.Callable[..., impl_cls], _UNDERLYING),
     }
 
+    init_defaults = {
+        p.name: p.default
+        for p in inspect.signature(impl_cls.__init__).parameters.values()
+        if p.default is not inspect._empty
+    }
+
     if dc.is_dataclass(impl_cls.Config):
         for f in dc.fields(impl_cls.Config):
             fty = f.type
@@ -82,10 +89,9 @@ def bind_impl(binder: inj.Binder, cls: ta.Type[Configable], impl_cls: ta.Type[Co
     @inj.annotate(factory=_UNDERLYING)
     def provide(config, __factory, **kwargs) -> impl_cls:
         fac_kwargs = {
-            k: v(config=cfg)
+            k: v(config=cfg) if cfg is not None else init_defaults[k]
             for k, v in kwargs.items()
             for cfg in [getattr(config, k)]
-            if cfg is not None
         }
         return __factory(config=config, **fac_kwargs)
 
