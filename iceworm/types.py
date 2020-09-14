@@ -83,7 +83,7 @@ class QualifiedName(dc.Pure, ta.Sequence[str]):
 class QualifiedNameSerde(serde.AutoSerde[QualifiedName]):
 
     def serialize(self, obj: QualifiedName) -> ta.Any:
-        return check.isinstance(obj, QualifiedName).parts
+        return list(check.isinstance(obj, QualifiedName).parts)
 
     def deserialize(self, ser: ta.Any) -> QualifiedName:
         return QualifiedName.of(ser)

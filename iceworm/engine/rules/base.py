@@ -94,6 +94,7 @@ class RuleElementProcessor(els.ElementProcessor, ta.Generic[RuleT]):
         for ele in elements:
             if isinstance(ele, self._proc.rule_cls):
                 for sub in self._proc.process(ele):
+                    sub = dc.replace(sub, anns={**ele.anns.inherited, **sub.anns})
                     if els.Origin not in sub.meta:
                         sub = dc.replace(sub, meta={els.Origin: els.Origin(ele)})
                     lst.append(sub)

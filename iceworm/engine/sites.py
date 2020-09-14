@@ -26,7 +26,7 @@ from ..utils import serde
 from ..utils import unique_dict
 
 
-class SourceLocation(els.Annotation):
+class SourceLocation(els.Annotation, els.Inherited):
     path: str = dc.field(check=lambda s: isinstance(s, str) and s)
     line: int = dc.field(check=lambda i: isinstance(i, int) and i >= 0)
 

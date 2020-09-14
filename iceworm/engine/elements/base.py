@@ -89,11 +89,22 @@ class Annotation(anns.Annotation, abstract=True):
     pass
 
 
+class Inherited(lang.Abstract):
+
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+        check.issubclass(cls, Annotation)
+
+
 class Annotations(anns.Annotations[Annotation]):
 
     @classmethod
     def _ann_cls(cls) -> ta.Type[Annotation]:
         return Annotation
+
+    @property
+    def inherited(self) -> ta.Mapping[ta.Type[Annotation], Annotation]:
+        return {type(a): a for a in self if isinstance(a, Inherited)}
 
 
 class Element(dc.Enum, nodal.Nodal['Element'], reorder=True):
