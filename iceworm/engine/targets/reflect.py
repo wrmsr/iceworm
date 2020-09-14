@@ -172,20 +172,21 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
 
 
 class TableDependencies(dc.Frozen, allow_setattr=True):
-    tables_by_name: ta.MutableMapping[QualifiedName, els.Ref[Table]] = dc.field(
+
+    tables_by_name: ta.Mapping[QualifiedName, Table] = dc.field(
         coerce=lambda d: ocol.FrozenDict(
-            (QualifiedName.of(n), els.Ref.cls(Table).of(t))
+            (QualifiedName.of(n), t)
             for n, t in check.isinstance(d, ta.Mapping).items()
         )
     )
 
     @properties.cached
     @property
-    def name_sets_by_table_id(self) -> ta.Mapping[els.Id, ta.AbstractSet[QualifiedName]]:
+    def name_sets_by_table(self) -> els.ElementMap[els.Element, ta.AbstractSet[QualifiedName]]:
         ret = {}
         for n, t in self.tables_by_name.items():
-            ret.setdefault(t.id, set()).add(n)
-        return ret
+            ret.setdefault(t, set()).add(n)
+        return els.ElementMap(ret)
 
 
 class TableDependenciesAnalysis(els.Analysis):
@@ -204,7 +205,7 @@ class TableDependenciesAnalysis(els.Analysis):
 
     @properties.cached
     @property
-    def by_element(self) -> ta.Mapping[els.Element, TableDependencies]:
+    def by_element(self) -> els.ElementMap[els.Element, TableDependencies]:
         return els.ElementMap(
             (ele, TableDependencies({qn: self.tables_by_name[qn] for qn in qns}))
             for ele in self.elements.get_type_set(Rows)
@@ -214,5 +215,5 @@ class TableDependenciesAnalysis(els.Analysis):
             }]
         )
 
-    def __getitem__(self, ele: els.Element) -> TableDependencies:
+    def __getitem__(self, ele: Rows) -> TableDependencies:
         return self.by_element[ele]

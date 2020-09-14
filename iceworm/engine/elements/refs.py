@@ -3,6 +3,7 @@ import typing as ta
 import weakref
 
 from omnibus import check
+from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import lang
 
@@ -14,6 +15,8 @@ from .base import id_check
 
 ElementT = ta.TypeVar('ElementT', bound='Element')
 Self = ta.TypeVar('Self"')
+V = ta.TypeVar('V')
+Refable = ta.Union['Ref', Id, Element]
 
 
 _REF_CLS_CACHE: ta.MutableMapping[type, ta.Type['Ref']] = weakref.WeakKeyDictionary()
@@ -101,7 +104,7 @@ class Ref(dc.Frozen, lang.Abstract, ta.Generic[ElementT], repr=False, eq=False, 
         return cls[arg]
 
     @classmethod
-    def of(cls: ta.Type[Self], obj: ta.Union[ElementT, 'Ref', Id]) -> Self:
+    def of(cls: ta.Type[Self], obj: Refable) -> Self:
         if cls is Ref:
             if isinstance(obj, Element):
                 return cls[type(obj)](obj.id)
@@ -117,3 +120,44 @@ class Ref(dc.Frozen, lang.Abstract, ta.Generic[ElementT], repr=False, eq=False, 
             if isinstance(obj, Id):
                 return cls(obj)
         raise TypeError(obj)
+
+
+class RefSet(ta.AbstractSet[Ref]):
+
+    def __init__(self, src: ta.Iterable[Refable] = ()) -> None:
+        super().__init__()
+        self._set = {Ref.of(e) for e in src}
+
+    def __len__(self) -> int:
+        return len(self._set)
+
+    def __contains__(self, obj: Refable) -> bool:
+        return Ref.of(obj) in self._set
+
+    def __iter__(self) -> ta.Iterator[Ref]:
+        return iter(self._set)
+
+
+class RefMap(ta.Mapping[Ref, V]):
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__()
+        if len(args) > 1:
+            raise TypeError(args)
+        self._dct: ta.Dict[Ref, V] = {}
+        for e, v in ocol.yield_dict_init(*args, **kwargs):
+            r = Ref.of(e)
+            check.not_in(r, self._dct)
+            self._dct[r] = v
+
+    def __len__(self) -> int:
+        return len(self._dct)
+
+    def __iter__(self) -> ta.Iterator[Ref]:
+        return iter(self._dct)
+
+    def __contains__(self, key: Refable) -> bool:
+        return Ref.of(key) in self._dct
+
+    def __getitem__(self, key: Refable) -> Element:
+        return self._dct[Ref.of(key)]

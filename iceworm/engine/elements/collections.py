@@ -74,17 +74,24 @@ class ElementSet(ta.Generic[ElementT]):
     def __iter__(self) -> ta.Iterator[ElementT]:
         return iter(self._elements)
 
-    def __contains__(self, key: ta.Union[Id, ElementT, type]) -> bool:
-        if isinstance(key, Id):
+    def __contains__(self, key: ta.Union[Ref, Id, ElementT]) -> bool:
+        if isinstance(key, Ref):
+            try:
+                ele = self._by_id[key.id]
+            except KeyError:
+                return False
+            else:
+                if not isinstance(ele, key.ele_cls):
+                    raise TypeError(ele, key)
+                return True
+        elif isinstance(key, Id):
             return key in self._by_id
         elif isinstance(key, Element):
             return key in self._set
-        elif isinstance(key, type):
-            return bool(self.get_type_set(key))
         else:
             raise TypeError(key)
 
-    def __getitem__(self, key: ta.Union[Ref, Id]) -> ElementT:
+    def __getitem__(self, key: ta.Union[Ref, Id, ElementT]) -> ElementT:
         if isinstance(key, Ref):
             ele = self._by_id[key.id]
             if not isinstance(ele, key.ele_cls):
@@ -92,6 +99,11 @@ class ElementSet(ta.Generic[ElementT]):
             return ele
         elif isinstance(key, Id):
             return self._by_id[key]
+        elif isinstance(key, Element):
+            if key in self._set:
+                return key
+            else:
+                raise KeyError(key)
         else:
             raise TypeError(key)
 
@@ -104,26 +116,54 @@ class ElementSet(ta.Generic[ElementT]):
             return a
 
 
-class ElementMap(ta.Mapping[Element, V]):
+class ElementMap(ta.Mapping[ElementT, V]):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         if len(args) > 1:
             raise TypeError(args)
-        self._dct: ta.Dict[Ref, V] = {}
+        self._dct: ta.MutableMapping[ElementT, V] = ocol.IdentityKeyDict()
+        self._by_id: ta.MutableMapping[Id, ElementT] = {}
         for e, v in ocol.yield_dict_init(*args, **kwargs):
-            r = Ref.of(e)
-            check.not_in(r, self._dct)
-            self._dct[r] = v
+            check.isinstance(e, Element)
+            check.not_in(e, self._dct)
+            self._dct[e] = v
+            if e.id is not None:
+                check.not_in(e.id, self._by_id)
+                self._by_id[e.id] = e
 
     def __len__(self) -> int:
         return len(self._dct)
 
-    def __iter__(self) -> ta.Iterator[Ref]:
+    def __iter__(self) -> ta.Iterator[ElementT]:
         return iter(self._dct)
 
-    def __contains__(self, key: ta.Union[Ref, Id, Element]) -> bool:
-        return Ref.of(key) in self._dct
+    def __contains__(self, key: ta.Union[Ref, Id, ElementT]) -> bool:
+        if isinstance(key, Ref):
+            try:
+                ele = self._by_id[key.id]
+            except KeyError:
+                return False
+            else:
+                if not isinstance(ele, key.ele_cls):
+                    raise TypeError(ele, key)
+                return True
+        elif isinstance(key, Id):
+            return key in self._by_id
+        elif isinstance(key, Element):
+            return key in self._dct
+        else:
+            raise TypeError(key)
 
-    def __getitem__(self, key: ta.Union[Ref, Id, Element]) -> Element:
-        return self._dct[Ref.of(key)]
+    def __getitem__(self, key: ta.Union[Ref, Id, ElementT]) -> V:
+        if isinstance(key, Ref):
+            ele = self._by_id[key.id]
+            if not isinstance(ele, key.ele_cls):
+                raise TypeError(ele, key)
+            return self._dct[ele]
+        elif isinstance(key, Id):
+            return self._dct[self._by_id[key]]
+        elif isinstance(key, Element):
+            return self._dct[key]
+        else:
+            raise TypeError(key)

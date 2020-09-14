@@ -28,3 +28,5 @@ from .processing import ProcessedBy  # noqa
 from .processing import has_processed  # noqa
 from .processors import IdGeneratorProcessor  # noqa
 from .refs import Ref  # noqa
+from .refs import RefMap  # noqa
+from .refs import RefSet  # noqa

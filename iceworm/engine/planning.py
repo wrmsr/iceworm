@@ -62,7 +62,7 @@ class ElementPlanner:
             row_sets_by_table_id.setdefault(ele.table.id, ocol.IdentitySet()).add(ele)
 
         table_deps = {
-            ele.table.id: set(self._elements.analyze(tars.TableDependenciesAnalysis)[ele].name_sets_by_table_id)
+            ele.table.id: {e.id for e in self._elements.analyze(tars.TableDependenciesAnalysis)[ele].name_sets_by_table}
             for ele in self._elements.get_type_set(tars.Rows)
         }
 

@@ -1,7 +1,6 @@
 """
 TODO:
- - add id's
- - add deps
+ - ** honor analysis deps **
  - find / warn / reject elements with no processors
   - processed_cls_set? optional, enforced if present, warn
  - enforce only modified ids that matched (or added new)
