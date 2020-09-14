@@ -1,3 +1,4 @@
+import itertools
 import operator
 import typing as ta
 
@@ -65,13 +66,31 @@ class RelationEvaluator(dispatch.Class):
     def eval(self, node: no.Relation) -> ta.Sequence[StrMap]:  # noqa
         raise TypeError(node)
 
+    def eval(self, node: no.Join) -> ta.Sequence[StrMap]:  # noqa
+        check.arg(dc_only(node, ['left', 'type', 'right']))
+        check.arg(node.type == no.JoinType.DEFAULT)
+
+        left = self.eval(node.left)
+        right = self.eval(node.right)
+
+        ret = []
+        for l, r in itertools.product(left, right):
+            ret.append({**l, **r})
+        return ret
+
     def eval(self, node: no.Table) -> ta.Sequence[StrMap]:  # noqa
-        if node.name.name != QualifiedName(['t']):
+        if node.name.name == QualifiedName(['t0']):
+            return [
+                {'id': 1, 's': 'one'},
+                {'id': 2, 's': 'two'},
+            ]
+        elif node.name.name == QualifiedName(['t1']):
+            return [
+                {'id': 1, 'i': 1},
+                {'id': 2, 'i': 2},
+            ]
+        else:
             raise NameError(node.name.name)
-        return [
-            {'id': 1, 's': 'one'},
-            {'id': 2, 's': 'two'},
-        ]
 
 
 OPS_BY_BINARY_OP = {

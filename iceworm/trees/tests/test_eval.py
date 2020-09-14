@@ -3,18 +3,37 @@ from .. import nodes as no
 
 
 def test_eval():
-    e = ev.StmtEvaluator()
     q = no.Select(
         [
             no.AllSelectItem(),
         ],
         [
             no.Table(
-                no.QualifiedNameNode.of(['t'])),
+                no.QualifiedNameNode.of(['t0'])),
         ],
         no.BinaryExpr(
             no.QualifiedNameNode.of(['id']),
             no.BinaryOp.EQ,
             no.Integer(2)),
     )
-    print(e.eval(q))
+
+    print(ev.StmtEvaluator().eval(q))
+
+
+def test_rels():
+    q = no.Select(
+        [
+            no.AllSelectItem()
+        ],
+        [
+            no.Join(
+                no.Table(
+                    no.QualifiedNameNode.of(['t0'])),
+                no.JoinType.DEFAULT,
+                no.Table(
+                    no.QualifiedNameNode.of(['t1'])),
+            )
+        ]
+    )
+
+    print(ev.StmtEvaluator().eval(q))
