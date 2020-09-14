@@ -41,6 +41,10 @@
     query: "select * from pg.b"
 
 - table_as_select:
+    table: [pg, d]
+    query: "select * from csv.b, pg.c"
+
+- table_as_select:
     table: [pg, nums]
     query: "select * from cmp.nums"
 

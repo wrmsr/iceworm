@@ -1,6 +1,7 @@
 /*
 TODO:
  - grab driver from m2?
+ - embed cookie in url cuz binding to port cuz no unixsocket
 */
 package com.wrmsr.iceworm.tool;
 
