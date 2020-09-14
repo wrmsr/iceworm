@@ -12,6 +12,8 @@ from ... import metadata as md
 from ... import sql
 from ...trees import eval as teval
 from ...trees import parsing as tpar
+from ...trees import rendering as ren
+from ...trees.types import Query
 from ...types import QualifiedName
 from ...utils import abs_set
 from ..connectors.impls.sql import SqlConnection
@@ -98,7 +100,7 @@ class CreateTableExecutor(ConnsOpExecutor[CreateTable]):
 
 class CreateTableAs(ConnOp):
     name: QualifiedName = dc.field(coerce=QualifiedName.of)
-    query: str = dc.field(check=lambda o: isinstance(o, str))
+    query: Query = dc.field(coerce=Query.of)
 
     @property
     def conn(self) -> str:
@@ -113,22 +115,23 @@ class CreateTableAsExecutor(ConnsOpExecutor[CreateTableAs]):
             sql.CreateTableAs(
                 sql.QualifiedNameElement(
                     QualifiedName(op.name[1:])),
-                sa.text(op.query)))
+                sa.text(ren.render_query(op.query))))
 
 
 class InsertIntoSelect(ConnsOp):
     dst: QualifiedName = dc.field(coerce=QualifiedName.of)
-    query: str = dc.field(check=lambda o: isinstance(o, str))
+    query: Query = dc.field(coerce=Query.of)
 
 
 class InsertIntoSelectExecutor(ConnsOpExecutor[InsertIntoSelect]):
 
     def execute(self, op: InsertIntoSelect) -> None:
+        query = ren.render_query(op.query)
         src = None
 
         if src is None:
             try:
-                src_name = parse_simple_select_table(op.query, star=True)
+                src_name = parse_simple_select_table(query, star=True)
             except ValueError:
                 pass
             else:
@@ -138,17 +141,17 @@ class InsertIntoSelectExecutor(ConnsOpExecutor[InsertIntoSelect]):
 
         if src is None:
             try:
-                tbl_names = parse_simple_select_tables(op.query)
+                tbl_names = parse_simple_select_tables(query)
                 if tbl_names:
                     raise ValueError
             except ValueError:
                 pass
             else:
-                root = tpar.parse_stmt(op.query)
+                root = tpar.parse_stmt(query)
                 src = ctrs.ListRowSource(teval.StmtEvaluator().eval(root))
 
         if src is None:
-            raise ValueError(op.query)
+            raise ValueError(query)
 
         dst_conn = self._conns[op.dst[0]]
         dst = dst_conn.create_row_sink(QualifiedName(op.dst[1:]))

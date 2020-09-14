@@ -12,11 +12,15 @@ import collections.abc
 import io
 import typing as ta
 
+from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import dispatch
 
 from . import nodes as no
 from .quoting import quote
+from .types import AstQuery
+from .types import Query
+from .types import StrQuery
 
 
 T = ta.TypeVar('T')
@@ -493,9 +497,19 @@ def render_part(part: Part, buf: io.StringIO) -> None:
 
 
 def render(node: no.Node) -> str:
+    check.isinstance(node, no.Node)
     part = Renderer()(node)
     part = remove_nodes(part)
     part = compact_part(part)
     buf = io.StringIO()
     render_part(part, buf)
     return buf.getvalue()
+
+
+def render_query(query: Query, **kwargs) -> str:
+    if isinstance(query, AstQuery):
+        return render(query.root, **kwargs)
+    elif isinstance(query, StrQuery):
+        return query.src
+    else:
+        raise TypeError(query)

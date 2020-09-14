@@ -42,6 +42,9 @@ from ._antlr.IceSqlParser import IceSqlParser
 from ._antlr.IceSqlParser import IceSqlParserConfig
 from ._antlr.IceSqlVisitor import IceSqlVisitor
 from .quoting import unquote
+from .types import AstQuery
+from .types import Query
+from .types import StrQuery
 
 
 def strip_jinja(text: str) -> str:
@@ -521,3 +524,12 @@ def parse_col_spec(buf: str, **kwargs) -> no.ColSpec:
     parser = create_parser(buf, **kwargs)
     node = _ParseVisitor().visit(parser.colSpec())
     return check.isinstance(node, no.ColSpec)
+
+
+def parse_query(query: Query, **kwargs) -> no.Node:
+    if isinstance(query, AstQuery):
+        return query.root
+    elif isinstance(query, StrQuery):
+        return parse_stmt(query.src, **kwargs)
+    else:
+        raise TypeError(query)
