@@ -17,11 +17,9 @@ from . import elements as els
 from . import targets as tars
 from .. import datatypes as dt
 from .. import metadata as md
-from ..trees import analysis as ana
-from ..trees import datatypes as tdatatypes
+from ..trees import datatypes as tdt
 from ..trees import nodes as no
 from ..trees import origins
-from ..trees import rendering  # noqa
 from ..trees import symbols
 from ..trees import transforms as ttfm
 from ..trees.types import AstQuery
@@ -195,7 +193,7 @@ class InferTableProcessor(els.ElementProcessor):
             syms = symbols.analyze(root, cat)
             oris = origins.analyze(root, syms)
 
-            dts = tdatatypes.analyze(root, oris, cat)
+            dts = tdt.analyze(root, oris, cat)
             tt = check.isinstance(dts.dts_by_node[root], dt.Table)
 
             # FIXME: pg.c defined in terms of generated pg.b, need iterativity
