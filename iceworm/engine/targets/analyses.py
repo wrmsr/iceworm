@@ -5,9 +5,7 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import properties
 
-from .. import connectors as ctrs
 from .. import elements as els
-from ... import metadata as md
 from ...trees import nodes as no
 from ...types import QualifiedName
 from ...utils import unique_dict
