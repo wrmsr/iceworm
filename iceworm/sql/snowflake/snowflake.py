@@ -2,9 +2,6 @@
 TODO:
  - expanded reflection - partitioning etc
  - https://docs.snowflake.com/en/sql-reference/functions/compress.html udf payloads? lol
- - purge the dumbass arrow libs
-  - chunk_downloader.py -> from .arrow_context import ArrowConverterContext - fucking idiots
-   - ** lazy_import, do what omni does for mypy **
 
 show locks:
  resource
@@ -62,7 +59,7 @@ import sqlalchemy as sa
 import sqlalchemy.ext.compiler  # noqa
 import sqlalchemy.sql.selectable  # noqa
 
-from .adapter import Adapter as _Adapter
+from ..adapter import Adapter as _Adapter
 
 
 EXEC_MULTI_SP_SRC = """
@@ -132,45 +129,21 @@ $$ ;
 
 
 @lang.cached_nullary
-def patch_ssl_wrapper():
-    from snowflake.connector import ssl_wrap_socket
-
-    import threading
-    local = threading.local()
-
-    def ssl_wrap_socket_with_ocsp(*args, **kwargs):
-        local.depth = getattr(local, 'depth', 0) + 1
-        if local.depth >= 3:
-            raise RuntimeError('snowflake ssl monkeypatch will infinitely recurse')
-        try:
-            return _ssl_wrap_socket_with_ocsp(*args, **kwargs)
-        finally:
-            local.depth -= 1
-
-    _ssl_wrap_socket_with_ocsp = ssl_wrap_socket.ssl_wrap_socket_with_ocsp
-    ssl_wrap_socket.ssl_wrap_socket_with_ocsp = ssl_wrap_socket_with_ocsp
-
-    def inject_into_urllib3():
-        ssl_wrap_socket.connection_.ssl_wrap_socket = ssl_wrap_socket_with_ocsp
-
-    ssl_wrap_socket.inject_into_urllib3 = inject_into_urllib3
-
-    if ssl_wrap_socket.connection_.ssl_wrap_socket == _ssl_wrap_socket_with_ocsp:
-        ssl_wrap_socket.connection_.ssl_wrap_socket = ssl_wrap_socket_with_ocsp
-
-
-patch_ssl_wrapper()
-
-
-@lang.cached_nullary
 def get_config() -> ta.Mapping[str, str]:
-    config_file_path = os.environ['ICEWORM_SNOWFLAKE_CONFIG_PATH']
-    with open(os.path.expanduser(config_file_path), 'r') as f:
-        txt = f.read()
+    config_file_path = os.environ.get('ICEWORM_SNOWFLAKE_CONFIG_PATH')
+    if config_file_path:
+        with open(os.path.expanduser(config_file_path), 'r') as f:
+            txt = f.read()
+        parser = configparser.ConfigParser()
+        parser.read_file(io.StringIO(txt))
+        return {k.lower(): v for k, v in parser.items('snowflake')}
 
-    parser = configparser.ConfigParser()
-    parser.read_file(io.StringIO(txt))
-    return {k.lower(): v for k, v in parser.items('snowflake')}
+    keys = {'user', 'password', 'host'}
+    ekeys = {k: 'ICEWORM_SNOWFLAKE_' + k.upper() for k in keys}
+    if all(os.environ.get(ek) for ek in ekeys.values()):
+        return {k: os.environ[ek] for k, ek in ekeys.items()}
+
+    raise ValueError
 
 
 @lang.cached_nullary

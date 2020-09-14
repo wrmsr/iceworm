@@ -23,6 +23,7 @@ TODO:
 """
 import abc
 import itertools
+import logging
 import typing as ta
 import weakref
 
@@ -37,6 +38,9 @@ from .base import Frozen
 from .collections import ElementSet
 from .phases import PHASES
 from .phases import Phase
+
+
+log = logging.getLogger(__name__)
 
 
 InstanceElementProcessorT = ta.TypeVar('InstanceElementProcessorT', bound='InstanceElementProcessor')

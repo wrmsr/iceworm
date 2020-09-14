@@ -5,11 +5,11 @@ from omnibus import check
 import sqlalchemy as sa
 
 from .. import snowflake
-from .. import tpch
-from ... import sql
-from ...tests import harness as har
-from ...types import QualifiedName
-from .helpers import DbManager
+from ... import elements
+from ... import tpch
+from ....tests import harness as har
+from ....types import QualifiedName
+from ...tests.helpers import DbManager
 
 
 def test_conns(harness: har.Harness):
@@ -46,7 +46,7 @@ def test_tpch(harness: har.Harness):
 
         sats = tpch.build_sa_tables(metadata=metadata)
         for sat in sats:
-            conn.execute(sql.DropTableIfExists(QualifiedName.of_dotted(sat.fullname)))
+            conn.execute(elements.DropTableIfExists(QualifiedName.of_dotted(sat.fullname)))
             sat.create(bind=conn)
 
         tpch.populate_sa_tables(conn, metadata)

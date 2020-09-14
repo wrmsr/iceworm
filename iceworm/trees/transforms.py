@@ -228,3 +228,7 @@ class LabelSelectItemsTransformer(Transformer):
         check.state(rem == {k: 0 for k in cts})
 
         return super().__call__(node, items=new_items)
+
+
+class CteHoistTransformer(Transformer):
+    pass
