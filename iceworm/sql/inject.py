@@ -3,6 +3,7 @@ import typing as ta
 from omnibus import check
 from omnibus import inject as inj
 
+from . import objman  # noqa
 from . import postgres
 from . import snowflake
 from ..utils import configable as cfgabl
@@ -23,5 +24,7 @@ def install(binder: inj.Binder) -> inj.Binder:
     bind_adapter_impl(binder, snowflake.SnowflakeAdapter)
 
     cfgabl.bind_factory(binder, Adapter)
+
+    # binder.bind_class(objman.ObjectManager, assists={'engine', 'adapter'})
 
     return binder
