@@ -51,6 +51,10 @@ class ElementSet(ta.Generic[ElementT]):
         else:
             return cls(it)
 
+    @property
+    def by_id(self) -> ta.Mapping[Id, ElementT]:
+        return self._by_id
+
     def get_type_set(self, ty: ta.Type[T]) -> ta.AbstractSet[T]:
         try:
             return self._sets_by_type[ty]

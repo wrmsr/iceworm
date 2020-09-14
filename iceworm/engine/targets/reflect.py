@@ -169,3 +169,66 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
                 *[dc.replace(e, meta={els.Origin: els.Origin(e)}) for e in self.matches],
                 *new,
             ])
+
+
+class TableDependencies(dc.Frozen, allow_setattr=True):
+    tables_by_name: ta.MutableMapping[QualifiedName, els.Ref[Table]] = dc.field(
+        coerce=lambda d: ocol.FrozenDict(
+            (QualifiedName.of(n), els.Ref.cls(Table).of(t))
+            for n, t in check.isinstance(d, ta.Mapping).items()
+        )
+    )
+
+    @properties.cached
+    @property
+    def name_sets_by_table_id(self) -> ta.Mapping[els.Id, ta.AbstractSet[QualifiedName]]:
+        ret = {}
+        for n, t in self.tables_by_name.items():
+            ret.setdefault(t.id, set()).add(n)
+        return ret
+
+
+class TableDependenciesProcessor(els.InstanceElementProcessor):
+
+    @classmethod
+    def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
+        return {*super().dependencies(), ReflectTablesProcessor, ReflectReferencedTablesProcessor}
+
+    class Instance(els.InstanceElementProcessor.Instance['TableDependenciesProcessor']):
+
+        @properties.cached
+        @property
+        def tables_by_name(self) -> ta.Mapping[QualifiedName, Table]:
+            return unique_dict(
+                (QualifiedName([ele.connector.id, *ele.name]), self.input[ele.table])
+                for ele in self.input.get_type_set(Materialization)
+            )
+
+        @properties.cached
+        def matches(self) -> ta.Iterable[els.Element]:
+            return [e for e in self.input.get_type_set(Rows) if TableDependencies not in e.meta]
+
+        @properties.cached
+        def output(self) -> els.ElementSet:
+            lst = []
+            for ele in self.input:
+                if isinstance(ele, Rows) and TableDependencies not in ele.meta:
+                    qns = {t.name.name for t in els.queries.get_basic(ele, ele.query).get_node_type_set(no.Table)}
+                    deps = TableDependencies({qn: self.tables_by_name[qn] for qn in qns})
+                    new = dc.replace(
+                        ele,
+                        meta={
+                            **ele.meta,
+                            TableDependencies: deps,
+                            els.Origin: els.Origin(ele),
+                        },
+                    )
+                    lst.append(new)
+                else:
+                    lst.append(ele)
+            return els.ElementSet.of(lst)
+
+
+def get_table_deps(ele: els.Element) -> TableDependencies:
+    check.isinstance(ele, els.Element)
+    return check.isinstance(ele.meta[TableDependencies], TableDependencies)

@@ -124,11 +124,11 @@ class InstanceElementProcessor(ElementProcessor, lang.Abstract):
             return self.__input
 
         @abc.abstractproperty
-        def matches(self) -> ta.AbstractSet[Element]:
+        def matches(self) -> ta.Iterable[Element]:
             raise NotImplementedError
 
         @abc.abstractproperty
-        def output(self) -> ElementSet:
+        def output(self) -> ta.Iterable[Element]:
             raise NotImplementedError
 
     def __init_subclass__(cls, **kwargs) -> None:

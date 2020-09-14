@@ -13,9 +13,11 @@ from omnibus import inject as inj
 from omnibus import lang
 import omnibus.inject.scopes  # noqa
 
+from . import processors
 from . import queries
 from .base import Element
 from .collections import ElementSet
+from .phases import PHASES
 from .phases import Phase
 from .phases import PhasePair
 from .phases import Phases
@@ -184,25 +186,45 @@ def get_scope(phase_pair: PhasePair) -> ta.Type[inj.Scope]:
     return _Scope._subclass_map[phase_pair]
 
 
-def bind_element_processor(binder: inj.Binder, cls: ta.Type[ElementProcessor], phase: Phase) -> None:
+def get_phases(phases: ta.Union[Phase, ta.Iterable[Phase]]) -> ta.AbstractSet[Phase]:
+    if isinstance(phases, Phase):
+        return {phases}
+    elif isinstance(phases, ta.Iterable):
+        return {check.isinstance(p, Phase) for p in phases}
+    else:
+        raise TypeError(phases)
+
+
+def bind_element_processor(
+        binder: inj.Binder,
+        cls: ta.Type[ElementProcessor],
+        phases: ta.Union[Phase, ta.Iterable[Phase]],
+) -> None:
     check.isinstance(binder, inj.Binder)
     check.issubclass(cls, ElementProcessor)
-    check.isinstance(phase, Phase)
-    scope = get_scope(PhasePair(phase, SubPhases.MAIN))
 
-    binder.bind(cls, in_=scope)
-    binder.new_set_binder(ElementProcessor, annotated_with=phase, in_=scope).bind(to=cls)
+    for phase in get_phases(phases):
+        check.isinstance(phase, Phase)
+        scope = get_scope(PhasePair(phase, SubPhases.MAIN))
+
+        binder.bind(cls, annotated_with=phase, in_=scope)
+        binder.new_set_binder(ElementProcessor, annotated_with=phase, in_=scope).bind(to=inj.Key(cls, phase))
 
 
-def bind_post_eager(binder: inj.Binder, key: ta.Union[inj.Key, ta.Type], phase: Phase) -> None:
+def bind_post_eager(
+        binder: inj.Binder,
+        key: ta.Union[inj.Key, ta.Type],
+        phases: ta.Union[Phase, ta.Iterable[Phase]],
+) -> None:
     check.isinstance(binder, inj.Binder)
     if not isinstance(key, inj.Key):
         key = inj.Key(key)
-    check.isinstance(phase, Phase)
-    phase_pair = PhasePair(phase, SubPhases.POST)
-    scope = get_scope(phase_pair)
 
-    binder.new_set_binder(_Eager, annotated_with=phase_pair, in_=scope).bind(to_instance=_Eager(key))
+    for phase in get_phases(phases):
+        phase_pair = PhasePair(phase, SubPhases.POST)
+        scope = get_scope(phase_pair)
+
+        binder.new_set_binder(_Eager, annotated_with=phase_pair, in_=scope).bind(to_instance=_Eager(key))
 
 
 def install(binder: inj.Binder) -> inj.Binder:
@@ -210,5 +232,6 @@ def install(binder: inj.Binder) -> inj.Binder:
 
     bind_element_processor(binder, queries.QueryBasicAnalysisElementProcessor, Phases.TARGETS)
     bind_element_processor(binder, queries.QueryParsingElementProcessor, Phases.TARGETS)
+    bind_element_processor(binder, processors.IdGeneratorProcessor, PHASES)
 
     return binder

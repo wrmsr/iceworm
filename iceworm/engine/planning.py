@@ -1,10 +1,11 @@
 """
 TODO:
- - toposort lol
+ -
 """
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 
 from . import connectors as ctrs
@@ -56,10 +57,21 @@ class ElementPlanner:
                     ops.CreateTable(dc.replace(mdt, name=dst)),
                 ])
 
+        row_sets_by_table_id = {}
         for ele in self._elements.get_type_set(tars.Rows):
-            if ele.table.id not in invalidated_tables:
+            row_sets_by_table_id.setdefault(ele.table.id, ocol.IdentitySet()).add(ele)
+
+        table_deps = {
+            ele.table.id: set(tars.get_table_deps(ele).name_sets_by_table_id)
+            for ele in self._elements.get_type_set(tars.Rows)
+        }
+
+        topo = [id for step in ocol.toposort(table_deps) for id in sorted(step)]
+        for tbl_id in topo:
+            if tbl_id not in invalidated_tables:
                 continue
-            for dst in tbl_qn_sets_by_id.get(ele.table.id, []):
-                plan.append(ops.InsertIntoSelect(dst, ele.query))
+            for rows in row_sets_by_table_id.get(tbl_id, []):
+                for dst in tbl_qn_sets_by_id.get(rows.table.id, []):
+                    plan.append(ops.InsertIntoSelect(dst, rows.query))
 
         return ops.List(plan)
