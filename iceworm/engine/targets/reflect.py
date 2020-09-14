@@ -17,19 +17,84 @@ from .targets import Rows
 from .targets import Table
 
 
-class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
+class Reflector:
 
-    def __init__(
-            self,
-            ctors: ctrs.ConnectorSet,
-    ) -> None:
+    def __init__(self, ctors: ctrs.ConnectorSet) -> None:
+        super().__init__()
+
+        self._ctors = check.isinstance(ctors, ctrs.ConnectorSet)
+
+    def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
+        objs = []
+
+        if len(name) > 1 and name[0] in self._ctors:
+            ctor = self._ctors[name[0]]
+            with contextlib.closing(ctor.connect()) as conn:
+                connobjs = conn.reflect([QualifiedName(name[1:])])
+                if connobjs:
+                    objs.append(check.single(connobjs.values()))
+
+        for ctor in self._ctors:
+            with contextlib.closing(ctor.connect()) as conn:
+                connobjs = conn.reflect([name])
+                if connobjs:
+                    objs.extend(connobjs.values())
+
+        return objs
+
+
+class ReflectTablesProcessor(els.InstanceElementProcessor):
+
+    def __init__(self, ctors: ctrs.ConnectorSet) -> None:
         super().__init__()
 
         self._ctors = ctrs.ConnectorSet.of(ctors)
+        self._reflector = Reflector(self._ctors)
 
     @classmethod
     def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
         return {*super().dependencies(), els.queries.QueryBasicAnalysisElementProcessor}
+
+    class Instance(els.InstanceElementProcessor.Instance['ReflectTablesProcessor']):
+
+        @properties.cached
+        def matches(self) -> ta.Iterable[els.Element]:
+            return [e for e in self.input.get_type_set(Table) if e.md is None and not els.has_processed(self.owner, e)]
+
+        @properties.cached
+        def output(self) -> ta.Iterable[els.Element]:
+            lst = []
+            for e in self.input:
+                new = e
+                if isinstance(e, Table) and e.md is None:
+                    mat = check.single(m for m in self.input.get_type_set(Materialization) if m.table == e)
+                    name = QualifiedName([mat.connector.id, *mat.name])
+                    objs = list(self.owner._reflector.reflect(name))
+                    if objs:
+                        md_table = check.isinstance(check.single(objs), md.Table)
+                        new = dc.replace(new, md=md_table)
+                new = dc.replace(
+                    new,
+                    meta={
+                        els.Origin: els.Origin(e),
+                        els.ProcessedBy: els.ProcessedBy([self.owner]),
+                    },
+                )
+                lst.append(new)
+            return lst
+
+
+class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
+
+    def __init__(self, ctors: ctrs.ConnectorSet) -> None:
+        super().__init__()
+
+        self._ctors = ctrs.ConnectorSet.of(ctors)
+        self._reflector = Reflector(self._ctors)
+
+    @classmethod
+    def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
+        return {*super().dependencies(), ReflectTablesProcessor}
 
     class Instance(els.InstanceElementProcessor.Instance['ReflectReferencedTablesProcessor']):
 
@@ -71,24 +136,6 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
                 ret.update(rows_eles)
             return ret
 
-        def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
-            objs = []
-
-            if len(name) > 1 and name[0] in self.owner._ctors:
-                ctor = self.owner._ctors[name[0]]
-                with contextlib.closing(ctor.connect()) as conn:
-                    connobjs = conn.reflect([QualifiedName(name[1:])])
-                    if connobjs:
-                        objs.append(check.single(connobjs.values()))
-
-            for ctor in self.owner._ctors:
-                with contextlib.closing(ctor.connect()) as conn:
-                    connobjs = conn.reflect([name])
-                    if connobjs:
-                        objs.extend(connobjs.values())
-
-            return objs
-
         @properties.stateful_cached
         @property
         def output(self) -> els.ElementSet:
@@ -97,7 +144,7 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
                 if table_name in self.tables_by_name:
                     continue
 
-                objs = list(self.reflect(table_name))
+                objs = list(self.owner._reflector.reflect(table_name))
                 obj = check.isinstance(check.single(objs), md.Table)
 
                 aset = alias_sets_by_md_table.setdefault(obj, set())

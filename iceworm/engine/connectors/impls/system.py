@@ -66,7 +66,7 @@ class SystemConnection(_Connection[SystemConnector]):
 
     def _reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:
         if names:
-            return {n: self._ctor._tables_by_name[n] for n in names if n in self._ctor._tables_by_name}
+            return {n: self._ctor._tables_by_name[n].md_table for n in names if n in self._ctor._tables_by_name}
         else:
             return {t.md_table.name: t.md_table for t in self._ctor._tables_by_name.values()}
 

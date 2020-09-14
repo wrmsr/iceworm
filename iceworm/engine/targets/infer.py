@@ -112,7 +112,12 @@ class InferTableProcessor(els.InstanceElementProcessor):
                 for id in step
             ]
 
-            given_tables: ta.Dict[QualifiedName, md.Table] = {}
+            given_tables: ta.Dict[QualifiedName, md.Table] = {
+                n: check.isinstance(t.md, md.Table)
+                for n, t in self.tables_by_name.items()
+                if not self.id_dep_sets_by_id.get(t.id, [])
+            }
+
             lst = list(self.ele_seq)
             for table in topo:
                 table_idx = self.idxs[table]
@@ -148,6 +153,8 @@ class InferTableProcessor(els.InstanceElementProcessor):
             return els.ElementSet.of(lst)
 
         def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
+            breakpoint()
+
             objs = []
 
             if len(name) > 1 and name[0] in self.owner._ctors:

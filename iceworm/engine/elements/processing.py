@@ -44,6 +44,7 @@ InstanceElementProcessorT = ta.TypeVar('InstanceElementProcessorT', bound='Insta
 
 class ProcessedBy(dc.Pure):
     processors: ta.AbstractSet['ElementProcessor'] = dc.field(
+        coerce=lambda o: ocol.IdentitySet(check.not_isinstance(o, str)) if not isinstance(o, ocol.IdentitySet) else o,
         check=lambda o: isinstance(o, ocol.IdentitySet) and all(isinstance(e, ElementProcessor) for e in o))
 
 
@@ -66,6 +67,17 @@ def _phase_frozen(cls: type) -> ta.Optional[Phase]:
             pf = None
         _PHASE_FROZEN_CACHE[cls] = pf
         return pf
+
+
+def has_processed(ep: 'ElementProcessor', e: Element) -> bool:
+    check.isinstance(ep, ElementProcessor)
+    check.isinstance(e, Element)
+    try:
+        pb = e.meta[ProcessedBy]
+    except KeyError:
+        return False
+    else:
+        return ep in check.isinstance(pb, ProcessedBy).processors
 
 
 class ElementProcessor(lang.Abstract):
@@ -132,11 +144,15 @@ class InstanceElementProcessor(ElementProcessor, lang.Abstract):
 
     @lang.final
     def match(self, elements: ElementSet) -> ta.Iterable[Element]:
-        return self._get_instance(elements).matches
+        inst = self._get_instance(elements)
+        check.state(inst.input is elements)
+        return inst.matches
 
     @lang.final
     def process(self, elements: ElementSet) -> ta.Iterable[Element]:
-        return self._get_instance(elements).output
+        inst = self._get_instance(elements)
+        check.state(inst.input is elements)
+        return inst.output
 
 
 ElementProcessorFactory = ta.Callable[[ElementSet, Phase], ta.Iterable[ElementProcessor]]
@@ -190,6 +206,7 @@ class ElementProcessingDriver:
                 steps = [eps]
 
             count = 0
+            history = []
             while True:
                 count += 1
 
@@ -206,6 +223,7 @@ class ElementProcessingDriver:
                     break
 
                 cur, cures = next(iter(dct.items()))
+                history.append(cur)
                 expected = [e for e in elements if e not in cures]
                 res = ElementSet.of(cur.process(elements))
 
@@ -240,7 +258,7 @@ class ElementProcessingDriver:
                         e,
                         meta={
                             **e.meta,
-                            ProcessedBy: ProcessedBy(ocol.IdentitySet([*npbs, cur])),
+                            ProcessedBy: ProcessedBy([*npbs, cur]),
                         },
                     )
 
