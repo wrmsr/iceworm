@@ -206,7 +206,9 @@ class InferTableProcessor(els.ElementProcessor):
         ret = []
         for ele in elements:
             if isinstance(ele, tars.Table) and ele.md is None:
+                rows = check.single(rt for rt in elements.get_type_set(tars.Rows) if rt.table == ele)
                 ret.append(ele)
+                ret.append(rows)
         return ret
 
     def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
