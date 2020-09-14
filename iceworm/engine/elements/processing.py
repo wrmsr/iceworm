@@ -160,10 +160,19 @@ ElementProcessorFactory = ta.Callable[[ElementSet, Phase], ta.Iterable[ElementPr
 
 class ElementProcessingDriver:
 
-    def __init__(self, processor_factory: ElementProcessorFactory) -> None:
+    class Config(dc.Pure):
+        max_iterations: int = 1000
+
+    def __init__(
+            self,
+            processor_factory: ElementProcessorFactory,
+            *,
+            config = Config(),
+    ) -> None:
         super().__init__()
 
         self._processor_factory = check.callable(processor_factory)
+        self._config = check.isinstance(config, self.Config)
 
     @classmethod
     def build_factory(cls, processors: ta.Iterable[ElementProcessor]) -> ElementProcessorFactory:
@@ -191,7 +200,7 @@ class ElementProcessingDriver:
             for ep in eps:
                 check.not_in(ep, ep_dep_tys)
                 check.in_(phase, type(ep).phases())
-                ep_dep_tys[ep] = {check.issubclass(d, ElementProcessor) for d in type(ep).dependencies()}
+                ep_dep_tys[ep] = {check.issubclass(d, ElementProcessor) for d in type(ep).cls_dependencies()}
                 for mro_cls in type(ep).__mro__:
                     if issubclass(mro_cls, ElementProcessor) and mro_cls != ElementProcessor:
                         ep_sets_by_mro_cls.setdefault(mro_cls, set()).add(ep)
@@ -209,6 +218,7 @@ class ElementProcessingDriver:
             history = []
             while True:
                 count += 1
+                check.state(count <= self._config.max_iterations)
 
                 dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Element]] = ocol.IdentityKeyDict()
                 for step in steps:

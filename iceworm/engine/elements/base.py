@@ -91,7 +91,7 @@ class Dependable(lang.Abstract):
         super().__init_subclass__(**kwargs)
         for mc in reversed(cls.__mro__):
             try:
-                deps = mc.__dict__['dependencies']
+                deps = mc.__dict__['cls_dependencies']
             except KeyError:
                 continue
             else:
@@ -101,7 +101,7 @@ class Dependable(lang.Abstract):
         check.isinstance(deps, classmethod)
 
     @classmethod
-    def dependencies(cls) -> ta.Iterable[ta.Type['Dependable']]:
+    def cls_dependencies(cls) -> ta.Iterable[ta.Type['Dependable']]:
         return []
 
 

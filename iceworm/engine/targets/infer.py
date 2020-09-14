@@ -31,8 +31,8 @@ from .targets import Table
 class InferTableProcessor(els.InstanceElementProcessor):
 
     @classmethod
-    def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
-        return {*super().dependencies(), ReflectReferencedTablesProcessor}
+    def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.ElementProcessor]]:
+        return {*super().cls_dependencies(), ReflectReferencedTablesProcessor}
 
     class Instance(els.InstanceElementProcessor.Instance['InferTableProcessor']):
 

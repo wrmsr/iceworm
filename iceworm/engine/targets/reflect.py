@@ -52,8 +52,8 @@ class ReflectTablesProcessor(els.InstanceElementProcessor):
         self._reflector = Reflector(self._ctors)
 
     @classmethod
-    def dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
-        return {*super().dependencies(), els.queries.QueryParsingElementProcessor}
+    def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
+        return {*super().cls_dependencies(), els.queries.QueryParsingElementProcessor}
 
     class Instance(els.InstanceElementProcessor.Instance['ReflectTablesProcessor']):
 
@@ -96,8 +96,8 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
         self._reflector = Reflector(self._ctors)
 
     @classmethod
-    def dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
-        return {*super().dependencies(), ReflectTablesProcessor}
+    def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
+        return {*super().cls_dependencies(), ReflectTablesProcessor}
 
     class Instance(els.InstanceElementProcessor.Instance['ReflectReferencedTablesProcessor']):
 
@@ -192,7 +192,7 @@ class TableDependencies(dc.Frozen, allow_setattr=True):
 class TableDependenciesAnalysis(els.Analysis):
 
     @classmethod
-    def dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
+    def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
         return {*super().dependencies(), ReflectTablesProcessor, ReflectReferencedTablesProcessor}
 
     @properties.cached
@@ -202,6 +202,14 @@ class TableDependenciesAnalysis(els.Analysis):
             (QualifiedName([ele.connector.id, *ele.name]), self.elements[ele.table])
             for ele in self.elements.get_type_set(Materialization)
         )
+
+    @properties.cached
+    @property
+    def name_sets_by_table(self) -> els.ElementMap[Table, ta.AbstractSet[QualifiedName]]:
+        ret = {}
+        for n, t in self.tables_by_name.items():
+            ret.setdefault(t, set()).add(n)
+        return els.ElementMap(ret)
 
     @properties.cached
     @property
