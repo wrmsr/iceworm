@@ -10,6 +10,9 @@
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 
+import { iceworm } from '@/protos/bundle'
+const { WebServiceStatus } = iceworm
+
 @Component({
   components: {
     HelloWorld,
@@ -18,8 +21,7 @@ import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 export default class Home extends Vue {
   @Prop({default: 0}) private num!: number;
 
-  public timer;
-  public list;
+  public timer: ReturnType<typeof setTimeout> | undefined;
 
   public goBack(): void {
     window.history.length > 1 ? this.$router.go(-1) : this.$router.push('/')
@@ -31,11 +33,10 @@ export default class Home extends Vue {
   }
 
   fetchEventsList() {
-    // var self = this
-    this.$http.get('http://yelp.com/version', function (events) {
-      console.log(events);
-      // self.list = events;
-    }).bind(this);
+    this.$http.get('/status').then(response => {
+      let thing = WebServiceStatus.fromObject(response.body);
+      console.log(thing);
+    });
   }
 
   beforeDestroy() {

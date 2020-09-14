@@ -4,6 +4,7 @@ include LICENSE-*
 
 global-include *.dss
 global-include *.g4
+global-include *.jar
 global-include *.proto
 global-include *.tokens
 global-include .revision
