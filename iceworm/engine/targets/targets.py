@@ -14,11 +14,11 @@ import typing as ta
 
 from omnibus import dataclasses as dc
 
-from . import connectors as ctrs
-from . import elements as els
-from .. import metadata as md_
-from ..trees.types import Query
-from ..types import QualifiedName
+from .. import connectors as ctrs
+from .. import elements as els
+from ... import metadata as md_
+from ...trees.types import Query
+from ...types import QualifiedName
 
 
 class Target(els.Element, abstract=True):

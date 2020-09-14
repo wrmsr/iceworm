@@ -13,6 +13,7 @@ from omnibus import inject as inj
 from omnibus import lang
 import omnibus.inject.scopes  # noqa
 
+from . import queries
 from .base import Element
 from .collections import ElementSet
 from .phases import Phase
@@ -202,3 +203,12 @@ def bind_post_eager(binder: inj.Binder, key: ta.Union[inj.Key, ta.Type], phase: 
     scope = get_scope(phase_pair)
 
     binder.new_set_binder(_Eager, annotated_with=phase_pair, in_=scope).bind(to_instance=_Eager(key))
+
+
+def install(binder: inj.Binder) -> inj.Binder:
+    check.isinstance(binder, inj.Binder)
+
+    bind_element_processor(binder, queries.QueryBasicAnalysisElementProcessor, Phases.TARGETS)
+    bind_element_processor(binder, queries.QueryParsingElementProcessor, Phases.TARGETS)
+
+    return binder

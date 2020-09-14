@@ -11,11 +11,11 @@ import pytest  # noqa
 
 from .. import connectors as ctrs
 from .. import elements as els
-from .. import inference as infr
 from .. import ops
 from .. import planning as pln
 from .. import rules as rls
 from .. import sites
+from .. import targets as tars
 from ... import domains as doms
 from ... import sql
 from ...sql.tests.helpers import DbManager
@@ -56,16 +56,14 @@ class UrlSecretsReplacer(els.ElementProcessor):
 
 def install_element_processors(binder: inj.Binder) -> inj.Binder:
     els.inject.bind_element_processor(binder, UrlSecretsReplacer, els.Phases.CONNECTORS)
-    els.inject.bind_element_processor(binder, els.queries.QueryBasicAnalysisElementProcessor, els.Phases.TARGETS)
-    els.inject.bind_element_processor(binder, els.queries.QueryParsingElementProcessor, els.Phases.TARGETS)
-    els.inject.bind_element_processor(binder, infr.InferTableProcessor, els.Phases.TARGETS)
-    els.inject.bind_element_processor(binder, infr.ReflectReferencedTablesProcessor, els.Phases.TARGETS)
     els.inject.bind_element_processor(binder, sites.SiteProcessor, els.Phases.SITES)
     rls.inject.bind_rule_processor(binder, rls.TableAsSelectProcessor, els.Phases.TARGETS)
 
     binder.bind(inj.Key(ta.Callable[[str], no.Node]), to_instance=par.parse_stmt)
 
     ctrs.inject.install(binder)
+    els.inject.install(binder)
+    tars.inject.install(binder)
 
     return binder
 
