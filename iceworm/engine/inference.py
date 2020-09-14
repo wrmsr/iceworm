@@ -122,13 +122,16 @@ class InferTableProcessor(els.ElementProcessor):
                     name=name,
                 )
 
+                lst[rows_idx] = dc.replace(
+                    rows,
+                    query=AstQuery(root),
+                    meta={els.Origin: els.Origin(rows)},
+                )
+
                 lst[table_idx] = dc.replace(
                     table,
                     md=md_table,
-                    meta={
-                        **table.meta,
-                        els.Origin: els.Origin(table),
-                    },
+                    meta={els.Origin: els.Origin(table)},
                 )
 
                 given_tables[name] = md_table
@@ -200,7 +203,11 @@ class InferTableProcessor(els.ElementProcessor):
             )
 
     def match(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
-        return [t for t in elements.get_type_set(tars.Table) if t.md is None]
+        ret = []
+        for ele in elements:
+            if isinstance(ele, tars.Table) and ele.md is None:
+                ret.append(ele)
+        return ret
 
     def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
         return self.Instance(self, elements).output

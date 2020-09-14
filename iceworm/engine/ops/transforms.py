@@ -14,4 +14,4 @@ class OpTransformer(dispatch.Class, lang.Abstract):
 
     def __call__(self, op: Op, **kwargs) -> Op:  # noqa
         res = op.map(self, **kwargs)
-        return dc.replace(res, meta={**res.meta, Origin: op})
+        return dc.replace(res, meta={Origin: op})
