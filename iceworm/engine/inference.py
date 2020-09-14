@@ -51,7 +51,7 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
                     tn.name.name
                     for tn in els.queries.get_basic(ele, ele.query).get_node_type_set(no.Table)
                 })
-                for ele in self._input.get_type_set(tars.Rows)
+                for ele in self.input.get_type_set(tars.Rows)
             )
 
         @properties.cached
@@ -67,8 +67,8 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
         @property
         def tables_by_name(self) -> ta.Mapping[QualifiedName, tars.Table]:
             return unique_dict(
-                (QualifiedName([ele.connector.id, *ele.name]), self._input[ele.table])
-                for ele in self._input.get_type_set(tars.Materialization)
+                (QualifiedName([ele.connector.id, *ele.name]), self.input[ele.table])
+                for ele in self.input.get_type_set(tars.Materialization)
             )
 
         @properties.cached
@@ -84,14 +84,14 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
         def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
             objs = []
 
-            if len(name) > 1 and name[0] in self._owner._ctors:
-                ctor = self._owner._ctors[name[0]]
+            if len(name) > 1 and name[0] in self.owner._ctors:
+                ctor = self.owner._ctors[name[0]]
                 with contextlib.closing(ctor.connect()) as conn:
                     connobjs = conn.reflect([QualifiedName(name[1:])])
                     if connobjs:
                         objs.append(check.single(connobjs.values()))
 
-            for ctor in self._owner._ctors:
+            for ctor in self.owner._ctors:
                 with contextlib.closing(ctor.connect()) as conn:
                     connobjs = conn.reflect([name])
                     if connobjs:
@@ -103,19 +103,32 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
         @property
         def output(self) -> els.ElementSet:
             alias_sets_by_md_table: ta.MutableMapping[md.Object, ta.Set[QualifiedName]] = ocol.IdentityKeyDict()
-
             for table_name in self.rows_ele_sets_by_table_name:
                 if table_name in self.tables_by_name:
                     continue
 
                 objs = list(self.reflect(table_name))
-                obj = check.single(objs)
+                obj = check.isinstance(check.single(objs), md.Table)
 
                 aset = alias_sets_by_md_table.setdefault(obj, set())
                 if table_name != obj.name:
                     aset.add(table_name)
 
-            raise NotImplementedError
+            new = []
+            for md_table, aliases in alias_sets_by_md_table.items():
+                for alias in aliases:
+                    id: els.Id = '/'.join(alias)
+                    ctor = self.owner._ctors[alias[0]]
+                    new.extend([
+                        tars.Table(id, md_table),
+                        tars.Materialization(id, ctor.id, alias[1:], readonly=True),
+                    ])
+
+            return els.ElementSet.of([
+                *[e for e in self.input if e not in self.matches],
+                *[dc.replace(e, meta={els.Origin: els.Origin(e)}) for e in self.matches],
+                *new,
+            ])
 
 
 class InferTableProcessor(els.InstanceElementProcessor):
@@ -137,9 +150,9 @@ class InferTableProcessor(els.InstanceElementProcessor):
         @properties.cached
         def matches(self) -> ta.Iterable[els.Element]:
             ret = []
-            for ele in self._input:
+            for ele in self.input:
                 if isinstance(ele, tars.Table) and ele.md is None:
-                    rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
+                    rows = check.single(rt for rt in self.input.get_type_set(tars.Rows) if rt.table == ele)
                     ret.append(ele)
                     ret.append(rows)
             return ret
@@ -148,8 +161,8 @@ class InferTableProcessor(els.InstanceElementProcessor):
         @property
         def tables_by_name(self) -> ta.Mapping[QualifiedName, tars.Table]:
             return unique_dict(
-                (QualifiedName([ele.connector.id, *ele.name]), self._input[ele.table])
-                for ele in self._input.get_type_set(tars.Materialization)
+                (QualifiedName([ele.connector.id, *ele.name]), self.input[ele.table])
+                for ele in self.input.get_type_set(tars.Materialization)
             )
 
         @properties.cached
@@ -160,7 +173,7 @@ class InferTableProcessor(els.InstanceElementProcessor):
         @properties.cached
         @property
         def ele_seq(self) -> ta.Sequence[els.Element]:
-            return list(self._input)
+            return list(self.input)
 
         @properties.cached
         @property
@@ -171,11 +184,15 @@ class InferTableProcessor(els.InstanceElementProcessor):
         @property
         def id_dep_sets_by_id(self) -> ta.Mapping[str, ta.AbstractSet[str]]:
             dct: ta.Dict[str, ta.Set[str]] = {}
-            for ele in self._input:
+            for ele in self.input:
                 if not isinstance(ele, tars.Table):
                     continue
 
-                rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
+                rows_eles = [rt for rt in self.input.get_type_set(tars.Rows) if rt.table == ele]
+                if not rows_eles:
+                    continue
+                rows = check.single(rows_eles)
+
                 deps = {
                     self.tables_by_name[name].id
                     for n in els.queries.get_basic(rows, rows.query).get_node_type_set(no.Table)
@@ -191,7 +208,7 @@ class InferTableProcessor(els.InstanceElementProcessor):
         @properties.stateful_cached
         def output(self) -> els.ElementSet:
             topo = [
-                check.isinstance(self._input[id], tars.Table)
+                check.isinstance(self.input[id], tars.Table)
                 for step in ocol.toposort(self.id_dep_sets_by_id)
                 for id in step
             ]
@@ -204,7 +221,7 @@ class InferTableProcessor(els.InstanceElementProcessor):
                 if table.md is not None:
                     continue
 
-                rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == table)
+                rows = check.single(rt for rt in self.input.get_type_set(tars.Rows) if rt.table == table)
                 rows_idx = self.idxs[rows]
                 check.state(lst[rows_idx] is rows)
 
@@ -234,14 +251,14 @@ class InferTableProcessor(els.InstanceElementProcessor):
         def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
             objs = []
 
-            if len(name) > 1 and name[0] in self._owner._ctors:
-                ctor = self._owner._ctors[name[0]]
+            if len(name) > 1 and name[0] in self.owner._ctors:
+                ctor = self.owner._ctors[name[0]]
                 with contextlib.closing(ctor.connect()) as conn:
                     connobjs = conn.reflect([QualifiedName(name[1:])])
                     if connobjs:
                         objs.append(check.single(connobjs.values()))
 
-            for ctor in self._owner._ctors:
+            for ctor in self.owner._ctors:
                 with contextlib.closing(ctor.connect()) as conn:
                     connobjs = conn.reflect([name])
                     if connobjs:

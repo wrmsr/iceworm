@@ -94,14 +94,18 @@ class InstanceElementProcessor(ElementProcessor, lang.Abstract):
         def __init__(self, owner: InstanceElementProcessorT, input: ElementSet) -> None:
             super().__init__()
 
-            self._owner = check.isinstance(owner, self._owner_cls)
-            self._input = check.isinstance(input, ElementSet)
+            self.__owner = check.isinstance(owner, self._owner_cls)
+            self.__input = check.isinstance(input, ElementSet)
 
         _owner_cls: ta.ClassVar[ta.Type[InstanceElementProcessorT]]
 
         @property
         def owner(self) -> InstanceElementProcessorT:
-            return self._owner
+            return self.__owner
+
+        @property
+        def input(self) -> ElementSet:
+            return self.__input
 
         @abc.abstractproperty
         def matches(self) -> ta.AbstractSet[Element]:
@@ -185,7 +189,10 @@ class ElementProcessingDriver:
             else:
                 steps = [eps]
 
+            count = 0
             while True:
+                count += 1
+
                 dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Element]] = ocol.IdentityKeyDict()
                 for step in steps:
                     for ep in step:
