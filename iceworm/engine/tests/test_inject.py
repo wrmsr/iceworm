@@ -88,7 +88,7 @@ def test_inject(harness: har.Harness):
         delements = els.ElementSet.of(serde.deserialize(selements, ta.Sequence[els.Element]))
         assert list(delements) == list(elements)
 
-        # print(__import__('yaml').dump(selements))
+        print(__import__('yaml').dump(selements))
 
         connectors = drv[ctrs.ConnectorSet]
         conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(connectors)))
@@ -96,7 +96,7 @@ def test_inject(harness: har.Harness):
             'pg/a',
             'pg/b',
             'pg/c',
-            # 'pg/d',
+            'pg/d',
             'pg/nums',
             'system/notifications',
         })

@@ -229,6 +229,6 @@ class TableDependenciesProcessor(els.InstanceElementProcessor):
             return els.ElementSet.of(lst)
 
 
-def get_table_deps(ele: els.Element) -> TableDependencies:
-    check.isinstance(ele, els.Element)
+def get_rows_table_deps(ele: Rows) -> TableDependencies:
+    check.isinstance(ele, Rows)
     return check.isinstance(ele.meta[TableDependencies], TableDependencies)

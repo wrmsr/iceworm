@@ -10,14 +10,21 @@ import typing as ta
 
 from omnibus import check
 from omnibus import collections as ocol
+from omnibus import dataclasses as dc
 
 from .base import Element
 from .base import Id
 from .refs import Ref
 
 
-T = ta.TypeVar('T"')
+AnalysisT = ta.TypeVar('AnalysisT', bound='Analysis')
 ElementT = ta.TypeVar('ElementT', bound='Element')
+T = ta.TypeVar('T')
+V = ta.TypeVar('V')
+
+
+class Analysis(dc.Enum, allow_setattr=True):
+    elements: 'ElementSet' = dc.field(check=lambda o: isinstance(o, ElementSet))
 
 
 class ElementSet(ta.Generic[ElementT]):
@@ -39,6 +46,7 @@ class ElementSet(ta.Generic[ElementT]):
         self._set = ele_set
 
         self._sets_by_type: ta.Dict[type, ta.AbstractSet[ElementT]] = {}
+        self._analyses: ta.Dict[ta.Type[Analysis], Analysis] = {}
 
     @property
     def set(self) -> ta.AbstractSet[Element]:
@@ -85,3 +93,35 @@ class ElementSet(ta.Generic[ElementT]):
             return self._by_id[key]
         else:
             raise TypeError(key)
+
+    def analyze(self, cls: ta.Type[AnalysisT]) -> AnalysisT:
+        try:
+            return self._analyses[cls]
+        except KeyError:
+            a = self._analyses[cls] = cls(self)
+            return a
+
+
+class ElementMap(ta.Mapping[Element, V]):
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__()
+        if len(args) > 1:
+            raise TypeError(args)
+        self._dct: ta.Dict[Ref, V] = {}
+        for e, v in ocol.yield_dict_init(*args, **kwargs):
+            r = Ref.of(e)
+            check.not_in(self._dct, r)
+            self._dct[r] = v
+
+    def __len__(self) -> int:
+        return len(self._dct)
+
+    def __iter__(self) -> ta.Iterator[Ref]:
+        return iter(self._dct)
+
+    def __contains__(self, key: ta.Union[Ref, Id, Element]) -> bool:
+        return Ref.of(key) in self._dct
+
+    def __getitem__(self, key: ta.Union[Ref, Id, Element]) -> Element:
+        return self._dct[Ref.of(key)]

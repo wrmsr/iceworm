@@ -26,7 +26,7 @@ class Ref(dc.Frozen, lang.Abstract, ta.Generic[ElementT], repr=False, eq=False, 
     ele_cls: ta.ClassVar[type]
 
     def __hash__(self) -> int:
-        raise TypeError('Forbidden')
+        return hash(id)
 
     def __bool__(self) -> bool:
         raise TypeError('Forbidden')
@@ -102,11 +102,18 @@ class Ref(dc.Frozen, lang.Abstract, ta.Generic[ElementT], repr=False, eq=False, 
 
     @classmethod
     def of(cls: ta.Type[Self], obj: ta.Union[ElementT, 'Ref', Id]) -> Self:
-        if isinstance(obj, cls.ele_cls):
-            return cls(obj.id)
-        elif type(obj) is cls:
-            return obj
-        elif isinstance(obj, Id):
-            return cls(obj)
+        if cls is Ref:
+            if isinstance(obj, Element):
+                return cls[type(obj)](obj.id)
+            if isinstance(obj, Ref):
+                return obj
+            if isinstance(obj, Id):
+                return cls[Element](obj)
         else:
-            raise TypeError(obj)
+            if isinstance(obj, cls.ele_cls):
+                return cls(obj.id)
+            if type(obj) is cls:
+                return obj
+            if isinstance(obj, Id):
+                return cls(obj)
+        raise TypeError(obj)
