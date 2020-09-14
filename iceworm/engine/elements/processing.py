@@ -223,6 +223,7 @@ class ElementProcessingDriver:
             history = []
             while True:
                 count += 1
+                # print(count)
                 check.state(count <= self._config.max_iterations)
 
                 dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Element]] = ocol.IdentityKeyDict()
