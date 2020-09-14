@@ -76,7 +76,11 @@ def bind_impl(binder: inj.Binder, cls: ta.Type[Configable], impl_cls: ta.Type[Co
 
     @inj.annotate(factory=_UNDERLYING)
     def provide(config, __factory, **kwargs) -> impl_cls:
-        return __factory(config=config)
+        fac_kwargs = {
+            k: v(config=getattr(config, k))
+            for k, v in kwargs.items()
+        }
+        return __factory(config=config, **fac_kwargs)
 
     binder.bind_class(impl_cls, key=inj.Key(impl_cls, _UNDERLYING), assists=impl_assists)
     binder.bind_callable(provide, assists={'config'}, kwargs=provider_kwargs)

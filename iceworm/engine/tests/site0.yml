@@ -3,6 +3,7 @@
 
 - sql_connector:
     id: pg
+    adapter: {postgres: {}}
     url_secret: pg_url
 
 - file_connector:

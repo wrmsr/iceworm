@@ -11,24 +11,32 @@ TODO:
 """
 import typing as ta
 
+from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
 import sqlalchemy as sa  # noqa
 
-from ..utils import configable as cfgable
+from ..utils import configable as cfgabl
+from ..utils import serde
 
 
 AdapterT = ta.TypeVar('AdapterT', bound='Adapter')
 AdapterConfigT = ta.TypeVar('AdapterConfigT', bound='Adapter.Config')
 
 
-class Adapter(cfgable.Configable[AdapterConfigT], lang.Abstract):
+class Adapter(cfgabl.Configable[AdapterConfigT], lang.Abstract):
 
-    class Config(dc.Enum, cfgable.Configable.Config):
-        pass
+    class Config(dc.Enum, cfgabl.Configable.Config):
+        dc.metadata({
+            serde.Name: lambda cls: lang.decamelize(cfgabl.get_impl(cls).__name__[:-7]),
+        })
 
     def __init__(self, config: AdapterConfigT) -> None:
         super().__init__(config)
+
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+        check.state(cls.__name__.endswith('Adapter'))
 
     def build_range(self, num):
         raise NotImplementedError

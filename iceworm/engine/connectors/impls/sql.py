@@ -26,14 +26,13 @@ from ..base import Rows
 class SqlConnector(_Connector['SqlConnector', 'SqlConnector.Config']):
 
     class Config(_Connector.Config):
+        adapter: sql.Adapter.Config = dc.field(check=lambda o: isinstance(o, sql.Adapter.Config))
+
         url: ta.Optional[str] = dc.field(None, check=lambda s: s is None or (isinstance(s, str) and s), kwonly=True)
         url_secret: ta.Optional[sec.SecretKey] = dc.field(None, coerce=sec.SecretKey.of_optional, kwonly=True)
-
         dc.check(lambda url, url_secret: check.one_of([url, url_secret], not_none=True))
 
         kwargs: ta.Mapping[str, ta.Any] = dc.field(ocol.frozendict(), coerce=ocol.frozendict)
-
-        adapter: sql.Adapter.Config = dc.field(sql.postgres.PostgresAdapter.Config(), check=lambda o: isinstance(o, sql.Adapter.Config))  # noqa
 
     def __init__(self, config: Config, adapter: sql.Adapter) -> None:
         super().__init__(check.isinstance(config, SqlConnector.Config))
