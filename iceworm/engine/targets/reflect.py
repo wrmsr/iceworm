@@ -97,7 +97,7 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
 
     @classmethod
     def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
-        return {*super().cls_dependencies(), ReflectTablesProcessor}
+        return {*super().cls_dependencies(), ReflectTablesProcessor, els.queries.QueryBasicAnalysis}
 
     class Instance(els.InstanceElementProcessor.Instance['ReflectReferencedTablesProcessor']):
 
@@ -193,7 +193,12 @@ class TableDependenciesAnalysis(els.Analysis):
 
     @classmethod
     def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
-        return {*super().cls_dependencies(), ReflectTablesProcessor, ReflectReferencedTablesProcessor}
+        return {
+            *super().cls_dependencies(),
+            ReflectTablesProcessor,
+            ReflectReferencedTablesProcessor,
+            els.queries.QueryBasicAnalysis,
+        }
 
     @properties.cached
     @property

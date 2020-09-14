@@ -80,6 +80,10 @@ class QueryBasics(dc.Pure):
 
 class QueryBasicAnalysis(Analysis):
 
+    @classmethod
+    def cls_dependencies(cls) -> ta.Iterable[ta.Type[ElementProcessor]]:
+        return {*super().cls_dependencies(), QueryParsingElementProcessor}
+
     @properties.cached
     @property
     def by_element(self) -> ta.Mapping[Element, QueryBasics]:

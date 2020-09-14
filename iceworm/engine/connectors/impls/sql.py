@@ -1,7 +1,3 @@
-"""
-TODO:
- - dialects: pg/sf/sqlite
-"""
 import typing as ta
 
 from omnibus import check

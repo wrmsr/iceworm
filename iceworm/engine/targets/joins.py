@@ -13,7 +13,7 @@ class JoinSplittingProcessor(els.InstanceElementProcessor):
 
     @classmethod
     def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.ElementProcessor]]:
-        return {*super().cls_dependencies(), ReflectReferencedTablesProcessor}
+        return {*super().cls_dependencies(), ReflectReferencedTablesProcessor, TableDependenciesAnalysis}
 
     class Instance(els.InstanceElementProcessor.Instance['JoinSplittingProcessor']):
 

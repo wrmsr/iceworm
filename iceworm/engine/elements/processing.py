@@ -35,6 +35,7 @@ from omnibus import properties
 from .base import Dependable
 from .base import Element
 from .base import Frozen
+from .collections import Analysis
 from .collections import ElementSet
 from .phases import PHASES
 from .phases import Phase
@@ -200,7 +201,11 @@ class ElementProcessingDriver:
             for ep in eps:
                 check.not_in(ep, ep_dep_tys)
                 check.in_(phase, type(ep).phases())
-                ep_dep_tys[ep] = {check.issubclass(d, ElementProcessor) for d in type(ep).cls_dependencies()}
+                ep_dep_tys[ep] = {
+                    check.issubclass(d, ElementProcessor)
+                    for d in type(ep).cls_dependencies()
+                    if not issubclass(d, Analysis)
+                }
                 for mro_cls in type(ep).__mro__:
                     if issubclass(mro_cls, ElementProcessor) and mro_cls != ElementProcessor:
                         ep_sets_by_mro_cls.setdefault(mro_cls, set()).add(ep)
