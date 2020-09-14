@@ -159,7 +159,7 @@ def new_meta_field(ann_cls: ta.Type[anns.Annotation]) -> dc.Field:
         repr=False,
         hash=False,
         compare=False,
-        coerce=ocol.frozendict,
-        check=lambda d: not any(isinstance(k, ann_cls) for k in d),
+        coerce=lambda d: ocol.frozendict((k, v) for k, v in check.isinstance(d, ta.Mapping).items() if v is not None),
+        check=lambda d: not any(isinstance(k, ann_cls) or v is None for k, v in d.items()),
         metadata={serde.Ignore: True},
     )

@@ -71,8 +71,8 @@ class InferTableProcessor(els.ElementProcessor):
 
         @properties.cached
         @property
-        def idxs_by_id(self):
-            return {e.id: i for i, e in enumerate(self.ele_seq)}
+        def idxs(self) -> ta.Mapping[els.Element, int]:
+            return ocol.IdentityKeyDict((e, i) for i, e in enumerate(self.ele_seq))
 
         @properties.cached
         @property
@@ -104,23 +104,32 @@ class InferTableProcessor(els.ElementProcessor):
             ]
 
             given_tables: ta.Dict[QualifiedName, md.Table] = {}
-            lst = list(self._input)
-            for ele in topo:
-                if ele.md is not None:
+            lst = list(self.ele_seq)
+            for table in topo:
+                table_idx = self.idxs[table]
+                check.state(lst[table_idx] is table)
+                if table.md is not None:
                     continue
 
-                rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
+                rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == table)
+                rows_idx = self.idxs[rows]
+                check.state(lst[rows_idx] is rows)
 
-                name = self.table_names_by_id[ele.id]
-                md_table = self.infer_table(
+                name = self.table_names_by_id[table.id]
+                root, md_table = self.infer_table(
                     check.isinstance(rows.query, AstQuery).root,
                     given_tables,
                     name=name,
                 )
 
-                idx = self.idxs_by_id[ele.id]
-                check.state(lst[idx] is ele)
-                lst[idx] = dc.replace(ele, md=md_table, meta={**ele.meta, els.Origin: els.Origin(ele)})
+                lst[table_idx] = dc.replace(
+                    table,
+                    md=md_table,
+                    meta={
+                        **table.meta,
+                        els.Origin: els.Origin(table),
+                    },
+                )
 
                 given_tables[name] = md_table
 
@@ -150,7 +159,7 @@ class InferTableProcessor(els.ElementProcessor):
                 given_tables: ta.Mapping[QualifiedName, md.Table],
                 *,
                 name: ta.Optional[QualifiedName] = None,
-        ) -> md.Table:
+        ) -> ta.Tuple[no.Node, md.Table]:
             table_names = {
                 tn.name.name
                 for tn in ana.basic(root).get_node_type_set(no.Table)
@@ -184,11 +193,8 @@ class InferTableProcessor(els.ElementProcessor):
             dts = tdatatypes.analyze(root, oris, cat)
             tt = check.isinstance(dts.dts_by_node[root], dt.Table)
 
-            ren = rendering.render(root)
-            print(ren)  # FIXME: update query
-
             # FIXME: pg.c defined in terms of generated pg.b, need iterativity
-            return md.Table(
+            return root, md.Table(
                 name if name is not None else ['$anon'],
                 [md.Column(n, t) for n, t in tt.columns],
             )
