@@ -81,9 +81,40 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
                 ret.update(rows_eles)
             return ret
 
+        def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
+            objs = []
+
+            if len(name) > 1 and name[0] in self._owner._ctors:
+                ctor = self._owner._ctors[name[0]]
+                with contextlib.closing(ctor.connect()) as conn:
+                    connobjs = conn.reflect([QualifiedName(name[1:])])
+                    if connobjs:
+                        objs.append(check.single(connobjs.values()))
+
+            for ctor in self._owner._ctors:
+                with contextlib.closing(ctor.connect()) as conn:
+                    connobjs = conn.reflect([name])
+                    if connobjs:
+                        objs.extend(connobjs.values())
+
+            return objs
+
         @properties.stateful_cached
         @property
         def output(self) -> els.ElementSet:
+            alias_sets_by_md_table: ta.MutableMapping[md.Object, ta.Set[QualifiedName]] = ocol.IdentityKeyDict()
+
+            for table_name in self.rows_ele_sets_by_table_name:
+                if table_name in self.tables_by_name:
+                    continue
+
+                objs = list(self.reflect(table_name))
+                obj = check.single(objs)
+
+                aset = alias_sets_by_md_table.setdefault(obj, set())
+                if table_name != obj.name:
+                    aset.add(table_name)
+
             raise NotImplementedError
 
 
