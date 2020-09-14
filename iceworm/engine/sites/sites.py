@@ -21,9 +21,9 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus.serde.objects import yaml as oyaml
 
-from . import elements as els
-from ..utils import serde
-from ..utils import unique_dict
+from .. import elements as els
+from ...utils import serde
+from ...utils import unique_dict
 
 
 class SourceLocation(els.Annotation, els.Inherited):

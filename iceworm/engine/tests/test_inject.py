@@ -23,7 +23,6 @@ from ...tests import harness as har
 from ...trees import nodes as no
 from ...trees import parsing as par
 from ...types import QualifiedName  # noqa
-from ...utils import nodal  # noqa
 from ...utils import secrets as sec  # noqa
 from ...utils import serde
 
@@ -56,13 +55,13 @@ class UrlSecretsReplacer(els.ElementProcessor):
 
 def install_element_processors(binder: inj.Binder) -> inj.Binder:
     els.inject.bind_element_processor(binder, UrlSecretsReplacer, els.Phases.CONNECTORS)
-    els.inject.bind_element_processor(binder, sites.SiteProcessor, els.Phases.SITES)
-    rls.inject.bind_rule_processor(binder, rls.TableAsSelectProcessor, els.Phases.TARGETS)
 
     binder.bind(inj.Key(ta.Callable[[str], no.Node]), to_instance=par.parse_stmt)
 
     ctrs.inject.install(binder)
     els.inject.install(binder)
+    rls.inject.install(binder)
+    sites.inject.install(binder)
     tars.inject.install(binder)
 
     return binder
