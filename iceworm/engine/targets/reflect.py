@@ -65,6 +65,9 @@ class ReflectTablesProcessor(els.InstanceElementProcessor):
         def output(self) -> ta.Iterable[els.Element]:
             lst = []
             for e in self.input:
+                if e not in self.matches:
+                    lst.append(e)
+                    continue
                 new = e
                 if isinstance(e, Table) and e.md is None:
                     mat = check.single(m for m in self.input.get_type_set(Materialization) if m.table == e)

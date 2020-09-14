@@ -1,3 +1,7 @@
+"""
+TODO:
+ - toposort lol
+"""
 import typing as ta
 
 from omnibus import check
@@ -39,22 +43,23 @@ class ElementPlanner:
         for mat in self._elements.get_type_set(tars.Materialization):
             tbl_qn_sets_by_id.setdefault(mat.table.id, set()).add(QualifiedName([mat.connector.id, *mat.name]))
 
-        for ele in self._elements:
-            if isinstance(ele, tars.Table):
-                if ele.id in invalidated_tables:
-                    for dst in tbl_qn_sets_by_id.get(ele.id, []):
-                        ctr = self._ctors[dst[0]]
-                        if not isinstance(ctr, ctrs.impls.sql.SqlConnector):
-                            continue
-                        mdt = check.isinstance(ele.md, md.Table)
-                        plan.extend([
-                            ops.DropTable(dst),
-                            ops.CreateTable(dc.replace(mdt, name=dst)),
-                        ])
+        for ele in self._elements.get_type_set(tars.Table):
+            if ele.id not in invalidated_tables:
+                continue
+            for dst in tbl_qn_sets_by_id.get(ele.id, []):
+                ctr = self._ctors[dst[0]]
+                if not isinstance(ctr, ctrs.impls.sql.SqlConnector):
+                    continue
+                mdt = check.isinstance(ele.md, md.Table)
+                plan.extend([
+                    ops.DropTable(dst),
+                    ops.CreateTable(dc.replace(mdt, name=dst)),
+                ])
 
-            elif isinstance(ele, tars.Rows):
-                if ele.table.id in invalidated_tables:
-                    for dst in tbl_qn_sets_by_id.get(ele.table.id, []):
-                        plan.append(ops.InsertIntoSelect(dst, ele.query))
+        for ele in self._elements.get_type_set(tars.Rows):
+            if ele.table.id not in invalidated_tables:
+                continue
+            for dst in tbl_qn_sets_by_id.get(ele.table.id, []):
+                plan.append(ops.InsertIntoSelect(dst, ele.query))
 
         return ops.List(plan)

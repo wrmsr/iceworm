@@ -4,7 +4,6 @@ TODO:
  - 'processed' sql query attribute?
  - ** query elements get a Map[QualifiedName, Id] field (or att??)
 """
-import contextlib
 import typing as ta
 
 from omnibus import check
@@ -12,7 +11,6 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import properties
 
-from .. import connectors as ctrs
 from .. import elements as els
 from ... import datatypes as dt
 from ... import metadata as md
@@ -31,14 +29,6 @@ from .targets import Table
 
 
 class InferTableProcessor(els.InstanceElementProcessor):
-
-    def __init__(
-            self,
-            ctors: ctrs.ConnectorSet,
-    ) -> None:
-        super().__init__()
-
-        self._ctors = ctrs.ConnectorSet.of(ctors)
 
     @classmethod
     def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
@@ -152,26 +142,6 @@ class InferTableProcessor(els.InstanceElementProcessor):
 
             return els.ElementSet.of(lst)
 
-        def reflect(self, name: QualifiedName) -> ta.Sequence[md.Object]:
-            breakpoint()
-
-            objs = []
-
-            if len(name) > 1 and name[0] in self.owner._ctors:
-                ctor = self.owner._ctors[name[0]]
-                with contextlib.closing(ctor.connect()) as conn:
-                    connobjs = conn.reflect([QualifiedName(name[1:])])
-                    if connobjs:
-                        objs.append(check.single(connobjs.values()))
-
-            for ctor in self.owner._ctors:
-                with contextlib.closing(ctor.connect()) as conn:
-                    connobjs = conn.reflect([name])
-                    if connobjs:
-                        objs.extend(connobjs.values())
-
-            return objs
-
         def infer_table(
                 self,
                 rows: Rows,
@@ -188,14 +158,10 @@ class InferTableProcessor(els.InstanceElementProcessor):
 
             alias_sets_by_tbl: ta.MutableMapping[md.Object, ta.Set[QualifiedName]] = ocol.IdentityKeyDict()
             for tn in table_names:
-                if tn in given_tables:
-                    alias_sets_by_tbl[given_tables[tn]] = set()
-                else:
-                    objs = list(self.reflect(tn))
-                    obj = check.single(objs)
-                    aset = alias_sets_by_tbl.setdefault(obj, set())
-                    if tn != obj.name:
-                        aset.add(tn)
+                tbl = check.isinstance(given_tables[tn], md.Table)
+                aset = alias_sets_by_tbl.setdefault(tbl, set())
+                if tn != tbl.name:
+                    aset.add(tn)
 
             cat = md.Catalog(
                 tables=[
