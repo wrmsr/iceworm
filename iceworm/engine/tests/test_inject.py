@@ -23,6 +23,7 @@ from ...tests import harness as har
 from ...trees import nodes as no
 from ...trees import parsing as par
 from ...types import QualifiedName  # noqa
+from ...utils import nodal  # noqa
 from ...utils import secrets as sec  # noqa
 from ...utils import serde
 

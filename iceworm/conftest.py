@@ -67,6 +67,40 @@ def pytest_runtest_makereport(item, call):
     #         return TestReport.from_item_and_call(item, call)
 
 
+# def pytest_exception_interact(node, call, report):
+#     try:
+#         import pydevd
+#         from pydevd import pydevd_tracing
+#
+#     except ImportError:
+#         pass
+#
+#     else:
+#         exctype, value, traceback = call.excinfo._excinfo
+#         frames = []
+#         while traceback:
+#             frames.append(traceback.tb_frame)
+#             traceback = traceback.tb_next
+#
+#         import threading
+#         thread = threading.current_thread()
+#         frames_by_id = dict([(id(frame), frame) for frame in frames])
+#         frame = frames[-1]
+#         exception = (exctype, value, traceback)
+#
+#         if hasattr(thread, 'additional_info'):
+#             thread.additional_info.pydev_message = 'test fail'
+#         try:
+#             debugger = pydevd.debugger
+#         except AttributeError:
+#             debugger = pydevd.get_global_debugger()
+#
+#         pydevd_tracing.SetTrace(None)
+#         debugger.stop_on_unhandled_exception(thread, frame, frames_by_id, exception)
+#
+#     return report
+
+
 # FIXME: gross
 @lang.cached_nullary
 def _load_dot_env() -> ta.Optional[ta.Mapping[str, str]]:

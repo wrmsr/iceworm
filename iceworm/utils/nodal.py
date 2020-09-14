@@ -35,6 +35,14 @@ class _FieldsInfo(dc.Pure):
 
 class Nodal(ta.Generic[NodalT], lang.Abstract):
 
+    @abc.abstractproperty
+    def anns(self) -> anns.Annotations:
+        raise NotImplementedError
+
+    @abc.abstractproperty
+    def meta(self) -> ta.Mapping[ta.Any, ta.Any]:
+        raise NotImplementedError
+
     def __init_subclass__(cls, **kwargs) -> None:
         super().__init_subclass__(**kwargs)
 
@@ -163,3 +171,21 @@ def new_meta_field(ann_cls: ta.Type[anns.Annotation]) -> dc.Field:
         check=lambda d: not any(isinstance(k, ann_cls) or v is None for k, v in d.items()),
         metadata={serde.Ignore: True},
     )
+
+
+def meta_chain(
+        obj: Nodal,
+        key: ta.Any,
+        *,
+        cls: ta.Type[Nodal] = Nodal,
+        next: ta.Callable[[ta.Any], Nodal] = lambda o: o,
+) -> ta.List[Nodal]:
+    lst = []
+    while True:
+        lst.append(check.isinstance(obj, cls))
+        try:
+            val = obj.meta[key]
+        except KeyError:
+            break
+        obj = next(val)
+    return lst
