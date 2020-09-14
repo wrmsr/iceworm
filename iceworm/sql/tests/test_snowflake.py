@@ -2,22 +2,21 @@ import contextlib
 import json
 
 from omnibus import check
-from omnibus import lang
 import pytest
 import sqlalchemy as sa
 
 from .. import snowflake
 from .. import tpch
 from ... import sql
+from ...tests import harness as har
 from ...types import QualifiedName
+from .helpers import DbManager
 
 
 @pytest.mark.xfail
-@pytest.mark.online
-def test_conns():
+def test_conns(harness: har.Harness):
     with contextlib.ExitStack() as es:
-        engine = es.enter_context(lang.disposing(sa.create_engine(snowflake.get_url())))
-        conn = es.enter_context(engine.connect())
+        conn = es.enter_context(harness[DbManager].snowflake_engine.connect())
 
         print(conn.scalar('select current_version()'))
         print(conn.scalar('select current_warehouse()'))
@@ -36,11 +35,9 @@ def test_conns():
 
 
 @pytest.mark.xfail
-@pytest.mark.online
-def test_tpch():
-    engine: sa.engine.Engine
+def test_tpch(harness: har.Harness):
     with contextlib.ExitStack() as es:
-        engine = es.enter_context(lang.disposing(sa.create_engine(snowflake.get_url())))
+        engine = harness[DbManager].snowflake_engine
         conn = es.enter_context(engine.connect())
 
         mdkw = {}
@@ -59,11 +56,9 @@ def test_tpch():
 
 
 @pytest.mark.xfail
-@pytest.mark.online
-def test_exec_multi():
-    engine: sa.engine.Engine
+def test_exec_multi(harness: har.Harness):
     with contextlib.ExitStack() as es:
-        engine = es.enter_context(lang.disposing(sa.create_engine(snowflake.get_url())))
+        engine = harness[DbManager].snowflake_engine
         conn = es.enter_context(engine.connect())
         schema = check.not_empty(snowflake.get_config()['schema'])
 
