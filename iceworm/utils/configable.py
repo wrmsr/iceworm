@@ -12,6 +12,7 @@ from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import inject as inj
 from omnibus import lang
+from omnibus import reflect as rfl
 
 
 ConfigableT = ta.TypeVar('ConfigableT', bound='Configable')
@@ -67,12 +68,16 @@ def bind_impl(binder: inj.Binder, cls: ta.Type[Configable], impl_cls: ta.Type[Co
 
     if dc.is_dataclass(impl_cls.Config):
         for f in dc.fields(impl_cls.Config):
-            if isinstance(f.type, type) and issubclass(f.type, Configable.Config):
+            fty = f.type
+            if rfl.is_generic(fty) and getattr(fty, '__origin__', None) is ta.Union and len(fty.__args__) == 2 and type(None) in fty.__args__:  # noqa
+                [fty] = [a for a in fty.__args__ if a is not type(None)]  # noqa
+
+            if isinstance(fty, type) and issubclass(fty, Configable.Config):
                 check.not_in(f.name, impl_assists)
                 check.not_in(f.name, provider_kwargs)
                 impl_assists.add(f.name)
                 # FIXME: forward anns
-                provider_kwargs[f.name] = inj.Key(ta.Callable[..., get_impl(f.type)])
+                provider_kwargs[f.name] = inj.Key(ta.Callable[..., get_impl(fty)])
 
     @inj.annotate(factory=_UNDERLYING)
     def provide(config, __factory, **kwargs) -> impl_cls:

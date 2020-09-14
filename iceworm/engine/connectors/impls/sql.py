@@ -26,7 +26,7 @@ from ..base import Rows
 class SqlConnector(_Connector['SqlConnector', 'SqlConnector.Config']):
 
     class Config(_Connector.Config):
-        adapter: sql.Adapter.Config = dc.field(check=lambda o: isinstance(o, sql.Adapter.Config))
+        adapter: ta.Optional[sql.Adapter.Config] = dc.field(None, check=lambda o: o is None or isinstance(o, sql.Adapter.Config))  # noqa
 
         url: ta.Optional[str] = dc.field(None, check=lambda s: s is None or (isinstance(s, str) and s), kwonly=True)
         url_secret: ta.Optional[sec.SecretKey] = dc.field(None, coerce=sec.SecretKey.of_optional, kwonly=True)
