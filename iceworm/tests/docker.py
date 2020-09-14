@@ -9,10 +9,10 @@ from omnibus import check
 from omnibus import docker
 from omnibus import lifecycles as lc
 from omnibus import properties
-import pytest
 import yaml
 
 from . import harness as har
+from .hooks import switches
 
 
 @har.bind(har.Session)
@@ -35,8 +35,7 @@ class DockerManager(lc.ContextManageableLifecycle):
             self,
             name_port_pairs: ta.Iterable[ta.Tuple[str, int]],
     ) -> ta.Dict[ta.Tuple[str, int], ta.Tuple[str, int]]:
-        if self._request is not None and self._request.config.getoption('--no-docker'):
-            pytest.skip('Docker disabled')
+        switches.skip_if_disabled(self._request, 'docker')
         if docker.is_in_docker():
             return {(h, p): (self.PREFIX + h, p) for h, p in name_port_pairs}
         ret = {}

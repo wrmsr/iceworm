@@ -3,17 +3,20 @@ from omnibus import lifecycles as lc
 from omnibus import properties
 import sqlalchemy as sa
 
+from .. import snowflake
 from ...tests import harness as har
 from ...tests.docker import DockerManager
+from ...tests.hooks import switches
 
 
 @har.bind(har.Function)
 class DbManager(lc.ContextManageableLifecycle):
 
-    def __init__(self, dm: DockerManager) -> None:
+    def __init__(self, dm: DockerManager, request: har.FixtureRequest) -> None:
         super().__init__()
 
         self._dm = dm
+        self._request = request
 
     @properties.stateful_cached
     @property
@@ -29,6 +32,12 @@ class DbManager(lc.ContextManageableLifecycle):
     @property
     def pg_engine(self) -> sa.engine.Engine:
         return self._lifecycle_exit_stack.enter_context(lang.disposing(sa.engine.create_engine(self.pg_url)))
+
+    @properties.stateful_cached
+    @property
+    def snowflake_engine(self) -> sa.engine.Engine:
+        switches.skip_if_disabled(self._request, 'online')
+        return self._lifecycle_exit_stack.enter_context(lang.disposing(sa.engine.create_engine(snowflake.get_url())))
 
 
 def clean_pg(engine: sa.engine.Engine) -> None:

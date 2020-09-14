@@ -17,17 +17,19 @@ class Annotation(dc.Enum):
 
 
 def _coerce_anns(
-        obj: ta.Union[ta.Mapping[ta.Type[Annotation], Annotation], ta.Iterable[Annotation]],
+        obj: ta.Union[ta.Mapping[ta.Type[Annotation], ta.Optional[Annotation]], ta.Iterable[Annotation]],
 ) -> ta.Sequence[Annotation]:
     if isinstance(obj, collections.abc.Mapping):
         ret = []
         seen = set()
         for c, a in obj.items():
-            if type(a) is not c:
+            if a is not None and type(a) is not c:
                 raise TypeError((c, a))
             if c in seen:
                 raise KeyError(c)
-            ret.append(a)
+            seen.add(c)
+            if a is not None:
+                ret.append(a)
         return ret
     else:
         return [check.isinstance(a, Annotation) for a in obj]
