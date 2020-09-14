@@ -117,7 +117,7 @@ class InferTableProcessor(els.ElementProcessor):
 
                 name = self.table_names_by_id[table.id]
                 root, md_table = self.infer_table(
-                    check.isinstance(rows.query, AstQuery).root,
+                    rows,
                     given_tables,
                     name=name,
                 )
@@ -158,14 +158,16 @@ class InferTableProcessor(els.ElementProcessor):
 
         def infer_table(
                 self,
-                root: no.Node,
+                rows: tars.Rows,
                 given_tables: ta.Mapping[QualifiedName, md.Table],
                 *,
                 name: ta.Optional[QualifiedName] = None,
         ) -> ta.Tuple[no.Node, md.Table]:
+            root = check.isinstance(rows.query, AstQuery).root
+
             table_names = {
                 tn.name.name
-                for tn in ana.basic(root).get_node_type_set(no.Table)
+                for tn in els.queries.get_basic(rows, rows.query).get_node_type_set(no.Table)
             }
 
             alias_sets_by_tbl: ta.MutableMapping[md.Object, ta.Set[QualifiedName]] = ocol.IdentityKeyDict()
