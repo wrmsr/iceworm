@@ -59,6 +59,7 @@ def install_element_processors(binder: inj.Binder) -> inj.Binder:
     els.inject.bind_element_processor(binder, els.queries.QueryBasicAnalysisElementProcesor, els.Phases.TARGETS)
     els.inject.bind_element_processor(binder, els.queries.QueryParsingElementProcessor, els.Phases.TARGETS)
     els.inject.bind_element_processor(binder, infr.InferTableProcessor, els.Phases.TARGETS)
+    els.inject.bind_element_processor(binder, infr.ReflectReferencedTablesProcessor, els.Phases.TARGETS)
     els.inject.bind_element_processor(binder, sites.SiteProcessor, els.Phases.SITES)
     rls.inject.bind_rule_processor(binder, rls.TableAsSelectProcessor, els.Phases.TARGETS)
 

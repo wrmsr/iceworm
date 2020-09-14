@@ -30,12 +30,16 @@ from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import lang
+from omnibus import properties
 
 from .base import Element
 from .base import Frozen
 from .collections import ElementSet
 from .phases import PHASES
 from .phases import Phase
+
+
+InstanceElementProcessorT = ta.TypeVar('InstanceElementProcessorT', bound='InstanceElementProcessor')
 
 
 class ProcessedBy(dc.Pure):
@@ -81,6 +85,54 @@ class ElementProcessor(lang.Abstract):
     @abc.abstractmethod
     def process(self, elements: ElementSet) -> ta.Iterable[Element]:
         raise NotImplementedError
+
+
+class InstanceElementProcessor(ElementProcessor, lang.Abstract):
+
+    class Instance(ta.Generic[InstanceElementProcessorT], lang.Abstract):
+
+        def __init__(self, owner: InstanceElementProcessorT, input: ElementSet) -> None:
+            super().__init__()
+
+            self._owner = check.isinstance(owner, self._owner_cls)
+            self._input = check.isinstance(input, ElementSet)
+
+        _owner_cls: ta.ClassVar[ta.Type[InstanceElementProcessorT]]
+
+        @property
+        def owner(self) -> InstanceElementProcessorT:
+            return self._owner
+
+        @abc.abstractproperty
+        def matches(self) -> ta.AbstractSet[Element]:
+            raise NotImplementedError
+
+        @abc.abstractproperty
+        def output(self) -> ElementSet:
+            raise NotImplementedError
+
+    def __init_subclass__(cls, **kwargs) -> None:
+        super().__init_subclass__(**kwargs)
+        lang.check_finals(cls, InstanceElementProcessor)
+        inst_cls = check.issubclass(cls.__dict__['Instance'], InstanceElementProcessor.Instance)
+        inst_cls._owner_cls = cls
+
+    _instance_cache: ta.MutableMapping[ElementSet, Instance] = properties.cached(lambda self: weakref.WeakKeyDictionary())  # noqa
+
+    def _get_instance(self, elements: ElementSet) -> Instance:
+        try:
+            return self._instance_cache[elements]
+        except KeyError:
+            inst = self._instance_cache[elements] = self.Instance(self, elements)
+            return inst
+
+    @lang.final
+    def match(self, elements: ElementSet) -> ta.Iterable[Element]:
+        return self._get_instance(elements).matches
+
+    @lang.final
+    def process(self, elements: ElementSet) -> ta.Iterable[Element]:
+        return self._get_instance(elements).output
 
 
 ElementProcessorFactory = ta.Callable[[ElementSet, Phase], ta.Iterable[ElementProcessor]]

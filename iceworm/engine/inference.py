@@ -27,7 +27,7 @@ from ..types import QualifiedName
 from ..utils import unique_dict
 
 
-class InferTableProcessor(els.ElementProcessor):
+class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
 
     def __init__(
             self,
@@ -41,13 +41,87 @@ class InferTableProcessor(els.ElementProcessor):
     def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
         return {*super().dependencies(), els.queries.QueryBasicAnalysisElementProcesor}
 
-    class Instance:
+    class Instance(els.InstanceElementProcessor.Instance['ReflectReferencedTablesProcessor']):
 
-        def __init__(self, owner: 'InferTableProcessor', input: els.ElementSet) -> None:
-            super().__init__()
+        @properties.cached
+        @property
+        def table_name_sets_by_rows_eles(self) -> ta.Mapping[tars.Rows, ta.AbstractSet[QualifiedName]]:
+            return ocol.IdentityKeyDict(
+                (ele, {
+                    tn.name.name
+                    for tn in els.queries.get_basic(ele, ele.query).get_node_type_set(no.Table)
+                })
+                for ele in self._input.get_type_set(tars.Rows)
+            )
 
-            self._owner = check.isinstance(owner, InferTableProcessor)
-            self._input = check.isinstance(input, els.ElementSet)
+        @properties.cached
+        @property
+        def rows_ele_sets_by_table_name(self) -> ta.Mapping[QualifiedName, ta.AbstractSet[tars.Rows]]:
+            ret = {}
+            for ele, tns in self.table_name_sets_by_rows_eles.items():
+                for tn in tns:
+                    ret.setdefault(tn, ocol.IdentitySet()).add(ele)
+            return ret
+
+        @properties.cached
+        @property
+        def tables_by_name(self) -> ta.Mapping[QualifiedName, tars.Table]:
+            return unique_dict(
+                (QualifiedName([ele.connector.id, *ele.name]), self._input[ele.table])
+                for ele in self._input.get_type_set(tars.Materialization)
+            )
+
+        @properties.cached
+        @property
+        def matches(self) -> ta.AbstractSet[els.Element]:
+            ret = ocol.IdentitySet()
+
+            for ele in self._input:
+                if isinstance(ele, tars.Table) and ele.md is None:
+                    rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
+                    ret.add(ele)
+                    ret.add(rows)
+
+                elif isinstance(ele, tars.Rows):
+                    root = check.isinstance(ele.query, AstQuery).root
+                    table_names = {
+                        tn.name.name
+                        for tn in els.queries.get_basic(ele, ele.query).get_node_type_set(no.Table)
+                    }
+
+            return ret
+
+        @properties.stateful_cached
+        @property
+        def output(self) -> els.ElementSet:
+            raise NotImplementedError
+
+
+class InferTableProcessor(els.InstanceElementProcessor):
+
+    def __init__(
+            self,
+            ctors: ctrs.ConnectorSet,
+    ) -> None:
+        super().__init__()
+
+        self._ctors = ctrs.ConnectorSet.of(ctors)
+
+    @classmethod
+    def dependencies(cls) -> ta.Iterable[ta.Type['els.ElementProcessor']]:
+        return {*super().dependencies(), ReflectReferencedTablesProcessor}
+
+    class Instance(els.InstanceElementProcessor.Instance['InferTableProcessor']):
+
+        @properties.cached
+        def matches(self) -> ta.Iterable[els.Element]:
+            ret = []
+            for ele in self._input:
+                if isinstance(ele, tars.Table) and ele.md is None:
+                    rows = check.single(rt for rt in self._input.get_type_set(tars.Rows) if rt.table == ele)
+                    ret.append(ele)
+                    ret.append(rows)
+            return ret
 
         @properties.cached
         @property
@@ -201,15 +275,3 @@ class InferTableProcessor(els.ElementProcessor):
                 name if name is not None else ['$anon'],
                 [md.Column(n, t) for n, t in tt.columns],
             )
-
-    def match(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
-        ret = []
-        for ele in elements:
-            if isinstance(ele, tars.Table) and ele.md is None:
-                rows = check.single(rt for rt in elements.get_type_set(tars.Rows) if rt.table == ele)
-                ret.append(ele)
-                ret.append(rows)
-        return ret
-
-    def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
-        return self.Instance(self, elements).output
