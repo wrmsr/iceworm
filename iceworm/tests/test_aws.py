@@ -1,31 +1,15 @@
-import os.path
-
-from omnibus import docker
 import boto3
 import botocore.client
-import pytest
-import yaml
+
+from . import harness as har
+from .docker import DockerManager
 
 
-@pytest.mark.online
-def test_docker_s3():
-    if docker.is_in_docker():
-        (host, port) = 'iceworm-minio', 9000
+def test_docker_s3(harness: har.Harness):
+    [(host, port)] = harness[DockerManager].get_container_tcp_endpoints([('minio', 9000)]).values()
 
-    else:
-        with docker.client_context() as client:
-            eps = docker.get_container_tcp_endpoints(
-                client,
-                [('docker_iceworm-minio_1', 9000)])
-
-        [(host, port)] = eps.values()
-
-    with open(os.path.join(os.path.dirname(__file__), '../../docker/docker-compose.yml'), 'r') as f:
-        dct = yaml.safe_load(f.read())
-    cfg = {
-        k: dct['services']['iceworm-minio']['environment']['MINIO_' + k.upper()]
-        for k in ['access_key', 'secret_key']
-    }
+    env = harness[DockerManager].compose_config['minio']['environment']
+    cfg = {k: env['MINIO_' + k.upper()] for k in ['access_key', 'secret_key']}
 
     s3 = boto3.client(
         's3',
