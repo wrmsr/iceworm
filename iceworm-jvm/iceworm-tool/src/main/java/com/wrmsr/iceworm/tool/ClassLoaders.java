@@ -5,7 +5,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.wrmsr.iceworm.util.Jdk;
 import com.wrmsr.iceworm.util.Pair;
-import com.wrmsr.iceworm.util.classloaders.ParentFirstClassLoader;
 import io.airlift.resolver.ArtifactResolver;
 import io.airlift.resolver.DefaultArtifact;
 import org.sonatype.aether.artifact.Artifact;
@@ -22,6 +21,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -102,7 +102,8 @@ public class ClassLoaders
         }
     }
 
-    public static void main(String[] args) throws Throwable
+    public static void main(String[] args)
+            throws Throwable
     {
         System.out.println(Jdk.getClasspath());
 
@@ -113,6 +114,7 @@ public class ClassLoaders
         File pomFile = new File("pom.xml");
 
         List<String> coords = readPomDepCoords(pomFile, ImmutableList.of(
+                Pair.immutable("io.prestosql.hadoop", "hadoop-apache"),
                 Pair.immutable("org.apache.parquet", "parquet-tools"))
         );
 
@@ -126,24 +128,29 @@ public class ClassLoaders
         System.out.println(cp);
 
         List<URL> classpath = ImmutableList.copyOf(Splitter.on(":").split(Jdk.getClasspath())).stream()
+                .filter(s -> !s.contains("/slf4j-jdk14-"))
                 .map(File::new)
                 .map(ClassLoaders::getFileUrl)
                 .collect(toImmutableList());
 
-        ClassLoader cl = new ParentFirstClassLoader(
-                cp,
-                new URLClassLoader(
-                        classpath.toArray(new URL[]{}),
-                        ClassLoader.getSystemClassLoader().getParent()),
-                ImmutableList.of(),
-                ImmutableList.of(
-                        "org.apache"
-                ));
+        // ClassLoader cl = new ParentFirstClassLoader(
+        //         cp,
+        //         new URLClassLoader(
+        //                 classpath.toArray(new URL[]{}),
+        //                 ClassLoader.getSystemClassLoader().getParent()),
+        //         ImmutableList.of(),
+        //         ImmutableList.of(
+        //                 "org.apache"
+        //         ));
 
-        Class<?> tc = cl.loadClass("com.wrmsr.iceworm.tool.ParquetThing");
+        ClassLoader cl = new URLClassLoader(
+                ImmutableList.builder().addAll(cp).addAll(classpath).build().toArray(new URL[] {}),
+                ClassLoader.getSystemClassLoader().getParent());
+
         Thread.currentThread().setContextClassLoader(cl);
-        tc.getDeclaredMethod("main", String[].class).invoke(null, new Object[]{new String[]{
-                "barf",
+        Class<?> tc = cl.loadClass("com.wrmsr.iceworm.tool.ParquetThing");
+        tc.getDeclaredMethod("main", String[].class).invoke(null, new Object[] {new String[] {
+                "temp/barf",
         }});
     }
 }
