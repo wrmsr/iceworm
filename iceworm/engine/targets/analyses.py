@@ -73,7 +73,3 @@ class TableDependenciesAnalysis(els.Analysis):
 
     def __getitem__(self, ele: Rows) -> TableDependencies:
         return self.by_element[ele]
-
-
-class StrictTableDependenciesAnalysis(TableDependenciesAnalysis):
-    _strict: bool = True

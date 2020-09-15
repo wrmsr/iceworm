@@ -166,3 +166,11 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
                 *[dc.replace(e, meta={els.Origin: els.Origin(e)}) for e in self.matches],
                 *new,
             ])
+
+
+class StrictTableDependenciesAnalysis(TableDependenciesAnalysis):
+    _strict: bool = True
+
+    @classmethod
+    def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
+        return {*super().cls_dependencies(), ReflectReferencedTablesProcessor}
