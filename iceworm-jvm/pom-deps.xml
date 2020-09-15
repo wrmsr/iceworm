@@ -22,7 +22,6 @@
         <dep.jackson-module-scala.version>2.6.7.1</dep.jackson-module-scala.version>
         <dep.jackson.databind.version>2.6.7.3</dep.jackson.databind.version>
         <dep.protobuf.version>3.13.0</dep.protobuf.version>
-        <dep.log4j.version>2.13.3</dep.log4j.version>
 
     </properties>
 
@@ -96,7 +95,7 @@
                 </exclusions>
             </dependency>
 
-            <!-- Other -->
+            <!-- Xml -->
 
             <dependency>
                 <groupId>javax.xml.bind</groupId>
@@ -115,6 +114,56 @@
                 <artifactId>jaxb-runtime</artifactId>
                 <version>2.3.2</version>
             </dependency>
+
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>1.3.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.activation</groupId>
+                <artifactId>javax.activation-api</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>2.3.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>txw2</artifactId>
+                <version>2.3.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.istack</groupId>
+                <artifactId>istack-commons-runtime</artifactId>
+                <version>3.0.8</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jvnet.staxex</groupId>
+                <artifactId>stax-ex</artifactId>
+                <version>1.8.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.xml.fastinfoset</groupId>
+                <artifactId>FastInfoset</artifactId>
+                <version>1.2.16</version>
+            </dependency>
+
+            <dependency>
+                <groupId>jakarta.activation</groupId>
+                <artifactId>jakarta.activation-api</artifactId>
+                <version>1.2.1</version>
+            </dependency>
+
+            <!-- Other -->
 
             <dependency>
                 <groupId>org.apache.parquet</groupId>
@@ -153,27 +202,10 @@
             </dependency>
 
             <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>${dep.log4j.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-slf4j-impl</artifactId>
-                <version>${dep.log4j.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-jul</artifactId>
-                <version>${dep.log4j.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>14.0.1</version>
+                <!-- <version>14.0.1</version> -->
+                <version>24.1-jre</version>
             </dependency>
 
             <dependency>
@@ -228,6 +260,18 @@
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-scala_2.11</artifactId>
                 <version>${dep.jackson-module-scala.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.30</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.7.30</version>
             </dependency>
 
             <!-- Test -->

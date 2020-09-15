@@ -22,7 +22,6 @@
         <dep.jackson-module-scala.version>2.6.7.1</dep.jackson-module-scala.version>
         <dep.jackson.databind.version>2.6.7.3</dep.jackson.databind.version>
         <dep.protobuf.version>3.13.0</dep.protobuf.version>
-        <dep.log4j.version>2.13.3</dep.log4j.version>
 
     </properties>
 
@@ -221,24 +220,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>${dep.log4j.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-slf4j-impl</artifactId>
-                <version>${dep.log4j.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-jul</artifactId>
-                <version>${dep.log4j.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <!-- <version>14.0.1</version> -->
@@ -297,6 +278,18 @@
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-scala_2.11</artifactId>
                 <version>${dep.jackson-module-scala.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.30</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>1.7.30</version>
             </dependency>
 
             <!-- Test -->
