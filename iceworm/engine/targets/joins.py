@@ -21,7 +21,10 @@ class JoinSplittingProcessor(els.InstanceElementProcessor):
     def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
         return {
             *super().cls_dependencies(),
+
+            # FIXME: real dep is StrictTableDependenciesAnalysis, remove when driver understands analysis deps
             ReflectReferencedTablesProcessor,
+
             StrictTableDependenciesAnalysis,
         }
 
