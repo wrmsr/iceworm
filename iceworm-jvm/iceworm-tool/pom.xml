@@ -69,6 +69,67 @@
         </dependency>
         -->
 
+        <!-- Xml -->
+
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+        </dependency>
+
+        <!--
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>javax.activation-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>txw2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.istack</groupId>
+            <artifactId>istack-commons-runtime</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jvnet.staxex</groupId>
+            <artifactId>stax-ex</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+        </dependency>
+        -->
+
+        <!-- Other -->
+
         <dependency>
             <groupId>org.apache.parquet</groupId>
             <artifactId>parquet-tools</artifactId>
@@ -198,6 +259,12 @@
                                     <shadedPattern>com.wrmsr.iceworm.shaded.</shadedPattern>
                                     <excludes>
                                         <exclude>java.**</exclude>
+
+                                        <exclude>javax.xml.parsers.**</exclude>
+                                        <exclude>javax.xml.xpath.**</exclude>
+                                        <exclude>org.w3c.**</exclude>
+                                        <exclude>org.xml.sax.*</exclude>
+
                                         <exclude>com.wrmsr.iceworm.**</exclude>
                                     </excludes>
                                 </relocation>

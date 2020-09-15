@@ -104,6 +104,8 @@ public class ClassLoaders
 
     public static void main(String[] args) throws Throwable
     {
+        System.out.println(Jdk.getClasspath());
+
         ArtifactResolver resolver = new ArtifactResolver(
                 ArtifactResolver.USER_LOCAL_REPO,
                 ImmutableList.of(ArtifactResolver.MAVEN_CENTRAL_URI));
