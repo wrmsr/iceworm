@@ -1,5 +1,6 @@
 from . import inject  # noqa
 from . import queries  # noqa
+from .analyses import IdGen  # noqa
 from .base import Annotation  # noqa
 from .base import Annotations  # noqa
 from .base import Dependable  # noqa

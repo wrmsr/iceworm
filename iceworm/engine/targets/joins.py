@@ -1,12 +1,16 @@
 import typing as ta
 
+from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import properties
 
+from . import targets as tars
 from .. import elements as els
+from ... import metadata as md
+from ...trees import transforms as ttfm
+from ...types import QualifiedName
 from .analyses import StrictTableDependenciesAnalysis
 from .reflect import ReflectReferencedTablesProcessor
-from .targets import Rows
 
 
 class JoinSplittingProcessor(els.InstanceElementProcessor):
@@ -22,17 +26,17 @@ class JoinSplittingProcessor(els.InstanceElementProcessor):
     class Instance(els.InstanceElementProcessor.Instance['JoinSplittingProcessor']):
 
         @properties.cached
-        def connector_ids_by_rows(self) -> els.ElementMap[Rows, ta.AbstractSet[els.Id]]:
+        def src_connector_ids_by_rows(self) -> els.ElementMap[tars.Rows, ta.AbstractSet[els.Id]]:
             return els.ElementMap(
                 (e, cids)
-                for e in self.input.get_type_set(Rows)
+                for e in self.input.get_type_set(tars.Rows)
                 for deps in [self.input.analyze(StrictTableDependenciesAnalysis)[e]]
                 for cids in [{qn[0] for qns in deps.name_sets_by_table.values() for qn in qns}]
             )
 
         @properties.cached
         def matches(self) -> ta.Iterable[els.Element]:
-            return [e for e, cids in self.connector_ids_by_rows.items() if len(cids) > 1]
+            return [e for e, cids in self.src_connector_ids_by_rows.items() if len(cids) > 1]
 
         @properties.cached
         def output(self) -> ta.Iterable[els.Element]:
@@ -47,6 +51,31 @@ class JoinSplittingProcessor(els.InstanceElementProcessor):
                     lst.append(e)
             return lst
 
-        def split_join(self, ele: Rows) -> ta.Sequence[els.Element]:
-            # return [ele]
-            raise NotImplementedError
+        def split_join(self, ele: tars.Rows) -> ta.Sequence[els.Element]:
+            ret = []
+            stda = self.input.analyze(StrictTableDependenciesAnalysis)
+            dst_qn = check.single(stda.name_sets_by_table[ele.table])
+            src_qns = {check.single(ns) for ns in stda.by_element[ele].name_sets_by_table.values()}
+            for src_qn in src_qns:
+                if src_qn[0] == dst_qn[0]:
+                    continue
+                src_tbl = stda.tables_by_name[src_qn]
+                new_qn = QualifiedName([dst_qn[0], '__' + src_qn[1]])
+                new_tbl = tars.Table(
+                    '/'.join(new_qn),
+                    md=dc.replace(
+                        check.isinstance(src_tbl.md, md.Table),
+                        name=new_qn[1:],
+                    ),
+                )
+                ret.extend([
+                    new_tbl,
+                    tars.Rows(new_tbl, f'select * from {src_qn.dotted}'),
+                    tars.Materialization(new_tbl, dst_qn[0], [new_qn[1]]),
+                ])
+                ele = dc.replace(
+                    ele,
+                    query=ttfm.ReplaceNamesTransformer({src_qn: new_qn})(ele.query.root),
+                    meta={els.Origin: els.Origin(ele)},
+                )
+            return [ele, *ret]
