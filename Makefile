@@ -279,7 +279,7 @@ deps-38: venv-38
 dep-freeze: venv
 	.venv/bin/pip freeze > requirements-frz.txt
 
-.PHONY: dep-unfreze
+.PHONY: dep-unfreeze
 dep-unfreeze: venv
 	.venv/bin/pip install -r requirements-frz.txt
 
