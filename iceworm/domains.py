@@ -192,6 +192,11 @@ class Range(ta.Generic[T]):
     def is_single_value(self) -> bool:
         return self._low.bound == Bound.EXACTLY and self._low == self._high
 
+    @property
+    def single_value(self) -> T:
+        check.state(self.is_single_value)
+        return self._low.value
+
     def _check_compat(self, other: 'Range') -> 'Range':
         check.isinstance(other, Range)
         if other._low._type != self._low._type:
@@ -554,7 +559,7 @@ class SortedRangeSet(ValueSet, lang.Final):
 
     @classmethod
     def all(cls, type: dt.Datatype) -> ValueSet:
-        raise NotImplementedError
+        return SortedRangeSet(type, [Range.all(type)])
 
     @property
     def type(self) -> dt.Datatype:
@@ -576,8 +581,26 @@ class SortedRangeSet(ValueSet, lang.Final):
     def is_single_value(self) -> bool:
         return len(self._ranges) == 1 and self.ranges[0].is_single_value
 
+    @property
+    def single_value(self) -> ta.Any:
+        check.state(self.is_single_value)
+        return check.single(self._low_indexed_ranges.values()).single_value
+
     def contains_value(self, value: ta.Any) -> bool:
-        raise NotImplementedError
+        return self._includes_marker(Marker.exactly(self._type, value))
+
+    def _check_marker_compat(self, marker: Marker) -> Marker:
+        if marker.type.py_type != self._type:
+            raise TypeError(marker)
+        return marker
+
+    def _includes_marker(self, marker: Marker) -> bool:
+        self._check_marker_compat(marker)
+        try:
+            floor = next(self._low_indexed_ranges.ritemsfrom(marker))
+        except StopIteration:
+            return False
+        return floor[1].includes(marker)
 
     def intersect(self, other: 'ValueSet') -> 'ValueSet':
         raise NotImplementedError
