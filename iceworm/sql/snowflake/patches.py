@@ -45,9 +45,8 @@ def patch_sqlalchemy_loader() -> None:
     import pkg_resources
     impl = next(pkg_resources.iter_entry_points(group, name))
 
-    import functools
     import sqlalchemy.dialects
-    sqlalchemy.dialects.registry.impls[name] = functools.partial(impl.load, require=False)
+    sqlalchemy.dialects.registry.impls[name] = impl.resolve
 
 
 patch_sqlalchemy_loader()
