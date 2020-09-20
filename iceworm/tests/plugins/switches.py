@@ -1,5 +1,4 @@
 from omnibus import check
-from omnibus import lang
 import pytest
 
 from ._registry import register
@@ -25,20 +24,17 @@ def skip_if_disabled(request, name: str) -> None:
 
 
 @register
-class SwitchesPlugin(lang.Namespace):
+class SwitchesPlugin:
 
-    @staticmethod
-    def pytest_addoption(parser):
+    def pytest_addoption(self, parser):
         for sw in SWITCHES:
             parser.addoption(f'--no-{sw}', action='store_true', default=False, help=f'disable {sw} tests')
 
-    @staticmethod
-    def pytest_configure(config):
+    def pytest_configure(self, config):
         for sw in SWITCHES:
             config.addinivalue_line('markers', f'{sw}: mark test as {sw}')
 
-    @staticmethod
-    def pytest_collection_modifyitems(config, items):
+    def pytest_collection_modifyitems(self, config, items):
         for sw in SWITCHES:
             if not config.getoption(f'--no-{sw}'):
                 continue

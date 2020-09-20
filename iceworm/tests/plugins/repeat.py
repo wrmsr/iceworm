@@ -1,5 +1,3 @@
-from omnibus import lang
-
 from ._registry import register
 
 
@@ -7,14 +5,12 @@ PARAM_NAME = '__repeat'
 
 
 @register
-class RepeatPlugin(lang.Namespace):
+class RepeatPlugin:
 
-    @staticmethod
-    def pytest_addoption(parser):
+    def pytest_addoption(self, parser):
         parser.addoption('--repeat', action='store', type=int, help='Number of times to repeat each test')
 
-    @staticmethod
-    def pytest_generate_tests(metafunc):
+    def pytest_generate_tests(self, metafunc):
         if metafunc.config.option.repeat is None:
             return
 

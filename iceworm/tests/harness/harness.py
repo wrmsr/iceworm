@@ -271,40 +271,37 @@ class Harness:
             self._inj_scopes_by_pytest_scope[pytest_scope].exit()
 
 
-@pytest.yield_fixture(scope='session', autouse=True)
-def harness() -> ta.Generator[Harness, None, None]:
-    with Harness(*_HARNESS_BINDERS) as harness:
-        yield harness
+class HarnessPlugin:
 
+    @pytest.yield_fixture(scope='session', autouse=True)
+    def harness(self) -> ta.Generator[Harness, None, None]:
+        with Harness(*_HARNESS_BINDERS) as harness:
+            yield harness
 
-@pytest.yield_fixture(scope='session', autouse=True)
-def _scope_listener_session(harness, request):
-    with harness.pytest_scope_manager(PytestScope.SESSION, request):
-        yield
+    @pytest.yield_fixture(scope='session', autouse=True)
+    def _scope_listener_session(self, harness, request):
+        with harness.pytest_scope_manager(PytestScope.SESSION, request):
+            yield
 
+    @pytest.yield_fixture(scope='package', autouse=True)
+    def _scope_listener_package(self, harness, request):
+        with harness.pytest_scope_manager(PytestScope.PACKAGE, request):
+            yield
 
-@pytest.yield_fixture(scope='package', autouse=True)
-def _scope_listener_package(harness, request):
-    with harness.pytest_scope_manager(PytestScope.PACKAGE, request):
-        yield
+    @pytest.yield_fixture(scope='module', autouse=True)
+    def _scope_listener_module(self, harness, request):
+        with harness.pytest_scope_manager(PytestScope.MODULE, request):
+            yield
 
+    @pytest.yield_fixture(scope='class', autouse=True)
+    def _scope_listener_class(self, harness, request):
+        with harness.pytest_scope_manager(PytestScope.CLASS, request):
+            yield
 
-@pytest.yield_fixture(scope='module', autouse=True)
-def _scope_listener_module(harness, request):
-    with harness.pytest_scope_manager(PytestScope.MODULE, request):
-        yield
-
-
-@pytest.yield_fixture(scope='class', autouse=True)
-def _scope_listener_class(harness, request):
-    with harness.pytest_scope_manager(PytestScope.CLASS, request):
-        yield
-
-
-@pytest.yield_fixture(scope='function', autouse=True)
-def _scope_listener_function(harness, request):
-    with harness.pytest_scope_manager(PytestScope.FUNCTION, request):
-        yield
+    @pytest.yield_fixture(scope='function', autouse=True)
+    def _scope_listener_function(self, harness, request):
+        with harness.pytest_scope_manager(PytestScope.FUNCTION, request):
+            yield
 
 
 _HARNESS_BINDERS = []

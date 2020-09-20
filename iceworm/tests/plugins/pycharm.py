@@ -1,15 +1,12 @@
 import threading
 
-from omnibus import lang
-
 from ._registry import register  # noqa
 
 
 # @register
-class PycharmPlugin(lang.Namespace):
+class PycharmPlugin:
 
-    @staticmethod
-    def pytest_exception_interact(node, call, report):
+    def pytest_exception_interact(self, node, call, report):
         try:
             import pydevd
             from pydevd import pydevd_tracing

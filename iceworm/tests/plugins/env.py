@@ -27,8 +27,7 @@ def _load_dot_env() -> ta.Optional[ta.Mapping[str, str]]:
 
 
 @register
-class EnvPlugin(lang.Namespace):
+class EnvPlugin:
 
-    @staticmethod
-    def pytest_configure(config):
+    def pytest_configure(self, config):
         _load_dot_env()
