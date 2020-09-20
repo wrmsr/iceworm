@@ -8,7 +8,7 @@ from omnibus import lang
 
 
 @lang.cached_nullary
-def patch_ssl_wrapper():
+def patch_ssl_wrapper() -> None:
     from snowflake.connector import ssl_wrap_socket
 
     import threading
@@ -33,3 +33,21 @@ def patch_ssl_wrapper():
 
     if ssl_wrap_socket.connection_.ssl_wrap_socket == _ssl_wrap_socket_with_ocsp:
         ssl_wrap_socket.connection_.ssl_wrap_socket = ssl_wrap_socket_with_ocsp
+
+
+patch_ssl_wrapper()
+
+
+def patch_sqlalchemy_loader() -> None:
+    name = 'snowflake'
+    group = 'sqlalchemy.dialects'
+
+    import pkg_resources
+    impl = next(pkg_resources.iter_entry_points(group, name))
+
+    import functools
+    import sqlalchemy.dialects
+    sqlalchemy.dialects.registry.impls[name] = functools.partial(impl.load, require=False)
+
+
+patch_sqlalchemy_loader()
