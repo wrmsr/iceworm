@@ -9,6 +9,9 @@ from .collections import IndexedSetSeq  # noqa
 from .collections import abs_set  # noqa
 from .collections import abs_set_or_none  # noqa
 from .collections import mapping   # noqa
+from .collections import order_frozen_set  # noqa
+from .collections import order_set  # noqa
+from .collections import order_values  # noqa
 from .collections import seq  # noqa
 from .collections import seq_or_none  # noqa
 from .collections import unique_dict  # noqa

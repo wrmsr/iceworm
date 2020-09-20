@@ -465,19 +465,47 @@ class EquatableValueSet(ValueSet, lang.Final):
 
     @property
     def is_single_value(self) -> bool:
-        raise NotImplementedError
+        return self._is_white_list and len(self._values) == 1
+
+    @property
+    def single_value(self) -> ta.Any:
+        check.state(self.is_single_value)
+        return check.single(self._values)
 
     def contains_value(self, value: ta.Any) -> bool:
-        raise NotImplementedError
+        return self._is_white_list == (value in self._values)
+
+    def _check_compat(self, other: 'ValueSet') -> 'EquatableValueSet':
+        if other.type.py_type != self._type:
+            raise TypeError(other)
+        if not isinstance(other, EquatableValueSet):
+            raise TypeError(other)
+        return ta.cast(EquatableValueSet, other)
 
     def intersect(self, other: 'ValueSet') -> 'ValueSet':
-        raise NotImplementedError
+        other = self._check_compat(other)
+        if self._is_white_list and other._is_white_list:
+            return EquatableValueSet(self._type, True, self._values & other._values)
+        elif self._is_white_list:
+            return EquatableValueSet(self._type, True, self._values - other._values)
+        elif other._is_white_list:
+            return EquatableValueSet(self._type, False, other._values - self._values)
+        else:
+            return EquatableValueSet(self._type, False, other._values | self._values)
 
     def union(self, other: 'ValueSet') -> 'ValueSet':
-        raise NotImplementedError
+        other = self._check_compat(other)
+        if self._is_white_list and other._is_white_list:
+            return EquatableValueSet(self._type, True, self._values | other._values)
+        elif self._is_white_list:
+            return EquatableValueSet(self._type, False, other._values - self._values)
+        elif other._is_white_list:
+            return EquatableValueSet(self._type, False, self._values - other._values)
+        else:
+            return EquatableValueSet(self._type, False, other._values & self._values)
 
     def complement(self) -> 'ValueSet':
-        raise NotImplementedError
+        return EquatableValueSet(self._type, not self._is_white_list, self._values)
 
 
 class SortedRangeSet(ValueSet, lang.Final):

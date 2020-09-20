@@ -7,6 +7,8 @@ from omnibus import collections as ocol
 T = ta.TypeVar('T')
 K = ta.TypeVar('K')
 V = ta.TypeVar('V')
+OrderingT = ta.Union[ta.Sequence[T], ocol.OrderedSet[T], ocol.OrderedFrozenSet[T]]
+ORDERING_TYPES = (ta.Sequence, ocol.OrderedSet, ocol.OrderedFrozenSet)
 
 
 def unique_dict(items: ta.Iterable[ta.Tuple[K, V]]) -> ta.Dict[K, V]:
@@ -75,6 +77,25 @@ def abs_set_or_none(it: ta.Optional[ta.Iterable[T]]) -> ta.Optional[ta.AbstractS
         return None
     else:
         return ret
+
+
+def order_values(values: ta.Container[T], ordering: OrderingT) -> ta.List[T]:
+    check.isinstance(ordering, ORDERING_TYPES)
+    lst = []
+    seen = set()
+    for v in ordering:
+        if v in values and v not in seen:
+            lst.append(v)
+            seen.add(v)
+    return lst
+
+
+def order_set(values: ta.Container[T], ordering: OrderingT) -> ocol.OrderedSet[T]:
+    return ocol.OrderedSet(order_values(values, ordering))
+
+
+def order_frozen_set(values: ta.Container[T], ordering: OrderingT) -> ocol.OrderedFrozenSet[T]:
+    return ocol.OrderedFrozenSet(order_values(values, ordering))
 
 
 class IndexedSeq(ta.Sequence[T]):
