@@ -11,6 +11,10 @@ clean:
 deps:
 	yarn install
 
+.PHONY: dep-updates
+dep-updates:
+	npm outdated
+
 .PHONY: gen
 gen: deps
 	yarn proto
