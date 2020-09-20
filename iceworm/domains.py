@@ -40,16 +40,24 @@ class Marker(ta.Generic[T]):
     defs.basic('type', 'value', 'bound')
 
     @classmethod
-    def exactly(cls, type: dt.Datatype, value: T) -> 'Marker[T]':
-        return cls(type, value, Bound.EXACTLY)
-
-    @classmethod
     def upper_unbounded(cls, type: dt.Datatype) -> 'Marker[T]':
         return cls(type, None, Bound.BELOW)
 
     @classmethod
     def lower_unbounded(cls, type: dt.Datatype) -> 'Marker[T]':
         return cls(type, None, Bound.ABOVE)
+
+    @classmethod
+    def above(cls, type: dt.Datatype, value: T) -> 'Marker[T]':
+        return cls(type, value, Bound.ABOVE)
+
+    @classmethod
+    def exactly(cls, type: dt.Datatype, value: T) -> 'Marker[T]':
+        return cls(type, value, Bound.EXACTLY)
+
+    @classmethod
+    def below(cls, type: dt.Datatype, value: T) -> 'Marker[T]':
+        return cls(type, value, Bound.BELOW)
 
     @classmethod
     def min(cls, marker1: 'Marker', marker2: 'Marker') -> 'Marker[T]':
@@ -145,6 +153,10 @@ class Range(ta.Generic[T]):
     @classmethod
     def all(cls, type: dt.Datatype) -> 'Range[T]':
         return cls(Marker.lower_unbounded(type), Marker.upper_unbounded(type))
+
+    # @classmethod
+    # def greater_than(cls, type: dt.Datatype) -> 'Range[T}]':
+    #     return cls(Marker.ab)
 
     @property
     def low(self) -> Marker[T]:
@@ -726,5 +738,12 @@ class Domain(lang.Final):
         return Domain(self._values.subtract(other._values), self._null_allowed and other._null_allowed)
 
 
-class TupleDomain:
-    pass
+class TupleDomain(ta.Generic[T]):
+
+    def __init__(self, domains: ta.Mapping[T, Domain]) -> None:
+        super().__init__()
+
+        self._domains: ta.Mapping[T, Domain] = {t: check.isinstance(d, Domain) for t, d in domains.items()}
+
+    def simplify(self) -> 'TupleDomain[T]':
+        raise NotImplementedError

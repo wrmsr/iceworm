@@ -2,6 +2,10 @@ from .. import datatypes as dt
 from .. import domains as dom
 
 
+def test_range():
+    dom.Range.all(dt.Integer())
+
+
 def test_domains():
     vs = dom.EquatableValueSet.all(dt.Integer())
     assert vs.is_all
