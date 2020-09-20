@@ -16,7 +16,6 @@ from .. import planning as pln
 from .. import rules as rls
 from .. import sites
 from .. import targets as tars
-from ... import domains as doms
 from ... import sql
 from ...sql.tests.helpers import DbManager
 from ...tests import harness as har
@@ -27,12 +26,12 @@ from ...utils import secrets as sec  # noqa
 from ...utils import serde
 
 
-def get_ele_dependencies(elements: ta.Iterable[els.Element]) -> ta.Mapping[els.Element, ta.AbstractSet[els.Element]]:  # noqa
-    raise NotImplementedError
+# def get_ele_dependencies(elements: ta.Iterable[els.Element]) -> ta.Mapping[els.Element, ta.AbstractSet[els.Element]]:  # noqa
+#     raise NotImplementedError
 
 
-def get_src_table_domain(query: str, src: QualifiedName, dom: doms.Domain) -> doms.Domain:  # noqa
-    raise NotImplementedError
+# def get_src_table_domain(query: str, src: QualifiedName, dom: doms.Domain) -> doms.Domain:  # noqa
+#     raise NotImplementedError
 
 
 class UrlSecretsReplacer(els.ElementProcessor):

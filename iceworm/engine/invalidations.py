@@ -16,7 +16,7 @@ from omnibus import lang
 
 from . import elements as els
 from . import targets as tars
-from .. import domains as doms
+from .. import metadata as md
 from ..types import QualifiedName
 from ..utils import cron
 
@@ -41,4 +41,4 @@ class Invalidation(dc.Enum):
 
 
 class DomainInvalidation(Invalidation):
-    domain: doms.Domain
+    domain: md.domains.Domain

@@ -5,7 +5,6 @@ from omnibus import dispatch
 
 from . import nodes as no
 from . import origins as oris
-from .. import datatypes as dt
 from .. import metadata as md
 from ..utils import memoized_unary
 from .analysis import basic
@@ -13,13 +12,13 @@ from .analysis import basic
 
 class TypeAnalysis:
 
-    def __init__(self, dts_by_node: ta.Mapping[no.Node, dt.Datatype]) -> None:
+    def __init__(self, dts_by_node: ta.Mapping[no.Node, md.Datatype]) -> None:
         super().__init__()
 
         self._dts_by_node = dts_by_node
 
     @property
-    def dts_by_node(self) -> ta.Mapping[no.Node, dt.Datatype]:
+    def dts_by_node(self) -> ta.Mapping[no.Node, md.Datatype]:
         return self._dts_by_node
 
 
@@ -39,59 +38,59 @@ class _Analyzer(dispatch.Class):
     __call__ = memoized_unary(_process, identity=True, max_recursion=100)
 
     @property
-    def dts_by_node(self) -> ta.Mapping[no.Node, dt.Datatype]:
+    def dts_by_node(self) -> ta.Mapping[no.Node, md.Datatype]:
         return self.__call__.dct
 
-    def _process(self, ori: oris.Origin) -> dt.Datatype:  # noqa
+    def _process(self, ori: oris.Origin) -> md.Datatype:  # noqa
         raise TypeError(ori)
 
-    def _process(self, node: no.Node) -> dt.Datatype:  # noqa
+    def _process(self, node: no.Node) -> md.Datatype:  # noqa
         raise TypeError(node)
 
-    def _process(self, ori: oris.Constant) -> dt.Datatype:  # noqa
+    def _process(self, ori: oris.Constant) -> md.Datatype:  # noqa
         return self(ori.node)
 
-    def _process(self, ori: oris.Derived) -> dt.Datatype:  # noqa
+    def _process(self, ori: oris.Derived) -> md.Datatype:  # noqa
         return self(ori.node)
 
-    def _process(self, ori: oris.Direct) -> dt.Datatype:  # noqa
+    def _process(self, ori: oris.Direct) -> md.Datatype:  # noqa
         return self(ori.src)
 
-    def _process(self, ori: oris.Export) -> dt.Datatype:  # noqa
+    def _process(self, ori: oris.Export) -> md.Datatype:  # noqa
         return self(ori.src)
 
-    def _process(self, ori: oris.Import) -> dt.Datatype:  # noqa
+    def _process(self, ori: oris.Import) -> md.Datatype:  # noqa
         return self(ori.src)
 
-    def _process(self, ori: oris.Scan) -> dt.Datatype:  # noqa
+    def _process(self, ori: oris.Scan) -> md.Datatype:  # noqa
         tbl = self._catalog.tables_by_name[check.isinstance(ori.node, no.Table).name.name]
         col = tbl.columns_by_name[ori.sym.name]
         return col.type
 
-    def _process(self, node: no.BinaryExpr) -> dt.Datatype:  # noqa
+    def _process(self, node: no.BinaryExpr) -> md.Datatype:  # noqa
         left = self(node.left)
         right = self(node.right)
         check.state(left == right)
         return left
 
-    def _process(self, node: no.EFalse) -> dt.Datatype:  # noqa
-        return dt.Boolean()
+    def _process(self, node: no.EFalse) -> md.Datatype:  # noqa
+        return md.BOOLEAN
 
-    def _process(self, node: no.ETrue) -> dt.Datatype:  # noqa
-        return dt.Boolean()
+    def _process(self, node: no.ETrue) -> md.Datatype:  # noqa
+        return md.BOOLEAN
 
-    def _process(self, node: no.Integer) -> dt.Datatype:  # noqa
-        return dt.Integer()
+    def _process(self, node: no.Integer) -> md.Datatype:  # noqa
+        return md.INTEGER
 
-    def _process(self, node: no.QualifiedNameNode) -> dt.Datatype:  # noqa
+    def _process(self, node: no.QualifiedNameNode) -> md.Datatype:  # noqa
         return self(check.single(self._ori_ana.ori_sets_by_node[node]))
 
-    def _process(self, node: no.Select) -> dt.Datatype:  # noqa
+    def _process(self, node: no.Select) -> md.Datatype:  # noqa
         cols = [(k, self(v)) for k, v in self._ori_ana.exports_by_node_by_name.get(node, {}).items()]
-        return dt.Table(cols)
+        return md.TableType(cols)
 
-    def _process(self, node: no.String) -> dt.Datatype:  # noqa
-        return dt.String()
+    def _process(self, node: no.String) -> md.Datatype:  # noqa
+        return md.STRING
 
 
 def analyze(root: no.Node, ori_ana: oris.OriginAnalysis, catalog: md.Catalog) -> TypeAnalysis:

@@ -12,7 +12,7 @@ from omnibus import collections as ocol
 from omnibus import defs
 from omnibus import lang
 
-from . import datatypes as dt
+from .. import datatypes as dt
 
 
 T = ta.TypeVar('T')

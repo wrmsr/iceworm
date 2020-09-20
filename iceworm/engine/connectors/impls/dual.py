@@ -4,7 +4,6 @@ from omnibus import check
 from omnibus import dataclasses as dc
 
 from ... import elements as els
-from .... import datatypes as dt
 from .... import metadata as md
 from ....types import QualifiedName
 from ...utils import parse_simple_select_table
@@ -18,7 +17,7 @@ from ..base import Rows
 TABLE = md.Table(
     ['dual'],
     [
-        md.Column('dummy', dt.String()),
+        md.Column('dummy', md.STRING),
     ]
 )
 

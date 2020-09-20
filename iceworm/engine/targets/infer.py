@@ -12,7 +12,6 @@ from omnibus import dataclasses as dc
 from omnibus import properties
 
 from .. import elements as els
-from ... import datatypes as dt
 from ... import metadata as md
 from ...trees import datatypes as tdt
 from ...trees import nodes as no
@@ -178,7 +177,7 @@ class InferTableProcessor(els.InstanceElementProcessor):
             oris = origins.analyze(root, syms)
 
             dts = tdt.analyze(root, oris, cat)
-            tt = check.isinstance(dts.dts_by_node[root], dt.Table)
+            tt = check.isinstance(dts.dts_by_node[root], md.TableType)
 
             # FIXME: pg.c defined in terms of generated pg.b, need iterativity
             return root, md.Table(

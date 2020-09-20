@@ -2,7 +2,7 @@ import pytest
 
 from .. import datatypes as dt
 from .. import metadata as md
-from ..utils import serde
+from ...utils import serde
 
 
 def test_metadata():

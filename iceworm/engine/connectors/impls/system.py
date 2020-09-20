@@ -7,7 +7,6 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 
 from ... import elements as els
-from .... import datatypes as dt
 from .... import metadata as md
 from ....types import QualifiedName
 from ....utils import unique_dict
@@ -76,7 +75,7 @@ class NotificationsTable(Table, RowSource, RowSink):
     TABLE = md.Table(
         ['notifications'],
         [
-            md.Column('message', dt.String()),
+            md.Column('message', md.STRING),
         ],
     )
 

@@ -28,11 +28,11 @@ from omnibus import check
 from omnibus import dataclasses as dc
 
 from . import datatypes as dt
-from .types import QualifiedName
-from .utils import abs_set
-from .utils import mapping
-from .utils import seq
-from .utils import unique_dict
+from ..types import QualifiedName
+from ..utils import abs_set
+from ..utils import mapping
+from ..utils import seq
+from ..utils import unique_dict
 
 
 ObjectT = ta.TypeVar('ObjectT', bound='Object')
@@ -62,14 +62,14 @@ class Table(Object):
 
     def __post_init__(self) -> None:
         self._columns_by_name: ta.Mapping[str, Column] = unique_dict((c.name, c) for c in self.columns)
-        self._type = dt.Table([(c.name, c.type) for c in self.columns])
+        self._type = dt.TableType([(c.name, c.type) for c in self.columns])
 
     @property
     def columns_by_name(self) -> ta.Mapping[str, Column]:
         return self._columns_by_name
 
     @property
-    def type(self) -> dt.Table:
+    def type(self) -> dt.TableType:
         return self._type
 
 

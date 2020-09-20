@@ -4,19 +4,18 @@ from .. import parsing
 from .. import rendering
 from .. import symbols
 from .. import transforms as tfm
-from ... import datatypes as dt
 from ... import metadata as md
 
 
 def test_origins():
     cat = md.Catalog([
         md.Table(['t0'], [
-            md.Column('a', dt.Integer()),
-            md.Column('b', dt.Integer()),
+            md.Column('a', md.INTEGER),
+            md.Column('b', md.INTEGER),
         ]),
         md.Table(['t1'], [
-            md.Column('a', dt.Integer()),
-            md.Column('c', dt.Integer()),
+            md.Column('a', md.INTEGER),
+            md.Column('c', md.INTEGER),
         ]),
     ])
 

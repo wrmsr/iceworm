@@ -1,5 +1,5 @@
 from .. import datatypes as dt
-from ..utils import serde
+from ...utils import serde
 
 
 def test_serde():

@@ -14,8 +14,8 @@ from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
 
-from .utils import seq
-from .utils import serde
+from ..utils import seq
+from ..utils import serde
 
 
 class Datatype(dc.Enum):
@@ -79,9 +79,18 @@ Integer = Number
 Numeric = Number
 Smallint = Number
 
+NUMBER = Number()
+INT = Int()
+INTEGER = Integer()
+NUMERIC = Numeric()
+SMALLINT = Smallint()
+
 
 class Decimal(Datatype):
     pass
+
+
+DECIMAL = Decimal()
 
 
 class Float(Datatype):
@@ -102,6 +111,9 @@ class Float(Datatype):
         return True
 
 
+FLOAT = Float()
+
+
 class Varchar(Datatype):
     ALIASES: ta.ClassVar = {
         'char',
@@ -115,6 +127,11 @@ Char = Varchar
 Character = Varchar
 String = Varchar
 Text = Varchar
+
+CHAR = Char()
+CHARACTER = Character()
+STRING = String()
+TEXT = Text()
 
 
 class Binary(Datatype):
@@ -135,6 +152,9 @@ class Binary(Datatype):
         return True
 
 
+BINARY = Binary()
+
+
 class Boolean(Datatype):
 
     @property
@@ -150,12 +170,21 @@ class Boolean(Datatype):
         return True
 
 
+BOOLEAN = Boolean()
+
+
 class Date(Datatype):
     pass
 
 
+DATE = Date()
+
+
 class Time(Datatype):
     pass
+
+
+TIME = Time()
 
 
 class TimestampNtz(Datatype):
@@ -166,13 +195,22 @@ class TimestampNtz(Datatype):
 
 Datetime = TimestampNtz
 
+TIMESTAMP_NTZ = TimestampNtz()
+DATETIME = Datetime()
+
 
 class TimestampLtz(Datatype):
     pass
 
 
+TIMESTAMP_LTZ = TimestampLtz()
+
+
 class TimestampTz(Datatype):
     pass
+
+
+TIMESTAMP_TZ = TimestampTz()
 
 
 class Variant(Datatype):
@@ -187,11 +225,19 @@ class Array(Datatype):
     pass
 
 
+VARIANT = Variant()
+OBJECT = Object()
+ARRAY = Array()
+
+
 class Geography(Datatype):
     pass
 
 
-class Table(Datatype):
+GEOGRAPHY = Geography()
+
+
+class TableType(Datatype):
     columns: ta.Sequence[ta.Tuple[str, Datatype]] = dc.field(
         coerce=seq, check=lambda l: all(isinstance(k, str) and isinstance(v, Datatype) for k, v in l))
 
