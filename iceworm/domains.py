@@ -417,15 +417,15 @@ class AllOrNoneValueSet(ValueSet, lang.Final):
             raise TypeError(other)
         return ta.cast(AllOrNoneValueSet, other)
 
-    def intersect(self, other: 'ValueSet') -> 'ValueSet':
+    def intersect(self, other: 'ValueSet') -> 'AllOrNoneValueSet':
         other = self._check_compat(other)
         return AllOrNoneValueSet(self._type, self._is_all and other._is_all)
 
-    def union(self, other: 'ValueSet') -> 'ValueSet':
+    def union(self, other: 'ValueSet') -> 'AllOrNoneValueSet':
         other = self._check_compat(other)
         return AllOrNoneValueSet(self._type, self._is_all or other._is_all)
 
-    def complement(self) -> 'ValueSet':
+    def complement(self) -> 'AllOrNoneValueSet':
         return AllOrNoneValueSet(self._type, not self._is_all)
 
 
@@ -487,7 +487,7 @@ class EquatableValueSet(ValueSet, lang.Final):
             raise TypeError(other)
         return ta.cast(EquatableValueSet, other)
 
-    def intersect(self, other: 'ValueSet') -> 'ValueSet':
+    def intersect(self, other: 'ValueSet') -> 'EquatableValueSet':
         other = self._check_compat(other)
         if self._is_white_list and other._is_white_list:
             return EquatableValueSet(self._type, True, self._values & other._values)
@@ -498,7 +498,7 @@ class EquatableValueSet(ValueSet, lang.Final):
         else:
             return EquatableValueSet(self._type, False, other._values | self._values)
 
-    def union(self, other: 'ValueSet') -> 'ValueSet':
+    def union(self, other: 'ValueSet') -> 'EquatableValueSet':
         other = self._check_compat(other)
         if self._is_white_list and other._is_white_list:
             return EquatableValueSet(self._type, True, self._values | other._values)
@@ -509,7 +509,7 @@ class EquatableValueSet(ValueSet, lang.Final):
         else:
             return EquatableValueSet(self._type, False, other._values & self._values)
 
-    def complement(self) -> 'ValueSet':
+    def complement(self) -> 'EquatableValueSet':
         return EquatableValueSet(self._type, not self._is_white_list, self._values)
 
 
@@ -602,10 +602,19 @@ class SortedRangeSet(ValueSet, lang.Final):
             return False
         return floor[1].includes(marker)
 
-    def intersect(self, other: 'ValueSet') -> 'ValueSet':
+    def _check_compat(self, other: 'ValueSet') -> 'SortedRangeSet':
+        if other.type.py_type != self._type:
+            raise TypeError(other)
+        if not isinstance(other, SortedRangeSet):
+            raise TypeError(other)
+        return ta.cast(SortedRangeSet, other)
+
+    def intersect(self, other: 'ValueSet') -> 'SortedRangeSet':
+        other = self._check_compat(other)
         raise NotImplementedError
 
-    def union(self, other: 'ValueSet') -> 'ValueSet':
+    def union(self, other: 'ValueSet') -> 'SortedRangeSet':
+        other = self._check_compat(other)
         raise NotImplementedError
 
     def complement(self) -> 'ValueSet':
