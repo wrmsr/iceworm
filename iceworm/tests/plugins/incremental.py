@@ -3,14 +3,17 @@ import typing as ta
 from omnibus import lang
 import pytest
 
+from ._registry import register
+
 
 _FAILED_INCREMENTAL: ta.Dict[str, ta.Dict[ta.Tuple[int, ...], str]] = {}
 
 
-class Hooks(lang.Namespace):
+@register
+class IncrementalPlugin(lang.Namespace):
 
     @staticmethod
-    def runtest_setup(item):
+    def pytest_runtest_setup(item):
         if 'incremental' not in item.keywords:
             return
 
@@ -24,7 +27,7 @@ class Hooks(lang.Namespace):
             pytest.xfail('previous test failed ({})'.format(test_name))
 
     @staticmethod
-    def runtest_makereport(item, call):
+    def pytest_runtest_makereport(item, call):
         if 'incremental' not in item.keywords:
             return
 

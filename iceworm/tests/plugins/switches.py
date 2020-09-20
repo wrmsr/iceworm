@@ -2,6 +2,8 @@ from omnibus import check
 from omnibus import lang
 import pytest
 
+from ._registry import register
+
 
 SWITCHES = [
     'docker',
@@ -22,20 +24,21 @@ def skip_if_disabled(request, name: str) -> None:
         pytest.skip(f'{name} disabled')
 
 
-class Hooks(lang.Namespace):
+@register
+class SwitchesPlugin(lang.Namespace):
 
     @staticmethod
-    def addoption(parser):
+    def pytest_addoption(parser):
         for sw in SWITCHES:
             parser.addoption(f'--no-{sw}', action='store_true', default=False, help=f'disable {sw} tests')
 
     @staticmethod
-    def configure(config):
+    def pytest_configure(config):
         for sw in SWITCHES:
             config.addinivalue_line('markers', f'{sw}: mark test as {sw}')
 
     @staticmethod
-    def collection_modifyitems(config, items):
+    def pytest_collection_modifyitems(config, items):
         for sw in SWITCHES:
             if not config.getoption(f'--no-{sw}'):
                 continue

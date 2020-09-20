@@ -3,6 +3,8 @@ import typing as ta
 
 from omnibus import lang
 
+from ._registry import register
+
 
 @lang.cached_nullary
 def _load_dot_env() -> ta.Optional[ta.Mapping[str, str]]:
@@ -24,8 +26,9 @@ def _load_dot_env() -> ta.Optional[ta.Mapping[str, str]]:
     return ret
 
 
-class Hooks(lang.Namespace):
+@register
+class EnvPlugin(lang.Namespace):
 
     @staticmethod
-    def configure(config):
+    def pytest_configure(config):
         _load_dot_env()

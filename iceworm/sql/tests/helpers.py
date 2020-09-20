@@ -6,7 +6,7 @@ import sqlalchemy as sa
 from .. import snowflake
 from ...tests import harness as har
 from ...tests.docker import DockerManager
-from ...tests.hooks import switches
+from ...tests.plugins import switches
 
 
 @har.bind(har.Function)

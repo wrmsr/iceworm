@@ -12,7 +12,7 @@ from omnibus import properties
 import yaml
 
 from . import harness as har
-from .hooks import switches
+from .plugins import switches
 
 
 @har.bind(har.Session)
