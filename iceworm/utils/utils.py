@@ -1,5 +1,7 @@
 import collections.abc
+import contextlib
 import inspect
+import socket
 import time
 import typing as ta
 
@@ -178,3 +180,10 @@ def ticking_timeout(s: ta.Union[int, float, None]) -> ta.Callable[[], None]:
             raise TimeoutException
     deadline = time.time() + s
     return tick
+
+
+def find_free_port() -> int:
+    with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(('', 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]

@@ -27,6 +27,7 @@ def main():
     while os.getppid() != 1:
         time.sleep(1)
 
+    sys.stderr.write(f'timebomb running: {cmd}\n')
     os.system(cmd)
 
 
