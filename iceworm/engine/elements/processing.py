@@ -316,8 +316,9 @@ class ElementProcessingDriver:
             history = []
             while True:
                 count += 1
-                # print(count)
                 check.state(count <= self._config.max_iterations)
+                if log.isEnabledFor(logging.DEBUG):
+                    log.debug(f'phase={phase} count={count}')
 
                 dct: ta.MutableMapping[ElementProcessor, ta.AbstractSet[Element]] = ocol.IdentityKeyDict()
                 for step in steps:
@@ -333,6 +334,8 @@ class ElementProcessingDriver:
 
                 processor, matches = next(iter(dct.items()))
                 history.append(processor)
+                if log.isEnabledFor(logging.DEBUG):
+                    log.debug(processor)
 
                 elements = self._run_processor(processor, matches, elements, phase)
 

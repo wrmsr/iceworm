@@ -37,6 +37,7 @@ class Phases(lang.ValueEnum):
     RULES = Phase('rules')
     CONNECTORS = Phase('connectors')
     TARGETS = Phase('targets')
+    PLAN = Phase('plan')
     FINALIZE = Phase('finalize')
 
 

@@ -117,6 +117,7 @@ PreSites, Sites, PostSites = _PhaseScope._subclass(Phases.SITES)
 PreRules, Rules, PostRules = _PhaseScope._subclass(Phases.RULES)
 PreConnectors, Connectors, PostConnectors = _PhaseScope._subclass(Phases.CONNECTORS)
 PreTargets, Targets, PostTargets = _PhaseScope._subclass(Phases.TARGETS)
+PrePlan, Plan, PostPlan = _PhaseScope._subclass(Phases.PLAN)
 PreFinalize, Finalize, PostFinalize = _PhaseScope._subclass(Phases.FINALIZE)
 
 
