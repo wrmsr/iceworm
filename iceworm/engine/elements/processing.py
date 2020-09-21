@@ -23,6 +23,7 @@ TODO:
 import abc
 import itertools
 import logging
+import random
 import typing as ta
 import weakref
 
@@ -86,6 +87,10 @@ def has_processed(ep: 'ElementProcessor', e: Element) -> bool:
 
 
 class ElementProcessor(Dependable, lang.Abstract):
+
+    @property
+    def kwargs(self) -> ta.Mapping[str, ta.Any]:
+        return {}
 
     @classmethod
     def phases(cls) -> ta.Iterable[Phase]:
@@ -164,6 +169,9 @@ class ElementProcessingDriver:
     class Config(dc.Pure):
         max_iterations: int = 1000
 
+        step_shuffle: bool = False
+        step_shuffle_seed: ta.Optional[int] = dc.field(None, check=lambda o: isinstance(o, (int, type(None))))
+
     def __init__(
             self,
             processor_factory: ElementProcessorFactory,
@@ -190,6 +198,8 @@ class ElementProcessingDriver:
             seen.add(ep)
         processor_seqs_by_phase: ta.Mapping[Phase, ta.Sequence[ElementProcessor]] = by_phase
         return lambda es, phase: processor_seqs_by_phase.get(phase, [])
+
+    def _sort_step(self, step: ta.Sequence[ElementProcessor]) -> ta.Sequence[ElementProcessor]:
 
     def process(self, elements: ta.Iterable[Element]) -> ElementSet:
         elements = ElementSet.of(elements)
@@ -218,6 +228,8 @@ class ElementProcessingDriver:
                 steps = list(ocol.toposort(ep_deps))
             else:
                 steps = [eps]
+
+            steps = [self._sort_step(step) for step in steps]
 
             count = 0
             history = []
