@@ -8,7 +8,6 @@ from omnibus import lifecycles as lc
 from omnibus import os as oos
 from omnibus import properties
 from omnibus.spark import local as sl
-from pyhive import hive  # noqa
 import sqlalchemy as sa
 
 from . import harness as har
@@ -32,6 +31,7 @@ class SparkManager(lc.ContextManageableLifecycle):
     def thrift_url(self) -> str:
         switches.skip_if_disabled(self._request, 'spark')
 
+        from pyhive import hive  # noqa
         from thrift.transport.TTransport import TTransportException
 
         spark_home = os.path.abspath(os.path.dirname(importlib.util.find_spec('pyspark').origin))

@@ -36,7 +36,6 @@ from omnibus import lang
 from omnibus import properties
 from omnibus.dev.testing.helpers import skip_if_cant_import
 from omnibus.spark import local as sl
-from pyhive import hive  # noqa
 import pytest
 import sqlalchemy as sa
 
