@@ -90,10 +90,10 @@ def has_processed(ep: 'ElementProcessor', e: Element) -> bool:
 
 class ElementProcessor(Dependable, lang.Abstract):
 
-    defs.repr('kwargs')
+    defs.repr('key')
 
     @property
-    def kwargs(self) -> ta.Mapping[str, ta.Any]:
+    def key(self) -> ta.Mapping[str, ta.Any]:
         return {}
 
     @classmethod
@@ -241,8 +241,8 @@ class ElementProcessingDriver:
         ret = []
         for _, cls in sorted(cls_by_qn.items(), key=lambda t: t[0]):
             kws_by_ep: ta.Mapping[ElementProcessor, ta.Mapping[str, ta.Any]] = ocol.IdentityKeyDict(
-                (ep, ep.kwargs) for ep in ep_sets_by_cls[cls])
-            kw_keys = sorted({k for kw in kws_by_ep.values() for k in kw})
+                (ep, dict(check.isinstance(ep.key, ta.Mapping))) for ep in ep_sets_by_cls[cls])
+            kw_keys = sorted({check.isinstance(k, str) for kw in kws_by_ep.values() for k in kw})
             eps_by_kwt = unique_dict((tuple(kw.get(k) for k in kw_keys), ep) for ep, kw in kws_by_ep.items())
             ret.extend([ep for _, ep in sorted(list(eps_by_kwt.items()), key=lambda t: t[0])])
 
