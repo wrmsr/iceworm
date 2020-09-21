@@ -86,6 +86,10 @@ class RuleElementProcessor(els.ElementProcessor, ta.Generic[RuleT]):
 
         self._proc = check.isinstance(proc, RuleProcessor)
 
+    @property
+    def kwargs(self) -> ta.Mapping[str, ta.Any]:
+        return {'rule_cls': self._proc.rule_cls.__qualname__}
+
     def match(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
         return [t for t in elements.get_type_set(self._proc.rule_cls)]
 
