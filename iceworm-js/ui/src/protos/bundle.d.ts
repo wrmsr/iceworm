@@ -2,91 +2,91 @@ import * as $protobuf from "protobufjs";
 /** Namespace iceworm. */
 export namespace iceworm {
 
-    /** Properties of a WebServiceStatus. */
-    interface IWebServiceStatus {
+    /** Properties of a ServiceWebStatus. */
+    interface IServiceWebStatus {
 
-        /** WebServiceStatus uptime */
+        /** ServiceWebStatus uptime */
         uptime?: (number|null);
     }
 
-    /** Represents a WebServiceStatus. */
-    class WebServiceStatus implements IWebServiceStatus {
+    /** Represents a ServiceWebStatus. */
+    class ServiceWebStatus implements IServiceWebStatus {
 
         /**
-         * Constructs a new WebServiceStatus.
+         * Constructs a new ServiceWebStatus.
          * @param [properties] Properties to set
          */
-        constructor(properties?: iceworm.IWebServiceStatus);
+        constructor(properties?: iceworm.IServiceWebStatus);
 
-        /** WebServiceStatus uptime. */
+        /** ServiceWebStatus uptime. */
         public uptime: number;
 
         /**
-         * Creates a new WebServiceStatus instance using the specified properties.
+         * Creates a new ServiceWebStatus instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns WebServiceStatus instance
+         * @returns ServiceWebStatus instance
          */
-        public static create(properties?: iceworm.IWebServiceStatus): iceworm.WebServiceStatus;
+        public static create(properties?: iceworm.IServiceWebStatus): iceworm.ServiceWebStatus;
 
         /**
-         * Encodes the specified WebServiceStatus message. Does not implicitly {@link iceworm.WebServiceStatus.verify|verify} messages.
-         * @param message WebServiceStatus message or plain object to encode
+         * Encodes the specified ServiceWebStatus message. Does not implicitly {@link iceworm.ServiceWebStatus.verify|verify} messages.
+         * @param message ServiceWebStatus message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: iceworm.IWebServiceStatus, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: iceworm.IServiceWebStatus, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified WebServiceStatus message, length delimited. Does not implicitly {@link iceworm.WebServiceStatus.verify|verify} messages.
-         * @param message WebServiceStatus message or plain object to encode
+         * Encodes the specified ServiceWebStatus message, length delimited. Does not implicitly {@link iceworm.ServiceWebStatus.verify|verify} messages.
+         * @param message ServiceWebStatus message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: iceworm.IWebServiceStatus, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: iceworm.IServiceWebStatus, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a WebServiceStatus message from the specified reader or buffer.
+         * Decodes a ServiceWebStatus message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns WebServiceStatus
+         * @returns ServiceWebStatus
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): iceworm.WebServiceStatus;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): iceworm.ServiceWebStatus;
 
         /**
-         * Decodes a WebServiceStatus message from the specified reader or buffer, length delimited.
+         * Decodes a ServiceWebStatus message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns WebServiceStatus
+         * @returns ServiceWebStatus
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): iceworm.WebServiceStatus;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): iceworm.ServiceWebStatus;
 
         /**
-         * Verifies a WebServiceStatus message.
+         * Verifies a ServiceWebStatus message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a WebServiceStatus message from a plain object. Also converts values to their respective internal types.
+         * Creates a ServiceWebStatus message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns WebServiceStatus
+         * @returns ServiceWebStatus
          */
-        public static fromObject(object: { [k: string]: any }): iceworm.WebServiceStatus;
+        public static fromObject(object: { [k: string]: any }): iceworm.ServiceWebStatus;
 
         /**
-         * Creates a plain object from a WebServiceStatus message. Also converts values to other types if specified.
-         * @param message WebServiceStatus
+         * Creates a plain object from a ServiceWebStatus message. Also converts values to other types if specified.
+         * @param message ServiceWebStatus
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: iceworm.WebServiceStatus, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: iceworm.ServiceWebStatus, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this WebServiceStatus to JSON.
+         * Converts this ServiceWebStatus to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };

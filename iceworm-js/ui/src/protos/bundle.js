@@ -18,24 +18,24 @@ $root.iceworm = (function() {
      */
     var iceworm = {};
 
-    iceworm.WebServiceStatus = (function() {
+    iceworm.ServiceWebStatus = (function() {
 
         /**
-         * Properties of a WebServiceStatus.
+         * Properties of a ServiceWebStatus.
          * @memberof iceworm
-         * @interface IWebServiceStatus
-         * @property {number|null} [uptime] WebServiceStatus uptime
+         * @interface IServiceWebStatus
+         * @property {number|null} [uptime] ServiceWebStatus uptime
          */
 
         /**
-         * Constructs a new WebServiceStatus.
+         * Constructs a new ServiceWebStatus.
          * @memberof iceworm
-         * @classdesc Represents a WebServiceStatus.
-         * @implements IWebServiceStatus
+         * @classdesc Represents a ServiceWebStatus.
+         * @implements IServiceWebStatus
          * @constructor
-         * @param {iceworm.IWebServiceStatus=} [properties] Properties to set
+         * @param {iceworm.IServiceWebStatus=} [properties] Properties to set
          */
-        function WebServiceStatus(properties) {
+        function ServiceWebStatus(properties) {
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -43,35 +43,35 @@ $root.iceworm = (function() {
         }
 
         /**
-         * WebServiceStatus uptime.
+         * ServiceWebStatus uptime.
          * @member {number} uptime
-         * @memberof iceworm.WebServiceStatus
+         * @memberof iceworm.ServiceWebStatus
          * @instance
          */
-        WebServiceStatus.prototype.uptime = 0;
+        ServiceWebStatus.prototype.uptime = 0;
 
         /**
-         * Creates a new WebServiceStatus instance using the specified properties.
+         * Creates a new ServiceWebStatus instance using the specified properties.
          * @function create
-         * @memberof iceworm.WebServiceStatus
+         * @memberof iceworm.ServiceWebStatus
          * @static
-         * @param {iceworm.IWebServiceStatus=} [properties] Properties to set
-         * @returns {iceworm.WebServiceStatus} WebServiceStatus instance
+         * @param {iceworm.IServiceWebStatus=} [properties] Properties to set
+         * @returns {iceworm.ServiceWebStatus} ServiceWebStatus instance
          */
-        WebServiceStatus.create = function create(properties) {
-            return new WebServiceStatus(properties);
+        ServiceWebStatus.create = function create(properties) {
+            return new ServiceWebStatus(properties);
         };
 
         /**
-         * Encodes the specified WebServiceStatus message. Does not implicitly {@link iceworm.WebServiceStatus.verify|verify} messages.
+         * Encodes the specified ServiceWebStatus message. Does not implicitly {@link iceworm.ServiceWebStatus.verify|verify} messages.
          * @function encode
-         * @memberof iceworm.WebServiceStatus
+         * @memberof iceworm.ServiceWebStatus
          * @static
-         * @param {iceworm.IWebServiceStatus} message WebServiceStatus message or plain object to encode
+         * @param {iceworm.IServiceWebStatus} message ServiceWebStatus message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        WebServiceStatus.encode = function encode(message, writer) {
+        ServiceWebStatus.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
             if (message.uptime != null && Object.hasOwnProperty.call(message, "uptime"))
@@ -80,33 +80,33 @@ $root.iceworm = (function() {
         };
 
         /**
-         * Encodes the specified WebServiceStatus message, length delimited. Does not implicitly {@link iceworm.WebServiceStatus.verify|verify} messages.
+         * Encodes the specified ServiceWebStatus message, length delimited. Does not implicitly {@link iceworm.ServiceWebStatus.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof iceworm.WebServiceStatus
+         * @memberof iceworm.ServiceWebStatus
          * @static
-         * @param {iceworm.IWebServiceStatus} message WebServiceStatus message or plain object to encode
+         * @param {iceworm.IServiceWebStatus} message ServiceWebStatus message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        WebServiceStatus.encodeDelimited = function encodeDelimited(message, writer) {
+        ServiceWebStatus.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a WebServiceStatus message from the specified reader or buffer.
+         * Decodes a ServiceWebStatus message from the specified reader or buffer.
          * @function decode
-         * @memberof iceworm.WebServiceStatus
+         * @memberof iceworm.ServiceWebStatus
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {iceworm.WebServiceStatus} WebServiceStatus
+         * @returns {iceworm.ServiceWebStatus} ServiceWebStatus
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        WebServiceStatus.decode = function decode(reader, length) {
+        ServiceWebStatus.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.iceworm.WebServiceStatus();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.iceworm.ServiceWebStatus();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
@@ -122,30 +122,30 @@ $root.iceworm = (function() {
         };
 
         /**
-         * Decodes a WebServiceStatus message from the specified reader or buffer, length delimited.
+         * Decodes a ServiceWebStatus message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof iceworm.WebServiceStatus
+         * @memberof iceworm.ServiceWebStatus
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {iceworm.WebServiceStatus} WebServiceStatus
+         * @returns {iceworm.ServiceWebStatus} ServiceWebStatus
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        WebServiceStatus.decodeDelimited = function decodeDelimited(reader) {
+        ServiceWebStatus.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a WebServiceStatus message.
+         * Verifies a ServiceWebStatus message.
          * @function verify
-         * @memberof iceworm.WebServiceStatus
+         * @memberof iceworm.ServiceWebStatus
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        WebServiceStatus.verify = function verify(message) {
+        ServiceWebStatus.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.uptime != null && message.hasOwnProperty("uptime"))
@@ -155,32 +155,32 @@ $root.iceworm = (function() {
         };
 
         /**
-         * Creates a WebServiceStatus message from a plain object. Also converts values to their respective internal types.
+         * Creates a ServiceWebStatus message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof iceworm.WebServiceStatus
+         * @memberof iceworm.ServiceWebStatus
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {iceworm.WebServiceStatus} WebServiceStatus
+         * @returns {iceworm.ServiceWebStatus} ServiceWebStatus
          */
-        WebServiceStatus.fromObject = function fromObject(object) {
-            if (object instanceof $root.iceworm.WebServiceStatus)
+        ServiceWebStatus.fromObject = function fromObject(object) {
+            if (object instanceof $root.iceworm.ServiceWebStatus)
                 return object;
-            var message = new $root.iceworm.WebServiceStatus();
+            var message = new $root.iceworm.ServiceWebStatus();
             if (object.uptime != null)
                 message.uptime = Number(object.uptime);
             return message;
         };
 
         /**
-         * Creates a plain object from a WebServiceStatus message. Also converts values to other types if specified.
+         * Creates a plain object from a ServiceWebStatus message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof iceworm.WebServiceStatus
+         * @memberof iceworm.ServiceWebStatus
          * @static
-         * @param {iceworm.WebServiceStatus} message WebServiceStatus
+         * @param {iceworm.ServiceWebStatus} message ServiceWebStatus
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        WebServiceStatus.toObject = function toObject(message, options) {
+        ServiceWebStatus.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
@@ -192,17 +192,17 @@ $root.iceworm = (function() {
         };
 
         /**
-         * Converts this WebServiceStatus to JSON.
+         * Converts this ServiceWebStatus to JSON.
          * @function toJSON
-         * @memberof iceworm.WebServiceStatus
+         * @memberof iceworm.ServiceWebStatus
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        WebServiceStatus.prototype.toJSON = function toJSON() {
+        ServiceWebStatus.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
-        return WebServiceStatus;
+        return ServiceWebStatus;
     })();
 
     iceworm._Stub = (function() {
