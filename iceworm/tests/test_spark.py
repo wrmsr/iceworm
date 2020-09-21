@@ -52,6 +52,7 @@ else:
     ps = lang.proxy_import('pyspark')
 
 from . import harness as har
+from ..utils import ticking_timeout
 from ..utils import timebomb
 from .plugins import switches
 
@@ -63,6 +64,8 @@ class SparkManager(lc.ContextManageableLifecycle):
         super().__init__()
 
         self._request = check.isinstance(request, har.FixtureRequest)
+
+    TIMEOUT = 20
 
     @properties.stateful_cached
     @property
@@ -86,11 +89,13 @@ class SparkManager(lc.ContextManageableLifecycle):
         stop_cmd = f'{exe} stop {cls} 1'
 
         self._lifecycle_exit_stack.enter_context(lang.defer(lambda: os.system(stop_cmd)))
-        self._lifecycle_exit_stack.enter_context(timebomb.start(stop_cmd, cwd=cwd, env=env, timeout=30))
+        self._lifecycle_exit_stack.enter_context(timebomb.start(stop_cmd, cwd=cwd, env=env, timeout=self.TIMEOUT))
         os.system(start_cmd)
 
         url = 'hive://localhost:10000/default'
+        tick = ticking_timeout(self.TIMEOUT)
         while True:
+            tick()
             try:
                 with lang.disposing(sa.create_engine(url)) as engine:
                     with engine.connect() as conn:

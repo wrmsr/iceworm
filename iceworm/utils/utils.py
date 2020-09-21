@@ -1,5 +1,6 @@
 import collections.abc
 import inspect
+import time
 import typing as ta
 
 from omnibus import check
@@ -163,3 +164,17 @@ def dc_only(
     if rem and all:
         return False
     return True
+
+
+class TimeoutException(Exception):
+    pass
+
+
+def ticking_timeout(s: ta.Union[int, float, None]) -> ta.Callable[[], None]:
+    if s is None:
+        return lambda: None
+    def tick():  # noqa
+        if time.time() >= deadline:
+            raise TimeoutException
+    deadline = time.time() + s
+    return tick
