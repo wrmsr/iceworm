@@ -82,7 +82,7 @@ class SparkManager(lc.ContextManageableLifecycle):
             'SPARK_HOME': spark_home,
         }
 
-        start_cmd = f'{exe} submit {cls} 1 --name "Thrift JDBC/ODBC Server"'
+        start_cmd = f'cd {cwd} && {exe} submit {cls} 1 --name "Thrift JDBC/ODBC Server"'
         stop_cmd = f'{exe} stop {cls} 1'
 
         self._lifecycle_exit_stack.enter_context(lang.defer(lambda: os.system(stop_cmd)))
