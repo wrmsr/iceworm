@@ -11,17 +11,17 @@ PYENV_BIN:=$(shell if [ -f "$${HOME}/.pyenv/bin/pyenv" ] ; then echo "$${HOME}/.
 PIP_ARGS:=
 
 PYENV_BREW_DEPS:= \
-	graphviz \
-	libyaml \
-	node \
 	openssl \
-	pipx \
 	readline \
 	sqlite3 \
 	zlib \
 
 BREW_DEPS:= \
 	$(PYENV_BREW_DEPS) \
+	graphviz \
+	libyaml \
+	node \
+	pipx \
 	protobuf \
 
 ANTLR_VERSION=4.8
@@ -64,9 +64,13 @@ clean:
 
 ### Env
 
-.PHONY: brew
-brew:
+.PHONY: brew-install
+brew-install:
 	brew install $(BREW_DEPS)
+
+.PHONY: brew-upgrade
+brew-upgrade:
+	brew upgrade $(BREW_DEPS)
 
 define do-venv
 	set -e ; \
