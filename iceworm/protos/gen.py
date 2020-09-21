@@ -18,6 +18,7 @@ from omnibus import code as ocod
 from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import logs
+from omnibus import properties
 
 from .. import __about__
 from .registry import _PROTO_OBJS
@@ -28,6 +29,10 @@ log = logging.getLogger(__name__)
 
 PACKAGE = __package__.split('.')[0]
 JAVA_PREFIX = 'com.' + __about__.__author__
+
+
+def _ver_tup(s: str) -> ta.Sequence[int]:
+    return tuple(map(int, s.strip().split('.')))
 
 
 class Gen:
@@ -54,7 +59,31 @@ class Gen:
         self._out = ocod.IndentWriter(indent='  ')
 
     @lang.cached_nullary
+    def get_protoc_ver_str(self) -> str:
+        return subprocess.check_output(['protoc', '--version']).decode('utf-8').strip()
+
+    @lang.cached_nullary
+    def get_protoc_ver_tup(self) -> ta.Sequence[int]:
+        buf = self.get_protoc_ver_str()
+        check.state(buf.startswith('libprotoc '))
+        return _ver_tup(buf.partition(' ')[2])
+
+    @properties.cached
+    def lib_ver_tup(self) -> ta.Sequence[int]:
+        import google.protobuf
+        return _ver_tup(google.protobuf.__version__)
+
+    @lang.cached_nullary
     def gen(self) -> str:
+        if self._compile:
+            lib_ver_tup = self.lib_ver_tup
+            bin_ver_tup = self.get_protoc_ver_tup()
+            if lib_ver_tup[:2] != bin_ver_tup[:2]:
+                raise EnvironmentError(
+                    f'protobuf versions out of sync: lib={lib_ver_tup}, bin={bin_ver_tup}. '
+                    f'please update {"lib" if bin_ver_tup > lib_ver_tup else "bin"}.'
+                )
+
         for ir in self._import_roots:
             log.info(f'Importing {ir}')
             for ie in lang.yield_import_all(ir, recursive=True):
@@ -86,8 +115,6 @@ class Gen:
                 f.write(src)
 
             if self._compile:
-                protoc_ver = subprocess.check_output(['protoc', '--version']).decode('utf-8').strip()
-
                 subprocess.check_call(
                     [
                         'protoc',
@@ -104,7 +131,7 @@ class Gen:
                     csrc = f.read()
                 with open(cfp, 'w') as f:
                     f.write('# flake8: noqa\n')
-                    f.write(f'# protoc: {protoc_ver}\n')
+                    f.write(f'# protoc: {self.get_protoc_ver_str()}\n')
                     f.write(csrc)
 
         return src
