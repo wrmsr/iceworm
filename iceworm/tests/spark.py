@@ -1,6 +1,7 @@
 import importlib.util
 import os.path
 import time
+import typing as ta
 
 from omnibus import check
 from omnibus import lang
@@ -27,12 +28,14 @@ class SparkManager(lc.ContextManageableLifecycle):
 
     TIMEOUT = 60
 
+    THRIFT_PORT: ta.Optional[int] = None
+
     @properties.stateful_cached
     @property
     def thrift_url(self) -> str:
         switches.skip_if_disabled(self._request, 'spark')
 
-        port = find_free_port()
+        port = self.THRIFT_PORT or find_free_port()
         url = f'hive://localhost:{port}/default'
 
         from pyhive import hive  # noqa
