@@ -23,6 +23,8 @@ from omnibus import lifecycles as lc
 import omnibus.inject.scopes  # noqa
 import pytest
 
+from . import plugins
+
 
 T = ta.TypeVar('T')
 
@@ -271,6 +273,7 @@ class Harness:
             self._inj_scopes_by_pytest_scope[pytest_scope].exit()
 
 
+@plugins.register
 class HarnessPlugin:
 
     @pytest.yield_fixture(scope='session', autouse=True)

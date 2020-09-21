@@ -30,10 +30,6 @@ class SwitchesPlugin:
         for sw in SWITCHES:
             parser.addoption(f'--no-{sw}', action='store_true', default=False, help=f'disable {sw} tests')
 
-    def pytest_configure(self, config):
-        for sw in SWITCHES:
-            config.addinivalue_line('markers', f'{sw}: mark test as {sw}')
-
     def pytest_collection_modifyitems(self, config, items):
         for sw in SWITCHES:
             if not config.getoption(f'--no-{sw}'):
@@ -42,3 +38,7 @@ class SwitchesPlugin:
             for item in items:
                 if sw in item.keywords:
                     item.add_marker(skip)
+
+    def pytest_configure(self, config):
+        for sw in SWITCHES:
+            config.addinivalue_line('markers', f'{sw}: mark test as {sw}')

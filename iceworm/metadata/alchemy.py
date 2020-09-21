@@ -10,6 +10,7 @@ from omnibus import dispatch
 import sqlalchemy as sa
 import sqlalchemy.sql.sqltypes
 
+from . import datatypes as dt
 from . import metadata as md
 
 
@@ -22,8 +23,8 @@ class FromInternal(dispatch.Class):
 
     __call__ = dispatch.property()
 
-    def __call__(self, md_type: md.Datatype) -> sa.Table:  # noqa
-        if isinstance(md_type, md.Integer):
+    def __call__(self, md_type: dt.Datatype) -> sa.Table:  # noqa
+        if isinstance(md_type, dt.Integer):
             return sa.Integer()
         else:
             raise TypeError(md_type)
@@ -49,9 +50,9 @@ class ToInternal(dispatch.Class):
 
     __call__ = dispatch.property()
 
-    def __call__(self, sa_type: sa.sql.sqltypes.TypeEngine) -> md.Datatype:  # noqa
+    def __call__(self, sa_type: sa.sql.sqltypes.TypeEngine) -> dt.Datatype:  # noqa
         if isinstance(sa_type, sa.Integer):
-            return md.INTEGER
+            return dt.INTEGER
         else:
             raise TypeError(sa_type)
 

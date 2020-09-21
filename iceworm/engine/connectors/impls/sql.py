@@ -5,18 +5,18 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 import sqlalchemy as sa
 
-from .... import alchemy as alch
 from .... import metadata as md
 from .... import sql
+from ....metadata import alchemy as alch
 from ....types import QualifiedName
 from ....utils import secrets as sec
 from ...utils import parse_simple_select_table
 from ..base import Connection as _Connection
 from ..base import Connector as _Connector
 from ..base import Row
+from ..base import Rows
 from ..base import RowSink
 from ..base import RowSource
-from ..base import Rows
 
 
 class SqlConnector(_Connector['SqlConnector', 'SqlConnector.Config']):

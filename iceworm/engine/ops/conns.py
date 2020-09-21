@@ -7,7 +7,6 @@ from omnibus import lang
 import sqlalchemy as sa
 
 from .. import connectors as ctrs
-from ... import alchemy as alch
 from ... import metadata as md
 from ... import sql
 from ...trees import eval as teval
@@ -94,7 +93,7 @@ class CreateTableExecutor(ConnsOpExecutor[CreateTable]):
 
     def execute(self, op: CreateTable) -> None:
         sa_conn = check.isinstance(self._conns[op.table.name[0]], SqlConnection).sa_conn
-        table = alch.FromInternal(sa.MetaData())(dc.replace(op.table, name=op.table.name[1:]))
+        table = md.alchemy.FromInternal(sa.MetaData())(dc.replace(op.table, name=op.table.name[1:]))
         table.create(sa_conn)
 
 
