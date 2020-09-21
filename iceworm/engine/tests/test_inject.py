@@ -74,12 +74,7 @@ def test_inject(harness: har.Harness):
 
         injector = inj.create_injector(binder)
 
-        elements_binder = inj.create_binder()
-        elements_installs = injector[inj.Key(ta.AbstractSet[ta.Callable[[inj.Binder], None]], 'elements')]
-        for e_i in elements_installs:
-            e_i(elements_binder)
-        elements_injector = injector.create_child(elements_binder)
-
+        elements_injector = injector[inj.Key(inj.Injector, 'elements')]
         with els.inject.new_driver_scope(elements_injector) as drv:
             elements = drv.run([
                 sites.Site('site0.yml'),
@@ -103,12 +98,7 @@ def test_inject(harness: har.Harness):
             'system/notifications',
         })
 
-        execution_binder = inj.create_binder()
-        execution_installs = injector[inj.Key(ta.AbstractSet[ta.Callable[[inj.Binder], None]], 'execution')]
-        for e_i in execution_installs:
-            e_i(execution_binder)
-        execution_injector = injector.create_child(execution_binder)
-
+        execution_injector = injector[inj.Key(inj.Injector, 'execution')]
         with ops.inject.new_execution_scope(execution_injector, conns):
             execution_injector[ops.OpExecutionDriver].execute(plan)
 

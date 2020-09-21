@@ -80,6 +80,21 @@ def _install_execution(binder: inj.Binder) -> inj.Binder:
 def install(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
+    def check_binds(injector: inj.Injector) -> None:
+        check.empty(injector[ta.Mapping[ta.Type[Op], OpExecutor]])
+
+    binder.new_dict_binder(ta.Type[Op], OpExecutor)
+    binder.bind_callable(check_binds, key=inj.Key(object, check_binds), as_eager_singleton=True)
+
     binder.new_set_binder(ta.Callable[[inj.Binder], None], annotated_with='execution').bind(to_instance=_install_execution)  # noqa
+
+    @inj.annotate('execution', mods='execution')
+    def provide_execution_injector(injector: inj.Injector, mods: ta.AbstractSet[ta.Callable[[inj.Binder], None]]) -> inj.Injector:  # noqa
+        bnd = inj.create_binder()
+        for mod in mods:
+            mod(bnd)
+        return injector.create_child(bnd)
+
+    binder.bind_callable(provide_execution_injector, as_eager_singleton=True)
 
     return binder

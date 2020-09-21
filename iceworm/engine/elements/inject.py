@@ -270,6 +270,25 @@ def _install_elements(binder: inj.Binder) -> inj.Binder:
 def install(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
+    def check_binds(injector: inj.Injector) -> None:
+        for s in _PhaseScope._subclass_map.values():
+            if s.phase_pair().sub_phase == SubPhases.MAIN:
+                check.empty(injector[inj.Key(ta.AbstractSet[ElementProcessor], s.phase_pair().phase)])
+
+    for s in _PhaseScope._subclass_map.values():
+        if s.phase_pair().sub_phase == SubPhases.MAIN:
+            binder.new_set_binder(ElementProcessor, annotated_with=s.phase_pair().phase)
+    binder.bind_callable(check_binds, key=inj.Key(object, check_binds), as_eager_singleton=True)
+
     binder.new_set_binder(ta.Callable[[inj.Binder], None], annotated_with='elements').bind(to_instance=_install_elements)  # noqa
+
+    @inj.annotate('elements', mods='elements')
+    def provide_elements_injector(injector: inj.Injector, mods: ta.AbstractSet[ta.Callable[[inj.Binder], None]]) -> inj.Injector:  # noqa
+        bnd = inj.create_binder()
+        for mod in mods:
+            mod(bnd)
+        return injector.create_child(bnd)
+
+    binder.bind_callable(provide_elements_injector, as_eager_singleton=True)
 
     return binder
