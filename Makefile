@@ -123,7 +123,11 @@ define do-deps
 		egrep -v omnibus | \
 		xargs $(1)/bin/pip $(PIP_ARGS) install ; \
 	\
-	$(1)/bin/pip install $(PIP_ARGS) --upgrade git+https://github.com/wrmsr/omnibus@wrmsr_working ; \
+	OMNIBUS_LOCAL=$$($(1)/bin/pip freeze | egrep '^omnibus ' | cut -d@ -f3) ; \
+	OMNIBUS_REMOTE=$$(git ls-remote https://github.com/wrmsr/omnibus wrmsr_working | awk '{print $$1}') ; \
+	if [ "$$OMNIBUS_LOCAL" != "$$OMNIBUS_REMOTE" ] ; then \
+		$(1)/bin/pip install $(PIP_ARGS) --upgrade git+https://github.com/wrmsr/omnibus@wrmsr_working ; \
+	fi ; \
 	\
 	if [ -d "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/" ] ; then \
 		if $(1)/bin/python -c 'import sys; exit(0 if sys.version_info < (3, 7) else 1)' ; then \
