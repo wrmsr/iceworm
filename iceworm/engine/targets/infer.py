@@ -111,14 +111,15 @@ class InferTableProcessor(els.InstanceElementProcessor):
             for table in topo:
                 table_idx = self.idxs[table]
                 check.state(lst[table_idx] is table)
+                name = self.table_names_by_id[table.id]
                 if table.md is not None:
+                    given_tables[name] = table.md
                     continue
 
                 rows = check.single(rt for rt in self.input.get_type_set(Rows) if rt.table == table)
                 rows_idx = self.idxs[rows]
                 check.state(lst[rows_idx] is rows)
 
-                name = self.table_names_by_id[table.id]
                 root, md_table = self.infer_table(
                     rows,
                     given_tables,
