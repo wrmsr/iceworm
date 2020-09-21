@@ -17,7 +17,7 @@ def bind_connector_impl(binder: inj.Binder, impl_cls: ta.Type[Connector]) -> Non
     cfgabl.bind_impl(binder, Connector, impl_cls)
 
 
-def install(binder: inj.Binder) -> inj.Binder:
+def _install_elements(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
     cfgabl.bind_factory(binder, Connector)
@@ -40,5 +40,13 @@ def install(binder: inj.Binder) -> inj.Binder:
 
     binder.bind_callable(provide_connector_set, in_=els.inject.PostConnectors)
     els.inject.bind_post_eager(binder, ConnectorSet, els.Phases.CONNECTORS)
+
+    return binder
+
+
+def install(binder: inj.Binder) -> inj.Binder:
+    check.isinstance(binder, inj.Binder)
+
+    binder.new_set_binder(ta.Callable[[inj.Binder], None], annotated_with='elements').bind(to_instance=_install_elements)  # noqa
 
     return binder

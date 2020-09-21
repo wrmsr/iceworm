@@ -14,7 +14,7 @@ def bind_rule_processor(binder: inj.Binder, cls: ta.Type[RuleProcessor], phase: 
     check.isinstance(binder, inj.Binder)
     check.issubclass(cls, RuleProcessor)
     check.isinstance(phase, els.Phase)
-    scope = els.inject.get_scope(els.PhasePair(phase, els.SubPhases.MAIN))
+    scope = els.inject.get_phase_scope(els.PhasePair(phase, els.SubPhases.MAIN))
 
     binder.bind(cls, in_=scope)
     binder.new_set_binder(RuleProcessor, annotated_with=phase, in_=scope).bind(to=cls)
@@ -26,10 +26,18 @@ def bind_rule_processor(binder: inj.Binder, cls: ta.Type[RuleProcessor], phase: 
     binder.new_set_binder(els.ElementProcessor, annotated_with=phase, in_=scope).bind(to_provider=RuleElementProcessor[cls])  # noqa
 
 
-def install(binder: inj.Binder) -> inj.Binder:
+def _install_elements(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
     bind_rule_processor(binder, InsertedRowsProcessor, els.Phases.TARGETS)
     bind_rule_processor(binder, TableAsSelectProcessor, els.Phases.TARGETS)
+
+    return binder
+
+
+def install(binder: inj.Binder) -> inj.Binder:
+    check.isinstance(binder, inj.Binder)
+
+    binder.new_set_binder(ta.Callable[[inj.Binder], None], annotated_with='elements').bind(to_instance=_install_elements)  # noqa
 
     return binder

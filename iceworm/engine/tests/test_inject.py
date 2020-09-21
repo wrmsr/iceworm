@@ -12,11 +12,10 @@ import yaml  # noqa
 
 from .. import connectors as ctrs
 from .. import elements as els
+from .. import inject as einj
 from .. import ops
 from .. import planning as pln
-from .. import rules as rls
 from .. import sites
-from .. import targets as tars
 from ... import sql
 from ...sql.tests.helpers import DbManager
 from ...tests import harness as har
@@ -53,20 +52,6 @@ class UrlSecretsReplacer(els.ElementProcessor):
         ]
 
 
-def install_element_processors(binder: inj.Binder) -> inj.Binder:
-    els.inject.bind_element_processor(binder, UrlSecretsReplacer, els.Phases.CONNECTORS)
-
-    binder.bind(inj.Key(ta.Callable[[str], no.Node]), to_instance=par.parse_stmt)
-
-    ctrs.inject.install(binder)
-    els.inject.install(binder)
-    rls.inject.install(binder)
-    sites.inject.install(binder)
-    tars.inject.install(binder)
-
-    return binder
-
-
 # @pytest.mark.xfail
 def test_inject(harness: har.Harness):
     with contextlib.ExitStack() as es:
@@ -77,14 +62,29 @@ def test_inject(harness: har.Harness):
         binder = inj.create_binder()
         binder.bind(sec.Secrets, to_instance=secrets)
         sql.inject.install(binder)
-        install_element_processors(binder)
-        # binder.bind(els.ElementProcessingDriver.Config(step_shuffle=True))
-        drv = els.inject.InjectionElementProcessingDriver(binder)
-        elements = drv.run([
-            sites.Site('site0.yml'),
-        ])
+        einj.install(binder)
 
-        print(elements)
+        # FIXME: check/forbid ele binds in root inj
+        def _i_e(b):
+            els.inject.bind_element_processor(b, UrlSecretsReplacer, els.Phases.CONNECTORS)
+        binder.new_set_binder(ta.Callable[[inj.Binder], None], annotated_with='elements').bind(to_instance=_i_e)  # noqa
+
+        binder.bind(inj.Key(ta.Callable[[str], no.Node]), to_instance=par.parse_stmt)
+        # binder.bind(els.ElementProcessingDriver.Config(step_shuffle=True))
+
+        injector = inj.create_injector(binder)
+
+        elements_binder = inj.create_binder()
+        elements_installs = injector[inj.Key(ta.AbstractSet[ta.Callable[[inj.Binder], None]], 'elements')]
+        for e_i in elements_installs:
+            e_i(elements_binder)
+        elements_injector = injector.create_child(elements_binder)
+
+        with els.inject.new_driver_scope(elements_injector) as drv:
+            elements = drv.run([
+                sites.Site('site0.yml'),
+            ])
+
         selements = serde.serialize(list(elements))
         delements = els.ElementSet.of(serde.deserialize(selements, ta.Sequence[els.Element]))
         assert list(delements) == list(elements)
@@ -103,8 +103,8 @@ def test_inject(harness: har.Harness):
         })
 
         binder = inj.create_binder()
-        binder.bind(ctrs.ConnectorSet, to_instance=connectors)
-        binder.bind(ctrs.ConnectionSet, to_instance=conns)
+        # binder.bind(ctrs.ConnectorSet, to_instance=connectors)
+        # binder.bind(ctrs.ConnectionSet, to_instance=conns)
         ops.inject.install(binder)
         injector = inj.create_injector(binder)
         injector[ops.OpExecutionDriver].execute(plan)

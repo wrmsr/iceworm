@@ -9,6 +9,7 @@ import typing as ta
 from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
+from omnibus import dynamic as dyn
 from omnibus import inject as inj
 from omnibus import lang
 import omnibus.inject.scopes  # noqa
@@ -30,7 +31,34 @@ from .processing import ElementProcessor
 T = ta.TypeVar('T')
 
 
-class _Scope(inj.Scope, lang.Abstract, lang.Sealed):
+class DriverScope(inj.Scope, lang.Final):
+
+    def provide(self, binding: inj.Binding[T]) -> T:
+        vals = self._CURRENT()
+        try:
+            return vals[binding]
+        except KeyError:
+            if binding.key == inj.Key(InjectionElementProcessingDriver):
+                val = vals[InjectionElementProcessingDriver]
+            else:
+                val = binding.provide()
+            vals[binding] = val
+            return val
+
+    _CURRENT: dyn.Var[ta.MutableMapping[ta.Union[ta.Type['InjectionElementProcessingDriver'], inj.Binding], ta.Any]] = dyn.Var()  # noqa
+
+
+@dyn.contextmanager
+def new_driver_scope(injector: inj.Injector) -> ta.Generator['InjectionElementProcessingDriver', None, None]:
+    check.isinstance(injector, inj.Injector)
+    vals = ocol.IdentityKeyDict()
+    with DriverScope._CURRENT(vals):
+        with injector._CURRENT(injector):
+            drv = vals[InjectionElementProcessingDriver] = InjectionElementProcessingDriver(injector)
+        yield drv
+
+
+class _PhaseScope(inj.Scope, lang.Abstract, lang.Sealed):
 
     class State(dc.Data, final=True):
         values: ta.MutableMapping[inj.Binding, ta.Any] = dc.field(default_factory=ocol.IdentityKeyDict, frozen=True)  # noqa
@@ -42,7 +70,7 @@ class _Scope(inj.Scope, lang.Abstract, lang.Sealed):
 
     def provide(self, binding: inj.Binding[T]) -> T:
         drv = inj.Injector.current[InjectionElementProcessingDriver]
-        state = drv._scope_states[self]
+        state = drv._phase_scope_states[self]
         if binding.key == inj.Key(Phase):
             return self.phase_pair().phase
         try:
@@ -52,10 +80,10 @@ class _Scope(inj.Scope, lang.Abstract, lang.Sealed):
             value = state.values[binding] = binding.provider()
             return value
 
-    _subclass_map: ta.Mapping[PhasePair, ta.Type['_Scope']] = {}
+    _subclass_map: ta.Mapping[PhasePair, ta.Type['_PhaseScope']] = {}
 
     @classmethod
-    def _subclass_one(cls, pp: PhasePair) -> ta.Type['_Scope']:
+    def _subclass_one(cls, pp: PhasePair) -> ta.Type['_PhaseScope']:
         check.isinstance(pp, PhasePair)
         check.not_in(pp, cls._subclass_map)
         scls = type(
@@ -74,9 +102,9 @@ class _Scope(inj.Scope, lang.Abstract, lang.Sealed):
             cls,
             p: Phase,
     ) -> ta.Tuple[
-        ta.Type['_Scope'],
-        ta.Type['_Scope'],
-        ta.Type['_Scope'],
+        ta.Type['_PhaseScope'],
+        ta.Type['_PhaseScope'],
+        ta.Type['_PhaseScope'],
     ]:
         return tuple(
             cls._subclass_one(PhasePair(p, sp))
@@ -84,15 +112,15 @@ class _Scope(inj.Scope, lang.Abstract, lang.Sealed):
         )
 
 
-PreBootstrap, Bootstrap, PostBootstrap = _Scope._subclass(Phases.BOOTSTRAP)
-PreSites, Sites, PostSites = _Scope._subclass(Phases.SITES)
-PreRules, Rules, PostRules = _Scope._subclass(Phases.RULES)
-PreConnectors, Connectors, PostConnectors = _Scope._subclass(Phases.CONNECTORS)
-PreTargets, Targets, PostTargets = _Scope._subclass(Phases.TARGETS)
-PreFinalize, Finalize, PostFinalize = _Scope._subclass(Phases.FINALIZE)
+PreBootstrap, Bootstrap, PostBootstrap = _PhaseScope._subclass(Phases.BOOTSTRAP)
+PreSites, Sites, PostSites = _PhaseScope._subclass(Phases.SITES)
+PreRules, Rules, PostRules = _PhaseScope._subclass(Phases.RULES)
+PreConnectors, Connectors, PostConnectors = _PhaseScope._subclass(Phases.CONNECTORS)
+PreTargets, Targets, PostTargets = _PhaseScope._subclass(Phases.TARGETS)
+PreFinalize, Finalize, PostFinalize = _PhaseScope._subclass(Phases.FINALIZE)
 
 
-class _CurrentScope(inj.Scope, lang.Final):
+class _CurrentPhaseScope(inj.Scope, lang.Final):
 
     def provide(self, binding: inj.Binding[T]) -> T:
         if binding.key == inj.Key(ElementSet):
@@ -107,30 +135,16 @@ class _Eager(dc.Pure):
 
 class InjectionElementProcessingDriver:
 
-    def __init__(self, *binders: inj.Binder) -> None:
+    def __init__(self, injector: inj.Injector) -> None:
         super().__init__()
 
-        binder = inj.create_binder()
-        for s in _Scope._subclass_map.values():
-            binder._elements.append(inj.types.ScopeBinding(s))
-            binder.new_set_binder(_Eager, annotated_with=s.phase_pair(), in_=s)
-            if s.phase_pair().sub_phase == SubPhases.MAIN:
-                binder.new_set_binder(ElementProcessor, annotated_with=s.phase_pair().phase, in_=s)
+        self._injector = check.isinstance(injector, inj.Injector)
 
-        binder.bind(InjectionElementProcessingDriver, to_instance=self)
-
-        binder._elements.append(inj.types.ScopeBinding(_CurrentScope))
-        binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(ElementSet), in_=_CurrentScope)
-
-        binder.bind_class(ElementProcessingDriver, assists={'processor_factory'})
-
-        self._injector = inj.create_injector(binder, *binders)
-
-        self._scopes: ta.Mapping[PhasePair, _Scope] = {
+        self._phase_scopes: ta.Mapping[PhasePair, _PhaseScope] = {
             s.phase_pair(): self._injector._scopes[s]
-            for s in _Scope._subclass_map.values()
+            for s in _PhaseScope._subclass_map.values()
         }
-        self._scope_states: ta.Mapping[_Scope, _Scope.State] = {}
+        self._phase_scope_states: ta.Mapping[_PhaseScope, _PhaseScope.State] = {}
 
         self._elements: ta.Optional[ElementSet] = None
 
@@ -141,20 +155,20 @@ class InjectionElementProcessingDriver:
         return self._injector[target]
 
     def run(self, elements: ta.Iterable[Element]) -> ElementSet:
-        def enter(s: _Scope) -> None:
-            check.not_in(s, self._scope_states)
-            self._scope_states[s] = _Scope.State()
+        def enter(s: _PhaseScope) -> None:
+            check.not_in(s, self._phase_scope_states)
+            self._phase_scope_states[s] = _PhaseScope.State()
             eags = self._injector[inj.Key(ta.AbstractSet[_Eager], s.phase_pair())]
             for eag in eags:
                 self._injector[eag.key]  # noqa
 
-        def freeze(s: _Scope) -> None:
-            state = self._scope_states[s]
+        def freeze(s: _PhaseScope) -> None:
+            state = self._phase_scope_states[s]
             check.state(not state.frozen)
             state.frozen = True
 
-        def exit(s: _Scope) -> None:
-            del self._scope_states[s]
+        def exit(s: _PhaseScope) -> None:
+            del self._phase_scope_states[s]
 
         cur_phase: ta.Optional[Phase] = None
 
@@ -163,17 +177,17 @@ class InjectionElementProcessingDriver:
 
             if cur_phase is not None:
                 self._elements = elements
-                enter(self._scopes[PhasePair(cur_phase, SubPhases.POST)])
+                enter(self._phase_scopes[PhasePair(cur_phase, SubPhases.POST)])
                 self._elements = None
-                freeze(self._scopes[PhasePair(cur_phase, SubPhases.POST)])
+                freeze(self._phase_scopes[PhasePair(cur_phase, SubPhases.POST)])
 
-                exit(self._scopes[PhasePair(cur_phase, SubPhases.MAIN)])
-                exit(self._scopes[PhasePair(cur_phase, SubPhases.PRE)])
+                exit(self._phase_scopes[PhasePair(cur_phase, SubPhases.MAIN)])
+                exit(self._phase_scopes[PhasePair(cur_phase, SubPhases.PRE)])
 
             cur_phase = phase
 
-            enter(self._scopes[PhasePair(cur_phase, SubPhases.PRE)])
-            enter(self._scopes[PhasePair(cur_phase, SubPhases.MAIN)])
+            enter(self._phase_scopes[PhasePair(cur_phase, SubPhases.PRE)])
+            enter(self._phase_scopes[PhasePair(cur_phase, SubPhases.MAIN)])
 
             return self._injector[inj.Key(ta.AbstractSet[ElementProcessor], phase)]
 
@@ -184,9 +198,9 @@ class InjectionElementProcessingDriver:
         return elements
 
 
-def get_scope(phase_pair: PhasePair) -> ta.Type[inj.Scope]:
+def get_phase_scope(phase_pair: PhasePair) -> ta.Type[inj.Scope]:
     check.isinstance(phase_pair, PhasePair)
-    return _Scope._subclass_map[phase_pair]
+    return _PhaseScope._subclass_map[phase_pair]
 
 
 def get_phases(phases: ta.Union[Phase, ta.Iterable[Phase]]) -> ta.AbstractSet[Phase]:
@@ -208,7 +222,7 @@ def bind_element_processor(
 
     for phase in get_phases(phases):
         check.isinstance(phase, Phase)
-        scope = get_scope(PhasePair(phase, SubPhases.MAIN))
+        scope = get_phase_scope(PhasePair(phase, SubPhases.MAIN))
 
         binder.bind(cls, annotated_with=phase, in_=scope)
         binder.new_set_binder(ElementProcessor, annotated_with=phase, in_=scope).bind(to=inj.Key(cls, phase))
@@ -225,15 +239,37 @@ def bind_post_eager(
 
     for phase in get_phases(phases):
         phase_pair = PhasePair(phase, SubPhases.POST)
-        scope = get_scope(phase_pair)
+        scope = get_phase_scope(phase_pair)
 
         binder.new_set_binder(_Eager, annotated_with=phase_pair, in_=scope).bind(to_instance=_Eager(key))
+
+
+def _install_elements(binder: inj.Binder) -> inj.Binder:
+    check.isinstance(binder, inj.Binder)
+
+    for s in _PhaseScope._subclass_map.values():
+        binder._elements.append(inj.types.ScopeBinding(s))
+        binder.new_set_binder(_Eager, annotated_with=s.phase_pair(), in_=s)
+        if s.phase_pair().sub_phase == SubPhases.MAIN:
+            binder.new_set_binder(ElementProcessor, annotated_with=s.phase_pair().phase, in_=s)
+
+    binder._elements.append(inj.types.ScopeBinding(DriverScope))
+    binder.bind(InjectionElementProcessingDriver, in_=DriverScope)
+
+    binder._elements.append(inj.types.ScopeBinding(_CurrentPhaseScope))
+    binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(ElementSet), in_=_CurrentPhaseScope)
+
+    binder.bind_class(ElementProcessingDriver, assists={'processor_factory'})
+
+    bind_element_processor(binder, queries.QueryParsingElementProcessor, Phases.TARGETS)
+    bind_element_processor(binder, processors.IdGeneratorProcessor, PHASES)
+
+    return binder
 
 
 def install(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
-    bind_element_processor(binder, queries.QueryParsingElementProcessor, Phases.TARGETS)
-    bind_element_processor(binder, processors.IdGeneratorProcessor, PHASES)
+    binder.new_set_binder(ta.Callable[[inj.Binder], None], annotated_with='elements').bind(to_instance=_install_elements)  # noqa
 
     return binder
