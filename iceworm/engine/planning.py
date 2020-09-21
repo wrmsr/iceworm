@@ -13,7 +13,10 @@ from . import elements as els
 from . import ops
 from . import targets as tars
 from .. import metadata as md
+from ..trees import rendering as ren
 from ..types import QualifiedName
+from .utils import parse_simple_select_table
+from .utils import parse_simple_select_tables
 
 
 class ElementPlanner:
@@ -73,8 +76,30 @@ class ElementPlanner:
         for tbl_id in topo:
             if tbl_id not in invalidated_tables:
                 continue
+
             for rows in row_sets_by_table_id.get(tbl_id, []):
                 for dst in tbl_qn_sets_by_id.get(rows.table.id, []):
-                    plan.append(ops.InsertIntoSelect(dst, rows.query))
+                    query = ren.render_query(rows.query)
+
+                    try:
+                        src_name = parse_simple_select_table(query, star=True)
+                    except ValueError:
+                        pass
+                    else:
+                        src_query = f"select * from {'.'.join(src_name[1:])}"
+                        plan.append(ops.InsertIntoSelect(dst, src_name[0], src_query))
+                        continue
+
+                    try:
+                        tbl_names = parse_simple_select_tables(query)
+                        if tbl_names:
+                            raise ValueError
+                    except ValueError:
+                        pass
+                    else:
+                        plan.append(ops.InsertIntoEval(dst, query))
+                        continue
+
+                    raise ValueError(rows)
 
         return ops.List(plan)

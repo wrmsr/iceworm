@@ -98,7 +98,7 @@ def test_inject(harness: har.Harness):
             'pg/a',
             'pg/b',
             'pg/c',
-            'pg/d',
+            # 'pg/d',
             'pg/nums',
             'system/notifications',
         })

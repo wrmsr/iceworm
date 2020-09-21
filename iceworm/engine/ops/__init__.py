@@ -17,6 +17,8 @@ from .conns import CreateTableAsExecutor  # noqa
 from .conns import CreateTableExecutor  # noqa
 from .conns import DropTable  # noqa
 from .conns import DropTableExecutor  # noqa
+from .conns import InsertIntoEval  # noqa
+from .conns import InsertIntoEvalExecutor  # noqa
 from .conns import InsertIntoSelect  # noqa
 from .conns import InsertIntoSelectExecutor  # noqa
 from .conns import Transaction  # noqa

@@ -11,13 +11,9 @@ from ... import metadata as md
 from ... import sql
 from ...trees import eval as teval
 from ...trees import parsing as tpar
-from ...trees import rendering as ren
-from ...trees.types import Query
 from ...types import QualifiedName
 from ...utils import abs_set
 from ..connectors.impls.sql import SqlConnection
-from ..utils import parse_simple_select_table
-from ..utils import parse_simple_select_tables
 from .base import Op
 from .base import OpExecutor
 from .base import OpGen
@@ -99,7 +95,7 @@ class CreateTableExecutor(ConnsOpExecutor[CreateTable]):
 
 class CreateTableAs(ConnOp):
     name: QualifiedName = dc.field(coerce=QualifiedName.of)
-    query: Query = dc.field(coerce=Query.of)
+    query: str = dc.field(check=lambda s: isinstance(s, str) and s)
 
     @property
     def conn(self) -> str:
@@ -114,44 +110,35 @@ class CreateTableAsExecutor(ConnsOpExecutor[CreateTableAs]):
             sql.CreateTableAs(
                 sql.QualifiedNameElement(
                     QualifiedName(op.name[1:])),
-                sa.text(ren.render_query(op.query))))
+                sa.text(op.query)))
 
 
 class InsertIntoSelect(ConnsOp):
     dst: QualifiedName = dc.field(coerce=QualifiedName.of)
-    query: Query = dc.field(coerce=Query.of)
+    src: str = dc.field(check=lambda s: isinstance(s, str) and s)
+    query: str = dc.field(check=lambda s: isinstance(s, str) and s)
 
 
 class InsertIntoSelectExecutor(ConnsOpExecutor[InsertIntoSelect]):
 
     def execute(self, op: InsertIntoSelect) -> None:
-        query = ren.render_query(op.query)
-        src = None
+        src_conn = self._conns[op.src]
+        src = src_conn.create_row_source(op.query)
+        dst_conn = self._conns[op.dst[0]]
+        dst = dst_conn.create_row_sink(QualifiedName(op.dst[1:]))
+        dst.consume_rows(src.produce_rows())
 
-        if src is None:
-            try:
-                src_name = parse_simple_select_table(query, star=True)
-            except ValueError:
-                pass
-            else:
-                src_conn = self._conns[src_name[0]]
-                src_query = f"select * from {'.'.join(src_name[1:])}"
-                src = src_conn.create_row_source(src_query)
 
-        if src is None:
-            try:
-                tbl_names = parse_simple_select_tables(query)
-                if tbl_names:
-                    raise ValueError
-            except ValueError:
-                pass
-            else:
-                root = tpar.parse_stmt(query)
-                src = ctrs.ListRowSource(teval.StmtEvaluator().eval(root))
+class InsertIntoEval(ConnsOp):
+    dst: QualifiedName = dc.field(coerce=QualifiedName.of)
+    query: str = dc.field(check=lambda s: isinstance(s, str) and s)
 
-        if src is None:
-            raise ValueError(query)
 
+class InsertIntoEvalExecutor(ConnsOpExecutor[InsertIntoEval]):
+
+    def execute(self, op: InsertIntoEval) -> None:
+        root = tpar.parse_stmt(op.query)
+        src = ctrs.ListRowSource(teval.StmtEvaluator().eval(root))
         dst_conn = self._conns[op.dst[0]]
         dst = dst_conn.create_row_sink(QualifiedName(op.dst[1:]))
         dst.consume_rows(src.produce_rows())
