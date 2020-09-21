@@ -8,6 +8,10 @@ TODO:
  - * min/max/expected rowcounts *
   - if using insert into pagerduty/jira/slack/email/etc enforce bounds
  - cache/memo wrap ana dispatch.prop?
+
+lint:
+ - div0
+ - bad auto-str conversion / missing try_parse
 """
 import typing as ta
 

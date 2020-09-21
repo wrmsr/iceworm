@@ -1,7 +1,9 @@
 """
 TODO:
+ - 'Refresher' complement to 'Invalidator'?
+ - region/lifetime-like..
  - DomainInvalidation
- - LookupInvalidation
+ - LookupInvalidation - 'ids' in s3, kafka.., compactable..
   - a Lookup invalidation is its own trigger..
  - sensors - s3, sftp, user
   - * codechange *

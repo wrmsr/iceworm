@@ -1,6 +1,6 @@
 /*
 TODO:
- -
+ - d3 :/
 
 https://www.npmjs.com/package/protobufjs#using-proto-files
 https://programmer.help/blogs/how-to-use-protobuf-in-the-front-end-vue-chapter.html

@@ -1,5 +1,6 @@
 """
 TODO:
+ - * exec: sea of nodes -> merged scans -> rdd execution model *
  - bootstrap:
   - git(-rev)-powered? - check for dirty + reject, check for rev pushed?
   - make vs setup.py.. reqs.txt..

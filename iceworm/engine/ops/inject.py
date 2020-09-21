@@ -67,6 +67,7 @@ def _install_execution(binder: inj.Binder) -> inj.Binder:
     bind_op_executor(binder, conns.CreateTable, conns.CreateTableExecutor)
     bind_op_executor(binder, conns.CreateTableAs, conns.CreateTableAsExecutor)
     bind_op_executor(binder, conns.DropTable, conns.DropTableExecutor)
+    bind_op_executor(binder, conns.Exec, conns.ExecExecutor)
     bind_op_executor(binder, conns.InsertIntoEval, conns.InsertIntoEvalExecutor)
     bind_op_executor(binder, conns.InsertIntoSelect, conns.InsertIntoSelectExecutor)
     bind_op_executor(binder, conns.Transaction, conns.TransactionExecutor)

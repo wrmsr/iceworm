@@ -144,6 +144,18 @@ class InsertIntoEvalExecutor(ConnsOpExecutor[InsertIntoEval]):
         dst.consume_rows(src.produce_rows())
 
 
+class Exec(ConnsOp):
+    name: str = dc.field(check=lambda s: isinstance(s, str) and s)
+    query: str = dc.field(check=lambda s: isinstance(s, str) and s)
+
+
+class ExecExecutor(ConnsOpExecutor[Exec]):
+
+    def execute(self, op: Exec) -> None:
+        sa_conn = check.isinstance(self._conns[op.name], SqlConnection).sa_conn
+        sa_conn.execute(op.query)
+
+
 class CopyTable(Op):
     dst: QualifiedName = dc.field(coerce=QualifiedName.of)
     src: QualifiedName = dc.field(coerce=QualifiedName.of)
