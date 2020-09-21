@@ -24,7 +24,7 @@ class SparkManager(lc.ContextManageableLifecycle):
 
         self._request = check.isinstance(request, har.FixtureRequest)
 
-    TIMEOUT = 20
+    TIMEOUT = 30
 
     @properties.stateful_cached
     @property
