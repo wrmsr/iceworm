@@ -38,14 +38,14 @@ class DriverScope(inj.Scope, lang.Final):
         try:
             return vals[binding]
         except KeyError:
-            if binding.key == inj.Key(InjectionElementProcessingDriver):
-                val = vals[InjectionElementProcessingDriver]
-            else:
+            try:
+                val = vals[binding.key.type]
+            except KeyError:
                 val = binding.provide()
             vals[binding] = val
             return val
 
-    _CURRENT: dyn.Var[ta.MutableMapping[ta.Union[ta.Type['InjectionElementProcessingDriver'], inj.Binding], ta.Any]] = dyn.Var()  # noqa
+    _CURRENT: dyn.Var[ta.MutableMapping[ta.Union[type, inj.Binding], ta.Any]] = dyn.Var()  # noqa
 
 
 @dyn.contextmanager

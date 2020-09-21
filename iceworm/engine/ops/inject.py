@@ -1,6 +1,8 @@
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as ocol
+from omnibus import dynamic as dyn
 from omnibus import inject as inj
 from omnibus import lang
 
@@ -12,10 +14,36 @@ from .base import Op
 from .base import OpExecutor
 
 
+T = ta.TypeVar('T')
+
+
 class ExecutionScope(inj.Scope):
 
-    def provide(self, binding: inj.Binding) -> ta.Any:
-        raise NotImplementedError
+    def provide(self, binding: inj.Binding[T]) -> T:
+        vals = self._CURRENT()
+        try:
+            return vals[binding]
+        except KeyError:
+            try:
+                val = vals[binding.key.type]
+            except KeyError:
+                val = binding.provide()
+            vals[binding] = val
+            return val
+
+    _CURRENT: dyn.Var[ta.MutableMapping[ta.Union[type, inj.Binding], ta.Any]] = dyn.Var()  # noqa
+
+
+@dyn.contextmanager
+def new_execution_scope(injector: inj.Injector, conns: ctrs.ConnectionSet) -> ta.Generator[None, None, None]:
+    check.isinstance(injector, inj.Injector)
+    check.isinstance(conns, ctrs.ConnectionSet)
+    vals = ocol.IdentityKeyDict()
+    with ExecutionScope._CURRENT(vals):
+        with injector._CURRENT(injector):
+            vals[ctrs.ConnectionSet] = conns
+            vals[ctrs.ConnectorSet] = conns.connectors
+        yield
 
 
 def bind_op_executor(binder: inj.Binder, op_cls: ta.Type[Op], oe_cls: ta.Type[OpExecutor]) -> None:

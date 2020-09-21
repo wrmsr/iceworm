@@ -52,6 +52,10 @@ class ConnectionSet(ta.Iterable[Connection]):
 
         self._conns_by_ctor: ta.MutableMapping[Connector, Connection] = ocol.IdentityKeyDict()
 
+    @property
+    def connectors(self) -> ConnectorSet:
+        return self._ctors
+
     def __iter__(self) -> ta.Iterator[Connection]:
         return iter(self._conns_by_ctor.values())
 

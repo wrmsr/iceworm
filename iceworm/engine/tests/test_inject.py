@@ -84,6 +84,7 @@ def test_inject(harness: har.Harness):
             elements = drv.run([
                 sites.Site('site0.yml'),
             ])
+            connectors = drv[ctrs.ConnectorSet]
 
         selements = serde.serialize(list(elements))
         delements = els.ElementSet.of(serde.deserialize(selements, ta.Sequence[els.Element]))
@@ -91,7 +92,7 @@ def test_inject(harness: har.Harness):
 
         print(yaml.dump(selements))
 
-        connectors = drv[ctrs.ConnectorSet]
+        # FIXME: manage in execution
         conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(connectors)))
         plan = pln.ElementPlanner(elements, connectors).plan({
             'pg/a',
@@ -102,12 +103,14 @@ def test_inject(harness: har.Harness):
             'system/notifications',
         })
 
-        binder = inj.create_binder()
-        # binder.bind(ctrs.ConnectorSet, to_instance=connectors)
-        # binder.bind(ctrs.ConnectionSet, to_instance=conns)
-        ops.inject.install(binder)
-        injector = inj.create_injector(binder)
-        injector[ops.OpExecutionDriver].execute(plan)
+        execution_binder = inj.create_binder()
+        execution_installs = injector[inj.Key(ta.AbstractSet[ta.Callable[[inj.Binder], None]], 'execution')]
+        for e_i in execution_installs:
+            e_i(execution_binder)
+        execution_injector = injector.create_child(execution_binder)
+
+        with ops.inject.new_execution_scope(execution_injector, conns):
+            execution_injector[ops.OpExecutionDriver].execute(plan)
 
         with harness[DbManager].pg_engine.connect() as pg_conn:
             print(list(pg_conn.execute('select * from a')))
