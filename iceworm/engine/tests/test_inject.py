@@ -8,6 +8,7 @@ from omnibus import inject as inj
 from omnibus import lang  # noqa
 from omnibus import os as oos  # noqa
 import pytest  # noqa
+import yaml  # noqa
 
 from .. import connectors as ctrs
 from .. import elements as els
@@ -77,6 +78,7 @@ def test_inject(harness: har.Harness):
         binder.bind(sec.Secrets, to_instance=secrets)
         sql.inject.install(binder)
         install_element_processors(binder)
+        # binder.bind(els.ElementProcessingDriver.Config(step_shuffle=True))
         drv = els.inject.InjectionElementProcessingDriver(binder)
         elements = drv.run([
             sites.Site('site0.yml'),
@@ -87,7 +89,7 @@ def test_inject(harness: har.Harness):
         delements = els.ElementSet.of(serde.deserialize(selements, ta.Sequence[els.Element]))
         assert list(delements) == list(elements)
 
-        print(__import__('yaml').dump(selements))
+        print(yaml.dump(selements))
 
         connectors = drv[ctrs.ConnectorSet]
         conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(connectors)))

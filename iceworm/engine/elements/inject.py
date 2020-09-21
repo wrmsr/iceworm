@@ -122,6 +122,8 @@ class InjectionElementProcessingDriver:
         binder._elements.append(inj.types.ScopeBinding(_CurrentScope))
         binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(ElementSet), in_=_CurrentScope)
 
+        binder.bind_class(ElementProcessingDriver, assists={'processor_factory'})
+
         self._injector = inj.create_injector(binder, *binders)
 
         self._scopes: ta.Mapping[PhasePair, _Scope] = {
@@ -175,7 +177,8 @@ class InjectionElementProcessingDriver:
 
             return self._injector[inj.Key(ta.AbstractSet[ElementProcessor], phase)]
 
-        epd = ElementProcessingDriver(fac)
+        with self._injector._CURRENT(self._injector):
+            epd = self._injector[ta.Callable[..., ElementProcessingDriver]](processor_factory=fac)
         elements = epd.process(elements)
 
         return elements
