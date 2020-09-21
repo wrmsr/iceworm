@@ -11,7 +11,7 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 
 import { iceworm } from '@/protos/bundle'
-const { WebServiceStatus } = iceworm
+const { ServiceWebStatus } = iceworm
 
 @Component({
   components: {
@@ -34,7 +34,7 @@ export default class Home extends Vue {
 
   fetchEventsList() {
     this.$http.get('/status').then(response => {
-      let thing = WebServiceStatus.fromObject(response.body);
+      let thing = ServiceWebStatus.fromObject((<any>response).body);
       console.log(thing);
     });
   }

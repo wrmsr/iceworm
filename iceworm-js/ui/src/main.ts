@@ -19,11 +19,11 @@ Vue.use(VueResource)
 Vue.config.productionTip = false
 
 import { iceworm } from './protos/bundle'
-const { WebServiceStatus } = iceworm
+const { ServiceWebStatus } = iceworm
 
-let message = WebServiceStatus.create({ uptime: 42. })
-let buffer  = WebServiceStatus.encode(message).finish()
-let decoded = WebServiceStatus.decode(buffer)
+let message = ServiceWebStatus.create({ uptime: 42. })
+let buffer  = ServiceWebStatus.encode(message).finish()
+let decoded = ServiceWebStatus.decode(buffer)
 console.log(decoded)
 
 new Vue({
