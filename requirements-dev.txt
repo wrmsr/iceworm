@@ -25,6 +25,7 @@ pytest==6.0.2
 
 py4j==0.10.9.1
 pyspark==3.0.1
+pyspark-stubs==3.0.0.post1
 
 # parquet
 
