@@ -1,6 +1,6 @@
 [package]
 name = "iceworm-rs"
-version = "0.0.1-dev1"
+version = "0.0.1-dev"
 authors = ["wrmsr"]
 edition = "2018"
 
