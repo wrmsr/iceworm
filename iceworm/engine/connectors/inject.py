@@ -6,8 +6,10 @@ from omnibus import inject as inj
 from . import impls
 from .. import elements as els
 from ...utils import configable as cfgabl
+from .collections import ConnectionSet
 from .collections import Connector
 from .collections import ConnectorSet
+from .mirrors import Mirror
 
 
 def bind_connector_impl(binder: inj.Binder, impl_cls: ta.Type[Connector]) -> None:
@@ -40,6 +42,8 @@ def _install_elements(binder: inj.Binder) -> inj.Binder:
 
     binder.bind_callable(provide_connector_set, in_=els.inject.PostConnectors)
     els.inject.bind_post_eager(binder, ConnectorSet, els.Phases.CONNECTORS)
+
+    binder.bind(Mirror, to=ConnectionSet)
 
     return binder
 

@@ -13,6 +13,14 @@ TODO:
    - diff between actually just dumb caches (jinja, trees) and 'artifacts' (elements) ?
   - required for commit and prod, prod will not boot uncompiled
    - pre-commit, enforce at boot
+ - auditing
+  - git vs zipsafe - prefer zipsafe capability
+  - scan whole package, build hash tree of all files?
+  - use git rev too when present
+  - IJ-style sqlitedb of index/catalog/metadata, scan/invalidate/rebuild on exec
+  - CLI style usage for iterative ds dev
+ - git aware sites - tag history, annotation, branches, etc, link to gh/pr/jira
+ - site rule for loading dirs of csvs + create_table_as'ing them
 """
 import typing as ta
 

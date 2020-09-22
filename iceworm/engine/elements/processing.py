@@ -50,6 +50,8 @@ class ProcessedBy(dc.Pure):
         coerce=lambda o: ocol.IdentitySet(check.not_isinstance(o, str)) if not isinstance(o, ocol.IdentitySet) else o,
         check=lambda o: isinstance(o, ocol.IdentitySet) and all(isinstance(e, ElementProcessor) for e in o))
 
+    EMPTY: ta.ClassVar['ProcessedBy']
+
 
 ProcessedBy.EMPTY = ProcessedBy([])
 

@@ -8,9 +8,13 @@ from omnibus import check
 from omnibus import collections as ocol
 
 from .. import elements as els
+from ... import metadata as md
+from ...types import QualifiedName
+from ...utils import set_dict
 from ...utils import unique_dict
-from .base import Connector
 from .base import Connection
+from .base import Connector
+from .mirrors import Mirror
 
 
 class ConnectorSet(ta.Iterable[Connector]):
@@ -43,7 +47,7 @@ class ConnectorSet(ta.Iterable[Connector]):
             ctor.close()
 
 
-class ConnectionSet(ta.Iterable[Connection]):
+class ConnectionSet(ta.Iterable[Connection], Mirror):
 
     def __init__(self, ctors: ConnectorSet) -> None:
         super().__init__()
@@ -74,6 +78,15 @@ class ConnectionSet(ta.Iterable[Connection]):
         except KeyError:
             conn = self._conns_by_ctor[ctor] = ctor.connect()
             return conn
+
+    def reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:
+        qns_by_cn = set_dict(names, lambda qn: qn[0], lambda qn: qn[1:])
+        ret = {}
+        for cn, qns in qns_by_cn.items():
+            conn = self[cn]
+            objs = conn.reflect(qns)
+            ret.update({QualifiedName([cn, *k]): v for k, v in objs.items()})
+        return ret
 
     def close(self) -> None:
         for conn in self._conns_by_ctor.values():

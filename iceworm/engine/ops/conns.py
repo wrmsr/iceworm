@@ -1,3 +1,8 @@
+"""
+TODO:
+ - sql conn specifics
+  - parameterized sa.text
+"""
 import abc
 import typing as ta
 

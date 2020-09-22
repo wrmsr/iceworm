@@ -28,6 +28,8 @@ TODO:
 TODO ( https://calcite.apache.org/docs/reference.html ):
  - UNNEST '(' expression ')' [ WITH ORDINALITY ]
  - MATCH_RECOGNIZE
+
+http://snowflake.net/blog/snowflake-sql-making-schema-on-read-a-reality-part-1-2/
 """
 import typing as ta
 

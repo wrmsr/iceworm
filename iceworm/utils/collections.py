@@ -2,6 +2,7 @@ import typing as ta
 
 from omnibus import check
 from omnibus import collections as ocol
+from omnibus import lang
 
 
 T = ta.TypeVar('T')
@@ -9,6 +10,32 @@ K = ta.TypeVar('K')
 V = ta.TypeVar('V')
 OrderingT = ta.Union[ta.Sequence[T], ocol.OrderedSet[T], ocol.OrderedFrozenSet[T]]
 ORDERING_TYPES = (ta.Sequence, ocol.OrderedSet, ocol.OrderedFrozenSet)
+
+
+def list_dict(
+        items: ta.Iterable[T],
+        key: ta.Callable[[V], K],
+        map: ta.Callable[[T], V] = lang.identity,
+) -> ta.Dict[K, ta.List[V]]:
+    dct = {}
+    for e in items:
+        k = key(e)
+        v = map(e)
+        dct.setdefault(k, []).append(v)
+    return dct
+
+
+def set_dict(
+        items: ta.Iterable[T],
+        key: ta.Callable[[T], K],
+        map: ta.Callable[[T], V] = lang.identity,
+) -> ta.Dict[K, ta.Set[V]]:
+    dct = {}
+    for e in items:
+        k = key(e)
+        v = map(e)
+        dct.setdefault(k, set()).add(v)
+    return dct
 
 
 def unique_dict(items: ta.Iterable[ta.Tuple[K, V]]) -> ta.Dict[K, V]:

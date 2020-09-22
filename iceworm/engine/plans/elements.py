@@ -17,6 +17,7 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 
 from .. import elements as els
+from .. import ops
 from .. import targets as tars
 from ... import metadata as md
 from ...types import QualifiedName
@@ -49,3 +50,8 @@ class Invalidation(dc.Enum):
 
 class DomainInvalidation(Invalidation):
     domain: md.domains.Domain
+
+
+class Refresher:
+    target: els.Ref[tars.Materialization]
+    op: ops.Op

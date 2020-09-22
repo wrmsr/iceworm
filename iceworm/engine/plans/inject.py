@@ -1,5 +1,3 @@
-import typing as ta
-
 from omnibus import check
 from omnibus import inject as inj
 

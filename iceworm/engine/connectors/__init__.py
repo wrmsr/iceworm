@@ -8,3 +8,4 @@ from .base import RowSink  # noqa
 from .base import RowSource  # noqa
 from .collections import ConnectionSet  # noqa
 from .collections import ConnectorSet  # noqa
+from .mirrors import Mirror  # noqa
