@@ -223,6 +223,12 @@ antlr:
 proto: venv
 	.venv/bin/python -m $(PROJECT).protos.gen gen
 
+.PHONY: vers
+vers: venv
+	VER=$$(.venv/bin/python -c 'from $(PROJECT) import __about__; print(__about__.__version__)') ; \
+	echo "$$VER" ; \
+	T=$$(mktemp) && cat $(PROJECT)-rs/Cargo.toml >$$T && sed "1,/version = .*/s/version = .*/version = \"$$VER\"/" <$$T >$(PROJECT)-rs/Cargo.toml ; \
+
 
 ### Build
 
