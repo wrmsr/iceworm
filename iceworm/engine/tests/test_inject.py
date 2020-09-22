@@ -64,10 +64,10 @@ def test_inject(harness: har.Harness):
         sql.inject.install(binder)
         einj.install(binder)
 
-        # FIXME: check/forbid ele binds in root inj
-        def _i_e(b):
+        def _install_elements(b):
             els.inject.bind_element_processor(b, UrlSecretsReplacer, els.Phases.CONNECTORS)
-        binder.new_set_binder(ta.Callable[[inj.Binder], None], annotated_with='elements').bind(to_instance=_i_e)  # noqa
+
+        els.inject.bind_elements_module(binder, _install_elements)
 
         binder.bind(inj.Key(ta.Callable[[str], no.Node]), to_instance=par.parse_stmt)
         # binder.bind(els.ElementProcessingDriver.Config(step_shuffle=True))

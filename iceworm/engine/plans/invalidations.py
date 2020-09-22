@@ -16,11 +16,11 @@ TODO:
 from omnibus import dataclasses as dc
 from omnibus import lang
 
-from . import elements as els
-from . import targets as tars
-from .. import metadata as md
-from ..types import QualifiedName
-from ..utils import cron
+from .. import elements as els
+from .. import targets as tars
+from ... import metadata as md
+from ...types import QualifiedName
+from ...utils import cron
 
 
 class InvalidatorTrigger(dc.Enum):
@@ -34,6 +34,11 @@ class InvalidatorTriggers(lang.Namespace):
 
 
 class Invalidator(els.Element):
+
+    dc.metadata({
+        els.PhaseFrozen: els.PhaseFrozen(els.Phases.PLAN),
+    })
+
     target: els.Ref[tars.Target]
     trigger: InvalidatorTrigger
 

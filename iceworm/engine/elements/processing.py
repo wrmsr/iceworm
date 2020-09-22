@@ -51,6 +51,9 @@ class ProcessedBy(dc.Pure):
         check=lambda o: isinstance(o, ocol.IdentitySet) and all(isinstance(e, ElementProcessor) for e in o))
 
 
+ProcessedBy.EMPTY = ProcessedBy([])
+
+
 class PhaseFrozen(dc.Pure):
     phase: Phase = dc.field(check=lambda o: isinstance(o, Phase))
 
@@ -274,6 +277,8 @@ class ElementProcessingDriver:
         added = [e for e in res if e not in elements]
         removed = [e for e in elements if e not in res]  # noqa
 
+        check.empty([e for e in removed if Frozen in e.meta])
+
         for e in itertools.chain(added, removed):
             pf = _phase_frozen(type(e))
             if pf is not None and pf < phase:
@@ -320,7 +325,6 @@ class ElementProcessingDriver:
                     for processor in step:
                         matches = ocol.IdentitySet(check.isinstance(e, Element) for e in processor.match(elements))
                         if matches:
-                            check.empty([e for e in matches if Frozen in e.meta])
                             dct[processor] = matches
                     if dct:
                         break

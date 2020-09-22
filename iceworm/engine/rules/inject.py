@@ -38,6 +38,6 @@ def _install_elements(binder: inj.Binder) -> inj.Binder:
 def install(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
-    binder.new_set_binder(ta.Callable[[inj.Binder], None], annotated_with='elements').bind(to_instance=_install_elements)  # noqa
+    els.inject.bind_elements_module(binder, _install_elements)
 
     return binder

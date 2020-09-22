@@ -1,14 +1,16 @@
+import typing as ta
+
 from omnibus import check
 from omnibus import inject as inj
 
 from .. import elements as els
-from .sites import SiteProcessor
+from .planning import PlanningElementProcessor
 
 
 def _install_elements(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
-    els.inject.bind_element_processor(binder, SiteProcessor, els.Phases.SITES)
+    els.inject.bind_element_processor(binder, PlanningElementProcessor, els.Phases.PLAN)
 
     return binder
 

@@ -22,7 +22,10 @@ from ...types import QualifiedName
 
 
 class Target(els.Element, abstract=True):
-    pass
+
+    dc.metadata({
+        els.PhaseFrozen: els.PhaseFrozen(els.Phases.TARGETS),
+    })
 
 
 class Table(Target):

@@ -216,10 +216,13 @@ def get_phases(phases: ta.Union[Phase, ta.Iterable[Phase]]) -> ta.AbstractSet[Ph
 def bind_element_processor(
         binder: inj.Binder,
         cls: ta.Type[ElementProcessor],
-        phases: ta.Union[Phase, ta.Iterable[Phase]],
+        phases: ta.Union[Phase, ta.Iterable[Phase], None] = None,
 ) -> None:
     check.isinstance(binder, inj.Binder)
     check.issubclass(cls, ElementProcessor)
+
+    if phases is None:
+        phases = set(cls.phases())
 
     for phase in get_phases(phases):
         check.isinstance(phase, Phase)
@@ -268,6 +271,13 @@ def _install_elements(binder: inj.Binder) -> inj.Binder:
     return binder
 
 
+def bind_elements_module(binder: inj.Binder, module: ta.Callable[[inj.Binder], ta.Any]) -> None:
+    check.isinstance(binder, inj.Binder)
+    check.callable(module)
+
+    binder.new_set_binder(ta.Callable[[inj.Binder], None], annotated_with='elements').bind(to_instance=module)
+
+
 def install(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
@@ -281,7 +291,7 @@ def install(binder: inj.Binder) -> inj.Binder:
             binder.new_set_binder(ElementProcessor, annotated_with=s.phase_pair().phase)
     binder.bind_callable(check_binds, key=inj.Key(object, check_binds), as_eager_singleton=True)
 
-    binder.new_set_binder(ta.Callable[[inj.Binder], None], annotated_with='elements').bind(to_instance=_install_elements)  # noqa
+    bind_elements_module(binder, _install_elements)
 
     @inj.annotate('elements', mods='elements')
     def provide_elements_injector(injector: inj.Injector, mods: ta.AbstractSet[ta.Callable[[inj.Binder], None]]) -> inj.Injector:  # noqa
