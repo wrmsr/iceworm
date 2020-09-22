@@ -22,3 +22,6 @@ deps:
 .PHONY: bundle
 bundle: deps
 	node_modules/.bin/browserify blob.js | node_modules/.bin/uglifyjs > bundle.js
+
+.PHONY: build
+build: bundle

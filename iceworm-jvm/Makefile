@@ -31,6 +31,9 @@ clean: java-home
 package: java-home
 	JAVA_HOME=$(JAVA_HOME) ./mvnw package -DskipTests
 
+.PHONY: build
+build: package
+
 .PHONY: tool
 tool: java-home
 	JAVA_HOME=$(JAVA_HOME) ./mvnw -pl iceworm-tool -am package -DskipTests

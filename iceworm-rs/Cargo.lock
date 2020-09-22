@@ -1021,7 +1021,7 @@ dependencies = [
 
 [[package]]
 name = "iceworm-rs"
-version = "0.0.1-xyz"
+version = "0.0.1-dev"
 dependencies = [
  "bson",
  "csv",

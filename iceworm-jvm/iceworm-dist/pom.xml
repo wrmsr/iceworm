@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.wrmsr.iceworm</groupId>
         <artifactId>iceworm-parent</artifactId>
-        <version>0.0.1-xyz</version>
+        <version>0.0.1-dev</version>
     </parent>
 
     <artifactId>iceworm-dist</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.0.1-dev</version>
     <packaging>jar</packaging>
 
     <name>iceworm-dist</name>

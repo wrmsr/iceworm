@@ -236,6 +236,8 @@ vers: venv
 		if [ -f "$$F" ] ; then \
 			T=$$(mktemp) && cat "$$F" >$$T && \
 				sed "1,/^    <version>.*/s/^    <version>.*/    <version>$$VER<\\/version>/" <$$T >"$$F" ; \
+			T=$$(mktemp) && cat "$$F" >$$T && \
+				sed "1,/^        <version>.*/s/^        <version>.*/        <version>$$VER<\\/version>/" <$$T >"$$F" ; \
 		fi ; \
 	done ; \
 	\
@@ -259,6 +261,14 @@ build: venv
 .PHONY: build-38
 build-38: venv-38 gen
 	$(call do-build,.venv-38)
+
+.PHONY: build-all
+build-all: build
+	(cd $(PROJECT)-js && make build) && \
+	(cd $(PROJECT)-jvm && make build) && \
+	(cd $(PROJECT)-rs && make build) && \
+	\
+	true
 
 
 ### Check
