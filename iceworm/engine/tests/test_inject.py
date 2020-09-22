@@ -14,7 +14,7 @@ from .. import connectors as ctrs
 from .. import elements as els
 from .. import inject as einj
 from .. import ops
-from .. import planning as pln
+from .. import plans as pln
 from .. import sites
 from ... import sql
 from ...sql.tests.helpers import DbManager

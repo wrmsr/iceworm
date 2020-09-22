@@ -12,6 +12,7 @@ import typing as ta
 from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
+from omnibus import properties
 
 from .. import connectors as ctrs
 from .. import elements as els
@@ -44,6 +45,8 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
 
     class Instance(els.InstanceElementProcessor.Instance['PlanningElementProcessor']):
 
+        @properties.cached
+        @property
         def matches(self) -> ta.Iterable[els.Element]:
             return [
                 e
@@ -73,6 +76,8 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
 
             raise ValueError(rows)
 
+        @properties.stateful_cached
+        @property
         def output(self) -> ta.Iterable[els.Element]:
             plan = []
 
