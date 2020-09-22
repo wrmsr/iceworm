@@ -1,6 +1,8 @@
 """
 TODO:
  - glaring unresolved ambiguity between selecting from mats and tbls
+ - ** NOT NECESSARILY FORCED TO REFRESH ALL MATERIALIZATIONS TOGETHER... **
+ - baked anns? materializations <-> rows?
 
 table -> invalidation -> rows -> refresh -> ...
   |
