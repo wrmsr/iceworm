@@ -23,6 +23,7 @@ from ...trees import rendering as ren
 from ...types import QualifiedName
 from ..utils import parse_simple_select_table
 from ..utils import parse_simple_select_tables
+from .elements import Materializer
 
 
 class PlanningElementProcessor(els.InstanceElementProcessor):
@@ -79,40 +80,36 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
         @properties.stateful_cached
         @property
         def output(self) -> ta.Iterable[els.Element]:
-            plan = []
+            rows_sets_by_table_id = {}
+            for rows in self.input.get_type_set(tars.Rows):
+                rows_sets_by_table_id.setdefault(rows.table.id, ocol.IdentitySet()).add(rows)
 
-            tbl_qn_sets_by_id = {}
+            mat_sets_by_table_id = {}
             for mat in self.input.get_type_set(tars.Materialization):
-                tbl_qn_sets_by_id.setdefault(mat.table.id, set()).add(QualifiedName([mat.connector.id, *mat.name]))
+                mat_sets_by_table_id.setdefault(mat.table.id, ocol.IdentitySet()).add(mat)
 
-            for ele in self.input.get_type_set(tars.Table):
-                for dst in tbl_qn_sets_by_id.get(ele.id, []):
-                    ctr = self.owner._ctors[dst[0]]
-                    if not isinstance(ctr, ctrs.impls.sql.SqlConnector):
-                        continue
-                    mdt = check.isinstance(ele.md, md.Table)
-                    plan.extend([
-                        ops.DropTable(dst),
-                        ops.CreateTable(dc.replace(mdt, name=dst)),
-                    ])
+            ret = [*self.matches]
+            for mat in self.input.get_type_set(tars.Materialization):
+                ctr = self.owner._ctors[mat.connector.id]
+                if not isinstance(ctr, ctrs.impls.sql.SqlConnector):
+                    continue
 
-            row_sets_by_table_id = {}
-            for ele in self.input.get_type_set(tars.Rows):
-                row_sets_by_table_id.setdefault(ele.table.id, ocol.IdentitySet()).add(ele)
+                dst = QualifiedName([mat.connector.id, *mat.name])
+                tbl = self.input[mat.table]
+                mdt = check.isinstance(tbl.md, md.Table)
+                plan = [
+                    ops.DropTable(dst),
+                    ops.CreateTable(dc.replace(mdt, name=dst)),
+                ]
 
-            table_deps = {
-                ele.table.id: {
-                    e.id
-                    for e in self.input.analyze(tars.StrictTableDependenciesAnalysis)[ele].name_sets_by_table
-                }
-                for ele in self.input.get_type_set(tars.Rows)
-            }
+                srcs: ta.Set[els.Id] = set()
+                for rows in rows_sets_by_table_id.get(mat.table.id, []):
+                    plan.append(self._build_rows_op(rows, dst))
+                    for src_tbl in self.input.analyze(tars.StrictTableDependenciesAnalysis).by_rows[rows].name_sets_by_table:  # noqa
+                        for src_mat in mat_sets_by_table_id.get(src_tbl.id):
+                            srcs.add(src_mat.id)
 
-            topo = [id for step in ocol.toposort(table_deps) for id in sorted(step)]
-            for tbl_id in topo:
-                for rows in row_sets_by_table_id.get(tbl_id, []):
-                    for dst in tbl_qn_sets_by_id.get(rows.table.id, []):
-                        plan.append(self._build_rows_op(rows, dst))
+                matr = Materializer(mat, srcs, ops.List(plan))
+                ret.append(matr)
 
-            # return ops.List(plan)
-            raise NotImplementedError
+            return ret

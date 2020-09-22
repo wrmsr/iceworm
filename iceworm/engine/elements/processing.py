@@ -1,5 +1,8 @@
 """
 TODO:
+ - ** some kind of rudimentary priority, internal only, prob read-only **
+  - ** enforcements - enforce after every pass all refs resolve * and to correct type * **
+  - *** NO - EAGER ANALYSES ***
  - ** honor analysis deps **
  - find / warn / reject elements with no processors
   - processed_cls_set? optional, enforced if present, warn

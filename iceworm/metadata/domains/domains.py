@@ -118,10 +118,27 @@ class Domain(lang.Final):
 
 class TupleDomain(ta.Generic[T]):
 
-    def __init__(self, domains: ta.Mapping[T, Domain]) -> None:
+    def __init__(self, domains: ta.Optional[ta.Mapping[T, Domain]]) -> None:
         super().__init__()
 
-        self._domains: ta.Mapping[T, Domain] = {t: check.isinstance(d, Domain) for t, d in domains.items()}
+        self._domains: ta.Optional[ta.Mapping[T, Domain]] = \
+            {t: check.isinstance(d, Domain) for t, d in domains.items()} if domains is not None else None
+
+    @classmethod
+    def all(cls) -> 'TupleDomain[T]':
+        return TupleDomain({})
+
+    @classmethod
+    def none(cls) -> 'TupleDomain[T]':
+        return TupleDomain(None)
 
     def simplify(self) -> 'TupleDomain[T]':
         raise NotImplementedError
+
+    @property
+    def is_all(self) -> bool:
+        return self._domains is not None and not self._domains
+
+    @property
+    def is_none(self) -> bool:
+        return self._domains is None

@@ -139,8 +139,9 @@ class Element(dc.Enum, nodal.Nodal['Element'], reorder=True):
     @classmethod
     def _build_fields_info(cls) -> nodal._FieldsInfo:
         fi = super()._build_fields_info()
-        if fi.flds:
-            raise TypeError(f'Element type {cls} has nested elements. Elements cannot be nested - use refs instead.')
+        for fn, f in fi.flds.items():
+            if isinstance(f.cls, type) and issubclass(f.cls, Element):
+                raise TypeError(f'Element type {cls} has nested element {fn}. Elements cannot be nested - use refs instead.')  # noqa
         return fi
 
     anns: Annotations = nodal.new_anns_field(Annotations)

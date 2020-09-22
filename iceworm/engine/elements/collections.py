@@ -11,6 +11,7 @@ import typing as ta
 from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
+from omnibus import properties
 
 from .base import Dependable
 from .base import Element
@@ -52,6 +53,11 @@ class ElementSet(ta.Generic[ElementT]):
     @property
     def set(self) -> ta.AbstractSet[Element]:
         return self._set
+
+    @properties.cached
+    @property
+    def seq(self) -> ta.Sequence[Element]:
+        return list(self._set)
 
     @classmethod
     def of(cls, it: ta.Iterable[ElementT]) -> 'ElementSet[ElementT]':

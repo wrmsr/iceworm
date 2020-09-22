@@ -14,7 +14,7 @@ from .targets import Rows
 from .targets import Table
 
 
-class TableDependencies(dc.Frozen, allow_setattr=True):
+class RowsTableDependencies(dc.Frozen, allow_setattr=True):
 
     tables_by_name: ta.Mapping[QualifiedName, Table] = dc.field(
         coerce=lambda d: ocol.FrozenDict(
@@ -25,7 +25,7 @@ class TableDependencies(dc.Frozen, allow_setattr=True):
 
     @properties.cached
     @property
-    def name_sets_by_table(self) -> els.ElementMap[els.Element, ta.AbstractSet[QualifiedName]]:
+    def name_sets_by_table(self) -> els.ElementMap[Table, ta.AbstractSet[QualifiedName]]:
         ret = {}
         for n, t in self.tables_by_name.items():
             ret.setdefault(t, set()).add(n)
@@ -57,9 +57,9 @@ class TableDependenciesAnalysis(els.Analysis):
 
     @properties.cached
     @property
-    def by_element(self) -> els.ElementMap[els.Element, TableDependencies]:
+    def by_rows(self) -> els.ElementMap[Rows, RowsTableDependencies]:
         return els.ElementMap(
-            (ele, TableDependencies({
+            (ele, RowsTableDependencies({
                 qn: self.tables_by_name[qn]
                 for qn in qns
                 if self._strict or qn in self.tables_by_name
@@ -70,6 +70,3 @@ class TableDependenciesAnalysis(els.Analysis):
                 for t in self.elements.analyze(els.queries.QueryBasicAnalysis)[ele][ele.query].get_node_type_set(no.Table)  # noqa
             }]
         )
-
-    def __getitem__(self, ele: Rows) -> TableDependencies:
-        return self.by_element[ele]

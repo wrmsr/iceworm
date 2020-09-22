@@ -35,7 +35,7 @@ class JoinSplittingProcessor(els.InstanceElementProcessor):
             return els.ElementMap(
                 (e, cids)
                 for e in self.input.get_type_set(Rows)
-                for deps in [self.input.analyze(StrictTableDependenciesAnalysis)[e]]
+                for deps in [self.input.analyze(StrictTableDependenciesAnalysis).by_rows[e]]
                 for cids in [{qn[0] for qns in deps.name_sets_by_table.values() for qn in qns}]
             )
 
@@ -56,11 +56,11 @@ class JoinSplittingProcessor(els.InstanceElementProcessor):
                     lst.append(e)
             return lst
 
-        def split_join(self, ele: Rows) -> ta.Sequence[els.Element]:
+        def split_join(self, rows: Rows) -> ta.Sequence[els.Element]:
             ret = []
             stda = self.input.analyze(StrictTableDependenciesAnalysis)
-            dst_qn = check.single(stda.name_sets_by_table[ele.table])
-            src_qns = {check.single(ns) for ns in stda.by_element[ele].name_sets_by_table.values()}
+            dst_qn = check.single(stda.name_sets_by_table[rows.table])
+            src_qns = {check.single(ns) for ns in stda.by_rows[rows].name_sets_by_table.values()}
             for src_qn in src_qns:
                 if src_qn[0] == dst_qn[0]:
                     continue
@@ -78,9 +78,9 @@ class JoinSplittingProcessor(els.InstanceElementProcessor):
                     Rows(new_tbl, f'select * from {src_qn.dotted}'),
                     Materialization(new_tbl, dst_qn[0], [new_qn[1]]),
                 ])
-                ele = dc.replace(
-                    ele,
-                    query=ttfm.ReplaceNamesTransformer({src_qn: new_qn})(ele.query.root),
-                    meta={els.Origin: els.Origin(ele)},
+                rows = dc.replace(
+                    rows,
+                    query=ttfm.ReplaceNamesTransformer({src_qn: new_qn})(rows.query.root),
+                    meta={els.Origin: els.Origin(rows)},
                 )
-            return [ele, *ret]
+            return [rows, *ret]
