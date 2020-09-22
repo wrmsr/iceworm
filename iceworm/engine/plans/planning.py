@@ -9,7 +9,6 @@ table -> invalidation -> rows -> refresh -> ...
   V
 materializations
 """
-import copy
 import typing as ta
 
 from omnibus import check
@@ -56,6 +55,8 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
             return ocol.IdentitySet([
                 mat
                 for mat in self.input.get_type_set(tars.Materialization)
+                for ctr in [self.owner._ctors[mat.connector.id]]
+                if isinstance(ctr, ctrs.impls.sql.SqlConnector)
                 if mat.id not in matr_mat_ids
             ])
 
@@ -92,7 +93,7 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
             for mat in self.input.get_type_set(tars.Materialization):
                 mat_sets_by_table_id.setdefault(mat.table.id, ocol.IdentitySet()).add(mat)
 
-            ret = [copy.copy(e) if e in self.matches else e for e in self.input]
+            ret = list(self.input)
             for mat in self.input.get_type_set(tars.Materialization):
                 ctr = self.owner._ctors[mat.connector.id]
                 if not isinstance(ctr, ctrs.impls.sql.SqlConnector):

@@ -25,7 +25,6 @@ from .processing import ElementProcessingDriver  # noqa
 from .processing import ElementProcessor  # noqa
 from .processing import InstanceElementProcessor  # noqa
 from .processing import PhaseFrozen  # noqa
-from .processing import ProcessedBy  # noqa
 from .processing import has_processed  # noqa
 from .processors import IdGeneratorProcessor  # noqa
 from .refs import Ref  # noqa

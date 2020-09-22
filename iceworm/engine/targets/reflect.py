@@ -84,7 +84,6 @@ class ReflectTablesProcessor(els.InstanceElementProcessor):
                     new,
                     meta={
                         els.Origin: els.Origin(e),
-                        els.ProcessedBy: els.ProcessedBy([self.owner]),
                     },
                 )
                 lst.append(new)

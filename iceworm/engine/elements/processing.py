@@ -9,8 +9,8 @@ TODO:
   - processed_cls_set? optional, enforced if present, warn
  - ** timing, + detect infinite loops **
   - max iterations?
-  - 'aspect_id' tagging equiv - 'ProcessedBy' attribute?
- - ProcessedBy allowed to be updated but only for self, added if not
+  - 'aspect_id' tagging equiv - '_ProcessedBy' attribute?
+ - _ProcessedBy allowed to be updated but only for self, added if not
  - RULES phase - keep? serde already bound lol, can't load any dynamic rule types yet.. *yet*.. nuke serde ctx?
  - class Phase(dc.Pure): name: str, mutable_element_types: ta.AbstractSet[type], ...
  - decompose? need to setup ctors before instantiating next phases lol..
@@ -49,15 +49,15 @@ log = logging.getLogger(__name__)
 InstanceElementProcessorT = ta.TypeVar('InstanceElementProcessorT', bound='InstanceElementProcessor')
 
 
-class ProcessedBy(dc.Pure):
+class _ProcessedBy(dc.Pure):
     processors: ta.AbstractSet['ElementProcessor'] = dc.field(
         coerce=lambda o: ocol.IdentitySet(check.not_isinstance(o, str)) if not isinstance(o, ocol.IdentitySet) else o,
         check=lambda o: isinstance(o, ocol.IdentitySet) and all(isinstance(e, ElementProcessor) for e in o))
 
-    EMPTY: ta.ClassVar['ProcessedBy']
+    EMPTY: ta.ClassVar['_ProcessedBy']
 
 
-ProcessedBy.EMPTY = ProcessedBy([])
+_ProcessedBy.EMPTY = _ProcessedBy([])
 
 
 class PhaseFrozen(dc.Pure):
@@ -85,11 +85,11 @@ def has_processed(ep: 'ElementProcessor', e: Element) -> bool:
     check.isinstance(ep, ElementProcessor)
     check.isinstance(e, Element)
     try:
-        pb = e.meta[ProcessedBy]
+        pb = e.meta[_ProcessedBy]
     except KeyError:
         return False
     else:
-        return ep in check.isinstance(pb, ProcessedBy).processors
+        return ep in check.isinstance(pb, _ProcessedBy).processors
 
 
 class ElementProcessor(Dependable, lang.Abstract):
@@ -273,9 +273,8 @@ class ElementProcessingDriver:
         if missing:
             raise ValueError(missing)
 
-        leftover = [e for e in matches if e in res]
+        leftover = [e for e in matches if e in res and Frozen not in e.meta]
         if leftover:
-            # Need to consume all matched or it'll inf loop..
             raise ValueError(leftover)
 
         swaps: ta.MutableMapping[Element, Element] = ocol.IdentityKeyDict()
@@ -291,9 +290,9 @@ class ElementProcessingDriver:
                 raise ValueError(e, pf)
 
         for e in added:
-            pbs = e.meta.get(ProcessedBy)
+            pbs = e.meta.get(_ProcessedBy)
             if pbs is not None:
-                npbs = check.isinstance(pbs, ProcessedBy).processors
+                npbs = check.isinstance(pbs, _ProcessedBy).processors
                 if processor in npbs:
                     continue
             else:
@@ -302,7 +301,7 @@ class ElementProcessingDriver:
                 e,
                 meta={
                     **e.meta,
-                    ProcessedBy: ProcessedBy([*npbs, processor]),
+                    _ProcessedBy: _ProcessedBy([*npbs, processor]),
                 },
             )
 
@@ -311,8 +310,11 @@ class ElementProcessingDriver:
 
         return res
 
+    def _strip_meta(self, eles: ta.Iterable[Element]) -> ElementSet:
+        return ElementSet.of(dc.replace(e, meta={**e.meta, _ProcessedBy: None}) for e in eles)
+
     def process(self, elements: ta.Iterable[Element]) -> ElementSet:
-        elements = ElementSet.of(elements)
+        elements = self._strip_meta(elements)
 
         for phase in PHASES:
             steps = self._build_steps(elements, phase)
@@ -351,4 +353,4 @@ class ElementProcessingDriver:
                 for pf in [_phase_frozen(type(e))]
             ])
 
-        return elements
+        return self._strip_meta(elements)
