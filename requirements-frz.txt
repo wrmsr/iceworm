@@ -11,7 +11,7 @@ boto3==1.15.1
 boto3-stubs==1.15.1.0
 botocore==1.18.1
 certifi==2020.6.20
-cffi==1.14.2
+cffi==1.14.3
 chardet==3.0.4
 cli-helpers==2.1.0
 click==7.1.2
@@ -52,7 +52,7 @@ nose==1.3.7
 numba==0.51.2
 numpy==1.19.2
 oauthlib==3.1.0
-omnibus @ git+https://github.com/wrmsr/omnibus@fe2252150a7b6b225af2cd5d255343b5c99103cd
+omnibus @ git+https://github.com/wrmsr/omnibus@23fe95e2d73ffe029331fb4084d5e715fb72660b
 oscrypto==1.2.1
 packaging==20.4
 pandas==1.1.2
@@ -86,6 +86,7 @@ Pyomo==5.7.1
 pyOpenSSL==19.1.0
 pyparsing==2.4.7
 pyspark==3.0.1
+pyspark-stubs==3.0.0.post1
 pytest==6.0.2
 pytest-benchmark==3.2.3
 pytest-forked==1.3.0
@@ -125,4 +126,4 @@ wcwidth==0.2.5
 webencodings==0.5.1
 websocket-client==0.57.0
 z3-solver==4.8.9.0
-zipp==3.1.0
+zipp==3.2.0
