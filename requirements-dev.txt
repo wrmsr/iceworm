@@ -3,7 +3,7 @@
 
 ## packaging deps
 
-boto3-stubs==1.15.1.0
+boto3-stubs==1.15.2.0
 twine==3.2.0
 wheel>=0.34.2
 
