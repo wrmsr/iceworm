@@ -1,8 +1,10 @@
 import contextlib
+import itertools
 import os.path
 import typing as ta  # noqa
 
 from omnibus import check
+from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import inject as inj
 from omnibus import lang  # noqa
@@ -16,6 +18,7 @@ from .. import inject as einj
 from .. import ops
 from .. import plans as pln
 from .. import sites
+from .. import targets as tars  # noqa
 from ... import sql
 from ...sql.tests.helpers import DbManager
 from ...tests import harness as har
@@ -24,6 +27,7 @@ from ...trees import parsing as par
 from ...types import QualifiedName  # noqa
 from ...utils import secrets as sec  # noqa
 from ...utils import serde
+from ...utils import unique_dict
 
 
 # def get_ele_dependencies(elements: ta.Iterable[els.Element]) -> ta.Mapping[els.Element, ta.AbstractSet[els.Element]]:  # noqa
@@ -81,26 +85,31 @@ def test_inject(harness: har.Harness):
             ])
             connectors = drv[ctrs.ConnectorSet]
 
+        elements = check.isinstance(elements, els.ElementSet)
         selements = serde.serialize(list(elements))
         delements = els.ElementSet.of(serde.deserialize(selements, ta.Sequence[els.Element]))
         assert list(delements) == list(elements)
 
         print(yaml.dump(selements))
 
-        # FIXME: manage in execution
-        conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(connectors)))
-        plan = pln.ElementPlanner(elements, connectors).plan({
-            'pg/a',
-            'pg/b',
-            'pg/c',
-            # 'pg/d',
-            'pg/nums',
-            'system/notifications',
-        })
+        # inval_ids = {
+        #     'pg/a',
+        #     'pg/b',
+        #     'pg/c',
+        #     # 'pg/d',
+        #     'pg/nums',
+        #     'system/notifications',
+        # }
 
+        conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(connectors)))
         execution_injector = injector[inj.Key(inj.Injector, 'execution')]
         with ops.inject.new_execution_scope(execution_injector, conns):
-            execution_injector[ops.OpExecutionDriver].execute(plan)
+            matrs_by_mat_id = unique_dict((matr.target.id, matr) for matr in elements.get_type_set(pln.Materializer))
+            deps = {mat_id: {d.id for d in matr.srcs} for mat_id, matr in matrs_by_mat_id.items()}
+            oed: ops.OpExecutionDriver = execution_injector[ops.OpExecutionDriver]
+            for mat_id in itertools.chain.from_iterable(ocol.toposort(deps)):
+                matr = matrs_by_mat_id[mat_id]
+                oed.execute(matr.op)
 
         with harness[DbManager].pg_engine.connect() as pg_conn:
             print(list(pg_conn.execute('select * from a')))

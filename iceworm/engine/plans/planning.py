@@ -55,8 +55,6 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
             return ocol.IdentitySet([
                 mat
                 for mat in self.input.get_type_set(tars.Materialization)
-                for ctr in [self.owner._ctors[mat.connector.id]]
-                if isinstance(ctr, ctrs.impls.sql.SqlConnector)
                 if mat.id not in matr_mat_ids
             ])
 
@@ -97,6 +95,9 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
             for mat in self.input.get_type_set(tars.Materialization):
                 ctr = self.owner._ctors[mat.connector.id]
                 if not isinstance(ctr, ctrs.impls.sql.SqlConnector):
+                    # FIXME: lol
+                    matr = Materializer(mat, [], ops.List([]))
+                    ret.append(matr)
                     continue
 
                 dst = QualifiedName([mat.connector.id, *mat.name])

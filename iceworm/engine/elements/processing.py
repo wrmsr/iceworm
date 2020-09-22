@@ -4,6 +4,7 @@ TODO:
   - ** enforcements - enforce after every pass all refs resolve * and to correct type * **
   - *** NO - EAGER ANALYSES ***
  - ** honor analysis deps **
+ - ** phase *RANGE* not frozen - cannot be added before, frozen after **
  - make processors only have to return what they modified? cann no longer sort
  - find / warn / reject elements with no processors
   - processed_cls_set? optional, enforced if present, warn
