@@ -9,6 +9,7 @@ table -> invalidation -> rows -> refresh -> ...
   V
 materializations
 """
+import copy
 import typing as ta
 
 from omnibus import check
@@ -50,12 +51,13 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
 
         @properties.cached
         @property
-        def matches(self) -> ta.Iterable[els.Element]:
-            return [
-                e
-                for e in self.input.get_type_set(tars.Target)
-                if self.owner not in e.meta.get(els.ProcessedBy, els.ProcessedBy.EMPTY).processors
-            ]
+        def matches(self) -> ta.AbstractSet[els.Element]:
+            matr_mat_ids = {matr.target.id for matr in self.input.get_type_set(Materializer)}
+            return ocol.IdentitySet([
+                mat
+                for mat in self.input.get_type_set(tars.Materialization)
+                if mat.id not in matr_mat_ids
+            ])
 
         def _build_rows_op(self, rows: tars.Rows, dst: QualifiedName) -> ops.Op:
             query = ren.render_query(rows.query)
@@ -90,7 +92,7 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
             for mat in self.input.get_type_set(tars.Materialization):
                 mat_sets_by_table_id.setdefault(mat.table.id, ocol.IdentitySet()).add(mat)
 
-            ret = [*self.matches]
+            ret = [copy.copy(e) if e in self.matches else e for e in self.input]
             for mat in self.input.get_type_set(tars.Materialization):
                 ctr = self.owner._ctors[mat.connector.id]
                 if not isinstance(ctr, ctrs.impls.sql.SqlConnector):
