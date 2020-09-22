@@ -227,7 +227,7 @@ proto: venv
 vers: venv
 	VER=$$(.venv/bin/python -c 'from $(PROJECT) import __about__; print(__about__.__version__)') ; \
 	echo "$$VER" ; \
-	T=$$(mktemp) && cat $(PROJECT)-js/ui/package.json >$$T && sed "1,/  \"version\": .*/s/version = .*/  \"version\": \"$$VER\",/" <$$T >$(PROJECT)-js/ui/package.json ; \
+	T=$$(mktemp) && cat $(PROJECT)-js/ui/package.json >$$T && sed "1,/  \"version\": .*/s/  \"version\": .*/  \"version\": \"$$VER\",/" <$$T >$(PROJECT)-js/ui/package.json ; \
 	T=$$(mktemp) && cat $(PROJECT)-rs/Cargo.toml >$$T && sed "1,/version = .*/s/version = .*/version = \"$$VER\"/" <$$T >$(PROJECT)-rs/Cargo.toml ; \
 
 
