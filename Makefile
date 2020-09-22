@@ -227,17 +227,23 @@ proto: venv
 vers: venv
 	VER=$$(.venv/bin/python -c 'from $(PROJECT) import __about__; print(__about__.__version__)') ; \
 	echo "$$VER" ; \
-	T=$$(mktemp) && cat $(PROJECT)-jvm/pom.xml >$$T && sed "1,/    <version>.*/s/    <version>.*/    <version>$$VER<\\/version>/" <$$T >$(PROJECT)-jvm/pom.xml ; \
+	\
+	T=$$(mktemp) && cat $(PROJECT)-jvm/pom.xml >$$T && \
+		sed "1,/^    <version>.*/s/^    <version>.*/    <version>$$VER<\\/version>/" <$$T >$(PROJECT)-jvm/pom.xml ; \
+	\
 	for D in $$(cd $(PROJECT)-jvm && find . -name '$(PROJECT)-*' -maxdepth 1 -type d) ; do \
 		F="$(PROJECT)-jvm/$$D/pom.xml" ; \
 		if [ -f "$$F" ] ; then \
-			echo "$$F" ; \
+			T=$$(mktemp) && cat "$$F" >$$T && \
+				sed "1,/^    <version>.*/s/^    <version>.*/    <version>$$VER<\\/version>/" <$$T >"$$F" ; \
 		fi ; \
 	done ; \
 	\
-	T=$$(mktemp) && cat $(PROJECT)-js/ui/package.json >$$T && sed "1,/  \"version\": .*/s/  \"version\": .*/  \"version\": \"$$VER\",/" <$$T >$(PROJECT)-js/ui/package.json ; \
+	T=$$(mktemp) && cat $(PROJECT)-js/ui/package.json >$$T && \
+		sed "1,/^  \"version\": .*/s/^  \"version\": .*/  \"version\": \"$$VER\",/" <$$T >$(PROJECT)-js/ui/package.json ; \
 	\
-	T=$$(mktemp) && cat $(PROJECT)-rs/Cargo.toml >$$T && sed "1,/version = .*/s/version = .*/version = \"$$VER\"/" <$$T >$(PROJECT)-rs/Cargo.toml ; \
+	T=$$(mktemp) && cat $(PROJECT)-rs/Cargo.toml >$$T && \
+		sed "1,/^version = .*/s/^version = .*/version = \"$$VER\"/" <$$T >$(PROJECT)-rs/Cargo.toml ; \
 
 
 ### Build

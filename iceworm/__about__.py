@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 __title__ = 'iceworm'
-__version__ = '0.0.1-dev'
+__version__ = '0.0.1-xyz'
 __description__ = ''
 __author__ = 'wrmsr'
 __url__ = 'https://github.com/wrmsr/iceworm'
