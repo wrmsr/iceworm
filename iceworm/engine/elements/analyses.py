@@ -1,7 +1,7 @@
 from omnibus import code as ocode
 from omnibus import properties
 
-from .processing import Analysis
+from .collections import Analysis
 
 
 class IdGen(Analysis):

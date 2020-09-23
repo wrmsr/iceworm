@@ -14,6 +14,9 @@ from .base import optional_id_check  # noqa
 from .collections import Analysis  # noqa
 from .collections import ElementMap  # noqa
 from .collections import ElementSet  # noqa
+from .driving import ElementProcessingDriver  # noqa
+from .driving import PhaseFrozen  # noqa
+from .driving import has_processed  # noqa
 from .phases import PHASES  # noqa
 from .phases import Phase  # noqa
 from .phases import PhasePair  # noqa
@@ -21,12 +24,9 @@ from .phases import Phases  # noqa
 from .phases import SUB_PHASES  # noqa
 from .phases import SubPhase  # noqa
 from .phases import SubPhases  # noqa
-from .processing import ElementProcessingDriver  # noqa
-from .processing import ElementProcessor  # noqa
-from .processing import InstanceElementProcessor  # noqa
-from .processing import PhaseFrozen  # noqa
-from .processing import has_processed  # noqa
+from .processors import ElementProcessor  # noqa
 from .processors import IdGeneratorProcessor  # noqa
+from .processors import InstanceElementProcessor  # noqa
 from .refs import Ref  # noqa
 from .refs import RefMap  # noqa
 from .refs import RefSet  # noqa

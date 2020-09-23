@@ -16,7 +16,7 @@ from .base import Origin
 from .collections import Analysis
 from .collections import ElementMap
 from .collections import ElementSet
-from .processing import ElementProcessor
+from .processors import ElementProcessor
 
 
 _QUERY_FIELDS_CACHE = weakref.WeakKeyDictionary()

@@ -19,15 +19,15 @@ from . import queries
 from . import validations
 from .base import Element
 from .collections import ElementSet
+from .driving import DriverItem
+from .driving import ElementProcessingDriver
 from .phases import PHASES
 from .phases import Phase
 from .phases import PhasePair
 from .phases import Phases
 from .phases import SUB_PHASES
 from .phases import SubPhases
-from .processing import DriverItem
-from .processing import ElementProcessingDriver
-from .processing import ElementProcessor
+from .processors import ElementProcessor
 
 
 T = ta.TypeVar('T')
