@@ -21,8 +21,12 @@ from .. import elements as els
 from .. import ops
 from .. import targets as tars
 from ... import metadata as md
+from ...trees import nodes as no
 from ...trees import rendering as ren
+from ...trees import transforms as ttfm
+from ...trees.types import AstQuery
 from ...types import QualifiedName
+from ...utils import set_dict
 from ..utils import parse_simple_select_table
 from ..utils import parse_simple_select_tables
 from .elements import Materializer
@@ -58,7 +62,17 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
                 if mat.id not in matr_mat_ids
             ])
 
-        def _build_rows_op(self, rows: tars.Rows, dst: QualifiedName) -> ops.Op:
+        @properties.cached
+        @property
+        def rows_sets_by_table_id(self) -> ta.Mapping[els.Id, ta.AbstractSet[tars.Rows]]:
+            return set_dict(self.input.get_type_set(tars.Rows), lambda r: r.table.id, identity_set=True)
+
+        @properties.cached
+        @property
+        def mat_sets_by_table_id(self) -> ta.Mapping[els.Id, ta.AbstractSet[tars.Materialization]]:
+            return set_dict(self.input.get_type_set(tars.Materialization), lambda m: m.table.id, identity_set=True)
+
+        def build_rows_op(self, rows: tars.Rows, dst: QualifiedName) -> ops.Op:
             query = ren.render_query(rows.query)
 
             try:
@@ -78,19 +92,29 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
             else:
                 return ops.InsertIntoEval(dst, query)
 
+            try:
+                ctor_ids = set()
+                for src_tbl in self.input.analyze(tars.StrictTableDependenciesAnalysis).by_rows[rows].name_sets_by_table:  # noqa
+                    for src_mat in self.mat_sets_by_table_id.get(src_tbl.id):
+                        ctor_ids.add(src_mat.connector.id)
+                if len(ctor_ids) != 1 or check.single(ctor_ids) != dst[0]:
+                    raise ValueError
+            except ValueError:
+                pass
+            else:
+                qb = self.input.analyze(els.queries.QueryBasicAnalysis)[rows][rows.query]
+                tqns = {t.name.name for t in qb.get_node_type_set(no.Table)}
+                check.state(all(n[0] == dst[0] for n in tqns))
+                reps = {n: QualifiedName(n[1:]) for n in tqns}
+                rq = ttfm.ReplaceNamesTransformer(reps)(check.isinstance(rows.query, AstQuery).root)
+                eq = f'insert into {QualifiedName(dst[1:]).dotted} {ren.render(rq)}'
+                return ops.Exec(dst[0], eq)
+
             raise ValueError(rows)
 
         @properties.stateful_cached
         @property
         def output(self) -> ta.Iterable[els.Element]:
-            rows_sets_by_table_id = {}
-            for rows in self.input.get_type_set(tars.Rows):
-                rows_sets_by_table_id.setdefault(rows.table.id, ocol.IdentitySet()).add(rows)
-
-            mat_sets_by_table_id = {}
-            for mat in self.input.get_type_set(tars.Materialization):
-                mat_sets_by_table_id.setdefault(mat.table.id, ocol.IdentitySet()).add(mat)
-
             ret = list(self.input)
             for mat in self.input.get_type_set(tars.Materialization):
                 ctr = self.owner._ctors[mat.connector.id]
@@ -109,10 +133,10 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
                 ]
 
                 srcs: ta.Set[els.Id] = set()
-                for rows in rows_sets_by_table_id.get(mat.table.id, []):
-                    plan.append(self._build_rows_op(rows, dst))
+                for rows in self.rows_sets_by_table_id.get(mat.table.id, []):
+                    plan.append(self.build_rows_op(rows, dst))
                     for src_tbl in self.input.analyze(tars.StrictTableDependenciesAnalysis).by_rows[rows].name_sets_by_table:  # noqa
-                        for src_mat in mat_sets_by_table_id.get(src_tbl.id):
+                        for src_mat in self.mat_sets_by_table_id.get(src_tbl.id):
                             srcs.add(src_mat.id)
 
                 matr = Materializer(mat, srcs, ops.List(plan))

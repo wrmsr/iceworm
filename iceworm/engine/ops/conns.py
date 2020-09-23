@@ -150,14 +150,14 @@ class InsertIntoEvalExecutor(ConnsOpExecutor[InsertIntoEval]):
 
 
 class Exec(ConnsOp):
-    name: str = dc.field(check=lambda s: isinstance(s, str) and s)
+    conn: str = dc.field(check=lambda s: isinstance(s, str) and s)
     query: str = dc.field(check=lambda s: isinstance(s, str) and s)
 
 
 class ExecExecutor(ConnsOpExecutor[Exec]):
 
     def execute(self, op: Exec) -> None:
-        sa_conn = check.isinstance(self._conns[op.name], SqlConnection).sa_conn
+        sa_conn = check.isinstance(self._conns[op.conn], SqlConnection).sa_conn
         sa_conn.execute(op.query)
 
 

@@ -16,8 +16,10 @@ def list_dict(
         items: ta.Iterable[T],
         key: ta.Callable[[V], K],
         map: ta.Callable[[T], V] = lang.identity,
+        *,
+        identity_dict: bool = False,
 ) -> ta.Dict[K, ta.List[V]]:
-    dct = {}
+    dct = ocol.IdentityKeyDict() if identity_dict else {}
     for e in items:
         k = key(e)
         v = map(e)
@@ -29,12 +31,15 @@ def set_dict(
         items: ta.Iterable[T],
         key: ta.Callable[[T], K],
         map: ta.Callable[[T], V] = lang.identity,
+        *,
+        identity_dict: bool = False,
+        identity_set: bool = False,
 ) -> ta.Dict[K, ta.Set[V]]:
-    dct = {}
+    dct = ocol.IdentityKeyDict() if identity_dict else {}
     for e in items:
         k = key(e)
         v = map(e)
-        dct.setdefault(k, set()).add(v)
+        dct.setdefault(k, ocol.IdentitySet() if identity_set else set()).add(v)
     return dct
 
 
@@ -48,8 +53,8 @@ def partition(items: ta.Iterable[T], pred: ta.Callable[[T], bool]) -> ta.Tuple[t
     return t, f
 
 
-def unique_dict(items: ta.Iterable[ta.Tuple[K, V]]) -> ta.Dict[K, V]:
-    dct = {}
+def unique_dict(items: ta.Iterable[ta.Tuple[K, V]], *, identity: bool = False) -> ta.Dict[K, V]:
+    dct = ocol.IdentityKeyDict() if identity else {}
     for k, v in items:
         if k in dct:
             raise KeyError(k)

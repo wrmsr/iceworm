@@ -92,15 +92,6 @@ def test_inject(harness: har.Harness):
 
         print(yaml.dump(selements))
 
-        # inval_ids = {
-        #     'pg/a',
-        #     'pg/b',
-        #     'pg/c',
-        #     # 'pg/d',
-        #     'pg/nums',
-        #     'system/notifications',
-        # }
-
         conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(connectors)))
         execution_injector = injector[inj.Key(inj.Injector, 'execution')]
         with ops.inject.new_execution_scope(execution_injector, conns):
@@ -115,4 +106,5 @@ def test_inject(harness: har.Harness):
             print(list(pg_conn.execute('select * from a')))
             print(list(pg_conn.execute('select * from b')))
             print(list(pg_conn.execute('select * from c')))
+            print(list(pg_conn.execute('select * from d')))
             print(list(pg_conn.execute('select * from nums')))
