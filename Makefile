@@ -333,12 +333,7 @@ dep-updates: venv
 
 .PHONY: dep-cyaml
 dep-cyaml: venv
-	( \
-		P=$$(pwd) && \
-		cd $$(mktemp -d -t ci-XXXXXXXXXX) && \
-		echo "$$P" && wget http://pyyaml.org/download/pyyaml/PyYAML-5.3.1.tar.gz -O pyyaml.tgz && \
-		"$$P/.venv/bin/pip" install ./pyyaml.tgz --global-option="--with-libyaml" \
-	)
+	.venv/bin/python setup.py cyaml
 
 .PHONY: dep-setup
 dep-setup: venv

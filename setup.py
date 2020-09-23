@@ -1,12 +1,23 @@
 import fnmatch
 import os
 import sys
+import warnings
 
 import setuptools.command.build_ext
+
+import distutils.cmd
+import distutils.log
 
 
 if sys.version_info < (3, 7):
     raise EnvironmentError('python >= 3.7 required')
+
+
+warnings.filterwarnings(
+    'ignore',
+    message=r"Normalizing '[^'-]+-[^'-]+' to '[^'-]+\.[^'-]+'",
+    module=r'setuptools\.dist',
+)
 
 
 PROJECT = 'iceworm'
@@ -66,6 +77,35 @@ EXT_MODULES = [
 ]
 
 
+class CyamlCommand(distutils.cmd.Command):
+    description = 'install cyaml'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        self.announce('Installing cyaml')
+
+        import tempfile
+        dp = tempfile.mkdtemp()
+
+        import os.path
+        fp = os.path.join(dp, 'cyaml.tar.gz')
+
+        import urllib.request
+        urllib.request.urlretrieve('http://pyyaml.org/download/pyyaml/PyYAML-5.3.1.tar.gz', fp)
+
+        import sys
+        os.system(
+            f'cd {dp} && '
+            f'{os.path.abspath(sys.executable)} -m pip install cyaml.tar.gz --global-option="--with-libyaml"'
+        )
+
+
 if __name__ == '__main__':
     setuptools.setup(
         name=ABOUT['__title__'],
@@ -73,6 +113,10 @@ if __name__ == '__main__':
         description=ABOUT['__description__'],
         author=ABOUT['__author__'],
         url=ABOUT['__url__'],
+
+        cmdclass={
+            'cyaml': CyamlCommand,
+        },
 
         python_requires=ABOUT['__python_requires__'],
         classifiers=ABOUT['__classifiers__'],
