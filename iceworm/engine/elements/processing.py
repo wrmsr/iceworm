@@ -34,6 +34,7 @@ from omnibus import defs
 from omnibus import lang
 from omnibus import properties
 
+from ...utils import partition
 from ...utils import unique_dict
 from .base import Dependable
 from .base import Element
@@ -210,13 +211,24 @@ class ElementProcessingDriver:
         processor_seqs_by_phase: ta.Mapping[Phase, ta.Sequence[ElementProcessor]] = by_phase
         return lambda es, phase: processor_seqs_by_phase.get(phase, [])
 
-    def _build_steps(self, elements: ElementSet, phase: Phase) -> ta.Sequence[ta.AbstractSet[ElementProcessor]]:
+    def _invoke_factory(
+            self,
+            elements: ElementSet,
+            phase: Phase
+    ) -> ta.Tuple[
+        ta.Sequence[ElementProcessor],
+        ta.Sequence[ta.Type[Validation]],
+    ]:
         items = list(self._factory(elements, phase))
-        eps = [check.isinstance(ep, ElementProcessor) for ep in items]
+        eps, items = partition(items, lambda e: isinstance(e, ElementProcessor))
+        vals, items = partition(items, lambda e: isinstance(e, type) and issubclass(e, Validation))
+        check.empty(items)
+        return eps, vals
 
+    def _build_steps(self, processors: ta.Sequence[ElementProcessor], phase: Phase) -> ta.Sequence[ta.AbstractSet[ElementProcessor]]:  # noqa
         ep_dep_tys = {}
         ep_sets_by_mro_cls = {}
-        for ep in eps:
+        for ep in processors:
             check.not_in(ep, ep_dep_tys)
             check.in_(phase, type(ep).phases())
             ep_dep_tys[ep] = {
@@ -235,7 +247,7 @@ class ElementProcessingDriver:
             }
             steps = list(ocol.toposort(ep_deps))
         else:
-            steps = [eps]
+            steps = [processors]
 
         return steps
 
@@ -321,7 +333,8 @@ class ElementProcessingDriver:
         elements = self._strip_meta(elements)
 
         for phase in PHASES:
-            steps = self._build_steps(elements, phase)
+            eps, vals = self._invoke_factory(elements, phase)
+            steps = self._build_steps(eps, phase)
             steps = [self._sort_step(step) for step in steps]
 
             count = 0
@@ -349,6 +362,9 @@ class ElementProcessingDriver:
                     log.debug(processor)
 
                 elements = self._run_processor(processor, matches, elements, phase)
+
+                for val in vals:
+                    elements.analyze(val)
 
             elements = ElementSet.of([
                 dc.replace(e, meta={**e.meta, Frozen: Frozen})

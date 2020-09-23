@@ -38,6 +38,16 @@ def set_dict(
     return dct
 
 
+def partition(items: ta.Iterable[T], pred: ta.Callable[[T], bool]) -> ta.Tuple[ta.List[T], ta.List[T]]:
+    t, f = [], []
+    for e in items:
+        if pred(e):
+            t.append(e)
+        else:
+            f.append(e)
+    return t, f
+
+
 def unique_dict(items: ta.Iterable[ta.Tuple[K, V]]) -> ta.Dict[K, V]:
     dct = {}
     for k, v in items:

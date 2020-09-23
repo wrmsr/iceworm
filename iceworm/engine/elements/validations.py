@@ -15,7 +15,7 @@ from .refs import Ref
 class Validation(Analysis, lang.Abstract):
 
     def __post_init__(self, *args, **kwargs) -> None:
-        super().__post_init__(*args, **kwargs)
+        lang.maybe_call(super(), '__post_init__', *args, **kwargs)
         self.validate()
 
     @abc.abstractmethod
