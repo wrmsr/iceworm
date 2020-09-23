@@ -29,5 +29,9 @@ def _load_dot_env() -> ta.Optional[ta.Mapping[str, str]]:
 @register
 class EnvPlugin:
 
+    def pytest_addoption(self, parser):
+        parser.addoption('--no-dotenv', action='store_true', help='Disables dotenv')
+
     def pytest_configure(self, config):
-        _load_dot_env()
+        if not config.option.no_dotenv:
+            _load_dot_env()

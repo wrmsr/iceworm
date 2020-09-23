@@ -4,7 +4,7 @@ from ._registry import register
 
 
 @register
-class DebugTimeoutPlugin:
+class TimeoutDebugPlugin:
 
     def pytest_collection(self, session):
         config = session.config
