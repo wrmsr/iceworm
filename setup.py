@@ -145,36 +145,40 @@ class InstallCommand(setuptools.command.install.install):
         self.sysdeps = 0
         self.cyaml = 0
 
-        """
-        29251 29243 /usr/local/Cellar/python@3.8/3.8.5/Frameworks/Python.framework/Versions/3.8/Resources/Python.app/Contents/MacOS/Python -u -c import sys, setuptools, tokenize; sys.argv[0] = '/private/var/folders/s7/z0_hyvy14txdpyh8j7j4bljr0000gn/T/pip-req    -build-9ehuvpb0/setup.py'; __file__='/private/var/folders/s7/z0_hyvy14txdpyh8j7j4bljr0000gn/T/pip-req-build-9ehuvpb0/setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exe    c')) bdist_wheel -d /private/var/folders/s7/z0_hyvy14txdpyh8j7j4bljr0000gn/T/pip-wheel-84jjswdf
-        29243 29235 /usr/local/Cellar/python@3.8/3.8.5/Frameworks/Python.framework/Versions/3.8/Resources/Python.app/Contents/MacOS/Python -m pip install --no-dependencies /Users/spinlock/src/wrmsr/iceworm/dist/iceworm-0.0.1.dev0.zip
-        29235 88867 /usr/local/Cellar/python@3.8/3.8.5/Frameworks/Python.framework/Versions/3.8/Resources/Python.app/Contents/MacOS/Python /usr/local/Cellar/pipx/0.15.5.1/libexec/bin/pipx install --verbose --force src/wrmsr/iceworm/dist/iceworm-0.0.1.dev0.zi    p
-        88867   713 -zsh
-        713     1 tmux -2
-        29279 29267 /usr/local/Cellar/python@3.8/3.8.5/Frameworks/Python.framework/Versions/3.8/Resources/Python.app/Contents/MacOS/Python -u -c import sys, setuptools, tokenize; sys.argv[0] = '/private/var/folders/s7/z0_hyvy14txdpyh8j7j4bljr0000gn/T/pip-req    -build-jr3wqzfh/setup.py'; __file__='/private/var/folders/s7/z0_hyvy14txdpyh8j7j4bljr0000gn/T/pip-req-build-jr3wqzfh/setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exe    c')) bdist_wheel -d /private/var/folders/s7/z0_hyvy14txdpyh8j7j4bljr0000gn/T/pip-wheel-_u9fhm5c
-        29267 29235 /usr/local/Cellar/python@3.8/3.8.5/Frameworks/Python.framework/Versions/3.8/Resources/Python.app/Contents/MacOS/Python -m pip install /Users/spinlock/src/wrmsr/iceworm/dist/iceworm-0.0.1.dev0.zip
-        29235 88867 /usr/local/Cellar/python@3.8/3.8.5/Frameworks/Python.framework/Versions/3.8/Resources/Python.app/Contents/MacOS/Python /usr/local/Cellar/pipx/0.15.5.1/libexec/bin/pipx install --verbose --force src/wrmsr/iceworm/dist/iceworm-0.0.1.dev0.zi    p
-        88867   713 -zsh
-        713     1 tmux -2
-        """
-
-        with open('/tmp/asdf', 'a') as f:
+        if sys.platform == 'darwin':
             import subprocess
-            p = int(os.getpid())
-            while p != 1:
-                buf = subprocess.check_output(f'ps -o pid=,ppid=,command= -p {p}'.split(' ')).decode('utf-8').strip()
-                f.write(buf + '\n')
-                p = int(buf.split()[1])
+            pid_chain = []
+            cur_pid = int(os.getpid())
+            while cur_pid != 1:
+                buf = subprocess.check_output(f'ps -o pid=,ppid=,command= -p {cur_pid}'.split(' ')).decode('utf-8')
+                pid_str, _, buf = buf.strip().partition(' ')
+                ppid_str, _, buf = buf.strip().partition(' ')
+                if int(pid_str) != cur_pid:
+                    raise Exception(f'{pid_str} != {cur_pid}')
+                tup = (int(ppid_str), buf)
+                pid_chain.append(tup)
+                cur_pid = tup[0]
 
-        try:
-            import omnibus
-        except ImportError:
-            self.announce('deps not present, skipping pipx extras')
-        else:
-            self.announce('activating pipx extras')
+            """
+            29251 29243 /usr/local/Cellar/python@3.8/3.8.5/Frameworks/Python.framework/Versions/3.8/Resources/Python.app/Contents/MacOS/Python -u -c import sys, setuptools, tokenize; sys.argv[0] = '/private/var/folders/s7/z0_hyvy14txdpyh8j7j4bljr0000gn/T/pip-req    -build-9ehuvpb0/setup.py'; __file__='/private/var/folders/s7/z0_hyvy14txdpyh8j7j4bljr0000gn/T/pip-req-build-9ehuvpb0/setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exe    c')) bdist_wheel -d /private/var/folders/s7/z0_hyvy14txdpyh8j7j4bljr0000gn/T/pip-wheel-84jjswdf
+            29243 29235 /usr/local/Cellar/python@3.8/3.8.5/Frameworks/Python.framework/Versions/3.8/Resources/Python.app/Contents/MacOS/Python -m pip install --no-dependencies /Users/spinlock/src/wrmsr/iceworm/dist/iceworm-0.0.1.dev0.zip
+            29235 88867 /usr/local/Cellar/python@3.8/3.8.5/Frameworks/Python.framework/Versions/3.8/Resources/Python.app/Contents/MacOS/Python /usr/local/Cellar/pipx/0.15.5.1/libexec/bin/pipx install --verbose --force src/wrmsr/iceworm/dist/iceworm-0.0.1.dev0.zi    p
+            88867   713 -zsh
+            713     1 tmux -2
+            29279 29267 /usr/local/Cellar/python@3.8/3.8.5/Frameworks/Python.framework/Versions/3.8/Resources/Python.app/Contents/MacOS/Python -u -c import sys, setuptools, tokenize; sys.argv[0] = '/private/var/folders/s7/z0_hyvy14txdpyh8j7j4bljr0000gn/T/pip-req    -build-jr3wqzfh/setup.py'; __file__='/private/var/folders/s7/z0_hyvy14txdpyh8j7j4bljr0000gn/T/pip-req-build-jr3wqzfh/setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exe    c')) bdist_wheel -d /private/var/folders/s7/z0_hyvy14txdpyh8j7j4bljr0000gn/T/pip-wheel-_u9fhm5c
+            29267 29235 /usr/local/Cellar/python@3.8/3.8.5/Frameworks/Python.framework/Versions/3.8/Resources/Python.app/Contents/MacOS/Python -m pip install /Users/spinlock/src/wrmsr/iceworm/dist/iceworm-0.0.1.dev0.zip
+            29235 88867 /usr/local/Cellar/python@3.8/3.8.5/Frameworks/Python.framework/Versions/3.8/Resources/Python.app/Contents/MacOS/Python /usr/local/Cellar/pipx/0.15.5.1/libexec/bin/pipx install --verbose --force src/wrmsr/iceworm/dist/iceworm-0.0.1.dev0.zi    p
+            88867   713 -zsh
+            713     1 tmux -2
+            """
 
-            self.sysdeps = 1
-            self.cyaml = 1
+            with open('/tmp/asdf', 'a') as f:
+                f.write(repr(pid_chain) + '\n')
+
+            # self.announce('activating pipx extras')
+
+            # self.sysdeps = 1
+            # self.cyaml = 1
 
     def run(self):
         if self.sysdeps:
