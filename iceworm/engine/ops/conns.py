@@ -48,7 +48,7 @@ class ConnsOpExecutor(OpExecutor[ConnsOpT], lang.Abstract):
 
 
 class Transaction(Op):
-    conns: ta.AbstractSet[str] = dc.field(coerce=abs_set, check=lambda l: all(isinstance(o, str) for o in l))
+    conns: ta.AbstractSet[str] = dc.field(coerce=abs_set, check=lambda l: all(isinstance(o, str) and o for o in l))
     op: Op
 
 
