@@ -43,6 +43,7 @@ from .collections import Analysis
 from .collections import ElementSet
 from .phases import PHASES
 from .phases import Phase
+from .phases import Phases
 from .validations import Validation
 
 
@@ -63,21 +64,33 @@ class _ProcessedBy(dc.Pure):
 _ProcessedBy.EMPTY = _ProcessedBy([])
 
 
+def _coerce_phase_range(o):
+    if isinstance(o, Phase):
+        return (Phases.BOOTSTRAP, o)
+    elif isinstance(o, ta.Sequence):
+        l, r = o
+        return (l, r)
+    else:
+        raise TypeError(o)
+
+
 class PhaseFrozen(dc.Pure):
-    phase: Phase = dc.field(check=lambda o: isinstance(o, Phase))
+    range: ta.Tuple[Phase, Phase] = dc.field(
+        coerce=_coerce_phase_range,
+        check=lambda t: len(t) == 2 and all(isinstance(e, Phase) for e in t) and t[0] <= t[1])
 
 
 _PHASE_FROZEN_CACHE = weakref.WeakKeyDictionary()
 
 
-def _phase_frozen(cls: type) -> ta.Optional[Phase]:
+def _phase_frozen(cls: type) -> ta.Optional[ta.Tuple[Phase, Phase]]:
     try:
         return _PHASE_FROZEN_CACHE[cls]
     except KeyError:
         check.issubclass(cls, Element)
         pfi = dc.metadatas_dict(cls).get(PhaseFrozen)
         if pfi is not None:
-            pf = check.isinstance(pfi, PhaseFrozen).phase
+            pf = check.isinstance(pfi, PhaseFrozen).range
         else:
             pf = None
         _PHASE_FROZEN_CACHE[cls] = pf
@@ -302,7 +315,7 @@ class ElementProcessingDriver:
 
         for e in itertools.chain(added, removed):
             pf = _phase_frozen(type(e))
-            if pf is not None and pf < phase:
+            if pf is not None and not (pf[0] <= phase <= pf[1]):
                 raise ValueError(e, pf)
 
         for e in added:
@@ -368,7 +381,7 @@ class ElementProcessingDriver:
 
             elements = ElementSet.of([
                 dc.replace(e, meta={**e.meta, Frozen: Frozen})
-                if pf is not None and phase == pf and Frozen not in e.meta else e
+                if pf is not None and phase == pf[1] and Frozen not in e.meta else e
                 for e in elements
                 for pf in [_phase_frozen(type(e))]
             ])

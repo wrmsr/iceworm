@@ -37,7 +37,7 @@ class DomainInvalidation(Invalidation):
 class Materializer(els.Element):
 
     dc.metadata({
-        els.PhaseFrozen: els.PhaseFrozen(els.Phases.PLAN),
+        els.PhaseFrozen: els.PhaseFrozen((els.Phases.PLAN, els.Phases.PLAN)),
     })
 
     target: els.Ref[tars.Materialization] = dc.field(coerce=els.Ref.cls(tars.Materialization).of)
@@ -59,7 +59,7 @@ class InvalidatorTriggers(lang.Namespace):
 class Invalidator(els.Element):
 
     dc.metadata({
-        els.PhaseFrozen: els.PhaseFrozen(els.Phases.PLAN),
+        els.PhaseFrozen: els.PhaseFrozen((els.Phases.PLAN, els.Phases.PLAN)),
     })
 
     target: els.Ref[els.Element] = dc.field(coerce=els.Ref[els.Element].of)

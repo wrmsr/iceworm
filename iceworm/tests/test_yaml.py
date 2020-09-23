@@ -1,9 +1,9 @@
 from omnibus import lang
+from omnibus.dev.testing.helpers import skip_if_cant_import
 from omnibus.serde.objects import yaml as oyaml
-import pytest
 
 
-@pytest.mark.xfail
+@skip_if_cant_import('_yaml')
 def test_cyaml():
     src = """
 x: 1
