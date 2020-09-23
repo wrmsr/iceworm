@@ -84,7 +84,11 @@ class Transmuter(dispatch.Class):
 
         stmt = sa.select(items)
         if rels:
-            stmt = stmt.select_from(*rels)
+            rel = rels[0]
+            for cur_rel in rels[1:]:
+                # FIXME: general purpose 'true' element, true in pg, 1 in mysql, ...
+                rel = sa.join(rel, cur_rel, sa.text('true'))  # sa.literal(True)
+            stmt = stmt.select_from(rel)
         if where is not None:
             stmt = stmt.where(where)
         return stmt

@@ -9,6 +9,7 @@ table -> invalidation -> rows -> refresh -> ...
   V
 materializations
 """
+import logging
 import typing as ta
 
 from omnibus import check
@@ -30,6 +31,9 @@ from ...utils import set_dict
 from ..utils import parse_simple_select_table
 from ..utils import parse_simple_select_tables
 from .elements import Materializer
+
+
+log = logging.getLogger(__name__)
 
 
 class PlanningElementProcessor(els.InstanceElementProcessor):
@@ -105,8 +109,15 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
                 qb = self.input.analyze(els.queries.QueryBasicAnalysis)[rows][rows.query]
                 tqns = {t.name.name for t in qb.get_node_type_set(no.Table)}
                 check.state(all(n[0] == dst[0] for n in tqns))
+
                 reps = {n: QualifiedName(n[1:]) for n in tqns}
                 rq = ttfm.ReplaceNamesTransformer(reps)(check.isinstance(rows.query, AstQuery).root)
+
+                from ...trees import alchemy as alch
+                arq = alch.transmute(rq)
+                if log.isEnabledFor(logging.DEBUG):
+                    log.debug(repr(arq))
+
                 eq = f'insert into {QualifiedName(dst[1:]).dotted} {ren.render(rq)}'
                 return ops.Exec(dst[0], eq)
 
