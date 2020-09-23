@@ -3,7 +3,7 @@ import os
 import sys
 import warnings
 
-import setuptools.command.build_ext
+import setuptools.command.install
 
 import distutils.cmd
 import distutils.log
@@ -77,6 +77,34 @@ EXT_MODULES = [
 ]
 
 
+BREW_DEPS = {
+    'graphviz',
+    'libyaml',
+}
+
+
+class SysdepsCommand(distutils.cmd.Command):
+    description = 'install sysdeps'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        self.announce('Installing sysdeps')
+
+        if sys.platform == 'darwin':
+            import shutil
+            if not shutil.which('brew'):
+                self.announce('brew not found, skipping')
+                return
+
+            os.system(f'brew install {" ".join(BREW_DEPS)}')
+
+
 class CyamlCommand(distutils.cmd.Command):
     description = 'install cyaml'
     user_options = []
@@ -99,11 +127,31 @@ class CyamlCommand(distutils.cmd.Command):
         import urllib.request
         urllib.request.urlretrieve('http://pyyaml.org/download/pyyaml/PyYAML-5.3.1.tar.gz', fp)
 
-        import sys
         os.system(
             f'cd {dp} && '
             f'{os.path.abspath(sys.executable)} -m pip install cyaml.tar.gz --global-option="--with-libyaml"'
         )
+
+
+class InstallCommand(setuptools.command.install.install):
+    user_options = setuptools.command.install.install.user_options + [
+        ('cyaml', None, None),
+        ('sysdeps', None, None),
+    ]
+
+    def initialize_options(self):
+        super().initialize_options()
+
+        self.sysdeps = False  # noqa
+        self.cyaml = False  # noqa
+
+    def run(self):
+        if self.sysdeps:
+            self.run_command('sysdeps')
+        if self.cyaml:
+            self.run_command('cyaml')
+
+        super().run()
 
 
 if __name__ == '__main__':
@@ -116,6 +164,8 @@ if __name__ == '__main__':
 
         cmdclass={
             'cyaml': CyamlCommand,
+            'install': InstallCommand,
+            'sysdeps': SysdepsCommand,
         },
 
         python_requires=ABOUT['__python_requires__'],
