@@ -8,7 +8,6 @@ from .. import elements as els
 from ... import metadata as md
 from ...trees import transforms as ttfm
 from ...types import QualifiedName
-from .reflect import ReflectReferencedTablesProcessor
 from .reflect import StrictTableDependenciesAnalysis
 from .targets import Materialization
 from .targets import Rows
@@ -19,14 +18,7 @@ class JoinSplittingProcessor(els.InstanceElementProcessor):
 
     @classmethod
     def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
-        return {
-            *super().cls_dependencies(),
-
-            # FIXME: real dep is StrictTableDependenciesAnalysis, remove when driver understands analysis deps
-            ReflectReferencedTablesProcessor,
-
-            StrictTableDependenciesAnalysis,
-        }
+        return {*super().cls_dependencies(), StrictTableDependenciesAnalysis}
 
     class Instance(els.InstanceElementProcessor.Instance['JoinSplittingProcessor']):
 

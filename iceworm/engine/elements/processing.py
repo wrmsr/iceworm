@@ -1,5 +1,6 @@
 """
 TODO:
+ - cross-phase dep tracking..
  - ** some kind of rudimentary priority, internal only, prob read-only **
   - ** enforcements - enforce after every pass all refs resolve * and to correct type * **
   - *** NO - EAGER ANALYSES ***
@@ -224,45 +225,57 @@ class ElementProcessingDriver:
         processor_seqs_by_phase: ta.Mapping[Phase, ta.Sequence[ElementProcessor]] = by_phase
         return lambda es, phase: processor_seqs_by_phase.get(phase, [])
 
-    def _invoke_factory(
+    def _build_steps(
             self,
-            elements: ElementSet,
-            phase: Phase
-    ) -> ta.Tuple[
-        ta.Sequence[ElementProcessor],
-        ta.Sequence[ta.Type[Validation]],
-    ]:
-        items = list(self._factory(elements, phase))
-        eps, items = partition(items, lambda e: isinstance(e, ElementProcessor))
-        vals, items = partition(items, lambda e: isinstance(e, type) and issubclass(e, Validation))
-        check.empty(items)
-        return eps, vals
+            items: ta.Sequence[ta.Union[ElementProcessor, ta.Type[Analysis]]],
+            phase: Phase,
+    ) -> ta.Sequence[ta.AbstractSet[ElementProcessor]]:
+        if not items:
+            return []
 
-    def _build_steps(self, processors: ta.Sequence[ElementProcessor], phase: Phase) -> ta.Sequence[ta.AbstractSet[ElementProcessor]]:  # noqa
-        ep_dep_tys = {}
-        ep_sets_by_mro_cls = {}
-        for ep in processors:
-            check.not_in(ep, ep_dep_tys)
-            check.in_(phase, type(ep).phases())
-            ep_dep_tys[ep] = {
-                check.issubclass(d, ElementProcessor)
-                for d in type(ep).cls_dependencies()
-                if not issubclass(d, Analysis)
-            }
-            for mro_cls in type(ep).__mro__:
-                if issubclass(mro_cls, ElementProcessor) and mro_cls != ElementProcessor:
-                    ep_sets_by_mro_cls.setdefault(mro_cls, set()).add(ep)
+        deps_dct = {}
+        ep_seqs_by_cls = {}
+        for e in items:
+            if isinstance(e, ElementProcessor):
+                cls = type(e)
+                check.in_(phase, cls.phases())
+                ep_seqs_by_cls.setdefault(type(e), []).append(e)
+            elif isinstance(e, type) and issubclass(e, Analysis):
+                cls = e
+            else:
+                raise TypeError(e)
+            deps_dct[cls] = {check.issubclass(d, Dependable) for d in e.cls_dependencies()}
 
-        if ep_dep_tys:
-            ep_deps = {
-                ep: {dep for dt in dts for dep in check.not_empty(ep_sets_by_mro_cls[dt])}
-                for ep, dts in ep_dep_tys.items()
-            }
-            steps = list(ocol.toposort(ep_deps))
-        else:
-            steps = [processors]
+        todo = set(deps_dct)
+        while todo:
+            cur = todo.pop()
+            try:
+                deps = deps_dct[cur]
+            except KeyError:
+                deps = deps_dct[cur] = cur.cls_dependencies()
+            for dep in deps:
+                if dep in deps_dct:
+                    continue
+                check.issubclass(dep, Dependable)
+                if not issubclass(dep, Analysis) and issubclass(dep, lang.Final):
+                    raise Exception(f'Can only implicitly dep final analyses, not {dep}')
+                todo.add(dep)
 
-        return steps
+        sets_by_mro_cls = {}
+        for c in deps_dct:
+            for mro_cls in c.__mro__:
+                sets_by_mro_cls.setdefault(mro_cls, set()).add(c)
+
+        ep_deps = {
+            e: {mdep for dep in deps for mdep in check.not_empty(sets_by_mro_cls[dep])}
+            for e, deps in deps_dct.items()
+        }
+        steps = list(ocol.toposort(ep_deps))
+
+        return [
+            {e for c in step if issubclass(c, ElementProcessor) for e in ep_seqs_by_cls[c]}
+            for step in steps
+        ]
 
     def _sort_step(self, step: ta.Iterable[ElementProcessor]) -> ta.Sequence[ElementProcessor]:
         ep_sets_by_cls = {}
@@ -346,7 +359,11 @@ class ElementProcessingDriver:
         elements = self._strip_meta(elements)
 
         for phase in PHASES:
-            eps, vals = self._invoke_factory(elements, phase)
+            items = list(self._factory(elements, phase))
+            eps, items = partition(items, lambda e: isinstance(e, ElementProcessor))
+            vals, items = partition(items, lambda e: isinstance(e, type) and issubclass(e, Validation))
+            check.empty(items)
+
             steps = self._build_steps(eps, phase)
             steps = [self._sort_step(step) for step in steps]
 

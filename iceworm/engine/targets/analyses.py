@@ -3,6 +3,7 @@ import typing as ta
 from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
+from omnibus import lang
 from omnibus import properties
 
 from .. import elements as els
@@ -32,8 +33,8 @@ class RowsTableDependencies(dc.Frozen, allow_setattr=True):
         return els.ElementMap(ret)
 
 
-class TableDependenciesAnalysis(els.Analysis):
-    _strict: bool = False
+class AbstractTableDependenciesAnalysis(els.Analysis, lang.Abstract):
+    _strict: ta.ClassVar[bool]
 
     @classmethod
     def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
@@ -70,3 +71,7 @@ class TableDependenciesAnalysis(els.Analysis):
                 for t in self.elements.analyze(els.queries.QueryBasicAnalysis)[ele][ele.query].get_node_type_set(no.Table)  # noqa
             }]
         )
+
+
+class TableDependenciesAnalysis(AbstractTableDependenciesAnalysis, lang.Final):
+    _strict = False

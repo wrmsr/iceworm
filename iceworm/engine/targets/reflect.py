@@ -8,6 +8,7 @@ import typing as ta
 from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
+from omnibus import lang
 from omnibus import properties
 
 from .. import connectors as ctrs
@@ -15,6 +16,7 @@ from .. import elements as els
 from ... import metadata as md
 from ...trees import nodes as no
 from ...types import QualifiedName
+from .analyses import AbstractTableDependenciesAnalysis
 from .analyses import TableDependenciesAnalysis
 from .targets import Materialization
 from .targets import Rows
@@ -171,7 +173,7 @@ class ReflectReferencedTablesProcessor(els.InstanceElementProcessor):
             ])
 
 
-class StrictTableDependenciesAnalysis(TableDependenciesAnalysis):
+class StrictTableDependenciesAnalysis(AbstractTableDependenciesAnalysis, lang.Final):
     _strict: bool = True
 
     @classmethod
