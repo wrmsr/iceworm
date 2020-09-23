@@ -164,10 +164,10 @@ class InstallCommand(setuptools.command.install.install):
                 p2 = pid_chain[2][1].split()
 
                 if (
-                        len(p1) >= 6 and
+                        len(p1) >= 5 and
                         p1[0].lower().endswith('/python') and
                         p1[1:4] == ['-m', 'pip', 'install'] and
-                        p1[5] != '--no-dependencies' and
+                        p1[4] != '--no-dependencies' and
                         len(p2) >= 3 and
                         p2[0].lower().endswith('/python') and
                         p2[1].lower().endswith('/pipx')
