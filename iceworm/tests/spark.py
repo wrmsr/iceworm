@@ -61,7 +61,7 @@ class SparkManager(lc.ContextManageableLifecycle):
         cls = 'org.apache.spark.sql.hive.thriftserver.HiveThriftServer2'
         args = [
             f'--hiveconf hive.server2.thrift.port={port}',
-            '--name "Thrift JDBC/ODBC Server"',
+            '--name "Iceworm Test Thrift JDBC/ODBC Server"',
         ]
         cwd = self._lifecycle_exit_stack.enter_context(oos.tmp_dir())
         env = {
