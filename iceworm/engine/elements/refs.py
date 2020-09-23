@@ -57,7 +57,8 @@ class Ref(dc.Frozen, lang.Abstract, ta.Generic[ElementT], repr=False, eq=False, 
         super().__init_subclass__()
 
         check.isinstance(cls.ele_cls, type)
-        check.issubclass(cls.ele_cls, Element)
+        if cls.ele_cls is not Element:
+            check.issubclass(cls.ele_cls, Element)
         check.state(lang.Final in cls.__bases__)
         rc = cls.ele_cls
         check.not_in(rc, _REF_CLS_CACHE)

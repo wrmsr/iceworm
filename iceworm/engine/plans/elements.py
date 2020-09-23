@@ -62,5 +62,5 @@ class Invalidator(els.Element):
         els.PhaseFrozen: els.PhaseFrozen(els.Phases.PLAN),
     })
 
-    target: els.Ref[tars.Materialization] = dc.field(coerce=els.Ref.cls(tars.Materialization).of)
+    target: els.Ref[els.Element] = dc.field(coerce=els.Ref[els.Element].of)
     trigger: InvalidatorTrigger = dc.field(check=lambda o: isinstance(o, InvalidatorTrigger))

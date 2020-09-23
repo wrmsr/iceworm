@@ -60,8 +60,8 @@
     table: [system, notifications]
     query: "select 'hi' as message"
 
-- invalidator:
-    target: pg/a
-    trigger:
-      scheduled:
-        spec: '0 1 * * *'
+# - invalidator:
+#     target: pg/a
+#     trigger:
+#       scheduled:
+#         spec: '0 1 * * *'
