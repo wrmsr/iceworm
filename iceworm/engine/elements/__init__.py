@@ -30,3 +30,4 @@ from .processors import IdGeneratorProcessor  # noqa
 from .refs import Ref  # noqa
 from .refs import RefMap  # noqa
 from .refs import RefSet  # noqa
+from .validations import RefValidation  # noqa

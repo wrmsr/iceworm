@@ -42,6 +42,7 @@ from .collections import Analysis
 from .collections import ElementSet
 from .phases import PHASES
 from .phases import Phase
+from .validations import Validation
 
 
 log = logging.getLogger(__name__)
@@ -170,7 +171,8 @@ class InstanceElementProcessor(ElementProcessor, lang.Abstract):
         return inst.output
 
 
-ElementProcessorFactory = ta.Callable[[ElementSet, Phase], ta.Iterable[ElementProcessor]]
+DriverItem = ta.Union[ElementProcessor, ta.Type[Validation]]
+DriverItemFactory = ta.Callable[[ElementSet, Phase], ta.Iterable[DriverItem]]
 
 
 class ElementProcessingDriver:
@@ -183,17 +185,17 @@ class ElementProcessingDriver:
 
     def __init__(
             self,
-            processor_factory: ElementProcessorFactory,
+            factory: DriverItemFactory,
             *,
             config: Config = Config(),
     ) -> None:
         super().__init__()
 
-        self._processor_factory = check.callable(processor_factory)
+        self._factory = check.callable(factory)
         self._config = check.isinstance(config, self.Config)
 
     @classmethod
-    def build_factory(cls, processors: ta.Iterable[ElementProcessor]) -> ElementProcessorFactory:
+    def build_factory(cls, processors: ta.Iterable[ElementProcessor]) -> DriverItemFactory:
         lst = []
         seen = ocol.IdentitySet()
         by_phase = {}
@@ -209,7 +211,8 @@ class ElementProcessingDriver:
         return lambda es, phase: processor_seqs_by_phase.get(phase, [])
 
     def _build_steps(self, elements: ElementSet, phase: Phase) -> ta.Sequence[ta.AbstractSet[ElementProcessor]]:
-        eps = [check.isinstance(ep, ElementProcessor) for ep in self._processor_factory(elements, phase)]
+        items = list(self._factory(elements, phase))
+        eps = [check.isinstance(ep, ElementProcessor) for ep in items]
 
         ep_dep_tys = {}
         ep_sets_by_mro_cls = {}

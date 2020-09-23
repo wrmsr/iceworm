@@ -16,6 +16,7 @@ import omnibus.inject.scopes  # noqa
 
 from . import processors
 from . import queries
+from . import validations
 from .base import Element
 from .collections import ElementSet
 from .phases import PHASES
@@ -24,6 +25,7 @@ from .phases import PhasePair
 from .phases import Phases
 from .phases import SUB_PHASES
 from .phases import SubPhases
+from .processing import DriverItem
 from .processing import ElementProcessingDriver
 from .processing import ElementProcessor
 
@@ -173,7 +175,7 @@ class InjectionElementProcessingDriver:
 
         cur_phase: ta.Optional[Phase] = None
 
-        def fac(elements: ElementSet, phase: Phase) -> ta.Iterable[ElementProcessor]:
+        def fac(elements: ElementSet, phase: Phase) -> ta.Iterable[DriverItem]:
             nonlocal cur_phase
 
             if cur_phase is not None:
@@ -190,10 +192,12 @@ class InjectionElementProcessingDriver:
             enter(self._phase_scopes[PhasePair(cur_phase, SubPhases.PRE)])
             enter(self._phase_scopes[PhasePair(cur_phase, SubPhases.MAIN)])
 
-            return self._injector[inj.Key(ta.AbstractSet[ElementProcessor], phase)]
+            eps = self._injector[inj.Key(ta.AbstractSet[ElementProcessor], phase)]
+            vals = self._injector[inj.Key(ta.AbstractSet[ta.Type[validations.Validation]], phase)]
+            return [*eps, *vals]
 
         with self._injector._CURRENT(self._injector):
-            epd = self._injector[ta.Callable[..., ElementProcessingDriver]](processor_factory=fac)
+            epd = self._injector[ta.Callable[..., ElementProcessingDriver]](factory=fac)
         elements = epd.process(elements)
 
         return elements
@@ -232,6 +236,24 @@ def bind_element_processor(
         binder.new_set_binder(ElementProcessor, annotated_with=phase, in_=scope).bind(to=inj.Key(cls, phase))
 
 
+def bind_validation(
+        binder: inj.Binder,
+        cls: ta.Type[validations.Validation],
+        phases: ta.Union[Phase, ta.Iterable[Phase], None] = None,
+) -> None:
+    check.isinstance(binder, inj.Binder)
+    check.issubclass(cls, validations.Validation)
+
+    if phases is None:
+        phases = PHASES
+
+    for phase in get_phases(phases):
+        check.isinstance(phase, Phase)
+        scope = get_phase_scope(PhasePair(phase, SubPhases.MAIN))
+
+        binder.new_set_binder(ta.Type[validations.Validation], annotated_with=phase, in_=scope).bind(to_instance=cls)
+
+
 def bind_post_eager(
         binder: inj.Binder,
         key: ta.Union[inj.Key, ta.Type],
@@ -256,6 +278,7 @@ def _install_elements(binder: inj.Binder) -> inj.Binder:
         binder.new_set_binder(_Eager, annotated_with=s.phase_pair(), in_=s)
         if s.phase_pair().sub_phase == SubPhases.MAIN:
             binder.new_set_binder(ElementProcessor, annotated_with=s.phase_pair().phase, in_=s)
+            binder.new_set_binder(ta.Type[validations.Validation], annotated_with=s.phase_pair().phase, in_=s)
 
     binder._elements.append(inj.types.ScopeBinding(DriverScope))
     binder.bind(InjectionElementProcessingDriver, in_=DriverScope)
@@ -263,10 +286,11 @@ def _install_elements(binder: inj.Binder) -> inj.Binder:
     binder._elements.append(inj.types.ScopeBinding(_CurrentPhaseScope))
     binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(ElementSet), in_=_CurrentPhaseScope)
 
-    binder.bind_class(ElementProcessingDriver, assists={'processor_factory'})
+    binder.bind_class(ElementProcessingDriver, assists={'factory'})
 
     bind_element_processor(binder, queries.QueryParsingElementProcessor, Phases.TARGETS)
     bind_element_processor(binder, processors.IdGeneratorProcessor, PHASES)
+    bind_validation(binder, validations.RefValidation)
 
     return binder
 

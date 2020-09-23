@@ -3,6 +3,7 @@ import enum
 import typing as ta
 import uuid
 
+from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 import pytest
 
@@ -65,6 +66,8 @@ def test_serde():
     rt(datetime.datetime.now().time())
     rt(datetime.datetime.now())
     rt(uuid.uuid4())
+
+    serde.serialize(ocol.FrozenDict({1: 2, 3: 4}))
 
 
 def test_code_serde():
