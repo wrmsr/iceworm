@@ -31,7 +31,7 @@ class Invalidation(dc.Enum, sealed=True):
 
 
 class DomainInvalidation(Invalidation):
-    domain: md.domains.TupleDomain[str] = dc.field(check=lambda o: isinstance(o, md.domains.TupleDomain))
+    domain: md.domains.TupleDomain[str] = dc.field(check_type=md.domains.TupleDomain)
 
 
 class Materializer(els.Element):
@@ -43,7 +43,7 @@ class Materializer(els.Element):
     target: els.Ref[tars.Materialization] = dc.field(coerce=els.Ref.cls(tars.Materialization).of)
     srcs: ta.AbstractSet[els.Ref[tars.Materialization]] = dc.field(
         coerce=lambda o: frozenset([els.Ref.cls(tars.Materialization).of(e) for e in check.not_isinstance(o, str)]))
-    op: ops.Op = dc.field(check=lambda o: isinstance(o, ops.Op))
+    op: ops.Op = dc.field(check_type=ops.Op)
 
 
 class InvalidatorTrigger(dc.Enum):
@@ -63,4 +63,4 @@ class Invalidator(els.Element):
     })
 
     target: els.Ref[els.Element] = dc.field(coerce=els.Ref[els.Element].of)
-    trigger: InvalidatorTrigger = dc.field(check=lambda o: isinstance(o, InvalidatorTrigger))
+    trigger: InvalidatorTrigger = dc.field(check_type=InvalidatorTrigger)

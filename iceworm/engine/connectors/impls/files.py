@@ -41,8 +41,8 @@ class SchemaPolicies(lang.Namespace):
 
 
 class Mount(dc.Pure):
-    path: str = dc.field(check=lambda o: isinstance(o, str))
-    schema: SchemaPolicy = dc.field(check=lambda o: isinstance(o, SchemaPolicy))
+    path: str = dc.field(check_type=str)
+    schema: SchemaPolicy = dc.field(check_type=SchemaPolicy)
     globs: ta.Sequence[str] = dc.field(coerce=seq)
 
 

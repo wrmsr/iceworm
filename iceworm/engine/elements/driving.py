@@ -114,7 +114,7 @@ class ElementProcessingDriver:
         max_iterations: int = 1000
 
         step_shuffle: bool = False
-        step_shuffle_seed: ta.Optional[int] = dc.field(None, check=lambda o: isinstance(o, (int, type(None))))
+        step_shuffle_seed: ta.Optional[int] = dc.field(None, check_type=(int, None))
 
     def __init__(
             self,

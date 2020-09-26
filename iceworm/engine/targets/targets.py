@@ -30,7 +30,7 @@ class Target(els.Element, abstract=True):
 
 class Table(Target):
     id: els.Id = dc.field(None, check=els.id_check)
-    md: ta.Optional[md_.Table] = dc.field(None, check=lambda o: o is None or isinstance(o, md_.Table))
+    md: ta.Optional[md_.Table] = dc.field(None, check_type=(md_.Table, None))
 
 
 class Rows(Target):

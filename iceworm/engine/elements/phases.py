@@ -82,8 +82,8 @@ SUB_PHASES = list(SubPhases._by_value)
 
 
 class PhasePair(dc.Pure):
-    phase: Phase = dc.field(check=lambda o: isinstance(o, Phase))
-    sub_phase: SubPhase = dc.field(check=lambda o: isinstance(o, SubPhase))
+    phase: Phase = dc.field(check_type=Phase)
+    sub_phase: SubPhase = dc.field(check_type=SubPhase)
 
     @property
     def name(self) -> str:

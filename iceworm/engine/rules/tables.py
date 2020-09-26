@@ -12,9 +12,9 @@ from .base import Rule
 
 class TableAsSelect(Rule):
     table: QualifiedName = dc.field(coerce=QualifiedName.of)
-    query: str = dc.field(check=lambda o: isinstance(o, str))
+    query: str = dc.field(check_type=str)
 
-    md: ta.Optional[md_.Table] = dc.field(None, check=lambda o: o is None or isinstance(o, md_.Table), kwonly=True)
+    md: ta.Optional[md_.Table] = dc.field(None, check_type=(md_.Table, None), kwonly=True)
 
 
 class TableAsSelectProcessor(RuleProcessor[TableAsSelect]):
@@ -32,7 +32,7 @@ class TableAsSelectProcessor(RuleProcessor[TableAsSelect]):
 
 class InsertedRows(Rule):
     table: QualifiedName = dc.field(coerce=QualifiedName.of)
-    query: str = dc.field(check=lambda o: isinstance(o, str))
+    query: str = dc.field(check_type=str)
 
 
 class InsertedRowsProcessor(RuleProcessor[InsertedRows]):
