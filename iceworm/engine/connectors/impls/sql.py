@@ -22,7 +22,7 @@ from ..base import RowSource
 class SqlConnector(_Connector['SqlConnector', 'SqlConnector.Config']):
 
     class Config(_Connector.Config):
-        adapter: ta.Optional[sql.Adapter.Config] = dc.field(None, check=lambda o: o is None or isinstance(o, sql.Adapter.Config))  # noqa
+        adapter: ta.Optional[sql.Adapter.Config] = dc.field(None, check_type=(sql.Adapter.Config, None))
 
         url: ta.Optional[str] = dc.field(None, check=lambda s: s is None or (isinstance(s, str) and s), kwonly=True)
         url_secret: ta.Optional[sec.SecretKey] = dc.field(None, coerce=sec.SecretKey.of_optional, kwonly=True)
