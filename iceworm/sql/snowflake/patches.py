@@ -35,9 +35,6 @@ def patch_ssl_wrapper() -> None:
         ssl_wrap_socket.connection_.ssl_wrap_socket = ssl_wrap_socket_with_ocsp
 
 
-patch_ssl_wrapper()
-
-
 def patch_sqlalchemy_loader() -> None:
     name = 'snowflake'
     group = 'sqlalchemy.dialects'
@@ -49,4 +46,6 @@ def patch_sqlalchemy_loader() -> None:
     sqlalchemy.dialects.registry.impls[name] = impl.resolve
 
 
-patch_sqlalchemy_loader()
+def patch_all() -> None:
+    patch_ssl_wrapper()
+    patch_sqlalchemy_loader()

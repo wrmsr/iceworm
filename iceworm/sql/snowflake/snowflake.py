@@ -60,6 +60,7 @@ import sqlalchemy.ext.compiler  # noqa
 import sqlalchemy.sql.selectable  # noqa
 
 from ..adapter import Adapter as _Adapter
+from .patches import patch_all
 
 
 EXEC_MULTI_SP_SRC = """
@@ -130,6 +131,8 @@ $$ ;
 
 @lang.cached_nullary
 def get_config() -> ta.Mapping[str, str]:
+    patch_all()
+
     config_file_path = os.environ.get('ICEWORM_SNOWFLAKE_CONFIG_PATH')
     if config_file_path:
         with open(os.path.expanduser(config_file_path), 'r') as f:
