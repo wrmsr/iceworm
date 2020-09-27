@@ -175,7 +175,7 @@ class InjectionElementProcessingDriver:
 
         cur_phase: ta.Optional[Phase] = None
 
-        def fac(elements: ElementSet, phase: Phase) -> ta.Iterable[DriverItem]:
+        def fac(phase: Phase, elements: ElementSet) -> ta.Iterable[DriverItem]:
             nonlocal cur_phase
 
             if cur_phase is not None:

@@ -105,7 +105,7 @@ def has_processed(ep: 'ElementProcessor', e: Element) -> bool:
 
 
 DriverItem = ta.Union[ElementProcessor, ta.Type[Validation]]
-DriverItemFactory = ta.Callable[[ElementSet, Phase], ta.Iterable[DriverItem]]
+DriverItemFactory = ta.Callable[[Phase, ta.Optional[ElementSet]], ta.Iterable[DriverItem]]
 
 
 class ElementProcessingDriver:
@@ -141,7 +141,7 @@ class ElementProcessingDriver:
                 by_phase.setdefault(p, []).append(ep)
             seen.add(ep)
         processor_seqs_by_phase: ta.Mapping[Phase, ta.Sequence[ElementProcessor]] = by_phase
-        return lambda es, phase: processor_seqs_by_phase.get(phase, [])
+        return lambda phase, es: processor_seqs_by_phase.get(phase, [])
 
     def _build_steps(
             self,
@@ -277,7 +277,7 @@ class ElementProcessingDriver:
         elements = self._strip_meta(elements)
 
         for phase in PHASES:
-            items = list(self._factory(elements, phase))
+            items = list(self._factory(phase, elements))
             eps, items = partition(items, lambda e: isinstance(e, ElementProcessor))
             vals, items = partition(items, lambda e: isinstance(e, type) and issubclass(e, Validation))
             check.empty(items)
