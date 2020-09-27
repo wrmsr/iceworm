@@ -13,7 +13,6 @@ from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import http
 from omnibus import lifecycles as lc
-from omnibus import logs
 
 from . import resources
 from .. import protos
@@ -171,8 +170,3 @@ def main():
         log.info(f'Listening on port {port}')
         for _ in loop:
             pass
-
-
-if __name__ == '__main__':
-    logs.configure_standard_logging(logging.INFO)
-    main()

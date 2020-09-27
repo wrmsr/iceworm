@@ -5,8 +5,8 @@ import time
 
 from omnibus import argparse as oap
 from omnibus import asyncs as oas
-from omnibus import logs
 
+from .bootstrap import Bootstrap
 from .trees import analysis
 from .trees import parsing
 from .trees import rendering
@@ -89,8 +89,8 @@ class Cli(oap.Cli):
 
 
 def main():
-    logs.configure_standard_logging(logging.INFO)
-    Cli()()
+    with Bootstrap():
+        Cli()()
 
 
 if __name__ == '__main__':

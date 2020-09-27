@@ -1,5 +1,6 @@
 from omnibus import argparse as oap
-from omnibus import logs
+
+from .bootstrap import Bootstrap
 
 
 class Main(oap.Cli):
@@ -10,8 +11,8 @@ class Main(oap.Cli):
 
 
 def main():
-    logs.configure_standard_logging()
-    Main()()
+    with Bootstrap():
+        Main()()
 
 
 if __name__ == '__main__':
