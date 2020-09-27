@@ -51,7 +51,7 @@ nose==1.3.7
 numba==0.51.2
 numpy==1.19.2
 oauthlib==3.1.0
-omnibus @ git+https://github.com/wrmsr/omnibus@594e9ebf864205c4ceca7be24bdcf4e8b1723617
+omnibus @ git+https://github.com/wrmsr/omnibus@0a1b585959f942107c51bb081ff9d3142fb8be6d
 oscrypto==1.2.1
 packaging==20.4
 pandas==1.1.2
