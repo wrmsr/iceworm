@@ -1,5 +1,6 @@
+from omnibus.inject.dev.pytest import harness as har
+
 from .. import objman
-from ...tests import harness as har
 from ..postgres import PostgresAdapter
 from .helpers import DbManager
 

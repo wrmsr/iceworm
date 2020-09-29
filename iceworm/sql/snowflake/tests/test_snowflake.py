@@ -2,12 +2,12 @@ import contextlib
 import json
 
 from omnibus import check
+from omnibus.inject.dev.pytest import harness as har
 import sqlalchemy as sa
 
 from .. import snowflake
 from ... import elements
 from ... import tpch
-from ....tests import harness as har
 from ....types import QualifiedName
 from ...tests.helpers import DbManager
 

@@ -1,5 +1,5 @@
 from omnibus import lang
-from omnibus.dev.testing.helpers import skip_if_cant_import
+from omnibus.dev.pytest import skip_if_cant_import
 from omnibus.serde.objects import yaml as oyaml
 
 

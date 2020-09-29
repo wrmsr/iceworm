@@ -24,7 +24,8 @@ import typing as ta
 
 from omnibus import lang
 from omnibus import properties
-from omnibus.dev.testing.helpers import skip_if_cant_import
+from omnibus.dev.pytest import skip_if_cant_import
+from omnibus.inject.dev.pytest import harness as har
 from omnibus.spark import local as sl
 import pytest
 import sqlalchemy as sa
@@ -34,7 +35,6 @@ if ta.TYPE_CHECKING:
 else:
     ps = lang.proxy_import('pyspark')
 
-from . import harness as har
 from .spark import SparkManager
 
 

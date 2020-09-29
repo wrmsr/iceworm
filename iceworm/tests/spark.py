@@ -8,14 +8,14 @@ from omnibus import lang
 from omnibus import lifecycles as lc
 from omnibus import os as oos
 from omnibus import properties
+from omnibus.dev.pytest.plugins import switches
+from omnibus.inject.dev.pytest import harness as har
 from omnibus.spark import local as sl
 import sqlalchemy as sa
 
-from . import harness as har
 from ..utils import find_free_port
 from ..utils import ticking_timeout
 from ..utils import timebomb
-from .plugins import switches
 
 
 @har.bind(har.Session)

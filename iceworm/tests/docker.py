@@ -9,10 +9,10 @@ from omnibus import check
 from omnibus import docker
 from omnibus import lifecycles as lc
 from omnibus import properties
+from omnibus.dev.pytest.plugins import switches
+from omnibus.inject.dev.pytest import harness as har
 import yaml
 
-from . import harness as har
-from .plugins import switches
 
 
 @har.bind(har.Session)

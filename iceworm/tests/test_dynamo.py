@@ -1,6 +1,6 @@
+from omnibus.inject.dev.pytest import harness as har
 import boto3.dynamodb.conditions
 
-from . import harness as har
 from .docker import DockerManager
 
 

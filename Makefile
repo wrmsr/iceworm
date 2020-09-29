@@ -129,12 +129,13 @@ define do-deps
 	\
 	OMNIBUS_LOCAL=$$($(1)/bin/pip freeze | egrep '^omnibus ' | cut -d@ -f3) ; \
 	OMNIBUS_REMOTE=$$(git ls-remote https://github.com/wrmsr/omnibus wrmsr_working | awk '{print $$1}') ; \
+	echo "omnibus local@$$OMNIBUS_LOCAL remote@$$OMNIBUS_REMOTE" ; \
 	if [ "$$OMNIBUS_LOCAL" != "$$OMNIBUS_REMOTE" ] ; then \
 		$(1)/bin/pip uninstall -y omnibus ; \
 		if [ $(2) == "1" ] ; then \
 			export __OMNIBUS_DEV=1 ; \
 		fi ; \
-		$(1)/bin/pip install --no-build-isolation --verbose $(PIP_ARGS) git+https://github.com/wrmsr/omnibus@wrmsr_working ; \
+		$(1)/bin/pip install --no-build-isolation $(PIP_ARGS) git+https://github.com/wrmsr/omnibus@wrmsr_working ; \
 	fi ; \
 	\
 	if [ -d "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/" ] ; then \
@@ -314,6 +315,7 @@ test-verbose: build
 .PHONY: deps
 deps: venv
 	$(call do-deps,.venv,1)
+	$(MAKE) dep-freeze dep-setup
 
 .PHONY: deps-38
 deps-38: venv-38

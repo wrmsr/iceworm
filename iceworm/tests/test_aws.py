@@ -1,7 +1,7 @@
+from omnibus.inject.dev.pytest import harness as har
 import boto3
 import botocore.client
 
-from . import harness as har
 from .docker import DockerManager
 
 

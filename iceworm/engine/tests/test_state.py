@@ -6,11 +6,11 @@ import dataclasses as dc
 import os.path
 
 from omnibus import lang
+from omnibus.inject.dev.pytest import harness as har
 import sqlalchemy as sa
 
 from .. import state as st
 from ...sql.tests.helpers import DbManager
-from ...tests import harness as har
 
 
 @dc.dataclass(frozen=True)

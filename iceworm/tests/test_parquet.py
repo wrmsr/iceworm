@@ -4,7 +4,7 @@ https://arrow.apache.org/docs/python/parquet.html
 import os.path
 import tempfile
 
-from omnibus.dev.testing.helpers import skip_if_cant_import
+from omnibus.dev.pytest import skip_if_cant_import
 
 
 @skip_if_cant_import('pyarrow')

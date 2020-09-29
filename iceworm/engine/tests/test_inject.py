@@ -9,6 +9,7 @@ from omnibus import dataclasses as dc
 from omnibus import inject as inj
 from omnibus import lang  # noqa
 from omnibus import os as oos  # noqa
+from omnibus.inject.dev.pytest import harness as har
 import pytest  # noqa
 import yaml  # noqa
 
@@ -21,7 +22,6 @@ from .. import sites
 from .. import targets as tars  # noqa
 from ... import sql
 from ...sql.tests.helpers import DbManager
-from ...tests import harness as har
 from ...trees import nodes as no
 from ...trees import parsing as par
 from ...types import QualifiedName  # noqa
