@@ -131,11 +131,13 @@ define do-deps
 	OMNIBUS_REMOTE=$$(git ls-remote https://github.com/wrmsr/omnibus wrmsr_working | awk '{print $$1}') ; \
 	echo "omnibus local@$$OMNIBUS_LOCAL remote@$$OMNIBUS_REMOTE" ; \
 	if [ "$$OMNIBUS_LOCAL" != "$$OMNIBUS_REMOTE" ] ; then \
+		A="" ; \
 		$(1)/bin/pip uninstall -y omnibus ; \
 		if [ $(2) == "1" ] ; then \
 			export __OMNIBUS_DEV=1 ; \
+			A="$$A --no-build-isolation" ; \
 		fi ; \
-		$(1)/bin/pip install --no-build-isolation $(PIP_ARGS) git+https://github.com/wrmsr/omnibus@wrmsr_working ; \
+		$(1)/bin/pip install $$A $(PIP_ARGS) git+https://github.com/wrmsr/omnibus@wrmsr_working ; \
 	fi ; \
 	\
 	if [ -d "/Applications/PyCharm.app/Contents/plugins/python/helpers/pydev/" ] ; then \
