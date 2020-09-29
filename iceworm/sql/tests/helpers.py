@@ -2,11 +2,11 @@ from omnibus import lang
 from omnibus import lifecycles as lc
 from omnibus import properties
 from omnibus.dev.pytest.plugins import switches
+from omnibus.docker.dev.pytest import DockerManager
 from omnibus.inject.dev.pytest import harness as har
 import sqlalchemy as sa
 
 from .. import snowflake
-from ...tests.docker import DockerManager
 
 
 @har.bind(har.Function)

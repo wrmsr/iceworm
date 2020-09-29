@@ -66,7 +66,7 @@ INSTALL_REQUIRES = [
     'SQLAlchemy>=1.3',
 
     # @omnibus-dep@
-    'omnibus @ git+https://github.com/wrmsr/omnibus@d0c7fccb5327e0f2a7c82856071bfc5aa55411c3',
+    'omnibus @ git+https://github.com/wrmsr/omnibus@1e51d3462ad6dc1b009a89bc3b2b4edf0420ba35',
 
 ]
 

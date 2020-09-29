@@ -1,7 +1,6 @@
+from omnibus.docker.dev.pytest import DockerManager
 from omnibus.inject.dev.pytest import harness as har
 import boto3.dynamodb.conditions
-
-from .docker import DockerManager
 
 
 def test_docker_dynamo(harness: har.Harness):

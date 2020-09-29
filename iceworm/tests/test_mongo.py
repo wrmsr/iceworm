@@ -1,7 +1,6 @@
+from omnibus.docker.dev.pytest import DockerManager
 from omnibus.inject.dev.pytest import harness as har
 import pymongo
-
-from .docker import DockerManager
 
 
 def test_docker_mongo(harness: har.Harness):

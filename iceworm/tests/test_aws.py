@@ -1,8 +1,7 @@
+from omnibus.docker.dev.pytest import DockerManager
 from omnibus.inject.dev.pytest import harness as har
 import boto3
 import botocore.client
-
-from .docker import DockerManager
 
 
 def test_docker_s3(harness: har.Harness):
