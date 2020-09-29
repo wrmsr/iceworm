@@ -3,6 +3,7 @@ import os
 import sys
 import warnings
 
+import setuptools.command.build_py
 import setuptools.command.install
 
 import distutils.cmd
@@ -184,6 +185,16 @@ class InstallCommand(setuptools.command.install.install):
             self.run_command('cyaml')
 
         super().run()
+
+
+def new_build_py_find_package_modules(self, package, package_dir):
+    modules = old_build_py_find_package_modules(self, package, package_dir)
+    if package == PROJECT:
+        modules = [t for t in modules if t[1] != 'conftest']
+    return modules
+
+old_build_py_find_package_modules = setuptools.command.build_py.build_py.find_package_modules  # noqa
+setuptools.command.build_py.build_py.find_package_modules = new_build_py_find_package_modules  # noqa
 
 
 if __name__ == '__main__':
