@@ -1,8 +1,4 @@
-import collections.abc
-import contextlib
 import inspect
-import socket
-import time
 import typing as ta
 
 from omnibus import check
@@ -129,61 +125,3 @@ FALSE_STRS = {'false', 'False', 'FALSE', 'no', 'No', 'NO', '0'}
 FALSE_VALS = {False, 0, *FALSE_STRS}
 
 check.empty(TRUE_VALS & FALSE_VALS)
-
-
-def _dc_only_test(v: ta.Any) -> bool:
-    if v is None:
-        return False
-    elif isinstance(v, collections.abc.Iterable):
-        return bool(v)
-    else:
-        return True
-
-
-def dc_only(
-        obj: ta.Any,
-        flds: ta.Iterable[str],
-        *,
-        all: bool = False,
-        test: ta.Callable[[ta.Any], bool] = _dc_only_test,
-) -> bool:
-    if isinstance(flds, str):
-        raise TypeError(flds)
-    fdct = dc.fields_dict(obj)
-    for fn in flds:
-        if fn not in fdct:
-            raise KeyError(fn)
-    rem = set(flds)
-    for fn, f in fdct.items():
-        if not f.compare and fn not in rem:
-            continue
-        v = getattr(obj, fn)
-        if test(v):
-            if fn in rem:
-                rem.remove(fn)
-            else:
-                return False
-    if rem and all:
-        return False
-    return True
-
-
-class TimeoutException(Exception):
-    pass
-
-
-def ticking_timeout(s: ta.Union[int, float, None]) -> ta.Callable[[], None]:
-    if s is None:
-        return lambda: None
-    def tick():  # noqa
-        if time.time() >= deadline:
-            raise TimeoutException
-    deadline = time.time() + s
-    return tick
-
-
-def find_free_port() -> int:
-    with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
-        s.bind(('', 0))
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        return s.getsockname()[1]

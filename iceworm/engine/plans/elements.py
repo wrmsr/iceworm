@@ -16,6 +16,7 @@ TODO:
 import typing as ta
 
 from omnibus import check
+from omnibus import cron
 from omnibus import dataclasses as dc
 from omnibus import lang
 
@@ -23,7 +24,6 @@ from .. import elements as els
 from .. import ops
 from .. import targets as tars
 from ... import metadata as md
-from ...utils import cron
 
 
 class Invalidation(dc.Enum, sealed=True):

@@ -27,6 +27,7 @@ from omnibus import properties
 from omnibus.dev.pytest import skip_if_cant_import
 from omnibus.inject.dev.pytest import harness as har
 from omnibus.spark import local as sl
+from omnibus.spark.dev.pytest.manager import SparkManager
 import pytest
 import sqlalchemy as sa
 
@@ -34,8 +35,6 @@ if ta.TYPE_CHECKING:
     import pyspark as ps
 else:
     ps = lang.proxy_import('pyspark')
-
-from .spark import SparkManager
 
 
 class Driver:

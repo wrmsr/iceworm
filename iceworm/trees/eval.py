@@ -3,11 +3,11 @@ import operator
 import typing as ta
 
 from omnibus import check
+from omnibus import dataclasses as dc
 from omnibus import dispatch
 
 from . import nodes as no
 from ..types import QualifiedName
-from ..utils import dc_only
 
 
 StrMap = ta.Mapping[str, ta.Any]
@@ -29,7 +29,7 @@ class StmtEvaluator(dispatch.Class):
         raise TypeError(node)
 
     def eval(self, node: no.Select) -> ta.Sequence[StrMap]:  # noqa
-        check.arg(dc_only(node, ['items', 'relations', 'where']))
+        check.arg(dc.only(node, ['items', 'relations', 'where']))
 
         if list(node.items) == [no.AllSelectItem()]:
             if len(node.relations) != 1:
@@ -67,7 +67,7 @@ class RelationEvaluator(dispatch.Class):
         raise TypeError(node)
 
     def eval(self, node: no.Join) -> ta.Sequence[StrMap]:  # noqa
-        check.arg(dc_only(node, ['left', 'type', 'right']))
+        check.arg(dc.only(node, ['left', 'type', 'right']))
         check.arg(node.type == no.JoinType.DEFAULT)
 
         left = self.eval(node.left)

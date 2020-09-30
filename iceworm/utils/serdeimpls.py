@@ -6,6 +6,7 @@ import typing as ta
 import uuid
 
 from omnibus import check
+from omnibus import cron
 from omnibus import lang
 
 from .serde import AutoSerde
@@ -92,3 +93,12 @@ class UuidSerde(AutoSerde[uuid.UUID]):
         check.isinstance(ser, str)
         check.arg(self.PATTERN.fullmatch(ser) is not None)
         return uuid.UUID(ser.replace('-', ''))
+
+
+class CronSpecSerde(AutoSerde[cron.Spec]):
+
+    def serialize(self, obj: cron.Spec) -> ta.Any:
+        return str(obj)
+
+    def deserialize(self, ser: ta.Any) -> cron.Spec:
+        return cron.Spec.of(ser)

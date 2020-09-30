@@ -1,17 +1,17 @@
 import typing as ta
 
 from omnibus import check
+from omnibus import dataclasses as dc
 
 from ..trees import analysis as tana
 from ..trees import nodes as no
 from ..trees import parsing as par
 from ..types import QualifiedName
-from ..utils import dc_only
 
 
 def is_simple_select(root: no.Select) -> bool:
     check.isinstance(root, no.Select)
-    return dc_only(root, ['items', 'relations'])
+    return dc.only(root, ['items', 'relations'])
 
 
 def parse_simple_select_tables(query: str) -> ta.AbstractSet[QualifiedName]:

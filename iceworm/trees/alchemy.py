@@ -1,10 +1,10 @@
 from omnibus import check
+from omnibus import dataclasses as dc
 from omnibus import dispatch
 import sqlalchemy as sa
 import sqlalchemy.sql.elements
 
 from . import nodes as no
-from ..utils import dc_only
 
 
 Visitable = sa.sql.elements.Visitable
@@ -59,7 +59,7 @@ class Transmuter(dispatch.Class):
         return sa.literal_column(node.name.dotted)
 
     def transmute(self, node: no.Select) -> Visitable:  # noqa
-        check.arg(dc_only(node, ['items', 'relations', 'where']))
+        check.arg(dc.only(node, ['items', 'relations', 'where']))
 
         items = []
         for i in node.items:

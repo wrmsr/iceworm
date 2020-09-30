@@ -4,15 +4,15 @@ import json  # noqa
 import os.path
 import typing as ta
 
-from omnibus.antlr import ParseException
 from omnibus import check
 from omnibus import dataclasses as dc
+from omnibus.antlr import ParseException
+from omnibus.graphs.dot import dot
 import pytest
 
 from .. import nodes as no
 from .. import parsing
 from .. import rendering
-from ...utils import dot
 from ...utils import serde
 from .._antlr.IceSqlParser import IceSqlParserConfig
 
