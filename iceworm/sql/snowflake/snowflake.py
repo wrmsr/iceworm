@@ -152,6 +152,11 @@ def get_config() -> ta.Mapping[str, str]:
 @lang.cached_nullary
 def get_url() -> str:
     cfg = get_config()
+
+    if 'host' not in cfg:
+        from snowflake.sqlalchemy import URL
+        return str(URL(**cfg))
+
     not_url_params = {'user', 'password', 'host'}
     url_params = {k.lower(): v for k, v in cfg.items() if k not in not_url_params}
     return (
