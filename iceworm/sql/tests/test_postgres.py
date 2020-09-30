@@ -6,11 +6,11 @@ import urllib.parse
 
 from omnibus import lang
 from omnibus import threading as othr
+from omnibus.dev.testing import call_many_with_timeout
 from omnibus.inject.dev.pytest import harness as har
 import sqlalchemy as sa
 
 from .. import tpch
-from ...tests.helpers import call_many_with_timeout
 from ..postgres import PostgresAdapter
 from .helpers import DbManager
 

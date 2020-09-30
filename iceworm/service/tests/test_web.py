@@ -5,10 +5,10 @@ import urllib.request
 from omnibus import http
 from omnibus import inject as inj
 from omnibus import lifecycles as lc
+from omnibus.dev.testing import run_with_timeout
 
 from .. import inject
 from .. import web
-from ...tests.helpers import run_with_timeout
 from ...utils import inject as utinj
 
 
