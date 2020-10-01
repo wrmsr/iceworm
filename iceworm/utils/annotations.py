@@ -77,9 +77,6 @@ class Annotations(
         return bool(self.anns)
 
     def keys(self) -> ta.Iterator[ta.Type[AnnotationT]]:
-        # The presence of this method enables use in splatting: {**anns, ...}:
-        #   https://github.com/python/cpython/blob/4e02981de0952f54bf87967f8e10d169d6946b40/Objects/dictobject.c#L2451
-        #   https://github.com/python/cpython/blob/4e02981de0952f54bf87967f8e10d169d6946b40/Objects/abstract.c#L2195
         return iter(self._anns_by_cls.keys())
 
     def __getitem__(self, cls: ta.Type[AnnotationT]) -> AnnotationT:
