@@ -40,7 +40,7 @@ class ReprFn:
         if inspect.isfunction(obj):
             obj = fn.__code__
         lnum = obj.co_firstlineno
-        return f'ReprFn(<{file}:{lnum}>)'
+        return f'ReprFn(<{file}:{lnum}:{self._fn!r}>)'
 
     def __get__(self, instance, owner=None):
         return ReprFn(self._fn.__get__(instance, owner))
