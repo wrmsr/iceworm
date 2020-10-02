@@ -56,7 +56,7 @@ def bind_op_executor(binder: inj.Binder, op_cls: ta.Type[Op], oe_cls: ta.Type[Op
 def _install_execution(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
-    binder._elements.append(inj.types.ScopeBinding(ExecutionScope))
+    binder.bind_scope(ExecutionScope)
     binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(ctrs.ConnectorSet), in_=ExecutionScope)
     binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(ctrs.ConnectionSet), in_=ExecutionScope)
 

@@ -67,7 +67,7 @@ INSTALL_REQUIRES = [
     'SQLAlchemy>=1.3',
 
     # @omnibus-dep@
-    'omnibus @ git+https://github.com/wrmsr/omnibus@7fbfb151efe4254d78eb4953813db0bec9a99ad5',
+    'omnibus @ git+https://github.com/wrmsr/omnibus@7155ea2131127db501b189de3ce288e710711df8',
 
 ]
 
@@ -126,7 +126,15 @@ class CyamlCommand(distutils.cmd.Command):
         fp = os.path.join(dp, 'cyaml.tar.gz')
 
         import urllib.request
-        urllib.request.urlretrieve('http://pyyaml.org/download/pyyaml/PyYAML-5.3.1.tar.gz', fp)
+        urllib.request.urlretrieve('https://pyyaml.org/download/pyyaml/PyYAML-5.3.1.tar.gz', fp)
+
+        import hashlib
+        sha = hashlib.sha1()
+        with open(fp, 'rb') as f:
+            sha.update(f.read())
+        digest = sha.hexdigest()
+        if digest != '3b20272e119990b2bbeb03815a1dd3f3e48af07e':
+            raise ValueError(f'Hash cyaml mismatch: {digest}')
 
         os.system(
             f'cd {dp} && '

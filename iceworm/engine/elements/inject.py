@@ -274,16 +274,16 @@ def _install_elements(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
     for s in _PhaseScope._subclass_map.values():
-        binder._elements.append(inj.types.ScopeBinding(s))
+        binder.bind_scope(s)
         binder.new_set_binder(_Eager, annotated_with=s.phase_pair(), in_=s)
         if s.phase_pair().sub_phase == SubPhases.MAIN:
             binder.new_set_binder(ElementProcessor, annotated_with=s.phase_pair().phase, in_=s)
             binder.new_set_binder(ta.Type[validations.Validation], annotated_with=s.phase_pair().phase, in_=s)
 
-    binder._elements.append(inj.types.ScopeBinding(DriverScope))
+    binder.bind_scope(DriverScope)
     binder.bind(InjectionElementProcessingDriver, in_=DriverScope)
 
-    binder._elements.append(inj.types.ScopeBinding(_CurrentPhaseScope))
+    binder.bind_scope(_CurrentPhaseScope)
     binder.bind_callable(lambda: lang.raise_(RuntimeError), key=inj.Key(ElementSet), in_=_CurrentPhaseScope)
 
     binder.bind_class(ElementProcessingDriver, assists={'factory'})
