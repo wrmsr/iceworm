@@ -374,3 +374,10 @@ class Box(lang.Abstract, ta.Generic[T], metaclass=_BoxMeta):
             return cls(obj)   # noqa  # type: ignore
         else:
             raise TypeError(obj)
+
+    @classmethod
+    def of_optional(cls: BoxT, obj: ta.Union[None, 'BoxT', T]) -> ta.Optional[BoxT]:  # type: ignore
+        if obj is None:
+            return None
+        else:
+            return cls.of(obj)
