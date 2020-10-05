@@ -2,10 +2,10 @@ import typing as ta  # noqa
 
 from omnibus import check
 from omnibus import inject as inj
+from omnibus.configs import inject as cfgs_inj
 
 from . import impls
 from .. import elements as els
-from ...utils import configable as cfgabl
 from .collections import ConnectionSet  # noqa
 from .collections import Connector
 from .collections import ConnectorSet
@@ -16,13 +16,13 @@ def bind_connector_impl(binder: inj.Binder, impl_cls: ta.Type[Connector]) -> Non
     check.isinstance(binder, inj.Binder)
     check.issubclass(impl_cls, Connector)
 
-    cfgabl.bind_impl(binder, Connector, impl_cls)
+    cfgs_inj.bind_impl(binder, Connector, impl_cls)
 
 
 def _install_elements(binder: inj.Binder) -> inj.Binder:
     check.isinstance(binder, inj.Binder)
 
-    cfgabl.bind_factory(binder, Connector)
+    cfgs_inj.bind_factory(binder, Connector)
 
     bind_connector_impl(binder, impls.computed.ComputedConnector)
     bind_connector_impl(binder, impls.dual.DualConnector)

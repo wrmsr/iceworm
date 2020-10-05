@@ -3,13 +3,13 @@ appnope==0.1.0
 asn1crypto==1.4.0
 attrs==20.2.0
 azure-common==1.1.25
-azure-core==1.8.1
+azure-core==1.8.2
 azure-storage-blob==12.5.0
 backcall==0.2.0
 bleach==3.2.1
-boto3==1.15.10
-boto3-stubs==1.15.10.0
-botocore==1.18.10
+boto3==1.15.11
+boto3-stubs==1.15.11.0
+botocore==1.18.11
 certifi==2020.6.20
 cffi==1.14.3
 chardet==3.0.4
@@ -24,10 +24,10 @@ docker==4.3.1
 docutils==0.15.2
 execnet==1.7.1
 fastparquet==0.4.1
-flake8==3.8.3
+flake8==3.8.4
 future==0.18.2
 gprof2dot==2019.11.30
-humanize==3.0.0
+humanize==3.0.1
 idna==2.9
 importlib-metadata==2.0.0
 iniconfig==1.0.1
@@ -51,7 +51,7 @@ nose==1.3.7
 numba==0.51.2
 numpy==1.19.2
 oauthlib==3.1.0
-omnibus @ git+https://github.com/wrmsr/omnibus@e14b3462741a9b96242bfd59806c304c8d51df7a
+omnibus @ git+https://github.com/wrmsr/omnibus@a69d8a4128767372ca4120611c1d52f4dec4526b
 oscrypto==1.2.1
 packaging==20.4
 pandas==1.1.2
@@ -86,7 +86,7 @@ pyOpenSSL==19.1.0
 pyparsing==2.4.7
 pyspark==3.0.1
 pyspark-stubs==3.0.0.post1
-pytest==6.1.0
+pytest==6.1.1
 pytest-asyncio==0.14.0
 pytest-benchmark==3.2.3
 pytest-clarity==0.3.0a0
@@ -129,4 +129,4 @@ wcwidth==0.2.5
 webencodings==0.5.1
 websocket-client==0.57.0
 z3-solver==4.8.9.0
-zipp==3.2.0
+zipp==3.3.0

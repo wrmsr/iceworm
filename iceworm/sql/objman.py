@@ -12,12 +12,12 @@ TODO:
 select pid, backend_start from pg_stat_activity
 """
 from omnibus import check
+from omnibus import configs as cfgs
 from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import lifecycles as lc
 import sqlalchemy as sa
 
-from ..utils import configable as cfgabl
 from .adapter import Adapter
 
 
@@ -31,9 +31,9 @@ class NamingPolicy:
     pass
 
 
-class ObjectManager(lc.ContextManageableLifecycle, cfgabl.Configable['ObjectManager.Config']):
+class ObjectManager(lc.ContextManageableLifecycle, cfgs.Configurable['ObjectManager.Config']):
 
-    class Config(dc.Pure, cfgabl.Configable.Config):
+    class Config(dc.Pure, cfgs.Config):
         pass
 
     def __init__(self, engine: sa.engine.Engine, adapter: Adapter, config: Config = Config()) -> None:

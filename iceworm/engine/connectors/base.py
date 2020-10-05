@@ -36,6 +36,7 @@ import abc
 import typing as ta
 
 from omnibus import check
+from omnibus import configs as cfgs
 from omnibus import dataclasses as dc
 from omnibus import defs
 from omnibus import lang
@@ -43,7 +44,6 @@ from omnibus import lang
 from .. import elements as els
 from ... import metadata as md
 from ...types import QualifiedName
-from ...utils import configable as cfgabl
 from ...utils import serde
 
 
@@ -101,13 +101,13 @@ class ListRowSink(RowSink):
         self._rows.extend(rows)
 
 
-class Connector(ta.Generic[ConnectorT, ConnectorConfigT], cfgabl.Configable[ConnectorConfigT], lang.Abstract):
+class Connector(ta.Generic[ConnectorT, ConnectorConfigT], cfgs.Configurable[ConnectorConfigT], lang.Abstract):
 
-    class Config(els.Element, cfgabl.Configable.Config, abstract=True):
+    class Config(els.Element, cfgs.Config, abstract=True):
 
         dc.metadata({
             els.PhaseFrozen: els.PhaseFrozen(els.Phases.CONNECTORS),
-            serde.Name: lambda cls: lang.decamelize(cfgabl.get_impl(cls).__name__),
+            serde.Name: lambda cls: lang.decamelize(cfgs.get_impl(cls).__name__),
         })
 
         id: els.Id = dc.field(check=lambda s: isinstance(s, els.Id) and s)
@@ -137,7 +137,7 @@ class Connector(ta.Generic[ConnectorT, ConnectorConfigT], cfgabl.Configable[Conn
         if isinstance(obj, Connector):
             return obj
         elif isinstance(obj, Connector.Config):
-            return check.isinstance(check.issubclass(cfgabl.get_impl(obj), cls)(obj), Connector)
+            return check.isinstance(check.issubclass(cfgs.get_impl(obj), cls)(obj), Connector)
         else:
             raise TypeError(obj)
 
