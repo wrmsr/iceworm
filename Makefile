@@ -315,7 +315,7 @@ test-verbose: build
 ### Deps
 
 .PHONY: deps
-deps: venv
+deps: venv dep-unfreeze
 	$(call do-deps,.venv,1)
 	$(MAKE) dep-freeze dep-setup
 
