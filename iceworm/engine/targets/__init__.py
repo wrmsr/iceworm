@@ -1,6 +1,7 @@
 from . import infer  # noqa
 from . import inject  # noqa
 from . import reflect  # noqa
+from .analyses import NamespaceAnalysis  # noqa
 from .analyses import RowsTableDependencies  # noqa
 from .analyses import TableDependenciesAnalysis  # noqa
 from .reflect import StrictTableDependenciesAnalysis  # noqa

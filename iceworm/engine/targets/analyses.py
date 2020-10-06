@@ -1,3 +1,4 @@
+import abc
 import typing as ta
 
 from omnibus import check
@@ -6,6 +7,7 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import properties
 
+from .. import connectors as ctrs
 from .. import elements as els
 from ...trees import nodes as no
 from ...types import QualifiedName
@@ -34,7 +36,10 @@ class RowsTableDependencies(dc.Frozen, allow_setattr=True):
 
 
 class AbstractTableDependenciesAnalysis(els.Analysis, lang.Abstract):
-    _strict: ta.ClassVar[bool]
+
+    @abc.abstractproperty
+    def _strict(self) -> bool:
+        raise NotImplementedError
 
     @classmethod
     def cls_dependencies(cls) -> ta.Iterable[ta.Type[els.Dependable]]:
@@ -75,3 +80,14 @@ class AbstractTableDependenciesAnalysis(els.Analysis, lang.Abstract):
 
 class TableDependenciesAnalysis(AbstractTableDependenciesAnalysis, lang.Final):
     _strict = False
+
+
+class NamespaceAnalysis(els.Analysis):
+
+    @properties.cached
+    @property
+    def namespace(self) -> ta.Mapping[ctrs.Connector.Config, ta.Mapping[Table, ta.AbstractSet[Materialization]]]:
+        dct = ocol.IdentityKeyDict()
+        for mat in self.elements.get_type_set(Materialization):
+            dct.setdefault(mat.connector, ocol.IdentityKeyDict()).setdefault(mat.table, ocol.IdentitySet()).add(mat)
+        return els.ElementMap((ctr, els.ElementMap((tbl, els.ElementSet(mats)) for tbl, mats in d2.items())) for ctr, d2 in dct.items())  # noqa
