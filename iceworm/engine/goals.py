@@ -117,7 +117,7 @@ selectors:
                 - 'package:snowplow'
                 - 'config.materialized:incremental'
             - export_performance_timing
-"""
+"""  # noqa
 import typing as ta
 
 from omnibus import dataclasses as dc

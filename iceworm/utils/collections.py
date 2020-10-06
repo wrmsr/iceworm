@@ -362,6 +362,9 @@ class Box(lang.Abstract, ta.Generic[T], metaclass=_BoxMeta):
             raise TypeError(other)
         return self._value < other._value  # type: ignore
 
+    def __bool__(self) -> bool:
+        return bool(self._value)
+
     @property
     def value(self) -> T:
         return self._value
