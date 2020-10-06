@@ -89,5 +89,5 @@ class NamespaceAnalysis(els.Analysis):
     def namespace(self) -> ta.Mapping[ctrs.Connector.Config, ta.Mapping[Table, ta.AbstractSet[Materialization]]]:
         dct = ocol.IdentityKeyDict()
         for mat in self.elements.get_type_set(Materialization):
-            dct.setdefault(mat.connector, ocol.IdentityKeyDict()).setdefault(mat.table, ocol.IdentitySet()).add(mat)
+            dct.setdefault(self.elements[mat.connector], ocol.IdentityKeyDict()).setdefault(self.elements[mat.table], ocol.IdentitySet()).add(mat)  # noqa0j0
         return els.ElementMap((ctr, els.ElementMap((tbl, els.ElementSet(mats)) for tbl, mats in d2.items())) for ctr, d2 in dct.items())  # noqa
