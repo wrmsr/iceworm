@@ -92,6 +92,8 @@ def test_inject(harness: har.Harness):
 
         print(yaml.dump(selements))
 
+        nsa = elements.analyze(tars.NamespaceAnalysis)  # noqa
+
         conns = es.enter_context(contextlib.closing(ctrs.ConnectionSet(connectors)))
         execution_injector = injector[inj.Key(inj.Injector, 'execution')]
         with ops.inject.new_execution_scope(execution_injector, conns):
