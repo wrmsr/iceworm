@@ -286,7 +286,7 @@ flake: venv
 
 .PHONY: typecheck
 typecheck: venv
-	.venv/bin/mypy --ignore-missing-imports $(PROJECT) | awk '{c+=1;print $$0}END{print c}'
+	.venv/bin/mypy $(PROJECT)
 
 
 ### Test
