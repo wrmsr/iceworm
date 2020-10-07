@@ -9,7 +9,7 @@ wheel>=0.34.2
 
 ## actual code deps
 
-boto3-stubs==1.15.12.1
+boto3-stubs==1.15.13.1
 docker==4.3.1
 pytest-asyncio==0.14.0
 pytest-benchmark==3.2.3
@@ -55,5 +55,5 @@ mypy==0.782
 pgcli==3.0.0
 pipdeptree==1.0.0
 pyflakes==2.2.0
-sqlparse==0.3.1
+sqlparse==0.4.0
 typed-ast==1.4.1
