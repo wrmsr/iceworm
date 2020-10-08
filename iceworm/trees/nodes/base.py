@@ -35,13 +35,6 @@ class Annotation(anns.Annotation, abstract=True):
     pass
 
 
-class Annotations(anns.Annotations[Annotation]):
-
-    @classmethod
-    def _ann_cls(cls) -> ta.Type[Annotation]:
-        return Annotation
-
-
 class Node(nodal.Nodal['Node', Annotation], repr=False, sealed='package'):
 
     __repr__ = build_dc_repr

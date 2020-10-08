@@ -38,6 +38,15 @@ class _NodalMeta(dc.metaclass.Meta):  # noqa
         if name == 'Nodal' and namespace['__module__'] == __name__:
             return super().__new__(mcls, name, bases, namespace, **kwargs)
 
+        for k in [
+            '_ann_cls',
+            '_anns_cls',
+            'anns',
+            'meta',
+        ]:
+            check.not_in(k, kwargs)
+            check.not_in(k, namespace.get('__annotations__', {}))
+
         nbs = {nb for b in bases for nb in b.__mro__ if Nodal in nb.__bases__}
         if not nbs:
             check.in_(Nodal, bases)

@@ -116,17 +116,6 @@ class Inherited(lang.Abstract):
         check.issubclass(cls, Annotation)
 
 
-class Annotations(anns.Annotations[Annotation]):
-
-    @classmethod
-    def _ann_cls(cls) -> ta.Type[Annotation]:
-        return Annotation
-
-    @property
-    def inherited(self) -> ta.Mapping[ta.Type[Annotation], Annotation]:
-        return {type(a): a for a in self if isinstance(a, Inherited)}
-
-
 class Element(nodal.Nodal['Element', Annotation]):
 
     id: ta.Optional[Id] = dc.field(None, check=optional_id_check, kwonly=True)
