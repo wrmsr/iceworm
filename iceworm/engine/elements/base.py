@@ -127,7 +127,7 @@ class Annotations(anns.Annotations[Annotation]):
         return {type(a): a for a in self if isinstance(a, Inherited)}
 
 
-class Element(dc.Enum, nodal.Nodal['Element'], reorder=True):
+class Element(nodal.Nodal['Element', Annotation]):
 
     id: ta.Optional[Id] = dc.field(None, check=optional_id_check, kwonly=True)
 
@@ -143,13 +143,6 @@ class Element(dc.Enum, nodal.Nodal['Element'], reorder=True):
             if isinstance(f.cls, type) and issubclass(f.cls, Element):
                 raise TypeError(f'Element type {cls} has nested element {fn}. Elements cannot be nested - use refs instead.')  # noqa
         return fi
-
-    anns: Annotations = nodal.new_anns_field(Annotations)
-    meta: ta.Mapping[ta.Any, ta.Any] = nodal.new_meta_field(Annotation)
-
-    @classmethod
-    def _nodal_cls(cls) -> ta.Type['Element']:
-        return Element
 
     __repr__ = build_dc_repr
 

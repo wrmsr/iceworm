@@ -25,16 +25,9 @@ class Annotations(anns.Annotations[Annotation]):
         return Annotation
 
 
-class Op(dc.Enum, nodal.Nodal['Op'], reorder=True, repr=False):
-
-    anns: Annotations = nodal.new_anns_field(Annotations)
-    meta: ta.Mapping[ta.Any, ta.Any] = nodal.new_meta_field(Annotation)
+class Op(nodal.Nodal['Op', Annotation], repr=False):
 
     __repr__ = build_dc_repr
-
-    @classmethod
-    def _nodal_cls(cls) -> ta.Type['Op']:
-        return Op
 
 
 class OpExecutor(lang.Abstract, ta.Generic[OpT]):

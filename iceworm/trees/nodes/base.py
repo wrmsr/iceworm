@@ -42,16 +42,9 @@ class Annotations(anns.Annotations[Annotation]):
         return Annotation
 
 
-class Node(dc.Enum, nodal.Nodal['Node'], reorder=True, repr=False, sealed='package'):
-
-    anns: Annotations = nodal.new_anns_field(Annotations)
-    meta: ta.Mapping[ta.Any, ta.Any] = nodal.new_meta_field(Annotation)
+class Node(nodal.Nodal['Node', Annotation], repr=False, sealed='package'):
 
     __repr__ = build_dc_repr
-
-    @classmethod
-    def _nodal_cls(cls) -> ta.Type['Node']:
-        return Node
 
 
 class Expr(Node, abstract=True):

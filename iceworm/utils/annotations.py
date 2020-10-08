@@ -92,3 +92,6 @@ class Annotations(
 
     def __iter__(self) -> ta.Iterator[Annotation]:
         return iter(self._anns_by_cls.values())
+
+    def filter(self, pred: ta.Callable[[AnnotationT], bool]) -> ta.Mapping[ta.Type[Annotation], Annotation]:
+        return {type(a): a for a in self if pred(a)}
