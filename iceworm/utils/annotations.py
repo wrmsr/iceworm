@@ -1,10 +1,11 @@
-import abc
 import collections.abc
 import operator
 import typing as ta
 
 from omnibus import check
 from omnibus import dataclasses as dc
+from omnibus import lang
+from omnibus import reflect as rfl
 
 from . import serde
 
@@ -35,6 +36,29 @@ def _coerce_anns(
         return [check.isinstance(a, Annotation) for a in obj]
 
 
+class _AnnotationsMeta(dc.Meta):
+
+    def __new__(mcls, name, bases, namespace, **kwargs):
+        if name == 'Annotations' and namespace['__module__'] == __name__:
+            return super().__new__(mcls, name, bases, namespace, **kwargs)
+
+        check.not_in('_ann_cls', namespace)
+        check.arg(list(bases) == [Annotations])
+
+        s = check.isinstance(rfl.spec(check.single(namespace['__orig_bases__'])), rfl.ExplicitParameterizedGenericTypeSpec)  # noqa
+        check.state(s.erased_cls is Annotations)
+
+        ann_cls = check.issubclass(check.single(s.cls_args), Annotation)
+        namespace['_ann_cls'] = ann_cls
+
+        if lang.Final not in bases:
+            bases = (*bases, lang.Final)
+
+        cls = super().__new__(mcls, name, bases, namespace, **kwargs)
+
+        return cls
+
+
 class Annotations(
     dc.Frozen,
     ta.Generic[AnnotationT],
@@ -43,27 +67,26 @@ class Annotations(
     ta.Container[ta.Type[AnnotationT]],
     abstract=True,
     allow_setattr=True,
+    metaclass=_AnnotationsMeta,
 ):
     anns: ta.Sequence[AnnotationT] = dc.field(
         (),
         coerce=_coerce_anns,
         metadata={
-            serde.GetType: lambda cls: ta.Sequence[cls._ann_cls()],
+            serde.GetType: lambda cls: ta.Sequence[cls._ann_cls],
             serde.Ignore: operator.not_,
         },
     )
 
-    @abc.abstractclassmethod
-    def _ann_cls(cls) -> ta.Type[Annotation]:
-        raise NotImplementedError
+    _ann_cls: ta.ClassVar[ta.Type[Annotation]]
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
 
-        check.issubclass(cls._ann_cls(), Annotation)
+        check.issubclass(cls._ann_cls, Annotation)
 
     def __post_init__(self) -> None:
-        ann_cls = self._ann_cls()
+        ann_cls = self._ann_cls
         for ann in self.anns:
             check.isinstance(ann, ann_cls)
 
@@ -80,11 +103,11 @@ class Annotations(
         return iter(self._anns_by_cls.keys())
 
     def __getitem__(self, cls: ta.Type[AnnotationT]) -> AnnotationT:
-        check.issubclass(cls, self._ann_cls())
+        check.issubclass(cls, self._ann_cls)
         return self._anns_by_cls[cls]
 
     def __contains__(self, cls: ta.Type[AnnotationT]) -> bool:  # noqa
-        check.issubclass(cls, self._ann_cls())
+        check.issubclass(cls, self._ann_cls)
         return cls in self._anns_by_cls
 
     def __len__(self) -> int:

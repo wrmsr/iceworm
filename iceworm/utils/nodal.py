@@ -11,6 +11,7 @@ import typing as ta
 from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
+from omnibus import lang
 from omnibus import reflect as rfl
 
 from . import annotations as ans
@@ -32,7 +33,7 @@ class _FieldsInfo(dc.Pure):
     flds: ta.Mapping[str, _FieldInfo]
 
 
-class _NodalMeta(dc.metaclass.Meta):  # noqa
+class _NodalMeta(dc.Meta):
 
     def __new__(mcls, name, bases, namespace, **kwargs):
         if name == 'Nodal' and namespace['__module__'] == __name__:
@@ -61,9 +62,7 @@ class _NodalMeta(dc.metaclass.Meta):  # noqa
             namespace['_ann_cls'] = ann_cls
 
             class Annotations(ans.Annotations[ann_cls]):
-                @classmethod
-                def _ann_cls(cls) -> ta.Type[ann_cls]:
-                    return ann_cls
+                pass
 
             namespace['_anns_cls'] = Annotations
 
@@ -136,8 +135,8 @@ class Nodal(
     },
 ):
 
-    anns: ans.Annotations = dc.field((), kwonly=True)
-    meta: ta.Mapping[ta.Any, ta.Any] = dc.field(ocol.frozendict(), kwonly=True)
+    anns: ans.Annotations[AnnotationT] = dc.field((), kwonly=True, coerce=lambda o: lang.raise_(TypeError))
+    meta: ta.Mapping[ta.Any, ta.Any] = dc.field(ocol.frozendict(), kwonly=True, coerce=lambda o: lang.raise_(TypeError))
 
     def __init_subclass__(cls, **kwargs) -> None:
         super().__init_subclass__(**kwargs)
