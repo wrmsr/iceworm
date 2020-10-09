@@ -1,5 +1,6 @@
 """
 TODO:
+ - ** (serializers|deserializers)_by_spec
  - strict mode
  - replace with builtin omni generic impl
  - extensible serde Contexts? want pluggable datatypes, -> Datatype.of
@@ -269,6 +270,17 @@ def serialize_dataclass(obj: T, *, fcls: ta.Optional[ta.Type] = None, no_custom:
 
 
 def serialize(obj: T, *, fcls: ta.Optional[ta.Type] = None) -> Serialized:
+    # spec = rfl.spec(fcls if fcls is not None else type(obj))
+    #
+    # if isinstance(spec, rfl.UnionSpec) and spec.optional_arg is not None:
+    #     spec = spec.optional_arg
+    #
+    # # FIXME: continue 'spec'-ification
+    # fcls = check.isinstance(spec, rfl.TypeSpec).erased_cls
+    #
+    # if dc.is_dataclass(obj):
+    #     return serialize_dataclass(obj, fcls=fcls)
+
     if fcls is not None and rfl.is_generic(fcls) and getattr(fcls, '__origin__', None) is ta.Union:
         args = fcls.__args__
         if len(args) != 2 or type(None) not in args:
@@ -278,7 +290,7 @@ def serialize(obj: T, *, fcls: ta.Optional[ta.Type] = None) -> Serialized:
     if dc.is_dataclass(obj):
         return serialize_dataclass(obj, fcls=fcls)
 
-    elif type(obj) in _STATE.serdes_by_cls:
+    if type(obj) in _STATE.serdes_by_cls:
         serde = _STATE.serdes_by_cls[type(obj)]
         return serde.serialize(obj)
 
