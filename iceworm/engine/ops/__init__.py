@@ -1,6 +1,5 @@
 from  . import inject  # noqa
 from .base import Annotation  # noqa
-from .base import Annotation  # noqa
 from .base import List  # noqa
 from .base import ListExecutor  # noqa
 from .base import Op  # noqa

@@ -1,5 +1,5 @@
 from .. import annotations as an
-from .. import serde
+from ... import serde
 
 
 class TestAnn(an.Annotation, abstract=True):

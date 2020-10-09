@@ -4,7 +4,6 @@ import typing as ta
 from omnibus import dataclasses as dc
 from omnibus import lang
 
-from ...utils import annotations as anns
 from ...utils import build_dc_repr
 from ...utils import nodal
 from ...utils import seq
@@ -14,12 +13,11 @@ OpT = ta.TypeVar('OpT', bound='Op')
 OpGen = ta.Generator['Op', None, None]
 
 
-class Annotation(anns.Annotation, abstract=True):
+class Annotation(nodal.Annotation):
     pass
 
 
 class Op(nodal.Nodal['Op', Annotation], repr=False):
-
     __repr__ = build_dc_repr
 
 

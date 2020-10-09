@@ -2,6 +2,7 @@
 TODO:
  - ** diffing **
  - explicit subclass registration for serde
+ - (optional) id + refs
 """
 import collections
 import operator
@@ -15,7 +16,7 @@ from omnibus import lang
 from omnibus import reflect as rfl
 
 from . import annotations as ans
-from . import serde
+from .. import serde
 
 
 Self = ta.TypeVar('Self')
@@ -23,14 +24,14 @@ NodalT = ta.TypeVar('NodalT', bound='Nodal')
 AnnotationT = ta.TypeVar('AnnotationT', bound=ans.Annotation)
 
 
-class _FieldInfo(dc.Pure):
-    cls: ta.Type['Noda']
+class FieldInfo(dc.Pure):
+    spec: rfl.TypeSpec
     opt: bool = False
     seq: bool = False
 
 
-class _FieldsInfo(dc.Pure):
-    flds: ta.Mapping[str, _FieldInfo]
+class FieldsInfo(dc.Pure):
+    flds: ta.Mapping[str, FieldInfo]
 
 
 class _NodalMeta(dc.Meta):
@@ -147,48 +148,53 @@ class Nodal(
     _nodal_cls: ta.ClassVar[ta.Type[NodalT]]
 
     @classmethod
-    def _build_fields_info(cls) -> _FieldsInfo:
+    def _build_nodal_fields(cls) -> FieldsInfo:
         th = ta.get_type_hints(cls)
         flds = {}
+
         for f in dc.fields(cls):
-            fcls = th[f.name]
+            fs = rfl.spec(th[f.name])
             opt = False
             seq = False
-            if rfl.is_generic(fcls) and fcls.__origin__ is ta.Union:
-                args = fcls.__args__
-                if len(args) != 2 or type(None) not in args:
-                    raise TypeError(fcls)
-                [fcls] = [a for a in args if a not in (None, type(None))]
+
+            if isinstance(fs, rfl.UnionSpec) and fs.optional_arg is not None:
+                fs = fs.optional_arg
                 opt = True
-            if rfl.is_generic(fcls) and fcls.__origin__ is collections.abc.Sequence:
-                [fcls] = fcls.__args__
+
+            if isinstance(fs, rfl.SpecialParameterizedGenericTypeSpec) and fs.erased_cls is collections.abc.Sequence:
+                [fs] = fs.args
                 seq = True
-            if isinstance(fcls, type) and issubclass(fcls, Nodal):
-                flds[f.name] = _FieldInfo(fcls, opt, seq)
-        return _FieldsInfo(flds)
+
+            if isinstance(fs, rfl.TypeSpec) and issubclass(fs.erased_cls, Nodal):
+                flds[f.name] = FieldInfo(fs, opt, seq)
+
+        return FieldsInfo(flds)
 
     def __post_init__(self) -> None:
         cls = type(self)
         try:
-            fi = cls.__dict__['_fields_info']
+            fi = cls.__dict__['_nodal_fields']
         except KeyError:
-            fi = cls._build_fields_info()
-            setattr(cls, '_fields_info', fi)
+            fi = cls._build_nodal_fields()
+            setattr(cls, '_nodal_fields', fi)
 
         for a, f in fi.flds.items():
             v = getattr(self, a)
+
             if f.opt and v is None:
                 continue
             elif v is None:
                 raise TypeError(v, f, a)
+
             if f.seq:
                 if isinstance(v, types.GeneratorType):
                     raise TypeError(v, f, a)
                 for e in v:
-                    if not isinstance(e, f.cls):
+                    if not isinstance(e, f.spec.erased_cls):
                         raise TypeError(e, f, a)
+
             else:
-                if not isinstance(v, f.cls):
+                if not isinstance(v, f.spec.erased_cls):
                     raise TypeError(v, f, a)
 
         try:
@@ -198,11 +204,17 @@ class Nodal(
         else:
             sup()
 
-    def yield_field_children(self, fld: dc.Field) -> ta.Iterator[NodalT]:
-        val = getattr(self, fld.name)
+    def yield_field_children(self, fld: ta.Union[dc.Field, str]) -> ta.Iterator[NodalT]:
+        if isinstance(fld, dc.Field):
+            val = getattr(self, fld.name)
+        elif isinstance(fld, str):
+            val = getattr(self, fld)
+        else:
+            raise TypeError(fld)
+
         if isinstance(val, self._nodal_cls):
             yield val
-        elif isinstance(val, collections.abc.Sequence):
+        elif isinstance(val, collections.abc.Sequence) and not isinstance(val, str):
             yield from (item for item in val if isinstance(item, self._nodal_cls))
 
     @property
@@ -210,8 +222,14 @@ class Nodal(
         for fld in dc.fields(self):
             yield from self.yield_field_children(fld)
 
-    def build_field_map_kwargs(self, fn: ta.Callable[[NodalT], NodalT], fld: dc.Field) -> ta.Mapping[str, ta.Any]:
-        val = getattr(self, fld.name)
+    def build_field_map_kwargs(self, fn: ta.Callable[[NodalT], NodalT], fld: ta.Union[dc.Field, str]) -> ta.Mapping[str, ta.Any]:  # noqa
+        if isinstance(fld, dc.Field):
+            val = getattr(self, fld.name)
+        elif isinstance(fld, str):
+            val = getattr(self, fld)
+        else:
+            raise TypeError(fld)
+
         if isinstance(val, self._nodal_cls):
             return {fld.name: fn(val)}
         elif isinstance(val, collections.abc.Sequence) and not isinstance(val, str):

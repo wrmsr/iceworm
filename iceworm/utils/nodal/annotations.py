@@ -1,19 +1,21 @@
 import collections.abc
 import operator
+import threading
 import typing as ta
+import weakref
 
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import reflect as rfl
 
-from . import serde
+from .. import serde
 
 
 AnnotationT = ta.TypeVar('AnnotationT', bound='Annotation')
 
 
-class Annotation(dc.Enum):
+class Annotation(dc.Enum, confer=dc.get_cls_spec(dc.Enum).extra_params.confer):
     pass
 
 
@@ -36,6 +38,10 @@ def _coerce_anns(
         return [check.isinstance(a, Annotation) for a in obj]
 
 
+_ANNS_CLS_CACHE = weakref.WeakKeyDictionary()
+_ANNS_CLS_CACHE_LOCK = threading.RLock()
+
+
 class _AnnotationsMeta(dc.Meta):
 
     def __new__(mcls, name, bases, namespace, **kwargs):
@@ -49,6 +55,12 @@ class _AnnotationsMeta(dc.Meta):
         check.state(s.erased_cls is Annotations)
 
         ann_cls = check.issubclass(check.single(s.cls_args), Annotation)
+
+        try:
+            return _ANNS_CLS_CACHE[ann_cls]
+        except KeyError:
+            pass
+
         namespace['_ann_cls'] = ann_cls
 
         if lang.Final not in bases:
@@ -56,7 +68,15 @@ class _AnnotationsMeta(dc.Meta):
 
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
 
-        return cls
+        try:
+            return _ANNS_CLS_CACHE[ann_cls]
+        except KeyError:
+            with _ANNS_CLS_CACHE_LOCK:
+                try:
+                    return _ANNS_CLS_CACHE[ann_cls]
+                except KeyError:
+                    _ANNS_CLS_CACHE[ann_cls] = cls
+                    return cls
 
 
 class Annotations(

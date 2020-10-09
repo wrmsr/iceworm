@@ -69,7 +69,6 @@ from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
 
-from ...utils import annotations as anns
 from ...utils import build_dc_repr
 from ...utils import nodal
 
@@ -105,7 +104,7 @@ class Dependable(lang.Abstract):
         return []
 
 
-class Annotation(anns.Annotation, abstract=True):
+class Annotation(nodal.Annotation):
     pass
 
 
@@ -126,10 +125,10 @@ class Element(nodal.Nodal['Element', Annotation]):
         check.state(nf.type in (Id, ta.Optional[Id]))
 
     @classmethod
-    def _build_fields_info(cls) -> nodal._FieldsInfo:
-        fi = super()._build_fields_info()
+    def _build_nodal_fields(cls) -> nodal.FieldsInfo:
+        fi = super()._build_nodal_fields()
         for fn, f in fi.flds.items():
-            if isinstance(f.cls, type) and issubclass(f.cls, Element):
+            if isinstance(f.spec.erased_cls, type) and issubclass(f.spec.erased_cls, Element):
                 raise TypeError(f'Element type {cls} has nested element {fn}. Elements cannot be nested - use refs instead.')  # noqa
         return fi
 

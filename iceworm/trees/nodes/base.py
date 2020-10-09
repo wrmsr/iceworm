@@ -17,7 +17,6 @@ from omnibus import dataclasses as dc
 from omnibus import properties
 
 from ...types import QualifiedName
-from ...utils import annotations as anns
 from ...utils import build_dc_repr
 from ...utils import build_enum_value_map
 from ...utils import nodal
@@ -31,12 +30,11 @@ NodeMapper = ta.Callable[['Node'], 'Node']
 NoneType = type(None)
 
 
-class Annotation(anns.Annotation, abstract=True):
+class Annotation(nodal.Annotation):
     pass
 
 
 class Node(nodal.Nodal['Node', Annotation], repr=False, sealed='package'):
-
     __repr__ = build_dc_repr
 
 

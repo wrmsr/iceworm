@@ -8,7 +8,7 @@ from omnibus import dataclasses as dc
 import pytest
 
 from .. import serde
-from ... import types as ty
+from .... import types as ty
 
 
 class Pt(dc.Pure):
