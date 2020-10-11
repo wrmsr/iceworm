@@ -250,11 +250,11 @@ def serialize_dataclass_fields(obj: T) -> Serialized:
         v = getattr(obj, fn)
         if fs.ignore_if is not None and fs.ignore_if(v):
             continue
-        ser[fn] = serialize(v, fcls=fs.cls)
+        ser[fn] = serialize(v, spec=rfl.spec(fs.cls))
     return ser
 
 
-def serialize_dataclass(obj: T, *, fcls: ta.Optional[ta.Type] = None, no_custom: bool = False) -> Serialized:
+def serialize_dataclass(obj: T, *, spec: ta.Optional[rfl.Spec] = None, no_custom: bool = False) -> Serialized:
     custom = _STATE.serdes_by_cls.get(type(obj)) if not no_custom else None
     if custom is not None:
         if custom.handles_dataclass_polymorphism:
@@ -262,51 +262,37 @@ def serialize_dataclass(obj: T, *, fcls: ta.Optional[ta.Type] = None, no_custom:
         ser = custom.serialize(obj)
     else:
         ser = serialize_dataclass_fields(obj)
-    if fcls is type(obj) and _is_monomorphic_dataclass(fcls):
+    if isinstance(spec, rfl.TypeSpec) and spec.erased_cls is type(obj) and _is_monomorphic_dataclass(spec.erased_cls):
         return ser
     else:
         scm = get_subclass_map(type(obj))
         return {check.isinstance(scm[type(obj)], str): ser}
 
 
-def serialize(obj: T, *, fcls: ta.Optional[ta.Type] = None) -> Serialized:
-    # spec = rfl.spec(fcls if fcls is not None else type(obj))
-    #
-    # if isinstance(spec, rfl.UnionSpec) and spec.optional_arg is not None:
-    #     spec = spec.optional_arg
-    #
-    # # FIXME: continue 'spec'-ification
-    # fcls = check.isinstance(spec, rfl.TypeSpec).erased_cls
-    #
-    # if dc.is_dataclass(obj):
-    #     return serialize_dataclass(obj, fcls=fcls)
-
-    if fcls is not None and rfl.is_generic(fcls) and getattr(fcls, '__origin__', None) is ta.Union:
-        args = fcls.__args__
-        if len(args) != 2 or type(None) not in args:
-            raise TypeError(fcls)
-        [fcls] = [a for a in args if a not in (None, type(None))]
+def serialize(obj: T, *, spec: ta.Optional[rfl.Spec] = None) -> Serialized:
+    if isinstance(spec, rfl.UnionSpec) and spec.optional_arg is not None:
+        spec = spec.optional_arg
 
     if dc.is_dataclass(obj):
-        return serialize_dataclass(obj, fcls=fcls)
+        return serialize_dataclass(obj, spec=spec)
 
     if type(obj) in _STATE.serdes_by_cls:
         serde = _STATE.serdes_by_cls[type(obj)]
         return serde.serialize(obj)
 
     elif isinstance(obj, collections.abc.Mapping):
-        if fcls is not None and rfl.is_generic(fcls) and getattr(fcls, '__origin__', None) is collections.abc.Mapping:
-            [kfcls, vfcls] = fcls.__args__
+        if isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Mapping:
+            kspec, vspec = spec.args
         else:
-            kfcls = vfcls = None
-        return [[serialize(k, fcls=kfcls), serialize(v, fcls=vfcls)] for k, v in obj.items()]
+            kspec = vspec = None
+        return [[serialize(k, spec=kspec), serialize(v, spec=vspec)] for k, v in obj.items()]
 
     elif isinstance(obj, (collections.abc.Sequence, collections.abc.Set)) and not isinstance(obj, str):
-        if fcls is not None and rfl.is_generic(fcls) and getattr(fcls, '__origin__', None) is collections.abc.Sequence:
-            [efcls] = fcls.__args__
+        if isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Sequence:
+            [espec] = spec.args
         else:
-            efcls = None
-        return [serialize(e, fcls=efcls) for e in obj]
+            espec = None
+        return [serialize(e, spec=espec) for e in obj]
 
     elif isinstance(obj, enum.Enum):
         return obj.name
