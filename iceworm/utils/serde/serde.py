@@ -274,32 +274,39 @@ def serialize_dataclass(obj: T, *, spec: ta.Optional[rfl.Spec] = None, no_custom
         return {check.isinstance(scm[type(obj)], str): ser}
 
 
-def serialize(obj: T, *, spec: ta.Optional[rfl.Spec] = None) -> Serialized:
+def serialize(obj: T, spec: ta.Optional[ta.Any] = None) -> Serialized:
+    spec = rfl.spec(spec if spec is not None else type(obj))
+
     if isinstance(spec, rfl.UnionSpec) and spec.optional_arg is not None:
         spec = spec.optional_arg
 
-    if dc.is_dataclass(obj):
+    if not isinstance(spec, rfl.TypeSpec):
+        raise TypeError(spec)
+
+    spec = check.isinstance(spec, rfl.TypeSpec)
+
+    if dc.is_dataclass(spec.erased_cls):
         return serialize_dataclass(obj, spec=spec)
 
-    if type(obj) in _STATE.serdes_by_cls:
-        serde = _STATE.serdes_by_cls[type(obj)]
+    elif spec.erased_cls in _STATE.serdes_by_cls:
+        serde = _STATE.serdes_by_cls[spec.erased_cls]
         return serde.serialize(obj)
 
-    elif isinstance(obj, collections.abc.Mapping):
+    elif issubclass(spec.erased_cls, collections.abc.Mapping):
         if isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Mapping:
             kspec, vspec = spec.args
         else:
             kspec = vspec = None
         return [[serialize(k, spec=kspec), serialize(v, spec=vspec)] for k, v in obj.items()]
 
-    elif isinstance(obj, (collections.abc.Sequence, collections.abc.Set)) and not isinstance(obj, str):
+    elif issubclass(spec.erased_cls, (collections.abc.Sequence, collections.abc.Set)) and not issubclass(spec.erased_cls, str):  # noqa
         if isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Sequence:
             [espec] = spec.args
         else:
             espec = None
         return [serialize(e, spec=espec) for e in obj]
 
-    elif isinstance(obj, enum.Enum):
+    elif issubclass(spec.erased_cls, enum.Enum):
         return obj.name
 
     elif isinstance(obj, PRIMITIVE_TYPES_TUPLE):
@@ -318,19 +325,19 @@ def deserialize_dataclass_fields(ser: ta.Mapping[str, ta.Any], dcls: type) -> T:
             fs = fdct[k]
         except KeyError:
             raise
-        kw[k] = deserialize(v, fs.cls, succinct=True)
+        kw[k] = deserialize(v, fs.cls)
     try:
         return dcls(**kw)
     except Exception as e:  # noqa
         raise
 
 
-def deserialize_dataclass(ser: Serialized, cls: type, *, succinct: bool = False, no_custom: bool = False) -> T:
+def deserialize_dataclass(ser: Serialized, cls: type, *, no_custom: bool = False) -> T:
     oser = ser  # noqa
     custom = _STATE.serdes_by_cls.get(cls) if not no_custom else None
     if custom is not None and custom.handles_dataclass_polymorphism:
         return custom.deserialize(ser)
-    if succinct and _is_monomorphic_dataclass(cls):
+    if _is_monomorphic_dataclass(cls):
         dcls = cls
     else:
         [[n, ser]] = check.isinstance(ser, ta.Mapping).items()
@@ -342,14 +349,14 @@ def deserialize_dataclass(ser: Serialized, cls: type, *, succinct: bool = False,
         return deserialize_dataclass_fields(ser, dcls)
 
 
-def _deserialize(ser: Serialized, spec: rfl.Spec, *, succinct: bool = False) -> T:
+def _deserialize(ser: Serialized, spec: rfl.Spec) -> T:
     if isinstance(spec, rfl.UnionSpec) and spec.optional_arg is not None:
         if ser is None:
             return None
         spec = spec.optional_arg
 
     if isinstance(spec, rfl.TypeSpec) and dc.is_dataclass(spec.erased_cls):
-        return deserialize_dataclass(ser, spec.erased_cls, succinct=succinct)
+        return deserialize_dataclass(ser, spec.erased_cls)
 
     elif isinstance(spec, rfl.TypeSpec) and spec.erased_cls in _STATE.serdes_by_cls:
         serde = _STATE.serdes_by_cls[spec.erased_cls]
@@ -362,7 +369,7 @@ def _deserialize(ser: Serialized, spec: rfl.Spec, *, succinct: bool = False) -> 
             raise TypeError(ser)
         elif isinstance(ser, collections.abc.Mapping):
             for kser, vser in ser.items():
-                k, v = deserialize(kser, kspec, succinct=succinct), deserialize(vser, vspec, succinct=succinct)
+                k, v = deserialize(kser, kspec), deserialize(vser, vspec)
                 if k in dct:
                     raise KeyError(k)
                 dct[k] = v
@@ -371,7 +378,7 @@ def _deserialize(ser: Serialized, spec: rfl.Spec, *, succinct: bool = False) -> 
                 if not isinstance(e, collections.abc.Sequence) or isinstance(e, str):
                     raise TypeError(e)
                 kser, vser = e
-                k, v = deserialize(kser, kspec, succinct=succinct), deserialize(vser, vspec, succinct=succinct)
+                k, v = deserialize(kser, kspec), deserialize(vser, vspec)
                 if k in dct:
                     raise KeyError(k)
                 dct[k] = v
@@ -381,13 +388,13 @@ def _deserialize(ser: Serialized, spec: rfl.Spec, *, succinct: bool = False) -> 
 
     elif isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Set:
         [espec] = spec.args
-        return {deserialize(e, espec, succinct=succinct) for e in ser}
+        return {deserialize(e, espec) for e in ser}
 
     elif isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Sequence:
         [espec] = spec.args
         if not isinstance(ser, collections.abc.Sequence) or isinstance(ser, str):
             raise TypeError(ser)
-        return [deserialize(e, espec, succinct=succinct) for e in ser]
+        return [deserialize(e, espec) for e in ser]
 
     elif isinstance(spec, rfl.SpecialParameterizedGenericTypeSpec) and spec.erased_cls is collections.abc.Callable:
         if not callable(ser):
@@ -433,12 +440,12 @@ _NO_RERAISE = False
 # _NO_RERAISE = True
 
 
-def deserialize(ser: Serialized, spec: ta.Any, no_reraise: bool = False, succinct: bool = False) -> T:
+def deserialize(ser: Serialized, spec: ta.Any, no_reraise: bool = False) -> T:
     spec = rfl.spec(spec)
     if no_reraise or _NO_RERAISE:
-        return _deserialize(ser, spec, succinct=succinct)
+        return _deserialize(ser, spec)
     else:
         try:
-            return _deserialize(ser, spec, succinct=succinct)
+            return _deserialize(ser, spec)
         except Exception as e:
             raise DeserializationException(spec=spec, ser=ser) from e

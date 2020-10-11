@@ -53,9 +53,6 @@ def test_serde():
     assert serde.deserialize([[0, 1], [2, 3]], ta.Mapping[int, int]) == {0: 1, 2: 3}
     assert serde.deserialize({0: 1, 2: 3}, ta.Mapping[int, int]) == {0: 1, 2: 3}
 
-    with pytest.raises(serde.DeserializationException):
-        serde.deserialize(None, int)
-
     rt(Pt(1, 2))
 
     rt(Box(Pt(1, 2), Pt(3, 4)))
@@ -70,23 +67,29 @@ def test_serde():
     serde.serialize(ocol.FrozenDict({1: 2, 3: 4}))
 
 
+def test_reraise():
+    with pytest.raises(serde.DeserializationException):
+        serde.deserialize(None, int)
+
+
 def test_code_serde():
     src = 'x: x + 2'
     lam = ty.Lambda(src)
     assert lam.fn(420) == 422
 
-    assert serde.deserialize({'lambda': 'x: x + 10'}, ty.Lambda).fn(20) == 30
+    assert serde.deserialize('x: x + 10', ty.Lambda).fn(20) == 30
+    assert serde.deserialize({'lambda': 'x: x + 10'}, ty.Code).fn(20) == 30
 
-    s = serde.serialize(lam)
+    s = serde.serialize(lam, ty.Code)
     assert s == {'lambda': {'src': src}}
-    d = serde.deserialize(s, ty.Lambda)
+    d = serde.deserialize(s, ty.Code)
     assert d.fn(422) == 424
 
     class Thing0(dc.Pure):
         code: ty.Code
 
     s = serde.serialize(Thing0(lam))
-    assert s == {'thing0': {'code': {'lambda': {'src': src}}}}
+    assert s == {'code': {'lambda': {'src': src}}}
     d = serde.deserialize(s, Thing0)
     assert d.code.fn(424) == 426
 
@@ -94,6 +97,6 @@ def test_code_serde():
         lam: ty.Lambda
 
     s = serde.serialize(Thing1(lam))
-    assert s == {'thing1': {'lam': {'src': src}}}
+    assert s == {'lam': {'src': src}}
     d = serde.deserialize(s, Thing1)
     assert d.lam.fn(426) == 428
