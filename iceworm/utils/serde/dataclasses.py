@@ -209,7 +209,6 @@ def deserialize_dataclass_fields(ser: ta.Mapping[str, ta.Any], dcls: type) -> T:
 
 
 def deserialize_dataclass(ser: Serialized, cls: type, *, no_custom: bool = False) -> T:
-    oser = ser  # noqa
     custom = get_serde(cls) if not no_custom else None
     if custom is not None and custom.handles_dataclass_polymorphism:
         return custom.deserialize(ser)
