@@ -99,15 +99,20 @@ _DataclassFieldSerdeMap = ta.Mapping[str, _DataclassFieldSerde]
 
 class _SerdeState(dc.Pure):
 
-    serdes_by_cls: ta.MutableMapping[type, Serde] = dc.field(default_factory=weakref.WeakKeyDictionary)
+    serdes_by_cls: ta.MutableMapping[type, Serde] = dc.field(
+        default_factory=weakref.WeakKeyDictionary)
 
-    subclass_map_resolvers_by_cls: ta.MutableMapping[type, ta.Callable[[type], SubclassMap]] = dc.field(default_factory=weakref.WeakKeyDictionary)  # noqa
+    subclass_map_resolvers_by_cls: ta.MutableMapping[type, ta.Callable[[type], SubclassMap]] = dc.field(
+        default_factory=weakref.WeakKeyDictionary)
 
-    subclass_maps_by_cls: ta.MutableMapping[type, SubclassMap] = dc.field(default_factory=weakref.WeakKeyDictionary)
+    subclass_maps_by_cls: ta.MutableMapping[type, SubclassMap] = dc.field(
+        default_factory=weakref.WeakKeyDictionary)
 
-    is_monomorphic_dataclass_by_cls: ta.MutableMapping[type, bool] = dc.field(default_factory=weakref.WeakKeyDictionary)
+    is_monomorphic_dataclass_by_cls: ta.MutableMapping[type, bool] = dc.field(
+        default_factory=weakref.WeakKeyDictionary)
 
-    field_type_maps_by_dataclass: ta.MutableMapping[type, _DataclassFieldSerdeMap] = dc.field(default_factory=weakref.WeakKeyDictionary)  # noqa
+    field_type_maps_by_dataclass: ta.MutableMapping[type, _DataclassFieldSerdeMap] = dc.field(
+        default_factory=weakref.WeakKeyDictionary)
 
 
 _STATE = _SerdeState()
@@ -337,31 +342,27 @@ def deserialize_dataclass(ser: Serialized, cls: type, *, succinct: bool = False,
         return deserialize_dataclass_fields(ser, dcls)
 
 
-def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) -> T:
-    if rfl.is_generic(cls) and getattr(cls, '__origin__', None) is ta.Union:
-        args = cls.__args__
-        if len(args) != 2 or type(None) not in args:
-            raise TypeError(cls)
-        [ecls] = [a for a in args if a not in (None, type(None))]
+def _deserialize(ser: Serialized, spec: rfl.Spec, *, succinct: bool = False) -> T:
+    if isinstance(spec, rfl.UnionSpec) and spec.optional_arg is not None:
         if ser is None:
             return None
-        cls = ecls
+        spec = spec.optional_arg
 
-    if dc.is_dataclass(cls):
-        return deserialize_dataclass(ser, cls, succinct=succinct)
+    if isinstance(spec, rfl.TypeSpec) and dc.is_dataclass(spec.erased_cls):
+        return deserialize_dataclass(ser, spec.erased_cls, succinct=succinct)
 
-    elif isinstance(cls, type) and cls in _STATE.serdes_by_cls:
-        serde = _STATE.serdes_by_cls[cls]
+    elif isinstance(spec, rfl.TypeSpec) and spec.erased_cls in _STATE.serdes_by_cls:
+        serde = _STATE.serdes_by_cls[spec.erased_cls]
         return serde.deserialize(ser)
 
-    elif rfl.is_generic(cls) and getattr(cls, '__origin__', None) is collections.abc.Mapping:
-        [kcls, vcls] = cls.__args__
+    elif isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Mapping:
+        [kspec, vspec] = spec.args
         dct = {}
         if isinstance(ser, str):
             raise TypeError(ser)
         elif isinstance(ser, collections.abc.Mapping):
             for kser, vser in ser.items():
-                k, v = deserialize(kser, kcls, succinct=succinct), deserialize(vser, vcls, succinct=succinct)
+                k, v = deserialize(kser, kspec, succinct=succinct), deserialize(vser, vspec, succinct=succinct)
                 if k in dct:
                     raise KeyError(k)
                 dct[k] = v
@@ -370,7 +371,7 @@ def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) ->
                 if not isinstance(e, collections.abc.Sequence) or isinstance(e, str):
                     raise TypeError(e)
                 kser, vser = e
-                k, v = deserialize(kser, kcls, succinct=succinct), deserialize(vser, vcls, succinct=succinct)
+                k, v = deserialize(kser, kspec, succinct=succinct), deserialize(vser, vspec, succinct=succinct)
                 if k in dct:
                     raise KeyError(k)
                 dct[k] = v
@@ -378,66 +379,66 @@ def _deserialize(ser: Serialized, cls: ta.Type[T], *, succinct: bool = False) ->
             raise TypeError(ser)
         return dct
 
-    elif rfl.is_generic(cls) and getattr(cls, '__origin__', None) is collections.abc.Set:
-        [ecls] = cls.__args__
-        if not isinstance(ser, collections.abc.Sequence):
-            raise TypeError(ser)
-        return {deserialize(e, ecls, succinct=succinct) for e in ser}
+    elif isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Set:
+        [espec] = spec.args
+        return {deserialize(e, espec, succinct=succinct) for e in ser}
 
-    elif rfl.is_generic(cls) and getattr(cls, '__origin__', None) is collections.abc.Sequence:
-        [ecls] = cls.__args__
+    elif isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Sequence:
+        [espec] = spec.args
         if not isinstance(ser, collections.abc.Sequence) or isinstance(ser, str):
             raise TypeError(ser)
-        return [deserialize(e, ecls, succinct=succinct) for e in ser]
+        return [deserialize(e, espec, succinct=succinct) for e in ser]
 
-    elif rfl.is_generic(cls) and getattr(cls, '__origin__', None) is collections.abc.Callable:
+    elif isinstance(spec, rfl.SpecialParameterizedGenericTypeSpec) and spec.erased_cls is collections.abc.Callable:
         if not callable(ser):
             raise TypeError(ser)
         return ser
 
-    elif not isinstance(cls, type):
-        raise TypeError(cls)
+    elif not isinstance(spec, rfl.NonGenericTypeSpec):
+        raise TypeError(spec)
 
-    elif issubclass(cls, enum.Enum):
+    elif issubclass(spec.erased_cls, enum.Enum):
         if isinstance(ser, str):
-            return cls.__members__[ser]
+            return spec.erased_cls.__members__[ser]
         else:
             raise TypeError(ser)
 
-    elif cls in PRIMITIVE_TYPES:
-        if isinstance(ser, cls):
+    elif spec.erased_cls in PRIMITIVE_TYPES:
+        if isinstance(ser, spec.erased_cls):
             return ser
         elif isinstance(ser, str):
-            return cls(ser)
+            return spec.erased_cls(ser)
         else:
             raise TypeError(ser)
 
     else:
-        raise TypeError(cls)
+        raise TypeError(spec)
 
 
 class DeserializationException(Exception):
 
-    def __init__(self, *args, cls: ta.Type[T], ser: Serialized) -> None:
+    def __init__(self, *args, spec: ta.Any, ser: Serialized) -> None:
         super().__init__(*args)
 
-        self.cls = cls
+        self.spec = spec
         self.ser = ser
 
-    defs.basic('args', 'cls', 'ser')
+    defs.basic('args', 'spec', 'ser')
 
     def __str__(self) -> str:
         return repr(self)
 
 
 _NO_RERAISE = False
+# _NO_RERAISE = True
 
 
-def deserialize(ser: Serialized, cls: ta.Any, no_reraise: bool = False, succinct: bool = False) -> T:
+def deserialize(ser: Serialized, spec: ta.Any, no_reraise: bool = False, succinct: bool = False) -> T:
+    spec = rfl.spec(spec)
     if no_reraise or _NO_RERAISE:
-        return _deserialize(ser, cls, succinct=succinct)
+        return _deserialize(ser, spec, succinct=succinct)
     else:
         try:
-            return _deserialize(ser, cls, succinct=succinct)
+            return _deserialize(ser, spec, succinct=succinct)
         except Exception as e:
-            raise DeserializationException(cls=cls, ser=ser) from e
+            raise DeserializationException(spec=spec, ser=ser) from e
