@@ -29,7 +29,7 @@ def test_comments():
         root = parsing.parse_stmt(sql)
         print(root)
 
-        ser = serde.serialize(root)  # noqa
+        ser = serde.serialize(root, no.Node)  # noqa
         des = serde.deserialize(ser, no.Node)  # noqa
         # assert des == node
 

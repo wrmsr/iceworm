@@ -15,6 +15,6 @@ def test_metadata():
 
 def test_serde():
     t = md.Table(['t'], [md.Column('a', dt.Integer()), md.Column('b', dt.String())])
-    s = serde.serialize(t)
+    s = serde.serialize(t, md.Object)
     d = serde.deserialize(s, md.Object)
     assert t == d

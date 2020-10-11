@@ -278,6 +278,8 @@ def serialize(obj: T, spec: ta.Optional[ta.Any] = None) -> Serialized:
     spec = rfl.spec(spec if spec is not None else type(obj))
 
     if isinstance(spec, rfl.UnionSpec) and spec.optional_arg is not None:
+        if obj is None:
+            return None
         spec = spec.optional_arg
 
     if not isinstance(spec, rfl.TypeSpec):

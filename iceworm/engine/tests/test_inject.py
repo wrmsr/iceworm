@@ -63,7 +63,7 @@ def exit_stack() -> ta.Iterator[contextlib.ExitStack]:
         yield es
 
 
-class TestHelper:
+class Helper:
 
     def __init__(self, harness: har.Harness) -> None:
         super().__init__()
@@ -74,7 +74,9 @@ class TestHelper:
     def secrets(self) -> sec.Secrets:
         return sec.Secrets({'pg_url': self._harness[DbManager].pg_url})
 
-    def build_elements(self) -> els.ElementSet:
+    @properties.cached
+    @property
+    def injector(self) -> inj.Injector:
         binder = inj.create_binder()
         binder.bind(sec.Secrets, to_instance=self.secrets)
         sql.inject.install(binder)
@@ -87,37 +89,59 @@ class TestHelper:
 
         binder.bind(inj.Key(ta.Callable[[str], no.Node]), to_instance=par.parse_stmt)
 
-        injector = inj.create_injector(binder)
+        return inj.create_injector(binder)
 
-        elements_injector = injector[inj.Key(inj.Injector, 'elements')]
+    @properties.cached
+    @property
+    def elements_and_connectors(self) -> ta.Tuple[els.ElementSet, ctrs.ConnectorSet]:
+        elements_injector = self.injector[inj.Key(inj.Injector, 'elements')]
+
         with els.inject.new_driver_scope(elements_injector) as drv:
             elements = drv.run([
                 sites.Site('site0.yml'),
             ])
             connectors = drv[ctrs.ConnectorSet]
 
+        return elements, connectors
+
+    @property
+    def elements(self) -> els.ElementSet:
+        return self.elements_and_connectors[0]
+
+    @property
+    def connectors(self) -> ctrs.ConnectorSet:
+        return self.elements_and_connectors[1]
+
+    def verify_elements_serde(self) -> None:
+        selements = serde.serialize(list(self.elements), ta.Sequence[els.Element])
+        delements = els.ElementSet.of(serde.deserialize(selements, ta.Sequence[els.Element]))
+        assert list(delements) == list(self.elements)
+
+        print(yaml.dump(selements))
+
+    def execute(self) -> None:
+        with contextlib.closing(ctrs.ConnectionSet(self.connectors)) as conns:
+            execution_injector = self.injector[inj.Key(inj.Injector, 'execution')]
+
+            with ops.inject.new_execution_scope(execution_injector, conns):
+                matrs_by_mat_id = unique_dict(
+                    (matr.target.id, matr) for matr in self.elements.get_type_set(pln.Materializer))
+
+                deps = {mat_id: {d.id for d in matr.srcs} for mat_id, matr in matrs_by_mat_id.items()}
+
+                oed: ops.OpExecutionDriver = execution_injector[ops.OpExecutionDriver]
+                for mat_id in itertools.chain.from_iterable(ocol.toposort(deps)):
+                    matr = matrs_by_mat_id[mat_id]
+                    oed.execute(matr.op)
+
 
 def test_inject(harness: har.Harness, exit_stack):
     exit_stack.enter_context(oos.tmp_chdir(os.path.dirname(__file__)))
 
-    elements = check.isinstance(elements, els.ElementSet)
-    selements = serde.serialize(list(elements))
-    delements = els.ElementSet.of(serde.deserialize(selements, ta.Sequence[els.Element]))
-    assert list(delements) == list(elements)
+    helper = Helper(harness)
 
-    print(yaml.dump(selements))
-
-    nsa = elements.analyze(tars.NamespaceAnalysis)  # noqa
-
-    conns = exit_stack.enter_context(contextlib.closing(ctrs.ConnectionSet(connectors)))
-    execution_injector = injector[inj.Key(inj.Injector, 'execution')]
-    with ops.inject.new_execution_scope(execution_injector, conns):
-        matrs_by_mat_id = unique_dict((matr.target.id, matr) for matr in elements.get_type_set(pln.Materializer))
-        deps = {mat_id: {d.id for d in matr.srcs} for mat_id, matr in matrs_by_mat_id.items()}
-        oed: ops.OpExecutionDriver = execution_injector[ops.OpExecutionDriver]
-        for mat_id in itertools.chain.from_iterable(ocol.toposort(deps)):
-            matr = matrs_by_mat_id[mat_id]
-            oed.execute(matr.op)
+    helper.verify_elements_serde()
+    helper.execute()
 
     with harness[DbManager].pg_engine.connect() as pg_conn:
         print(list(pg_conn.execute('select * from a')))
@@ -125,6 +149,3 @@ def test_inject(harness: har.Harness, exit_stack):
         print(list(pg_conn.execute('select * from c')))
         print(list(pg_conn.execute('select * from d')))
         print(list(pg_conn.execute('select * from nums')))
-
-
-# class BaseTestFuck(unittest.TestCase):

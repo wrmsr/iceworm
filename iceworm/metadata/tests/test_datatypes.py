@@ -3,7 +3,7 @@ from ...utils import serde
 
 
 def test_serde():
-    s = serde.serialize(dt.Integer())
+    s = serde.serialize(dt.Integer(), dt.Datatype)
     assert s == {'number': {}}
     d = serde.deserialize(s, dt.Datatype)
     assert d == dt.Integer()
