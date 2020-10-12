@@ -221,20 +221,26 @@ def serialize_dataclass(obj: T, *, spec: ta.Optional[rfl.Spec] = None, no_custom
     return dataclass_serializer(spec=spec if spec is not None else rfl.spec(type(obj)), no_custom=no_custom)(obj)
 
 
-def deserialize_dataclass_fields(ser: ta.Mapping[str, ta.Any], dcls: type) -> T:
-    check.isinstance(ser, ta.Mapping)
+def dataclass_fields_deserializer(dcls: type) -> Deserializer:
     fdct = _get_dataclass_field_type_map(dcls)
-    kw = {}
-    for k, v in ser.items():
+    desers = {fn: deserializer(rfl.spec(fs.cls)) for fn, fs in fdct.items()}
+
+    def des(ser):
+        check.isinstance(ser, ta.Mapping)
+        kw = {}
+        for k, v in ser.items():
+            fd = desers[k]
+            kw[k] = fd(v)
         try:
-            fs = fdct[k]
-        except KeyError:
+            return dcls(**kw)
+        except Exception as e:  # noqa
             raise
-        kw[k] = deserialize(v, fs.cls)
-    try:
-        return dcls(**kw)
-    except Exception as e:  # noqa
-        raise
+
+    return des
+
+
+def deserialize_dataclass_fields(ser: ta.Mapping[str, ta.Any], dcls: type) -> T:
+    return dataclass_fields_deserializer(dcls)(ser)
 
 
 def deserialize_dataclass(ser: Serialized, cls: type, *, no_custom: bool = False) -> T:
