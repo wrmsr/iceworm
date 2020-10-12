@@ -27,7 +27,7 @@ class Zbox(Box):
 
 def test_serde():
     def rt(o, t=None):
-        s = serde.serialize(o)
+        s = serde.serialize(o, t)
         d = serde.deserialize(s, t or type(o))
         assert d == o
 

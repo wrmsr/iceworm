@@ -15,6 +15,7 @@ from .dataclasses import SubclassMap  # noqa
 from .serde import AutoSerde  # noqa
 from .serde import DeserializationException  # noqa
 from .serde import deserialize  # noqa
+from .serde import deserializer  # noqa
 from .serde import MappingKey  # noqa
 from .serde import Primitive  # noqa
 from .serde import PRIMITIVE_TYPES  # noqa
@@ -23,3 +24,4 @@ from .serde import Serde  # noqa
 from .serde import serde_for  # noqa
 from .serde import serialize  # noqa
 from .serde import Serialized  # noqa
+from .serde import serializer  # noqa
