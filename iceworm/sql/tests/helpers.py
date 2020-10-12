@@ -1,22 +1,30 @@
+import typing as ta
+
 from omnibus import lang
 from omnibus import lifecycles as lc
 from omnibus import properties
-from omnibus.dev.pytest.plugins import switches
 from omnibus.docker.dev.pytest import DockerManager
-from omnibus.inject.dev.pytest import harness as har
+from omnibus.inject.dev import pytest as ptinj
 import sqlalchemy as sa
 
 from .. import snowflake
 
 
-@har.bind(har.Function)
+@ptinj.bind(ptinj.Function)
 class DbManager(lc.ContextManageableLifecycle):
 
-    def __init__(self, dm: DockerManager, request: har.FixtureRequest) -> None:
+    def __init__(
+            self,
+            dm: DockerManager,
+            request: ptinj.FixtureRequest,
+            *,
+            switches: ta.Optional[ptinj.Switches] = None,
+    ) -> None:
         super().__init__()
 
         self._dm = dm
         self._request = request
+        self._switches = switches
 
     @properties.stateful_cached
     @property
@@ -36,7 +44,7 @@ class DbManager(lc.ContextManageableLifecycle):
     @properties.stateful_cached
     @property
     def snowflake_engine(self) -> sa.engine.Engine:
-        switches.skip_if_disabled(self._request, 'online')
+        self._switches.skip_if_not('online')
         return self._lifecycle_exit_stack.enter_context(lang.disposing(sa.engine.create_engine(snowflake.get_url())))
 
 
