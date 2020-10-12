@@ -1,9 +1,9 @@
 from omnibus.docker.dev.pytest import DockerManager
-from omnibus.inject.dev.pytest import harness as har
+from omnibus.inject.dev import pytest as ptinj
 import pymongo
 
 
-def test_docker_mongo(harness: har.Harness):
+def test_docker_mongo(harness: ptinj.Harness):
     [(host, port)] = harness[DockerManager].get_container_tcp_endpoints([('mongo', 27017)]).values()
 
     client = pymongo.MongoClient(f'mongodb://root:iceworm@{host}:{port}')

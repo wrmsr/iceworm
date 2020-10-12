@@ -10,7 +10,7 @@ from omnibus import inject as inj
 from omnibus import lang  # noqa
 from omnibus import os as oos  # noqa
 from omnibus import properties
-from omnibus.inject.dev.pytest import harness as har
+from omnibus.inject.dev import pytest as ptinj
 import pytest  # noqa
 import yaml  # noqa
 
@@ -65,7 +65,7 @@ def exit_stack() -> ta.Iterator[contextlib.ExitStack]:
 
 class Helper:
 
-    def __init__(self, harness: har.Harness) -> None:
+    def __init__(self, harness: ptinj.Harness) -> None:
         super().__init__()
         self._harness = harness
 
@@ -135,7 +135,7 @@ class Helper:
                     oed.execute(matr.op)
 
 
-def test_inject(harness: har.Harness, exit_stack):
+def test_inject(harness: ptinj.Harness, exit_stack):
     exit_stack.enter_context(oos.tmp_chdir(os.path.dirname(__file__)))
 
     helper = Helper(harness)

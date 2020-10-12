@@ -1,9 +1,9 @@
 from omnibus.docker.dev.pytest import DockerManager
-from omnibus.inject.dev.pytest import harness as har
+from omnibus.inject.dev import pytest as ptinj
 import boto3.dynamodb.conditions
 
 
-def test_docker_dynamo(harness: har.Harness):
+def test_docker_dynamo(harness: ptinj.Harness):
     [(host, port)] = harness[DockerManager].get_container_tcp_endpoints([('dynamodb', 8000)]).values()
 
     dynamodb = boto3.resource(

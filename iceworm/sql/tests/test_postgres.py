@@ -7,7 +7,7 @@ import urllib.parse
 from omnibus import lang
 from omnibus import threading as othr
 from omnibus.dev.testing import call_many_with_timeout
-from omnibus.inject.dev.pytest import harness as har
+from omnibus.inject.dev import pytest as ptinj
 import sqlalchemy as sa
 
 from .. import tpch
@@ -20,7 +20,7 @@ IS_NUMBER_JS = """
 """  # noqa
 
 
-def test_docker_postgres(harness: har.Harness):  # noqa
+def test_docker_postgres(harness: ptinj.Harness):  # noqa
     engine: sa.engine.Engine
     with contextlib.ExitStack() as es:
         engine = es.enter_context(lang.disposing(sa.create_engine(harness[DbManager].pg_url)))
@@ -82,7 +82,7 @@ def test_docker_postgres(harness: har.Harness):  # noqa
         print(tbl)
 
 
-def test_postgres_locks(harness: har.Harness):  # noqa
+def test_postgres_locks(harness: ptinj.Harness):  # noqa
     engine: sa.engine.Engine
     with contextlib.ExitStack() as es:
         engine = es.enter_context(lang.disposing(sa.create_engine(harness[DbManager].pg_url)))
@@ -172,7 +172,7 @@ def test_postgres_locks(harness: har.Harness):  # noqa
             c.execute("select 1")
 
 
-def test_tpch(harness: har.Harness):  # noqa
+def test_tpch(harness: ptinj.Harness):  # noqa
     engine: sa.engine.Engine
     with contextlib.ExitStack() as es:
         engine = es.enter_context(lang.disposing(sa.create_engine(harness[DbManager].pg_url)))
@@ -186,7 +186,7 @@ def test_tpch(harness: har.Harness):  # noqa
         tpch.populate_sa_tables(conn, metadata)
 
 
-def test_pg8000(harness: har.Harness):  # noqa
+def test_pg8000(harness: ptinj.Harness):  # noqa
     pg_url = urllib.parse.urlunparse(urllib.parse.urlparse(harness[DbManager].pg_url)._replace(scheme='postgresql+pg8000'))  # noqa
 
     engine: sa.engine.Engine
@@ -206,16 +206,16 @@ def test_range():
     assert ada.render_query(stmt).split() == 'SELECT i FROM generate_series(1, 5) AS s(i)'.split()
 
 
-def test_harness(harness: har.Harness):
+def test_harness(harness: ptinj.Harness):
     dbm = harness[DbManager]
     print(dbm.pg_url)
 
 
-def test_harness2(harness: har.Harness):
+def test_harness2(harness: ptinj.Harness):
     dbm = harness[DbManager]
     print(dbm.pg_url)
 
 
-def test_ping(harness: har.Harness):
+def test_ping(harness: ptinj.Harness):
     with harness[DbManager].pg_engine.connect() as conn:
         assert conn.scalar('select 1') == 1

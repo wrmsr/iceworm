@@ -6,7 +6,7 @@ import dataclasses as dc
 import os.path
 
 from omnibus import lang
-from omnibus.inject.dev.pytest import harness as har
+from omnibus.inject.dev import pytest as ptinj
 import sqlalchemy as sa
 
 from .. import state as st
@@ -33,7 +33,7 @@ def test_state():
     assert store.get(WorldState, store.key(wos[0])) == wos[0]
 
 
-def test_state_script(harness: har.Harness):  # noqa
+def test_state_script(harness: ptinj.Harness):  # noqa
     with open(os.path.join(os.path.dirname(__file__), 'state.sql'), 'r') as f:
         buf = f.read()
 

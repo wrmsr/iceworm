@@ -25,7 +25,7 @@ import typing as ta
 from omnibus import lang
 from omnibus import properties
 from omnibus.dev.pytest import skip_if_cant_import
-from omnibus.inject.dev.pytest import harness as har
+from omnibus.inject.dev import pytest as ptinj
 from omnibus.spark import local as sl
 from omnibus.spark.dev.pytest.manager import SparkManager
 import pytest
@@ -88,7 +88,7 @@ def test_local_launcher():
 
 
 @pytest.mark.spark
-def test_sql(harness: har.Harness):
+def test_sql(harness: ptinj.Harness):
     # conn = hive.Connection(host='localhost', port=10000)
     # cur = conn.cursor()
     # print(list(cur.execute('select 1')))

@@ -1,10 +1,10 @@
 from omnibus.docker.dev.pytest import DockerManager
-from omnibus.inject.dev.pytest import harness as har
+from omnibus.inject.dev import pytest as ptinj
 import boto3
 import botocore.client
 
 
-def test_docker_s3(harness: har.Harness):
+def test_docker_s3(harness: ptinj.Harness):
     [(host, port)] = harness[DockerManager].get_container_tcp_endpoints([('minio', 9000)]).values()
 
     env = harness[DockerManager].compose_config['minio']['environment']
