@@ -245,7 +245,7 @@ class TableType(Datatype):
 class DatatypeSerde(serde.AutoSerde[Datatype]):
 
     @property
-    def handles_dataclass_polymorphism(self) -> bool:
+    def handles_polymorphism(self) -> bool:
         return True
 
     def serialize(self, obj: Datatype) -> ta.Any:

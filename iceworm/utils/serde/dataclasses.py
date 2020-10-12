@@ -4,10 +4,13 @@ import weakref
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
+from omnibus import reflect as rfl
 
 from .serde import deserializer
 from .serde import Deserializer
 from .serde import get_serde
+from .serde import serde_gen
+from .serde import SerdeGen
 from .serde import Serialized
 from .serde import serializer
 from .serde import Serializer
@@ -189,7 +192,7 @@ def serialize_dataclass_fields(obj: T) -> Serialized:
 
 def dataclass_serializer(cls: type, no_custom: bool = False) -> Serializer:
     custom = get_serde(cls) if not no_custom else None
-    if custom is not None and custom.handles_dataclass_polymorphism:
+    if custom is not None and custom.handles_polymorphism:
         return custom.serialize
 
     if _is_monomorphic_dataclass(cls):
@@ -201,7 +204,7 @@ def dataclass_serializer(cls: type, no_custom: bool = False) -> Serializer:
             continue
 
         custom = get_serde(scls) if not no_custom else None
-        if custom is not None and custom.handles_dataclass_polymorphism:
+        if custom is not None and custom.handles_polymorphism:
             ser = custom.serialize
         else:
             sser = custom.serialize if custom is not None else dataclass_fields_serializer(scls)
@@ -240,7 +243,7 @@ def deserialize_dataclass_fields(ser: ta.Mapping[str, ta.Any], dcls: type) -> T:
 
 def dataclass_deserializer(cls: type, *, no_custom: bool = False) -> Deserializer:
     custom = get_serde(cls) if not no_custom else None
-    if custom is not None and custom.handles_dataclass_polymorphism:
+    if custom is not None and custom.handles_polymorphism:
         return custom.deserialize
 
     if _is_monomorphic_dataclass(cls):
@@ -263,3 +266,16 @@ def dataclass_deserializer(cls: type, *, no_custom: bool = False) -> Deserialize
 
 def deserialize_dataclass(ser: Serialized, cls: type, *, no_custom: bool = False) -> T:
     return dataclass_deserializer(cls, no_custom=no_custom)(ser)
+
+
+@serde_gen(first=True)
+class DataclassSerdeGen(SerdeGen):
+
+    def match(self, spec: rfl.Spec) -> bool:
+        return isinstance(spec, rfl.TypeSpec) and dc.is_dataclass(spec.erased_cls)
+
+    def serializer(self, spec: rfl.Spec) -> Serializer:
+        return lambda obj: serialize_dataclass(obj, spec.erased_cls)
+
+    def deserializer(self, spec: rfl.Spec) -> Deserializer:
+        return lambda ser: deserialize_dataclass(ser, spec.erased_cls)

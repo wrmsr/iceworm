@@ -8,7 +8,6 @@ TODO:
  - allow_empty? system: {{}}
 """
 import abc
-import collections.abc
 import enum
 import typing as ta
 import weakref
@@ -62,7 +61,7 @@ Deserializer = ta.Callable[[Serialized], T]
 class Serde(lang.Abstract, ta.Generic[T]):
 
     @property
-    def handles_dataclass_polymorphism(self) -> bool:
+    def handles_polymorphism(self) -> bool:
         return False
 
     @abc.abstractmethod
@@ -134,14 +133,19 @@ class AutoSerde(Serde[T], lang.Abstract):
         serde_for(ty)(cls)
 
 
-def serde_gen(obj):
-    if isinstance(obj, type):
-        sd = obj()
-    else:
-        sd = obj
-    check.isinstance(sd, SerdeGen)
-    _STATE.serde_gens.append(sd)
-    return obj
+def serde_gen(*, first: bool = False):
+    def inner(obj):
+        if isinstance(obj, type):
+            sd = obj()
+        else:
+            sd = obj
+        check.isinstance(sd, SerdeGen)
+        if first:
+            _STATE.serde_gens.insert(0, sd)
+        else:
+            _STATE.serde_gens.append(sd)
+        return obj
+    return inner
 
 
 class AutoSerdeGen(SerdeGen, lang.Abstract):
@@ -149,71 +153,7 @@ class AutoSerdeGen(SerdeGen, lang.Abstract):
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__()
         check.state(cls.__bases__ == (AutoSerdeGen,))
-        serde_gen(cls)
-
-
-class OptionalSerdeGen(AutoSerdeGen):
-
-    def match(self, spec: rfl.Spec) -> bool:
-        return isinstance(spec, rfl.UnionSpec) and spec.optional_arg is not None
-
-    def serializer(self, spec: rfl.Spec) -> Serializer:
-        eser = serializer(spec.optional_arg)
-        return lambda obj: None if obj is None else eser(obj)
-
-    def deserializer(self, spec: rfl.Spec) -> Deserializer:
-        edes = deserializer(spec.optional_arg)
-        return lambda ser: None if ser is None else edes(ser)
-
-
-class AnySerdeGen(AutoSerdeGen):
-
-    def match(self, spec: rfl.Spec) -> bool:
-        return isinstance(spec, rfl.AnySpec)
-
-    def serializer(self, spec: rfl.Spec) -> Serializer:
-        def ser(obj):
-            if isinstance(obj, PRIMITIVE_TYPES_TUPLE):
-                return obj
-            else:
-                raise TypeError(obj)
-        return ser
-
-    def deserializer(self, spec: rfl.Spec) -> Deserializer:
-        def des(ser):
-            if isinstance(ser, PRIMITIVE_TYPES_TUPLE):
-                return ser
-            else:
-                raise TypeError(ser)
-        return des
-
-
-class DataclassSerdeGen(AutoSerdeGen):
-
-    def match(self, spec: rfl.Spec) -> bool:
-        return isinstance(spec, rfl.TypeSpec) and dc.is_dataclass(spec.erased_cls)
-
-    def serializer(self, spec: rfl.Spec) -> Serializer:
-        from .dataclasses import serialize_dataclass
-        return lambda obj: serialize_dataclass(obj, spec.erased_cls)
-
-    def deserializer(self, spec: rfl.Spec) -> Deserializer:
-        from .dataclasses import deserialize_dataclass
-        return lambda ser: deserialize_dataclass(ser, spec.erased_cls)
-
-
-class CustomSerdeGen(AutoSerdeGen):
-
-    def match(self, spec: rfl.Spec) -> bool:
-        return isinstance(spec, rfl.TypeSpec) and spec.erased_cls in _STATE.serdes_by_cls
-
-    def serializer(self, spec: rfl.Spec) -> Serializer:
-        serde = _STATE.serdes_by_cls[spec.erased_cls]
-        return lambda obj: serde.serialize(obj)
-
-    def deserializer(self, spec: rfl.Spec) -> Deserializer:
-        serde = _STATE.serdes_by_cls[spec.erased_cls]
-        return lambda ser: serde.deserialize(ser)
+        serde_gen()(cls)
 
 
 def serializer(spec: ta.Optional[ta.Any]) -> Serializer:
@@ -222,33 +162,6 @@ def serializer(spec: ta.Optional[ta.Any]) -> Serializer:
     for sg in _STATE.serde_gens:
         if sg.match(spec):
             return sg.serializer(spec)
-
-    if isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Mapping:
-        kspec, vspec = spec.args
-        kser, vser = serializer(kspec), serializer(vspec)
-        return lambda obj: [[kser(k), vser(v)] for k, v in obj.items()]
-
-    if (
-            isinstance(spec, rfl.GenericTypeSpec) and
-            spec.erased_cls in (collections.abc.Sequence, collections.abc.Set)
-    ):
-        [espec] = spec.args
-        eser = serializer(espec)
-        return lambda obj: [eser(e) for e in obj]
-
-    if isinstance(spec, rfl.TupleTypeSpec):
-        esers = [serializer(e) for e in spec.args]
-        def ser(obj):  # noqa
-            if not isinstance(obj, tuple) or len(obj) != esers:
-                raise TypeError(obj)
-            return[s(e) for s, e in zip(esers, obj)]
-        return ser
-
-    if issubclass(spec.erased_cls, enum.Enum):
-        return lambda obj: obj.name
-
-    if issubclass(spec.erased_cls, PRIMITIVE_TYPES_TUPLE):
-        return lambda obj: obj
 
     raise TypeError(spec)
 
@@ -263,74 +176,6 @@ def deserializer(spec: ta.Any) -> Deserializer:
     for sg in _STATE.serde_gens:
         if sg.match(spec):
             return sg.deserializer(spec)
-
-    if isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Mapping:
-        [kspec, vspec] = spec.args
-        kdes, vdes = deserializer(kspec), deserializer(vspec)
-        def des(ser):  # noqa
-            dct = {}
-            if isinstance(ser, str):
-                raise TypeError(ser)
-            elif isinstance(ser, collections.abc.Mapping):
-                for kser, vser in ser.items():
-                    k, v = kdes(kser), vdes(vser)
-                    if k in dct:
-                        raise KeyError(k)
-                    dct[k] = v
-            elif isinstance(ser, collections.abc.Sequence):
-                for e in ser:
-                    if not isinstance(e, collections.abc.Sequence) or isinstance(e, str):
-                        raise TypeError(e)
-                    kser, vser = e
-                    k, v = kdes(kser), vdes(vser)
-                    if k in dct:
-                        raise KeyError(k)
-                    dct[k] = v
-            else:
-                raise TypeError(ser)
-            return dct
-        return des
-
-    if isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Set:
-        [espec] = spec.args
-        edes = deserializer(espec)
-        return lambda ser: {edes(e) for e in ser}
-
-    if isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Sequence:
-        [espec] = spec.args
-        edes = deserializer(espec)
-        def des(ser):  # noqa
-            if not isinstance(ser, collections.abc.Sequence) or isinstance(ser, str):
-                raise TypeError(ser)
-            return [edes(e) for e in ser]
-        return des
-
-    if isinstance(spec, rfl.TupleTypeSpec):
-        edess = [serializer(e) for e in spec.args]
-        def des(ser):  # noqa
-            if isinstance(ser, str) or len(ser) != edess:
-                raise TypeError(ser)
-            return[d(e) for d, e in zip(edess, ser)]
-        return des
-
-    if isinstance(spec, rfl.SpecialParameterizedGenericTypeSpec) and spec.erased_cls is collections.abc.Callable:
-        return lambda ser: check.callable(ser)
-
-    if not isinstance(spec, rfl.NonGenericTypeSpec):
-        raise TypeError(spec)
-
-    if isinstance(spec, rfl.TypeSpec) and issubclass(spec.erased_cls, enum.Enum):
-        return lambda ser: spec.erased_cls.__members__[check.isinstance(ser, str)]
-
-    if isinstance(spec, rfl.TypeSpec) and spec.erased_cls in PRIMITIVE_TYPES:
-        def des(ser):
-            if isinstance(ser, spec.erased_cls):
-                return ser
-            elif isinstance(ser, str):
-                return spec.erased_cls(ser)
-            else:
-                raise TypeError(ser)
-        return des
 
     raise TypeError(spec)
 

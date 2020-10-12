@@ -68,7 +68,7 @@ class Ref(dc.Frozen, lang.Abstract, ta.Generic[ElementT], repr=False, eq=False, 
             _bind = cls
 
             @property
-            def handles_dataclass_polymorphism(self) -> bool:
+            def handles_polymorphism(self) -> bool:
                 return True
 
             def serialize(self, obj: Ref) -> ta.Any:

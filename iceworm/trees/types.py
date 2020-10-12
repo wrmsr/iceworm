@@ -31,7 +31,7 @@ class AstQuery(Query):
 class QuerySerde(serde.AutoSerde[Query]):
 
     @property
-    def handles_dataclass_polymorphism(self) -> bool:
+    def handles_polymorphism(self) -> bool:
         return True
 
     def serialize(self, obj: Query) -> ta.Any:
