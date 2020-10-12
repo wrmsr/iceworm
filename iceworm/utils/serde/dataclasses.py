@@ -6,11 +6,9 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import reflect as rfl
 
-from .serde import deserialize
 from .serde import deserializer
 from .serde import Deserializer
 from .serde import get_serde
-from .serde import serialize
 from .serde import Serialized
 from .serde import serializer
 from .serde import Serializer
@@ -243,17 +241,28 @@ def deserialize_dataclass_fields(ser: ta.Mapping[str, ta.Any], dcls: type) -> T:
     return dataclass_fields_deserializer(dcls)(ser)
 
 
-def deserialize_dataclass(ser: Serialized, cls: type, *, no_custom: bool = False) -> T:
+def dataclass_deserializer(cls: type, *, no_custom: bool = False) -> Deserializer:
     custom = get_serde(cls) if not no_custom else None
     if custom is not None and custom.handles_dataclass_polymorphism:
-        return custom.deserialize(ser)
+        return custom.deserialize
+
     if _is_monomorphic_dataclass(cls):
-        dcls = cls
-    else:
+        return custom.deserialize if custom is not None else dataclass_fields_deserializer(cls)
+
+    scm = {}
+    for scls, snam in get_subclass_map(cls).items():
+        if not isinstance(scls, type):
+            continue
+
+        custom = get_serde(scls) if not no_custom else None
+        scm[snam] = custom.deserialize if custom is not None else dataclass_fields_deserializer(scls)
+
+    def des(ser):
         [[n, ser]] = check.isinstance(ser, ta.Mapping).items()
-        dcls = check.isinstance(get_subclass_map(cls)[n], type)
-    custom = get_serde(dcls) if not no_custom else None
-    if custom is not None:
-        return custom.deserialize(ser)
-    else:
-        return deserialize_dataclass_fields(ser, dcls)
+        return scm[n](ser)
+
+    return des
+
+
+def deserialize_dataclass(ser: Serialized, cls: type, *, no_custom: bool = False) -> T:
+    return dataclass_deserializer(cls, no_custom=no_custom)(ser)
