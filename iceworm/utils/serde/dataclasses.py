@@ -7,9 +7,11 @@ from omnibus import lang
 from omnibus import reflect as rfl
 
 from .serde import deserialize
+from .serde import deserializer
 from .serde import get_serde
 from .serde import serialize
 from .serde import Serialized
+from .serde import serializer
 
 
 T = ta.TypeVar('T')
@@ -167,14 +169,23 @@ def _get_dataclass_field_type_map(dcls: type) -> _DataclassFieldSerdeMap:
         return dct
 
 
-def serialize_dataclass_fields(obj: T) -> Serialized:
-    ser = {}
-    for fn, fs in _get_dataclass_field_type_map(type(obj)).items():
-        v = getattr(obj, fn)
-        if fs.ignore_if is not None and fs.ignore_if(v):
-            continue
-        ser[fn] = serialize(v, spec=rfl.spec(fs.cls))
+def dataclass_fields_serializer(cls: type) -> Serialized:
+    sers = {}
+    for fn, fs in _get_dataclass_field_type_map(cls).items():
+        sers[fn] = (fs, serializer(rfl.spec(fs.cls)))
+    def ser(obj):  # noqa
+        dct = {}
+        for fn, (fs, fser) in sers.items():
+            v = getattr(obj, fn)
+            if fs.ignore_if is not None and fs.ignore_if(v):
+                continue
+            dct[fn] = fser(v)
+        return dct
     return ser
+
+
+def serialize_dataclass_fields(obj: T) -> Serialized:
+    return dataclass_fields_serializer(type(obj))(obj)
 
 
 def serialize_dataclass(obj: T, *, spec: ta.Optional[rfl.Spec] = None, no_custom: bool = False) -> Serialized:
