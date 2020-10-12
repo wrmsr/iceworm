@@ -268,7 +268,7 @@ def deserialize_dataclass(ser: Serialized, cls: type, *, no_custom: bool = False
     return dataclass_deserializer(cls, no_custom=no_custom)(ser)
 
 
-@serde_gen(first=True)
+@serde_gen(priority=True)
 class DataclassSerdeGen(SerdeGen):
 
     def match(self, spec: rfl.Spec) -> bool:

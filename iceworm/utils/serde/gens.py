@@ -151,7 +151,7 @@ class TupleSerdeGen(AutoSerdeGen):
         return ser
 
     def deserializer(self, spec: rfl.Spec) -> Deserializer:
-        edess = [serializer(e) for e in spec.args]
+        edess = [deserializer(e) for e in spec.args]
         def des(ser):  # noqa
             if isinstance(ser, str) or len(ser) != edess:
                 raise TypeError(ser)

@@ -90,6 +90,9 @@ class SerdeGen(lang.Abstract):
 
 class _SerdeState(dc.Pure):
 
+    priority_serde_gens: ta.MutableSequence[SerdeGen] = dc.field(
+        default_factory=list)
+
     serde_gens: ta.MutableSequence[SerdeGen] = dc.field(
         default_factory=list)
 
@@ -105,6 +108,18 @@ def get_serde(cls: type) -> ta.Optional[Serde]:
     try:
         return _STATE.serdes_by_cls[cls]
     except KeyError:
+        return None
+
+
+def get_serde_gen(spec: ta.Any) -> ta.Optional[SerdeGen]:
+    spec = rfl.spec(spec)
+    for g in _STATE.priority_serde_gens:
+        if g.match(spec):
+            return g
+    matches = [g for g in _STATE.serde_gens if g.match(spec)]
+    if matches:
+        return check.single(matches)
+    else:
         return None
 
 
@@ -133,15 +148,15 @@ class AutoSerde(Serde[T], lang.Abstract):
         serde_for(ty)(cls)
 
 
-def serde_gen(*, first: bool = False):
+def serde_gen(*, priority: bool = False):
     def inner(obj):
         if isinstance(obj, type):
             sd = obj()
         else:
             sd = obj
         check.isinstance(sd, SerdeGen)
-        if first:
-            _STATE.serde_gens.insert(0, sd)
+        if priority:
+            _STATE.priority_serde_gens.append(sd)
         else:
             _STATE.serde_gens.append(sd)
         return obj
@@ -158,11 +173,9 @@ class AutoSerdeGen(SerdeGen, lang.Abstract):
 
 def serializer(spec: ta.Optional[ta.Any]) -> Serializer:
     spec = rfl.spec(spec)
-
-    for sg in _STATE.serde_gens:
-        if sg.match(spec):
-            return sg.serializer(spec)
-
+    gen = get_serde_gen(spec)
+    if gen is not None:
+        return gen.serializer(spec)
     raise TypeError(spec)
 
 
@@ -172,11 +185,9 @@ def serialize(obj: T, spec: ta.Optional[ta.Any] = None) -> Serialized:
 
 def deserializer(spec: ta.Any) -> Deserializer:
     spec = rfl.spec(spec)
-
-    for sg in _STATE.serde_gens:
-        if sg.match(spec):
-            return sg.deserializer(spec)
-
+    gen = get_serde_gen(spec)
+    if gen is not None:
+        return gen.deserializer(spec)
     raise TypeError(spec)
 
 
