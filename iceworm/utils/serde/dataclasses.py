@@ -8,10 +8,12 @@ from omnibus import reflect as rfl
 
 from .serde import deserialize
 from .serde import deserializer
+from .serde import Deserializer
 from .serde import get_serde
 from .serde import serialize
 from .serde import Serialized
 from .serde import serializer
+from .serde import Serializer
 
 
 T = ta.TypeVar('T')
@@ -169,7 +171,7 @@ def _get_dataclass_field_type_map(dcls: type) -> _DataclassFieldSerdeMap:
         return dct
 
 
-def dataclass_fields_serializer(cls: type) -> Serialized:
+def dataclass_fields_serializer(cls: type) -> Serializer:
     sers = {}
     for fn, fs in _get_dataclass_field_type_map(cls).items():
         sers[fn] = (fs, serializer(rfl.spec(fs.cls)))
@@ -188,19 +190,35 @@ def serialize_dataclass_fields(obj: T) -> Serialized:
     return dataclass_fields_serializer(type(obj))(obj)
 
 
+def dataclass_serializer(spec: ta.Optional[rfl.Spec] = None, no_custom: bool = False) -> Serializer:
+    cls = check.isinstance(spec, rfl.TypeSpec).erased_cls
+
+    custom = get_serde(cls) if not no_custom else None
+    if custom is not None and custom.handles_dataclass_polymorphism:
+        return custom.serialize
+
+    if _is_monomorphic_dataclass(cls):
+        return custom.serialize if custom is not None else dataclass_fields_serializer(cls)
+
+    scm = {}
+    for scls, snam in get_subclass_map(cls).items():
+        if not isinstance(scls, type):
+            continue
+
+        custom = get_serde(scls) if not no_custom else None
+        if custom is not None and custom.handles_dataclass_polymorphism:
+            ser = custom.serialize
+        else:
+            sser = custom.serialize if custom is not None else dataclass_fields_serializer(scls)
+            ser = (lambda snam, sser: lambda obj: {snam: sser(obj)})(snam, sser)
+
+        scm[scls] = ser
+
+    return lambda obj: scm[type(obj)](obj)
+
+
 def serialize_dataclass(obj: T, *, spec: ta.Optional[rfl.Spec] = None, no_custom: bool = False) -> Serialized:
-    custom = get_serde(type(obj)) if not no_custom else None
-    if custom is not None:
-        if custom.handles_dataclass_polymorphism:
-            return custom.serialize(obj)
-        ser = custom.serialize(obj)
-    else:
-        ser = serialize_dataclass_fields(obj)
-    if isinstance(spec, rfl.TypeSpec) and spec.erased_cls is type(obj) and _is_monomorphic_dataclass(spec.erased_cls):
-        return ser
-    else:
-        scm = get_subclass_map(type(obj))
-        return {check.isinstance(scm[type(obj)], str): ser}
+    return dataclass_serializer(spec=spec if spec is not None else rfl.spec(type(obj)), no_custom=no_custom)(obj)
 
 
 def deserialize_dataclass_fields(ser: ta.Mapping[str, ta.Any], dcls: type) -> T:

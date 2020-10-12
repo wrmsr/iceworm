@@ -142,18 +142,26 @@ def serializer(spec: ta.Optional[ta.Any]) -> Serializer:
         serde = _STATE.serdes_by_cls[spec.erased_cls]
         return lambda obj: serde.serialize(obj)
 
-    elif isinstance(spec, rfl.GenericTypeSpec) and issubclass(spec.erased_cls, collections.abc.Mapping):
+    elif isinstance(spec, rfl.GenericTypeSpec) and spec.erased_cls is collections.abc.Mapping:
         kspec, vspec = spec.args
         kser, vser = serializer(kspec), serializer(vspec)
         return lambda obj: [[kser(k), vser(v)] for k, v in obj.items()]
 
     elif (
             isinstance(spec, rfl.GenericTypeSpec) and
-            issubclass(spec.erased_cls, (collections.abc.Sequence, collections.abc.Set))
+            spec.erased_cls in (collections.abc.Sequence, collections.abc.Set)
     ):
         [espec] = spec.args
         eser = serializer(espec)
         return lambda obj: [eser(e) for e in obj]
+
+    elif isinstance(spec, rfl.TupleTypeSpec):
+        esers = [serializer(e) for e in spec.args]
+        def ser(obj):  # noqa
+            if not isinstance(obj, tuple) or len(obj) != esers:
+                raise TypeError(obj)
+            return[s(e) for s, e in zip(esers, obj)]
+        return ser
 
     elif issubclass(spec.erased_cls, enum.Enum):
         return lambda obj: obj.name
@@ -221,6 +229,14 @@ def deserializer(spec: rfl.Spec) -> Deserializer:
             if not isinstance(ser, collections.abc.Sequence) or isinstance(ser, str):
                 raise TypeError(ser)
             return [edes(e) for e in ser]
+        return des
+
+    elif isinstance(spec, rfl.TupleTypeSpec):
+        edess = [serializer(e) for e in spec.args]
+        def des(ser):  # noqa
+            if isinstance(ser, str) or len(ser) != edess:
+                raise TypeError(ser)
+            return[d(e) for d, e in zip(edess, ser)]
         return des
 
     elif isinstance(spec, rfl.SpecialParameterizedGenericTypeSpec) and spec.erased_cls is collections.abc.Callable:

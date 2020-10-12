@@ -1,6 +1,7 @@
 import typing as ta
 
 from omnibus import dataclasses as dc
+from omnibus import reflect as rfl
 
 from ..utils import serde
 from .nodes import Node
@@ -35,7 +36,7 @@ class QuerySerde(serde.AutoSerde[Query]):
         return True
 
     def serialize(self, obj: Query) -> ta.Any:
-        return serde.serialize_dataclass(obj, no_custom=True)
+        return serde.serialize_dataclass(obj, spec=rfl.spec(Query), no_custom=True)
 
     def deserialize(self, ser: ta.Any) -> Query:
         if isinstance(ser, str):

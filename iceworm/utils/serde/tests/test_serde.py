@@ -64,7 +64,7 @@ def test_serde():
     rt(datetime.datetime.now())
     rt(uuid.uuid4())
 
-    serde.serialize(ocol.FrozenDict({1: 2, 3: 4}))
+    serde.serialize(ocol.FrozenDict({1: 2, 3: 4}), ta.Mapping[int, int])
 
 
 def test_reraise():
