@@ -13,7 +13,6 @@ import typing as ta
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
-from omnibus import reflect as rfl
 
 from ..utils import seq
 from ..utils import serde
@@ -250,7 +249,7 @@ class DatatypeSerde(serde.AutoSerde[Datatype]):
         return True
 
     def serialize(self, obj: Datatype) -> ta.Any:
-        return serde.serialize_dataclass(obj, spec=rfl.spec(Datatype), no_custom=True)
+        return serde.serialize_dataclass(obj, Datatype, no_custom=True)
 
     def deserialize(self, ser: ta.Any) -> Datatype:
         if isinstance(ser, str):

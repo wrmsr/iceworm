@@ -74,7 +74,25 @@ class Serde(lang.Abstract, ta.Generic[T]):
         raise NotImplementedError
 
 
+class SerdeGen(lang.Abstract):
+
+    @abc.abstractmethod
+    def match(self, spec: rfl.Spec) -> bool:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def serializer(self, spec: rfl.Spec) -> Serializer:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def deserializer(self, spec: rfl.Spec) -> Deserializer:
+        raise NotImplementedError
+
+
 class _SerdeState(dc.Pure):
+
+    serde_gens: ta.MutableSequence[SerdeGen] = dc.field(
+        default_factory=list)
 
     serdes_by_cls: ta.MutableMapping[type, Serde] = dc.field(
         default_factory=weakref.WeakKeyDictionary)
@@ -116,8 +134,44 @@ class AutoSerde(Serde[T], lang.Abstract):
         serde_for(ty)(cls)
 
 
+def serde_gen(obj):
+    if isinstance(obj, type):
+        sd = obj()
+    else:
+        sd = obj
+    check.isinstance(sd, SerdeGen)
+    _STATE.serde_gens.append(sd)
+    return obj
+
+
+class AutoSerdeGen(SerdeGen, lang.Abstract):
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__()
+        check.state(cls.__bases__ == (AutoSerdeGen,))
+        serde_gen(cls)
+
+
+class OptionalSerdeGen(AutoSerdeGen):
+
+    def match(self, spec: rfl.Spec) -> bool:
+        return isinstance(spec, rfl.UnionSpec) and spec.optional_arg is not None
+
+    def serializer(self, spec: rfl.Spec) -> Serializer:
+        eser = serializer(spec.optional_arg)
+        return lambda obj: None if obj is None else eser(obj)
+
+    def deserializer(self, spec: rfl.Spec) -> Deserializer:
+        edes = deserializer(spec.optional_arg)
+        return lambda ser: None if ser is None else edes(ser)
+
+
 def serializer(spec: ta.Optional[ta.Any]) -> Serializer:
     spec = rfl.spec(spec)
+
+    for sg in _STATE.serde_gens:
+        if sg.match(spec):
+            return sg.serializer(spec)
 
     if isinstance(spec, rfl.UnionSpec) and spec.optional_arg is not None:
         eser = serializer(spec.optional_arg)
@@ -136,7 +190,7 @@ def serializer(spec: ta.Optional[ta.Any]) -> Serializer:
 
     elif isinstance(spec, rfl.TypeSpec) and dc.is_dataclass(spec.erased_cls):
         from .dataclasses import serialize_dataclass
-        return lambda obj: serialize_dataclass(obj, spec=spec)
+        return lambda obj: serialize_dataclass(obj, spec.erased_cls)
 
     elif isinstance(spec, rfl.TypeSpec) and spec.erased_cls in _STATE.serdes_by_cls:
         serde = _STATE.serdes_by_cls[spec.erased_cls]
@@ -177,12 +231,14 @@ def serialize(obj: T, spec: ta.Optional[ta.Any] = None) -> Serialized:
     return serializer(spec if spec is not None else type(obj))(obj)
 
 
-def deserializer(spec: rfl.Spec) -> Deserializer:
-    if isinstance(spec, rfl.UnionSpec) and spec.optional_arg is not None:
-        edes = deserializer(spec.optional_arg)
-        return lambda ser: None if ser is None else edes(ser)
+def deserializer(spec: ta.Any) -> Deserializer:
+    spec = rfl.spec(spec)
 
-    elif isinstance(spec, rfl.TypeSpec) and dc.is_dataclass(spec.erased_cls):
+    for sg in _STATE.serde_gens:
+        if sg.match(spec):
+            return sg.deserializer(spec)
+
+    if isinstance(spec, rfl.TypeSpec) and dc.is_dataclass(spec.erased_cls):
         from .dataclasses import deserialize_dataclass
         return lambda ser: deserialize_dataclass(ser, spec.erased_cls)
 

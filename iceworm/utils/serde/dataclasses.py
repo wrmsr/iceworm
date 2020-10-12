@@ -4,7 +4,6 @@ import weakref
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
-from omnibus import reflect as rfl
 
 from .serde import deserializer
 from .serde import Deserializer
@@ -172,7 +171,7 @@ def _get_dataclass_field_type_map(dcls: type) -> _DataclassFieldSerdeMap:
 def dataclass_fields_serializer(cls: type) -> Serializer:
     sers = {}
     for fn, fs in _get_dataclass_field_type_map(cls).items():
-        sers[fn] = (fs, serializer(rfl.spec(fs.cls)))
+        sers[fn] = (fs, serializer(fs.cls))
     def ser(obj):  # noqa
         dct = {}
         for fn, (fs, fser) in sers.items():
@@ -188,9 +187,7 @@ def serialize_dataclass_fields(obj: T) -> Serialized:
     return dataclass_fields_serializer(type(obj))(obj)
 
 
-def dataclass_serializer(spec: ta.Optional[rfl.Spec] = None, no_custom: bool = False) -> Serializer:
-    cls = check.isinstance(spec, rfl.TypeSpec).erased_cls
-
+def dataclass_serializer(cls: type, no_custom: bool = False) -> Serializer:
     custom = get_serde(cls) if not no_custom else None
     if custom is not None and custom.handles_dataclass_polymorphism:
         return custom.serialize
@@ -215,13 +212,13 @@ def dataclass_serializer(spec: ta.Optional[rfl.Spec] = None, no_custom: bool = F
     return lambda obj: scm[type(obj)](obj)
 
 
-def serialize_dataclass(obj: T, *, spec: ta.Optional[rfl.Spec] = None, no_custom: bool = False) -> Serialized:
-    return dataclass_serializer(spec=spec if spec is not None else rfl.spec(type(obj)), no_custom=no_custom)(obj)
+def serialize_dataclass(obj: T, cls: ta.Optional[type] = None, *, no_custom: bool = False) -> Serialized:
+    return dataclass_serializer(cls if cls is not None else type(obj), no_custom=no_custom)(obj)
 
 
 def dataclass_fields_deserializer(dcls: type) -> Deserializer:
     fdct = _get_dataclass_field_type_map(dcls)
-    desers = {fn: deserializer(rfl.spec(fs.cls)) for fn, fs in fdct.items()}
+    desers = {fn: deserializer(fs.cls) for fn, fs in fdct.items()}
 
     def des(ser):
         check.isinstance(ser, ta.Mapping)
