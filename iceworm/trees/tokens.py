@@ -16,7 +16,6 @@ from omnibus._vendor import antlr4
 
 from . import analysis as ana
 from . import nodes as no
-from ..utils import IndexedSeq
 
 
 class TokenAnalysis:
@@ -30,8 +29,8 @@ class TokenAnalysis:
 
     @properties.cached
     @property
-    def toks(self) -> IndexedSeq[antlr4.Token]:
-        return IndexedSeq(self._root.meta[antlr4.ParserRuleContext].parser.getInputStream().tokens, identity=True)
+    def toks(self) -> ocol.IndexedSeq[antlr4.Token]:
+        return ocol.IndexedSeq(self._root.meta[antlr4.ParserRuleContext].parser.getInputStream().tokens, identity=True)
 
     @properties.cached
     @property

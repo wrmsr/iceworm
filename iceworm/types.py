@@ -8,15 +8,15 @@ import collections.abc
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as col
 from omnibus import dataclasses as dc
 from omnibus import properties
 
-from .utils import seq
 from .utils import serde
 
 
 class QualifiedName(dc.Pure, ta.Sequence[str]):
-    parts: ta.Sequence[str] = dc.field(coerce=seq)
+    parts: ta.Sequence[str] = dc.field(coerce=col.seq)
 
     dc.check(lambda parts: (
             parts and

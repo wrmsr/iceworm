@@ -13,6 +13,7 @@ import enum
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as col
 from omnibus import dataclasses as dc
 from omnibus import properties
 
@@ -20,7 +21,6 @@ from ...types import QualifiedName
 from ...utils import build_dc_repr
 from ...utils import build_enum_value_map
 from ...utils import nodal
-from ...utils import seq
 
 
 T = ta.TypeVar('T')
@@ -60,7 +60,7 @@ class Identifier(Expr):
 
 
 class QualifiedNameNode(Expr):
-    parts: ta.Sequence[Identifier] = dc.field(coerce=seq)
+    parts: ta.Sequence[Identifier] = dc.field(coerce=col.seq)
 
     @properties.cached
     @property
@@ -133,7 +133,7 @@ class StarExpr(Expr):
 
 class TypeSpec(Node):
     name: Identifier
-    args: ta.Sequence[Expr] = dc.field((), coerce=seq)
+    args: ta.Sequence[Expr] = dc.field((), coerce=col.seq)
 
 
 class Direction(enum.Enum):

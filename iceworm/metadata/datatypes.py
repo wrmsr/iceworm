@@ -11,10 +11,10 @@ TODO:
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as col
 from omnibus import dataclasses as dc
 from omnibus import lang
 
-from ..utils import seq
 from ..utils import serde
 
 
@@ -239,7 +239,7 @@ GEOGRAPHY = Geography()
 
 class TableType(Datatype):
     columns: ta.Sequence[ta.Tuple[str, Datatype]] = dc.field(
-        coerce=seq, check=lambda l: all(isinstance(k, str) and isinstance(v, Datatype) for k, v in l))
+        coerce=col.seq, check=lambda l: all(isinstance(k, str) and isinstance(v, Datatype) for k, v in l))
 
 
 class DatatypeSerde(serde.AutoSerde[Datatype]):

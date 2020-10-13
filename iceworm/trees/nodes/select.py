@@ -2,11 +2,10 @@ import enum
 import operator
 import typing as ta
 
+from omnibus import collections as col
 from omnibus import dataclasses as dc
 
 from ...utils import build_enum_value_map
-from ...utils import seq
-from ...utils import seq_or_none
 from ...utils import serde
 from .base import Expr
 from .base import Identifier
@@ -54,7 +53,7 @@ class Join(Relation):
     type: JoinType
     right: Relation
     condition: ta.Optional[Expr] = None
-    using: ta.Optional[ta.Sequence[Identifier]] = dc.field(None, coerce=seq_or_none)
+    using: ta.Optional[ta.Sequence[Identifier]] = dc.field(None, coerce=col.seq_or_none)
 
 
 class Pivot(Relation):
@@ -62,14 +61,14 @@ class Pivot(Relation):
     func: QualifiedNameNode
     pivot_col: Identifier
     value_col: Identifier
-    values: ta.Sequence[Expr] = dc.field(coerce=seq)
+    values: ta.Sequence[Expr] = dc.field(coerce=col.seq)
 
 
 class Unpivot(Relation):
     relation: Relation
     value_col: Identifier
     name_col: Identifier
-    pivot_cols: ta.Sequence[Identifier] = dc.field(coerce=seq)
+    pivot_cols: ta.Sequence[Identifier] = dc.field(coerce=col.seq)
 
 
 class Lateral(Relation):
@@ -87,7 +86,7 @@ class Table(Relation):
 class AliasedRelation(Relation):
     relation: Relation = dc.field(check=lambda r: not isinstance(r, AliasedRelation))
     alias: Identifier
-    columns: ta.Sequence[Identifier] = dc.field((), coerce=seq)
+    columns: ta.Sequence[Identifier] = dc.field((), coerce=col.seq)
 
 
 class SelectItem(Node, abstract=True):
@@ -112,27 +111,27 @@ class Grouping(Node, abstract=True):
 
 
 class FlatGrouping(Grouping):
-    items: ta.Sequence[Expr] = dc.field(coerce=seq)
+    items: ta.Sequence[Expr] = dc.field(coerce=col.seq)
 
 
 class GroupingSet(Node):
-    items: ta.Sequence[Expr] = dc.field(coerce=seq)
+    items: ta.Sequence[Expr] = dc.field(coerce=col.seq)
 
 
 class SetsGrouping(Grouping):
-    sets: ta.Sequence[GroupingSet] = dc.field(coerce=seq)
+    sets: ta.Sequence[GroupingSet] = dc.field(coerce=col.seq)
 
 
 class Select(Selectable, Stmt):
-    items: ta.Sequence[SelectItem] = dc.field(coerce=seq)
-    relations: ta.Sequence[Relation] = dc.field((), coerce=seq, metadata={serde.Ignore: operator.not_})
+    items: ta.Sequence[SelectItem] = dc.field(coerce=col.seq)
+    relations: ta.Sequence[Relation] = dc.field((), coerce=col.seq, metadata={serde.Ignore: operator.not_})
     where: ta.Optional[Expr] = dc.field(None, metadata={serde.Ignore: operator.not_})
     top_n: ta.Optional[Integer] = dc.field(None, metadata={serde.Ignore: operator.not_})
     set_quantifier: ta.Optional[SetQuantifier] = dc.field(None, metadata={serde.Ignore: operator.not_})
     group_by: ta.Optional[Grouping] = dc.field(None, metadata={serde.Ignore: operator.not_})
     having: ta.Optional[Expr] = dc.field(None, metadata={serde.Ignore: operator.not_})
     qualify: ta.Optional[Expr] = dc.field(None, metadata={serde.Ignore: operator.not_})
-    order_by: ta.Optional[ta.Sequence[SortItem]] = dc.field(None, coerce=seq_or_none, metadata={serde.Ignore: operator.not_})  # noqa
+    order_by: ta.Optional[ta.Sequence[SortItem]] = dc.field(None, coerce=col.seq_or_none, metadata={serde.Ignore: operator.not_})  # noqa
     limit: ta.Optional[int] = dc.field(None, metadata={serde.Ignore: operator.not_})
 
 
@@ -142,7 +141,7 @@ class Cte(Node):
 
 
 class CteSelect(Selectable):
-    ctes: ta.Sequence[Cte] = dc.field(coerce=seq)
+    ctes: ta.Sequence[Cte] = dc.field(coerce=col.seq)
     select: Selectable
 
 
@@ -165,7 +164,7 @@ class SetSelectItem(Node):
 
 class SetSelect(Selectable):
     left: Selectable
-    items: ta.Sequence[SetSelectItem] = dc.field(coerce=seq)
+    items: ta.Sequence[SetSelectItem] = dc.field(coerce=col.seq)
 
 
 class SelectExpr(Expr):

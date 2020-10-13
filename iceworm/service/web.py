@@ -10,13 +10,13 @@ import time
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as col
 from omnibus import dataclasses as dc
 from omnibus import http
 from omnibus import lifecycles as lc
 
 from . import resources
 from .. import protos
-from ..utils import unique_dict
 
 
 log = logging.getLogger(__name__)
@@ -120,7 +120,7 @@ class App(lc.ContextManageableLifecycle):
         super().__init__()
 
         self._handlers = [check.isinstance(h, Handler) for h in handlers]
-        self._handlers_by_endpoint = unique_dict((e, h) for h in self._handlers for e in h.endpoints)
+        self._handlers_by_endpoint = col.unique_dict((e, h) for h in self._handlers for e in h.endpoints)
         self._all_paths = {e.path for h in self._handlers for e in h.endpoints}
 
     def _do_lifecycle_start(self) -> None:

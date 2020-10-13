@@ -2,11 +2,11 @@ import abc
 import typing as ta
 
 from omnibus import dataclasses as dc
+from omnibus import collections as col
 from omnibus import lang
 
 from ...utils import build_dc_repr
 from ...utils import nodal
-from ...utils import seq
 
 
 OpT = ta.TypeVar('OpT', bound='Op')
@@ -29,11 +29,11 @@ class OpExecutor(lang.Abstract, ta.Generic[OpT]):
 
 
 class Set(Op):
-    ops: ta.Sequence[Op] = dc.field(coerce=seq)
+    ops: ta.Sequence[Op] = dc.field(coerce=col.seq)
 
 
 class List(Op):
-    ops: ta.Sequence[Op] = dc.field(coerce=seq)
+    ops: ta.Sequence[Op] = dc.field(coerce=col.seq)
 
 
 class ListExecutor(OpExecutor[List]):

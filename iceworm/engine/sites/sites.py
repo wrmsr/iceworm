@@ -25,13 +25,13 @@ TODO:
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as col
 from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus.serde.objects import yaml as oyaml
 
 from .. import elements as els
 from ...utils import serde
-from ...utils import unique_dict
 
 
 class SourceLocation(els.Annotation, els.Inherited):
@@ -49,7 +49,7 @@ class Formats(lang.ValueEnum):
     SQL = Format('sql', {'sql'})
 
 
-FORMATS_BY_EXTENSION: ta.Mapping[str, Format] = unique_dict((e, f) for f in Formats._by_value for e in f.extensions)
+FORMATS_BY_EXTENSION: ta.Mapping[str, Format] = col.unique_dict((e, f) for f in Formats._by_value for e in f.extensions)
 
 
 class Site(els.Element):

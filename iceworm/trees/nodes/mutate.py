@@ -1,8 +1,8 @@
 import typing as ta
 
+from omnibus import collections as col
 from omnibus import dataclasses as dc
 
-from ...utils import seq
 from .base import Expr
 from .base import Identifier
 from .base import Node
@@ -19,7 +19,7 @@ class ColSpec(Node):
 
 class CreateTable(Stmt):
     name: QualifiedNameNode
-    cols: ta.Sequence[ColSpec] = dc.field(coerce=seq)
+    cols: ta.Sequence[ColSpec] = dc.field(coerce=col.seq)
     select: ta.Optional[Select] = None
 
 

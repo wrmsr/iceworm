@@ -28,11 +28,11 @@ import collections.abc
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as col
 from omnibus import lang
 import sqlalchemy as sa
 
 from ..utils import serde
-from ..utils import unique_dict
 
 
 StrMap = ta.Mapping[str, ta.Any]
@@ -80,7 +80,7 @@ class ObjMappers(ta.Iterable[ObjMapper]):
     def __init__(self, mappers: ta.Iterable[ObjMapper]) -> None:
         super().__init__()
 
-        self._mappers_by_cls = unique_dict((sm.cls, sm) for sm in mappers for _ in [check.isinstance(sm, ObjMapper)])
+        self._mappers_by_cls = col.unique_dict((sm.cls, sm) for sm in mappers for _ in [check.isinstance(sm, ObjMapper)])  # noqa
 
     @classmethod
     def of(cls, obj: ta.Union['ObjMappers', ta.Iterable[ObjMapper]]) -> 'ObjMappers':

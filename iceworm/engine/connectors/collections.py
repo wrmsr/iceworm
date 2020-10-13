@@ -5,13 +5,11 @@ TODO:
 import typing as ta
 
 from omnibus import check
-from omnibus import collections as ocol
+from omnibus import collections as col
 
 from .. import elements as els
 from ... import metadata as md
 from ...types import QualifiedName
-from ...utils import set_dict
-from ...utils import unique_dict
 from .base import Connection
 from .base import Connector
 from .mirrors import Mirror
@@ -24,7 +22,7 @@ class ConnectorSet(ta.Iterable[Connector]):
 
         self._ctors = [check.isinstance(e, Connector) for e in ctors]
 
-        self._ctors_by_id: ta.Mapping[els.Id, Connector] = unique_dict((c.id, c) for c in self._ctors)
+        self._ctors_by_id: ta.Mapping[els.Id, Connector] = col.unique_dict((c.id, c) for c in self._ctors)
 
     @classmethod
     def of(cls, it: ta.Iterable[ta.Union[Connector, Connector.Config]]) -> 'ConnectorSet':
@@ -54,7 +52,7 @@ class ConnectionSet(ta.Iterable[Connection], Mirror):
 
         self._ctors = check.isinstance(ctors, ConnectorSet)
 
-        self._conns_by_ctor: ta.MutableMapping[Connector, Connection] = ocol.IdentityKeyDict()
+        self._conns_by_ctor: ta.MutableMapping[Connector, Connection] = col.IdentityKeyDict()
 
     @property
     def connectors(self) -> ConnectorSet:
@@ -80,7 +78,7 @@ class ConnectionSet(ta.Iterable[Connection], Mirror):
             return conn
 
     def reflect(self, names: ta.Optional[ta.Iterable[QualifiedName]] = None) -> ta.Mapping[QualifiedName, md.Object]:
-        qns_by_cn = set_dict(names, lambda qn: qn[0], lambda qn: qn[1:])
+        qns_by_cn = col.set_dict(names, lambda qn: qn[0], lambda qn: qn[1:])
         ret = {}
         for cn, qns in qns_by_cn.items():
             conn = self[cn]

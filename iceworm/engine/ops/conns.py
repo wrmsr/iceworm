@@ -7,6 +7,7 @@ import abc
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as col
 from omnibus import dataclasses as dc
 from omnibus import lang
 import sqlalchemy as sa
@@ -17,7 +18,6 @@ from ... import sql
 from ...trees import eval as teval
 from ...trees import parsing as tpar
 from ...types import QualifiedName
-from ...utils import abs_set
 from ..connectors.impls.sql import SqlConnection
 from .base import Op
 from .base import OpExecutor
@@ -48,7 +48,7 @@ class ConnsOpExecutor(OpExecutor[ConnsOpT], lang.Abstract):
 
 
 class Transaction(Op):
-    conns: ta.AbstractSet[str] = dc.field(coerce=abs_set, check=lambda l: all(isinstance(o, str) and o for o in l))
+    conns: ta.AbstractSet[str] = dc.field(coerce=col.abs_set, check=lambda l: all(isinstance(o, str) and o for o in l))
     op: Op
 
 

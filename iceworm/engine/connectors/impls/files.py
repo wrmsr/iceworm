@@ -12,13 +12,13 @@ import os.path
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as col
 from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import properties
 
 from .... import metadata as md
 from ....types import QualifiedName
-from ....utils import seq
 from ...utils import parse_simple_select_table
 from ..base import Connection as _Connection
 from ..base import Connector as _Connector
@@ -37,13 +37,13 @@ class SchemaPolicies(lang.Namespace):
         pass
 
     class Provided(SchemaPolicy):
-        columns: ta.Sequence[md.Column] = dc.field(coerce=seq)
+        columns: ta.Sequence[md.Column] = dc.field(coerce=col.seq)
 
 
 class Mount(dc.Pure):
     path: str = dc.field(check_type=str)
     schema: SchemaPolicy = dc.field(check_type=SchemaPolicy)
-    globs: ta.Sequence[str] = dc.field(coerce=seq)
+    globs: ta.Sequence[str] = dc.field(coerce=col.seq)
 
 
 class Table(dc.Pure):
@@ -54,7 +54,7 @@ class Table(dc.Pure):
 class FileConnector(_Connector['FileConnector', 'FileConnector.Config']):
 
     class Config(_Connector.Config):
-        mounts: ta.Sequence[Mount] = dc.field(coerce=seq, check=lambda l: all(isinstance(e, Mount) for e in l))
+        mounts: ta.Sequence[Mount] = dc.field(coerce=col.seq, check=lambda l: all(isinstance(e, Mount) for e in l))
 
     def __init__(self, config: Config) -> None:
         super().__init__(check.isinstance(config, FileConnector.Config))

@@ -7,8 +7,6 @@ from omnibus import dataclasses as dc
 from omnibus import dispatch
 
 from . import nodes as no
-from ..utils import mapping
-from ..utils import seq
 from .symbols import Symbol
 from .symbols import SymbolAnalysis
 from .symbols import SymbolRef
@@ -23,7 +21,7 @@ class Origin(dc.Enum, eq=False):
 
 
 class Derived(Origin):
-    srcs: ta.Sequence[Origin] = dc.field(coerce=seq, check=lambda l: all(isinstance(e, Origin) for e in l))
+    srcs: ta.Sequence[Origin] = dc.field(coerce=ocol.seq, check=lambda l: all(isinstance(e, Origin) for e in l))
 
 
 class Link(Origin, abstract=True):
@@ -78,7 +76,7 @@ class Value(Context):
 
 class Scope(Context):
     oris_by_sym: ta.Mapping[Symbol, Origin] = dc.field(
-        coerce=mapping, check=lambda dct: all(isinstance(k, Symbol) and isinstance(v, Origin) for k, v in dct.items()))
+        coerce=ocol.map, check=lambda dct: all(isinstance(k, Symbol) and isinstance(v, Origin) for k, v in dct.items()))
 
     def __iter__(self) -> ta.Iterator[Origin]:
         yield from self.oris_by_sym.values()

@@ -27,7 +27,6 @@ from ...trees import rendering as ren
 from ...trees import transforms as ttfm
 from ...trees.types import AstQuery
 from ...types import QualifiedName
-from ...utils import set_dict
 from ..utils import parse_simple_select_table
 from ..utils import parse_simple_select_tables
 from .elements import Materializer
@@ -69,12 +68,12 @@ class PlanningElementProcessor(els.InstanceElementProcessor):
         @properties.cached
         @property
         def rows_sets_by_table_id(self) -> ta.Mapping[els.Id, ta.AbstractSet[tars.Rows]]:
-            return set_dict(self.input.get_type_set(tars.Rows), lambda r: r.table.id, identity_set=True)
+            return ocol.set_dict(self.input.get_type_set(tars.Rows), lambda r: r.table.id, identity_set=True)
 
         @properties.cached
         @property
         def mat_sets_by_table_id(self) -> ta.Mapping[els.Id, ta.AbstractSet[tars.Materialization]]:
-            return set_dict(self.input.get_type_set(tars.Materialization), lambda m: m.table.id, identity_set=True)
+            return ocol.set_dict(self.input.get_type_set(tars.Materialization), lambda m: m.table.id, identity_set=True)
 
         def build_rows_op(self, rows: tars.Rows, dst: QualifiedName) -> ops.Op:
             query = ren.render_query(rows.query)

@@ -3,13 +3,13 @@ import logging
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as col
 from omnibus import dataclasses as dc
 from omnibus import lang
 
 from ... import elements as els
 from .... import metadata as md
 from ....types import QualifiedName
-from ....utils import unique_dict
 from ...utils import parse_simple_select_table
 from ..base import Connection as _Connection
 from ..base import Connector as _Connector
@@ -37,7 +37,7 @@ class SystemConnector(_Connector['SystemConnector', 'SystemConnector.Config']):
     def __init__(self, config: Config = Config()) -> None:
         super().__init__(check.isinstance(config, SystemConnector.Config))
 
-        self._tables_by_name = unique_dict((t.md_table.name, t) for t in [
+        self._tables_by_name = col.unique_dict((t.md_table.name, t) for t in [
             NotificationsTable(),
         ])
 

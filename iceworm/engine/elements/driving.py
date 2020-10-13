@@ -32,8 +32,6 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import lang
 
-from ...utils import partition
-from ...utils import unique_dict
 from .base import Dependable
 from .base import Element
 from .base import Frozen
@@ -200,14 +198,14 @@ class ElementProcessingDriver:
 
         for ep in step:
             ep_sets_by_cls.setdefault(type(ep), ocol.IdentitySet()).add(ep)
-        cls_by_qn = unique_dict((cls.__qualname__, cls) for cls in ep_sets_by_cls)
+        cls_by_qn = ocol.unique_dict((cls.__qualname__, cls) for cls in ep_sets_by_cls)
 
         ret = []
         for _, cls in sorted(cls_by_qn.items(), key=lambda t: t[0]):
             kws_by_ep: ta.Mapping[ElementProcessor, ta.Mapping[str, ta.Any]] = ocol.IdentityKeyDict(
                 (ep, dict(check.isinstance(ep.key, ta.Mapping))) for ep in ep_sets_by_cls[cls])
             kw_keys = sorted({check.isinstance(k, str) for kw in kws_by_ep.values() for k in kw})
-            eps_by_kwt = unique_dict((tuple(kw.get(k) for k in kw_keys), ep) for ep, kw in kws_by_ep.items())
+            eps_by_kwt = ocol.unique_dict((tuple(kw.get(k) for k in kw_keys), ep) for ep, kw in kws_by_ep.items())
             ret.extend([ep for _, ep in sorted(list(eps_by_kwt.items()), key=lambda t: t[0])])
 
         if self._config.step_shuffle:
@@ -278,8 +276,8 @@ class ElementProcessingDriver:
 
         for phase in PHASES:
             items = list(self._factory(phase, elements))
-            eps, items = partition(items, lambda e: isinstance(e, ElementProcessor))
-            vals, items = partition(items, lambda e: isinstance(e, type) and issubclass(e, Validation))
+            eps, items = ocol.partition(items, lambda e: isinstance(e, ElementProcessor))
+            vals, items = ocol.partition(items, lambda e: isinstance(e, type) and issubclass(e, Validation))
             check.empty(items)
 
             steps = self._build_steps(eps, phase)

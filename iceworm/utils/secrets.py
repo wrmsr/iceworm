@@ -2,10 +2,10 @@ import abc
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as col
 from omnibus import dataclasses as dc
 
 from . import serde
-from .collections import unique_dict
 
 
 class SecretKey(dc.Pure):
@@ -70,7 +70,7 @@ class Secrets:
     def __init__(self, dct: ta.Mapping[str, str]) -> None:
         super().__init__()
 
-        self._dct = unique_dict((check.isinstance(k, str), check.isinstance(v, str)) for k, v in dct.items())
+        self._dct = col.unique_dict((check.isinstance(k, str), check.isinstance(v, str)) for k, v in dct.items())
 
     def __getitem__(self, key: ta.Union[Secret, SecretKey, str]) -> Secret:
         if isinstance(key, Secret):

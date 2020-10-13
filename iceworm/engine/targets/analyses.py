@@ -11,7 +11,6 @@ from .. import connectors as ctrs
 from .. import elements as els
 from ...trees import nodes as no
 from ...types import QualifiedName
-from ...utils import unique_dict
 from .targets import Materialization
 from .targets import Rows
 from .targets import Table
@@ -48,7 +47,7 @@ class AbstractTableDependenciesAnalysis(els.Analysis, lang.Abstract):
     @properties.cached
     @property
     def tables_by_name(self) -> ta.Mapping[QualifiedName, Table]:
-        return unique_dict(
+        return ocol.unique_dict(
             (QualifiedName([ele.connector.id, *ele.name]), self.elements[ele.table])
             for ele in self.elements.get_type_set(Materialization)
         )

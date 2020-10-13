@@ -20,7 +20,6 @@ from ...trees import symbols
 from ...trees import transforms as ttfm
 from ...trees.types import AstQuery
 from ...types import QualifiedName
-from ...utils import unique_dict
 from .reflect import ReflectReferencedTablesProcessor
 from .targets import Materialization
 from .targets import Rows
@@ -48,7 +47,7 @@ class InferTableProcessor(els.InstanceElementProcessor):
         @properties.cached
         @property
         def tables_by_name(self) -> ta.Mapping[QualifiedName, Table]:
-            return unique_dict(
+            return ocol.unique_dict(
                 (QualifiedName([ele.connector.id, *ele.name]), self.input[ele.table])
                 for ele in self.input.get_type_set(Materialization)
             )
@@ -56,7 +55,7 @@ class InferTableProcessor(els.InstanceElementProcessor):
         @properties.cached
         @property
         def table_names_by_id(self) -> ta.Mapping[els.Id, QualifiedName]:
-            return unique_dict((ele.id, name) for name, ele in self.tables_by_name.items())
+            return ocol.unique_dict((ele.id, name) for name, ele in self.tables_by_name.items())
 
         @properties.cached
         @property

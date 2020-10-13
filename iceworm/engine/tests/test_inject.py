@@ -28,7 +28,6 @@ from ...trees import parsing as par
 from ...types import QualifiedName  # noqa
 from ...utils import secrets as sec  # noqa
 from ...utils import serde
-from ...utils import unique_dict
 
 
 # def get_ele_dependencies(elements: ta.Iterable[els.Element]) -> ta.Mapping[els.Element, ta.AbstractSet[els.Element]]:  # noqa
@@ -124,7 +123,7 @@ class Helper:
             execution_injector = self.injector[inj.Key(inj.Injector, 'execution')]
 
             with ops.inject.new_execution_scope(execution_injector, conns):
-                matrs_by_mat_id = unique_dict(
+                matrs_by_mat_id = ocol.unique_dict(
                     (matr.target.id, matr) for matr in self.elements.get_type_set(pln.Materializer))
 
                 deps = {mat_id: {d.id for d in matr.srcs} for mat_id, matr in matrs_by_mat_id.items()}

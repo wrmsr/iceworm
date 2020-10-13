@@ -1,12 +1,12 @@
 import typing as ta
 
 from omnibus import check
+from omnibus import collections as col
 from omnibus import dataclasses as dc
 
 from .... import metadata as md
 from ....types import Code
 from ....types import QualifiedName
-from ....utils import seq
 from ...utils import parse_simple_select_table
 from ..base import Connection as _Connection
 from ..base import Connector as _Connector
@@ -23,7 +23,7 @@ class Table(dc.Pure):
 class ComputedConnector(_Connector['ComputedConnector', 'ComputedConnector.Config']):
 
     class Config(_Connector.Config):
-        tables: ta.Sequence[Table] = dc.field(coerce=seq)
+        tables: ta.Sequence[Table] = dc.field(coerce=col.seq)
 
     def __init__(self, config: Config) -> None:
         super().__init__(check.isinstance(config, ComputedConnector.Config))
