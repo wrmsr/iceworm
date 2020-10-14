@@ -78,6 +78,7 @@ class _DataclassSerdeState:
     ) -> SubclassMap:
         if name_formatter is None:
             name_formatter = self.format_subclass_name
+
         dct = {}
         todo = {cls}
         seen = set()
@@ -85,6 +86,7 @@ class _DataclassSerdeState:
             cur = todo.pop()
             if cur in seen:
                 continue
+
             seen.add(cur)
             if lang.Abstract not in cur.__bases__:
                 n = None
@@ -94,8 +96,10 @@ class _DataclassSerdeState:
                         n = n(cur)
                 if n is None:
                     n = name_formatter(cur)
+
                 check.isinstance(n, str)
                 check.not_empty(n)
+
                 try:
                     existing = dct[n]
                 except KeyError:
@@ -103,67 +107,85 @@ class _DataclassSerdeState:
                 else:
                     if existing is not cur:
                         raise NameError(n)
+
                 dct[n] = cur
                 dct[cur] = n
+
             todo.update(cur.__subclasses__())
+
         return dct
 
     def get_subclass_map(self, cls: type) -> SubclassMap:
         if not isinstance(cls, type):
             raise TypeError(cls)
+
         try:
             return self._subclass_maps_by_cls[cls]
         except KeyError:
-            try:
-                bld = self._subclass_map_resolvers_by_cls[cls]
-            except KeyError:
-                bld = self.build_subclass_map
-            dct = self._subclass_maps_by_cls[cls] = bld(cls)
-            return dct
+            pass
+
+        try:
+            bld = self._subclass_map_resolvers_by_cls[cls]
+        except KeyError:
+            bld = self.build_subclass_map
+
+        dct = self._subclass_maps_by_cls[cls] = bld(cls)
+        return dct
 
     def _is_monomorphic_dataclass(self, cls: type) -> bool:
         try:
             return self._is_monomorphic_dataclass_by_cls[cls]
         except KeyError:
-            scm = self.get_subclass_map(cls)
-            scmcls = {k: v for k, v in scm.items() if isinstance(k, type)}
-            ret = False
-            if len(scmcls) == 1 and list(scmcls) == [cls] and lang.Final in cls.__bases__:
-                ret = True
-            self._is_monomorphic_dataclass_by_cls[cls] = ret
-            return ret
+            pass
+
+        scm = self.get_subclass_map(cls)
+        scmcls = {k: v for k, v in scm.items() if isinstance(k, type)}
+
+        ret = False
+        if len(scmcls) == 1 and list(scmcls) == [cls] and lang.Final in cls.__bases__:
+            ret = True
+
+        self._is_monomorphic_dataclass_by_cls[cls] = ret
+        return ret
 
     def _get_dataclass_field_type_map(self, dcls: type) -> _DataclassFieldSerdeMap:
         if not isinstance(dcls, type) or not dc.is_dataclass(dcls):
             raise TypeError(dcls)
+
         try:
             return self._field_type_maps_by_dataclass[dcls]
         except KeyError:
-            th = ta.get_type_hints(dcls)
-            dct = {}
-            for f in dc.fields(dcls):
+            pass
+
+        th = ta.get_type_hints(dcls)
+        dct = {}
+        for f in dc.fields(dcls):
+            ignore_if = None
+            try:
+                ig = f.metadata[Ignore]
+            except KeyError:
                 ignore_if = None
-                try:
-                    ig = f.metadata[Ignore]
-                except KeyError:
-                    ignore_if = None
-                else:
-                    if callable(ig):
-                        ignore_if = ig
-                    elif ig:
-                        continue
-                if GetType in f.metadata:
-                    fcls = f.metadata[GetType](dcls)
-                else:
-                    fcls = th[f.name]
-                dct[f.name] = _DataclassFieldSerde(fcls, ignore_if=ignore_if)
-            self._field_type_maps_by_dataclass[dcls] = dct
-            return dct
+            else:
+                if callable(ig):
+                    ignore_if = ig
+                elif ig:
+                    continue
+
+            if GetType in f.metadata:
+                fcls = f.metadata[GetType](dcls)
+            else:
+                fcls = th[f.name]
+            dct[f.name] = _DataclassFieldSerde(fcls, ignore_if=ignore_if)
+
+        self._field_type_maps_by_dataclass[dcls] = dct
+        return dct
 
     def gen_dataclass_fields_serializer(self, cls: type) -> Serializer:
         sers = {}
+
         for fn, fs in self._get_dataclass_field_type_map(cls).items():
             sers[fn] = (fs, serde(fs.cls).serialize)
+
         def ser(obj):  # noqa
             dct = {}
             for fn, (fs, fser) in sers.items():
@@ -172,6 +194,7 @@ class _DataclassSerdeState:
                     continue
                 dct[fn] = fser(v)
             return dct
+
         return ser
 
     def serialize_dataclass_fields(self, obj: T) -> Serialized:
