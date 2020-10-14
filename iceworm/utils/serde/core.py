@@ -7,11 +7,11 @@ TODO:
  - recursive custom serde?
  - allow_empty? system: {{}}
 """
-import contextlib  # noqa
 import typing as ta
 import weakref
 
 from omnibus import check
+from omnibus import defs
 from omnibus import reflect as rfl
 
 from .types import DeserializationException
@@ -23,34 +23,25 @@ from .types import Serialized
 T = ta.TypeVar('T')
 
 
-# class _ProxySerdeGen(SerdeGen):
-#
-#     def __init__(self, spec: rfl.Spec) -> None:
-#         super().__init__()
-#
-#         self._spec = spec
-#         self._gen: ta.Optional[SerdeGen] = None
-#         self._serializer: ta.Optional[Serializer] = None
-#         self._deserializer: ta.Optional[Deserializer] = None
-#
-#     @property
-#     def spec(self) -> rfl.Spec:
-#         return self._spec
-#
-#     def set(self, gen: SerdeGen) -> None:
-#         check.none(self._gen)
-#         self._gen = gen
-#         self._serializer = gen.serializer(self._spec)
-#         self._deserializer = gen.serializer(self._spec)
-#
-#     def match(self, spec: rfl.Spec) -> bool:
-#         return spec == self._spec
-#
-#     def serializer(self, spec: rfl.Spec) -> Serializer:
-#         return lambda obj: self._serializer(obj)
-#
-#     def deserializer(self, spec: rfl.Spec) -> Deserializer:
-#         return lambda des: self._deserializer(des)
+class _ProxySerde(Serde):
+
+    def __init__(self, spec: rfl.Spec) -> None:
+        super().__init__()
+
+        self._spec = spec
+        self._child: ta.Optional[Serde] = None
+
+    defs.repr('_spec')
+
+    def set(self, child: Serde) -> None:
+        check.none(self._child)
+        self._child = child
+
+    def serialize(self, obj: T) -> ta.Any:
+        return self._child.serialize(obj)
+
+    def deserialize(self, ser: ta.Any) -> T:
+        return self._child.deserialize(ser)
 
 
 class _SerdeState:
@@ -62,22 +53,7 @@ class _SerdeState:
         self._serde_gens: ta.MutableSequence[SerdeGen] = []
 
         self._serdes_by_spec: ta.MutableMapping[rfl.Spec, Serde] = weakref.WeakKeyDictionary()
-
-        # self._in_request = False
-        # self._proxies_by_spec: ta.MutableMapping[rfl.Spec, _ProxySerdeGen] = {}
-
-    # @contextlib.contextmanager
-    # def _request_context(self) -> ta.Iterator[None]:
-    #     if self._in_request:
-    #         yield
-    #         return
-    #     self._in_request = True
-    #     try:
-    #         yield
-    #         for prx in self._proxies_by_spec.values():
-    #
-    #     finally:
-    #         self._in_request = False
+        self._proxies_by_spec: ta.MutableMapping[rfl.Spec, _ProxySerde] = {}
 
     def register_serde_gen(self, serde_gen: SerdeGen, priority: bool = False) -> None:
         check.callable(serde_gen)
@@ -86,8 +62,8 @@ class _SerdeState:
         else:
             self._serde_gens.append(serde_gen)
 
-    def _get_serde(self, spec: ta.Any) -> ta.Optional[Serde]:
-        spec = rfl.spec(spec)
+    def _gen_serde(self, spec: rfl.Spec) -> Serde:
+        check.isinstance(spec, rfl.Spec)
 
         for g in self._priority_serde_gens:
             s = g(spec)
@@ -97,8 +73,8 @@ class _SerdeState:
         matches = [s for g in self._serde_gens for s in [g(spec)] if s is not None]
         if matches:
             return check.single(matches)
-        else:
-            return None
+
+        raise TypeError(spec)
 
     def serde(self, spec: ta.Optional[ta.Any]) -> Serde:
         spec = rfl.spec(spec)
@@ -108,8 +84,19 @@ class _SerdeState:
         except KeyError:
             pass
 
-        sd = self._get_serde(spec)
-        self._serdes_by_spec[spec] = sd
+        try:
+            return self._proxies_by_spec[spec]
+        except KeyError:
+            pass
+
+        try:
+            prx = self._proxies_by_spec[spec] = _ProxySerde(spec)
+            sd = self._gen_serde(spec)
+            self._serdes_by_spec[spec] = sd
+            prx.set(sd)
+        finally:
+            del self._proxies_by_spec[spec]
+
         return sd
 
     def serialize(self, obj: T, spec: ta.Optional[ta.Any] = None) -> Serialized:
