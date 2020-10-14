@@ -88,39 +88,92 @@ class SerdeGen(lang.Abstract):
         raise NotImplementedError
 
 
-class _SerdeState(dc.Pure):
+class DeserializationException(Exception):
 
-    priority_serde_gens: ta.MutableSequence[SerdeGen] = dc.field(
-        default_factory=list)
+    def __init__(self, *args, spec: ta.Any, ser: Serialized) -> None:
+        super().__init__(*args)
 
-    serde_gens: ta.MutableSequence[SerdeGen] = dc.field(
-        default_factory=list)
+        self.spec = spec
+        self.ser = ser
 
-    serdes_by_cls: ta.MutableMapping[type, Serde] = dc.field(
-        default_factory=weakref.WeakKeyDictionary)
+    defs.basic('args', 'spec', 'ser')
+
+    def __str__(self) -> str:
+        return repr(self)
+
+
+class _SerdeState:
+
+    def __init__(self) -> None:
+        super().__init__()
+
+        self._priority_serde_gens: ta.MutableSequence[SerdeGen] = []
+        self._serde_gens: ta.MutableSequence[SerdeGen] = []
+        self._serdes_by_cls: ta.MutableMapping[type, Serde] = weakref.WeakKeyDictionary()
+
+    def register_serde(self, cls: type, serde: Serde) -> None:
+        check.isinstance(cls, type)
+        check.isinstance(serde, Serde)
+        check.not_in(cls, self._serdes_by_cls)
+        self._serdes_by_cls[cls] = serde
+
+    def get_serde(self, cls: type) -> ta.Optional[Serde]:
+        check.isinstance(cls, type)
+        try:
+            return self._serdes_by_cls[cls]
+        except KeyError:
+            return None
+
+    def register_serde_gen(self, serde_gen: SerdeGen, priority: bool = False) -> None:
+        check.isinstance(serde_gen, SerdeGen)
+        if priority:
+            self._priority_serde_gens.append(serde_gen)
+        else:
+            self._serde_gens.append(serde_gen)
+
+    def get_serde_gen(self, spec: ta.Any) -> ta.Optional[SerdeGen]:
+        spec = rfl.spec(spec)
+        for g in self._priority_serde_gens:
+            if g.match(spec):
+                return g
+        matches = [g for g in self._serde_gens if g.match(spec)]
+        if matches:
+            return check.single(matches)
+        else:
+            return None
+
+    def serializer(self, spec: ta.Optional[ta.Any]) -> Serializer:
+        spec = rfl.spec(spec)
+        gen = self.get_serde_gen(spec)
+        if gen is not None:
+            return gen.serializer(spec)
+        raise TypeError(spec)
+
+    def serialize(self, obj: T, spec: ta.Optional[ta.Any] = None) -> Serialized:
+        return self.serializer(spec if spec is not None else type(obj))(obj)
+
+    def deserializer(self, spec: ta.Any) -> Deserializer:
+        spec = rfl.spec(spec)
+        gen = self.get_serde_gen(spec)
+        if gen is not None:
+            return gen.deserializer(spec)
+        raise TypeError(spec)
+
+    _NO_RERAISE = False
+    # _NO_RERAISE = True
+
+    def deserialize(self, ser: Serialized, spec: ta.Any, no_reraise: bool = False) -> T:
+        spec = rfl.spec(spec)
+        if no_reraise or self._NO_RERAISE:
+            return self.deserializer(spec)(ser)
+        else:
+            try:
+                return self.deserializer(spec)(ser)
+            except Exception as e:
+                raise DeserializationException(spec=spec, ser=ser) from e
 
 
 _STATE = _SerdeState()
-
-
-def get_serde(cls: type) -> ta.Optional[Serde]:
-    check.isinstance(cls, type)
-    try:
-        return _STATE.serdes_by_cls[cls]
-    except KeyError:
-        return None
-
-
-def get_serde_gen(spec: ta.Any) -> ta.Optional[SerdeGen]:
-    spec = rfl.spec(spec)
-    for g in _STATE.priority_serde_gens:
-        if g.match(spec):
-            return g
-    matches = [g for g in _STATE.serde_gens if g.match(spec)]
-    if matches:
-        return check.single(matches)
-    else:
-        return None
 
 
 def serde_for(*clss):
@@ -129,10 +182,8 @@ def serde_for(*clss):
             sd = obj()
         else:
             sd = obj
-        check.isinstance(sd, Serde)
         for c in clss:
-            check.not_in(c, _STATE.serdes_by_cls)
-            _STATE.serdes_by_cls[c] = sd
+            _STATE.register_serde(c, sd)
         return obj
     check.arg(all(isinstance(c, type) for c in clss))
     return inner
@@ -154,11 +205,7 @@ def serde_gen(*, priority: bool = False):
             sd = obj()
         else:
             sd = obj
-        check.isinstance(sd, SerdeGen)
-        if priority:
-            _STATE.priority_serde_gens.append(sd)
-        else:
-            _STATE.serde_gens.append(sd)
+        _STATE.register_serde_gen(sd, priority=priority)
         return obj
     return inner
 
@@ -171,50 +218,9 @@ class AutoSerdeGen(SerdeGen, lang.Abstract):
         serde_gen()(cls)
 
 
-def serializer(spec: ta.Optional[ta.Any]) -> Serializer:
-    spec = rfl.spec(spec)
-    gen = get_serde_gen(spec)
-    if gen is not None:
-        return gen.serializer(spec)
-    raise TypeError(spec)
-
-
-def serialize(obj: T, spec: ta.Optional[ta.Any] = None) -> Serialized:
-    return serializer(spec if spec is not None else type(obj))(obj)
-
-
-def deserializer(spec: ta.Any) -> Deserializer:
-    spec = rfl.spec(spec)
-    gen = get_serde_gen(spec)
-    if gen is not None:
-        return gen.deserializer(spec)
-    raise TypeError(spec)
-
-
-class DeserializationException(Exception):
-
-    def __init__(self, *args, spec: ta.Any, ser: Serialized) -> None:
-        super().__init__(*args)
-
-        self.spec = spec
-        self.ser = ser
-
-    defs.basic('args', 'spec', 'ser')
-
-    def __str__(self) -> str:
-        return repr(self)
-
-
-_NO_RERAISE = False
-# _NO_RERAISE = True
-
-
-def deserialize(ser: Serialized, spec: ta.Any, no_reraise: bool = False) -> T:
-    spec = rfl.spec(spec)
-    if no_reraise or _NO_RERAISE:
-        return deserializer(spec)(ser)
-    else:
-        try:
-            return deserializer(spec)(ser)
-        except Exception as e:
-            raise DeserializationException(spec=spec, ser=ser) from e
+get_serde = _STATE.get_serde
+get_serde_gen = _STATE.get_serde_gen
+serializer = _STATE.serializer
+serialize = _STATE.serialize
+deserializer = _STATE.deserializer
+deserialize = _STATE.deserialize

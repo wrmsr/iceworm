@@ -60,12 +60,6 @@ class _DataclassSerdeState(dc.Pure):
     field_type_maps_by_dataclass: ta.MutableMapping[type, _DataclassFieldSerdeMap] = dc.field(
         default_factory=weakref.WeakKeyDictionary)
 
-    # serializers_by_cls: ta.MutableMapping[type, Serializer] = dc.field(
-    #     default_factory=weakref.WeakKeyDictionary)
-
-    # deserializers_by_cls: ta.MutableMapping[type, Deserializer] = dc.field(
-    #     default_factory=weakref.WeakKeyDictionary)
-
 
 _STATE = _DataclassSerdeState()
 
@@ -281,7 +275,9 @@ class DataclassSerdeGen(SerdeGen):
         return isinstance(spec, rfl.TypeSpec) and dc.is_dataclass(spec.erased_cls)
 
     def serializer(self, spec: rfl.Spec) -> Serializer:
-        return lambda obj: serialize_dataclass(obj, spec.erased_cls)
+        # return dataclass_serializer(spec.erased_cls)
+        return lambda ser: serialize_dataclass(ser, spec.erased_cls)
 
     def deserializer(self, spec: rfl.Spec) -> Deserializer:
+        # return dataclass_deserializer(spec.erased_cls)
         return lambda ser: deserialize_dataclass(ser, spec.erased_cls)
