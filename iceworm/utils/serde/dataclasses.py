@@ -276,8 +276,10 @@ class DataclassSerdeGen(InstanceSerdeGen):
             super().__init__(spec)
 
             cls = spec.erased_cls
-            self._ser = dataclass_serializer(cls)
-            self._des = dataclass_deserializer(cls)
+            # self._ser = dataclass_serializer(cls)
+            # self._des = dataclass_deserializer(cls)
+            self._ser = lambda obj: serialize_dataclass(obj, cls)
+            self._des = lambda ser: deserialize_dataclass(ser, cls)
 
         def serialize(self, obj: T) -> ta.Any:
             return self._ser(obj)

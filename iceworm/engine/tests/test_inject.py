@@ -150,6 +150,7 @@ def test_inject(harness: ptinj.Harness, exit_stack):
         print(list(pg_conn.execute('select * from nums')))
 
 
+@pytest.mark.skip()
 def test_inject2(harness: ptinj.Harness, exit_stack):
     exit_stack.enter_context(oos.tmp_chdir(os.path.dirname(__file__)))
 
