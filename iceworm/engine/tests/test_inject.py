@@ -64,9 +64,11 @@ def exit_stack() -> ta.Iterator[contextlib.ExitStack]:
 
 class Helper:
 
-    def __init__(self, harness: ptinj.Harness) -> None:
+    def __init__(self, harness: ptinj.Harness, seed_elements: ta.Iterable[els.Element]) -> None:
         super().__init__()
+
         self._harness = harness
+        self._seed_elements = list(seed_elements)
 
     @properties.cached
     @property
@@ -96,9 +98,7 @@ class Helper:
         elements_injector = self.injector[inj.Key(inj.Injector, 'elements')]
 
         with els.inject.new_driver_scope(elements_injector) as drv:
-            elements = drv.run([
-                sites.Site('site0.yml'),
-            ])
+            elements = drv.run(list(self._seed_elements))
             connectors = drv[ctrs.ConnectorSet]
 
         return elements, connectors
@@ -137,7 +137,7 @@ class Helper:
 def test_inject(harness: ptinj.Harness, exit_stack):
     exit_stack.enter_context(oos.tmp_chdir(os.path.dirname(__file__)))
 
-    helper = Helper(harness)
+    helper = Helper(harness, [sites.Site('site0.yml')])
 
     helper.verify_elements_serde()
     helper.execute()
@@ -148,3 +148,13 @@ def test_inject(harness: ptinj.Harness, exit_stack):
         print(list(pg_conn.execute('select * from c')))
         print(list(pg_conn.execute('select * from d')))
         print(list(pg_conn.execute('select * from nums')))
+
+
+def test_inject2(harness: ptinj.Harness, exit_stack):
+    exit_stack.enter_context(oos.tmp_chdir(os.path.dirname(__file__)))
+
+    helper = Helper(harness, [sites.Site('site2.yml')])
+
+    helper.verify_elements_serde()
+    helper.execute()
+

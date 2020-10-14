@@ -7,9 +7,9 @@ azure-core==1.8.2
 azure-storage-blob==12.5.0
 backcall==0.2.0
 bleach==3.2.1
-boto3==1.15.14
-boto3-stubs==1.15.14.0
-botocore==1.18.14
+boto3==1.15.16
+boto3-stubs==1.15.16.0
+botocore==1.18.16
 certifi==2020.6.20
 cffi==1.14.3
 chardet==3.0.4
@@ -45,19 +45,19 @@ llvmlite==0.34.0
 MarkupSafe==1.1.1
 mccabe==0.6.1
 msrest==0.6.19
-mypy==0.782
+mypy==0.790
 mypy-extensions==0.4.3
 nose==1.3.7
 numba==0.51.2
 numpy==1.19.2
 oauthlib==3.1.0
-omnibus @ git+https://github.com/wrmsr/omnibus@29ef4766960d317429a142235c4f5d67e1c47a53
+omnibus @ git+https://github.com/wrmsr/omnibus@7efb2a9ee3a66cc2ca15dfdeb86969e1cb5ef509
 oscrypto==1.2.1
 packaging==20.4
 pandas==1.1.3
 parso==0.7.1
 pexpect==4.8.0
-pg8000==1.16.5
+pg8000==1.16.6
 pgcli==3.0.0
 pgspecial==1.11.10
 pickleshare==0.7.5
@@ -111,7 +111,7 @@ setproctitle==1.1.10
 six==1.15.0
 snowflake-connector-python==2.3.3
 snowflake-sqlalchemy==1.2.4
-SQLAlchemy==1.3.19
+SQLAlchemy==1.3.20
 sqlparse==0.4.1
 tabulate==0.8.7
 termcolor==1.1.0
