@@ -109,7 +109,7 @@ class SequenceSerdeGen(InstanceSerdeGen):
             super().__init__(spec)
 
             [espec] = spec.args
-            self._child = child(espec)
+            self._child = serde(espec)
 
         def serialize(self, obj: T) -> ta.Any:
             return [self._child.serialize(e) for e in obj]
@@ -138,7 +138,7 @@ class SetSerdeGen(InstanceSerdeGen):
             return [self._child.serialize(e) for e in obj]
 
         def deserialize(self, ser: ta.Any) -> T:
-            return {self._child.serialize(e) for e in obj}
+            return {self._child.deserialize(e) for e in ser}
 
 
 @serde_gen()
@@ -147,7 +147,7 @@ class TupleSerdeGen(InstanceSerdeGen):
     def match(self, spec: rfl.Spec) -> bool:
         return isinstance(spec, rfl.TupleTypeSpec)
 
-    class Instance(InstanceSerdeGen.Instance)
+    class Instance(InstanceSerdeGen.Instance):
 
         def __init__(self, spec: rfl.Spec) -> None:
             super().__init__(spec)
