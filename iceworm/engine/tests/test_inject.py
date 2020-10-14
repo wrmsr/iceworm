@@ -157,4 +157,3 @@ def test_inject2(harness: ptinj.Harness, exit_stack):
 
     helper.verify_elements_serde()
     helper.execute()
-
