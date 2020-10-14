@@ -254,6 +254,8 @@ _STATE = _DataclassSerdeState()
 
 
 build_subclass_map = _STATE.build_subclass_map
+dataclass_deserializer = _STATE.dataclass_deserializer
+dataclass_serializer = _STATE.dataclass_serializer
 deserialize_dataclass = _STATE.deserialize_dataclass
 deserialize_dataclass_fields = _STATE.deserialize_dataclass_fields
 format_subclass_name = _STATE.format_subclass_name
@@ -270,8 +272,8 @@ class DataclassSerdeGen(SerdeGen):
         return isinstance(spec, rfl.TypeSpec) and dc.is_dataclass(spec.erased_cls)
 
     def serializer(self, spec: rfl.Spec) -> Serializer:
-        # return dataclass_serializer(spec.erased_cls)
-        return lambda ser: serialize_dataclass(ser, spec.erased_cls)
+        return dataclass_serializer(spec.erased_cls)
+        # return lambda ser: serialize_dataclass(ser, spec.erased_cls)
 
     def deserializer(self, spec: rfl.Spec) -> Deserializer:
         # return dataclass_deserializer(spec.erased_cls)

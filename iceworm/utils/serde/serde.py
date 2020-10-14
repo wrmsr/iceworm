@@ -7,6 +7,7 @@ TODO:
  - recursive custom serde?
  - allow_empty? system: {{}}
 """
+import contextlib  # noqa
 import typing as ta
 import weakref
 
@@ -24,6 +25,36 @@ from .types import Serializer
 T = ta.TypeVar('T')
 
 
+# class _ProxySerdeGen(SerdeGen):
+#
+#     def __init__(self, spec: rfl.Spec) -> None:
+#         super().__init__()
+#
+#         self._spec = spec
+#         self._gen: ta.Optional[SerdeGen] = None
+#         self._serializer: ta.Optional[Serializer] = None
+#         self._deserializer: ta.Optional[Deserializer] = None
+#
+#     @property
+#     def spec(self) -> rfl.Spec:
+#         return self._spec
+#
+#     def set(self, gen: SerdeGen) -> None:
+#         check.none(self._gen)
+#         self._gen = gen
+#         self._serializer = gen.serializer(self._spec)
+#         self._deserializer = gen.serializer(self._spec)
+#
+#     def match(self, spec: rfl.Spec) -> bool:
+#         return spec == self._spec
+#
+#     def serializer(self, spec: rfl.Spec) -> Serializer:
+#         return lambda obj: self._serializer(obj)
+#
+#     def deserializer(self, spec: rfl.Spec) -> Deserializer:
+#         return lambda des: self._deserializer(des)
+
+
 class _SerdeState:
 
     def __init__(self) -> None:
@@ -34,6 +65,22 @@ class _SerdeState:
 
         self._serializers_by_spec: ta.MutableMapping[rfl.Spec, Serializer] = weakref.WeakKeyDictionary()
         self._deserializers_by_spec: ta.MutableMapping[rfl.Spec, Deserializer] = weakref.WeakKeyDictionary()
+
+        # self._in_request = False
+        # self._proxies_by_spec: ta.MutableMapping[rfl.Spec, _ProxySerdeGen] = {}
+
+    # @contextlib.contextmanager
+    # def _request_context(self) -> ta.Iterator[None]:
+    #     if self._in_request:
+    #         yield
+    #         return
+    #     self._in_request = True
+    #     try:
+    #         yield
+    #         for prx in self._proxies_by_spec.values():
+    #
+    #     finally:
+    #         self._in_request = False
 
     def register_serde_gen(self, serde_gen: SerdeGen, priority: bool = False) -> None:
         check.isinstance(serde_gen, SerdeGen)
