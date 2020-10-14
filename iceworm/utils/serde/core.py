@@ -80,7 +80,7 @@ class _SerdeState:
     #         self._in_request = False
 
     def register_serde_gen(self, serde_gen: SerdeGen, priority: bool = False) -> None:
-        check.isinstance(serde_gen, SerdeGen)
+        check.callable(serde_gen)
         if priority:
             self._priority_serde_gens.append(serde_gen)
         else:

@@ -6,12 +6,11 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import reflect as rfl
 
-from .serde import deserializer
-from .serde import serde_gen
-from .serde import serializer
+from .core import serde
+from .core import serde_gen
 from .simple import get_serde
 from .types import Deserializer
-from .types import SerdeGen
+from .types import InstanceSerdeGen
 from .types import Serialized
 from .types import Serializer
 
@@ -163,7 +162,7 @@ class _DataclassSerdeState:
     def dataclass_fields_serializer(self, cls: type) -> Serializer:
         sers = {}
         for fn, fs in self._get_dataclass_field_type_map(cls).items():
-            sers[fn] = (fs, serializer(fs.cls))
+            sers[fn] = (fs, serde(fs.cls).serialize)
         def ser(obj):  # noqa
             dct = {}
             for fn, (fs, fser) in sers.items():
@@ -206,7 +205,7 @@ class _DataclassSerdeState:
 
     def dataclass_fields_deserializer(self, dcls: type) -> Deserializer:
         fdct = self._get_dataclass_field_type_map(dcls)
-        desers = {fn: deserializer(fs.cls) for fn, fs in fdct.items()}
+        desers = {fn: serde(fs.cls).deserialize for fn, fs in fdct.items()}
 
         def des(ser):
             check.isinstance(ser, ta.Mapping)
@@ -266,15 +265,22 @@ subclass_map_resolver_for = _STATE.subclass_map_resolver_for
 
 
 @serde_gen(priority=True)
-class DataclassSerdeGen(SerdeGen):
+class DataclassSerdeGen(InstanceSerdeGen):
 
     def match(self, spec: rfl.Spec) -> bool:
         return isinstance(spec, rfl.TypeSpec) and dc.is_dataclass(spec.erased_cls)
 
-    def serializer(self, spec: rfl.Spec) -> Serializer:
-        return dataclass_serializer(spec.erased_cls)
-        # return lambda ser: serialize_dataclass(ser, spec.erased_cls)
+    class Instance(InstanceSerdeGen.Instance):
 
-    def deserializer(self, spec: rfl.Spec) -> Deserializer:
-        # return dataclass_deserializer(spec.erased_cls)
-        return lambda ser: deserialize_dataclass(ser, spec.erased_cls)
+        def __init__(self, spec: rfl.Spec) -> None:
+            super().__init__(spec)
+
+            cls = spec.erased_cls
+            self._ser = dataclass_serializer(cls)
+            self._des = dataclass_deserializer(cls)
+
+        def serialize(self, obj: T) -> ta.Any:
+            return self._ser(obj)
+
+        def deserialize(self, ser: ta.Any) -> T:
+            return self._des(ser)

@@ -5,8 +5,8 @@ import typing as ta
 from omnibus import check
 from omnibus import reflect as rfl
 
-from .serde import serde
-from .serde import serde_gen
+from .core import serde
+from .core import serde_gen
 from .types import InstanceSerdeGen
 from .types import PRIMITIVE_TYPES_TUPLE
 

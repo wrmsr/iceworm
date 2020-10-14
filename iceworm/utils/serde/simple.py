@@ -5,10 +5,8 @@ from omnibus import check
 from omnibus import lang
 from omnibus import reflect as rfl
 
-from .serde import AutoSerdeGen
-from .types import Deserializer
+from .core import serde_gen
 from .types import Serde
-from .types import Serializer
 
 
 T = ta.TypeVar('T')
@@ -64,15 +62,11 @@ class AutoSerde(Serde[T], lang.Abstract):
         serde_for(ty)(cls)
 
 
-class SimpleSerdeGen(AutoSerdeGen):
+@serde_gen()
+class SimpleSerdeGen:
 
-    def match(self, spec: rfl.Spec) -> bool:
-        return isinstance(spec, rfl.TypeSpec) and get_serde(spec.erased_cls) is not None
-
-    def serializer(self, spec: rfl.Spec) -> Serializer:
-        serde = get_serde(spec.erased_cls)
-        return lambda obj: serde.serialize(obj)
-
-    def deserializer(self, spec: rfl.Spec) -> Deserializer:
-        serde = get_serde(spec.erased_cls)
-        return lambda ser: serde.deserialize(ser)
+    def __call__(self, spec: rfl.Spec) -> ta.Optional[Serde]:
+        if isinstance(spec, rfl.TypeSpec):
+            return get_serde(spec.erased_cls)
+        else:
+            return None
