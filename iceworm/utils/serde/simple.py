@@ -19,13 +19,13 @@ class _SimpleSerdeState:
 
         self._serdes_by_cls: ta.MutableMapping[type, Serde] = weakref.WeakKeyDictionary()
 
-    def register_serde(self, cls: type, serde: Serde) -> None:
+    def register_simple_serde(self, cls: type, serde: Serde) -> None:
         check.isinstance(cls, type)
         check.isinstance(serde, Serde)
         check.not_in(cls, self._serdes_by_cls)
         self._serdes_by_cls[cls] = serde
 
-    def get_serde(self, cls: type) -> ta.Optional[Serde]:
+    def get_simple_serde(self, cls: type) -> ta.Optional[Serde]:
         check.isinstance(cls, type)
         try:
             return self._serdes_by_cls[cls]
@@ -36,7 +36,7 @@ class _SimpleSerdeState:
 _STATE = _SimpleSerdeState()
 
 
-get_serde = _STATE.get_serde
+get_simple_serde = _STATE.get_simple_serde
 
 
 def serde_for(*clss):
@@ -46,7 +46,7 @@ def serde_for(*clss):
         else:
             sd = obj
         for c in clss:
-            _STATE.register_serde(c, sd)
+            _STATE.register_simple_serde(c, sd)
         return obj
     check.arg(all(isinstance(c, type) for c in clss))
     return inner
@@ -67,6 +67,6 @@ class SimpleSerdeGen:
 
     def __call__(self, spec: rfl.Spec) -> ta.Optional[Serde]:
         if isinstance(spec, rfl.TypeSpec):
-            return get_serde(spec.erased_cls)
+            return get_simple_serde(spec.erased_cls)
         else:
             return None

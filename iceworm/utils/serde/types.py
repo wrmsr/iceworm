@@ -61,6 +61,21 @@ class Serde(lang.Abstract, ta.Generic[T]):
         raise NotImplementedError
 
 
+class FnSerde(Serde, lang.Final):
+
+    def __init__(self, ser: Serializer, des: Deserializer) -> None:
+        super().__init__()
+
+        self._ser = self.serialize = ser
+        self._des = self.deserialize = des
+
+    def serialize(self, obj: T) -> ta.Any:
+        return self._ser(obj)
+
+    def deserialize(self, ser: ta.Any) -> T:
+        return self._des(ser)
+
+
 SerdeGen = ta.Callable[[rfl.Spec], ta.Optional[Serde]]
 
 

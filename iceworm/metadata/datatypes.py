@@ -249,13 +249,34 @@ class DatatypeSerde(serde.AutoSerde[Datatype]):
         return True
 
     def serialize(self, obj: Datatype) -> ta.Any:
-        return serde.serialize_dataclass(obj, Datatype, no_custom=True)
+        return serde.gen_dataclass_serde(Datatype, no_custom=True).serialize(obj)
 
     def deserialize(self, ser: ta.Any) -> Datatype:
         if isinstance(ser, str):
             cls = Datatype.CLS_MAP[ser]
             return cls()
-        return serde.deserialize_dataclass(ser, Datatype, no_custom=True)
+        return serde.gen_dataclass_serde(Datatype, no_custom=True).deserialize(ser)
+
+
+# class DatatypeSerdeGen(serde.InstanceSerdeGen):
+#
+#     def match(self, spec: rfl.Spec) -> bool:
+#         return isinstance(spec, rfl.TypeSpec) and spec.erased_cls is Datatype
+#
+#     class Instance(serde.InstanceSerdeGen.Instance):
+#
+#         def __init__(self, spec: rfl.Spec) -> None:
+#             super().__init__(spec)
+#
+#         @property
+#         def handles_polymorphism(self) -> bool:
+#             return True
+#
+#         def serialize(self, obj: T) -> ta.Any:
+#             pass
+#
+#         def deserialize(self, ser: ta.Any) -> T:
+#             pass
 
 
 @serde.subclass_map_resolver_for(Datatype)

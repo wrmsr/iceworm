@@ -35,9 +35,9 @@ class QuerySerde(serde.AutoSerde[Query]):
         return True
 
     def serialize(self, obj: Query) -> ta.Any:
-        return serde.serialize_dataclass(obj, Query, no_custom=True)
+        return serde.gen_dataclass_serde(Query, no_custom=True).serialize(obj)
 
     def deserialize(self, ser: ta.Any) -> Query:
         if isinstance(ser, str):
             return StrQuery(ser)
-        return serde.deserialize_dataclass(ser, Query, no_custom=True)
+        return serde.gen_dataclass_serde(Query, no_custom=True).deserialize(ser)

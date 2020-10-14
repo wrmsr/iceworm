@@ -8,9 +8,10 @@ from omnibus import reflect as rfl
 
 from .core import serde
 from .core import serde_gen
-from .simple import get_serde
+from .simple import get_simple_serde
 from .types import Deserializer
-from .types import InstanceSerdeGen
+from .types import FnSerde
+from .types import Serde
 from .types import Serialized
 from .types import Serializer
 
@@ -159,7 +160,7 @@ class _DataclassSerdeState:
             self._field_type_maps_by_dataclass[dcls] = dct
             return dct
 
-    def dataclass_fields_serializer(self, cls: type) -> Serializer:
+    def gen_dataclass_fields_serializer(self, cls: type) -> Serializer:
         sers = {}
         for fn, fs in self._get_dataclass_field_type_map(cls).items():
             sers[fn] = (fs, serde(fs.cls).serialize)
@@ -174,36 +175,9 @@ class _DataclassSerdeState:
         return ser
 
     def serialize_dataclass_fields(self, obj: T) -> Serialized:
-        return self.dataclass_fields_serializer(type(obj))(obj)
+        return self.gen_dataclass_fields_serializer(type(obj))(obj)
 
-    def dataclass_serializer(self, cls: type, no_custom: bool = False) -> Serializer:
-        custom = get_serde(cls) if not no_custom else None
-        if custom is not None and custom.handles_polymorphism:
-            return custom.serialize
-
-        if self._is_monomorphic_dataclass(cls):
-            return custom.serialize if custom is not None else self.dataclass_fields_serializer(cls)
-
-        scm = {}
-        for scls, snam in self.get_subclass_map(cls).items():
-            if not isinstance(scls, type):
-                continue
-
-            custom = get_serde(scls) if not no_custom else None
-            if custom is not None and custom.handles_polymorphism:
-                ser = custom.serialize
-            else:
-                sser = custom.serialize if custom is not None else self.dataclass_fields_serializer(scls)
-                ser = (lambda snam, sser: lambda obj: {snam: sser(obj)})(snam, sser)
-
-            scm[scls] = ser
-
-        return lambda obj: scm[type(obj)](obj)
-
-    def serialize_dataclass(self, obj: T, cls: ta.Optional[type] = None, *, no_custom: bool = False) -> Serialized:
-        return self.dataclass_serializer(cls if cls is not None else type(obj), no_custom=no_custom)(obj)
-
-    def dataclass_fields_deserializer(self, dcls: type) -> Deserializer:
+    def gen_dataclass_fields_deserializer(self, dcls: type) -> Deserializer:
         fdct = self._get_dataclass_field_type_map(dcls)
         desers = {fn: serde(fs.cls).deserialize for fn, fs in fdct.items()}
 
@@ -221,66 +195,71 @@ class _DataclassSerdeState:
         return des
 
     def deserialize_dataclass_fields(self, ser: ta.Mapping[str, ta.Any], dcls: type) -> T:
-        return self.dataclass_fields_deserializer(dcls)(ser)
+        return self.gen_dataclass_fields_deserializer(dcls)(ser)
 
-    def dataclass_deserializer(self, cls: type, *, no_custom: bool = False) -> Deserializer:
-        custom = get_serde(cls) if not no_custom else None
+    def gen_dataclass_serde(self, cls: type, *, no_custom: bool = False) -> Serde:
+        custom = get_simple_serde(cls) if not no_custom else None
         if custom is not None and custom.handles_polymorphism:
-            return custom.deserialize
+            return custom
 
         if self._is_monomorphic_dataclass(cls):
-            return custom.deserialize if custom is not None else self.dataclass_fields_deserializer(cls)
+            if custom is not None:
+                return custom
+            else:
+                return FnSerde(
+                    self.gen_dataclass_fields_serializer(cls),
+                    self.gen_dataclass_fields_deserializer(cls),
+                )
 
-        scm = {}
+        ser_scm = {}
+        des_scm = {}
         for scls, snam in self.get_subclass_map(cls).items():
             if not isinstance(scls, type):
                 continue
 
-            custom = get_serde(scls) if not no_custom else None
-            scm[snam] = custom.deserialize if custom is not None else self.dataclass_fields_deserializer(scls)
+            custom = get_simple_serde(scls) if not no_custom else None
+
+            if custom is not None and custom.handles_polymorphism:
+                ser = custom.serialize
+            else:
+                sser = custom.serialize if custom is not None else self.gen_dataclass_fields_serializer(scls)
+                ser = (lambda snam, sser: lambda obj: {snam: sser(obj)})(snam, sser)
+
+            if custom is not None:
+                des = custom.deserialize
+            else:
+                des = self.gen_dataclass_fields_deserializer(scls)
+
+            ser_scm[scls] = ser
+            des_scm[snam] = des
+
+        def ser(obj):
+            return ser_scm[type(obj)](obj)
 
         def des(ser):
             [[n, ser]] = check.isinstance(ser, ta.Mapping).items()
-            return scm[n](ser)
+            return des_scm[n](ser)
 
-        return des
-
-    def deserialize_dataclass(self, ser: Serialized, cls: type, *, no_custom: bool = False) -> T:
-        return self.dataclass_deserializer(cls, no_custom=no_custom)(ser)
+        return FnSerde(ser, des)
 
 
 _STATE = _DataclassSerdeState()
 
 
-build_subclass_map = _STATE.build_subclass_map
-dataclass_deserializer = _STATE.dataclass_deserializer
-dataclass_serializer = _STATE.dataclass_serializer
-deserialize_dataclass = _STATE.deserialize_dataclass
-deserialize_dataclass_fields = _STATE.deserialize_dataclass_fields
-format_subclass_name = _STATE.format_subclass_name
-get_subclass_map = _STATE.get_subclass_map
-serialize_dataclass = _STATE.serialize_dataclass
-serialize_dataclass_fields = _STATE.serialize_dataclass_fields
 subclass_map_resolver_for = _STATE.subclass_map_resolver_for
+format_subclass_name = _STATE.format_subclass_name
+build_subclass_map = _STATE.build_subclass_map
+get_subclass_map = _STATE.get_subclass_map
+serialize_dataclass_fields = _STATE.serialize_dataclass_fields
+deserialize_dataclass_fields = _STATE.deserialize_dataclass_fields
+gen_dataclass_serde = _STATE.gen_dataclass_serde
 
 
 @serde_gen(priority=True)
-class DataclassSerdeGen(InstanceSerdeGen):
+class DataclassSerdeGen:
 
-    def match(self, spec: rfl.Spec) -> bool:
-        return isinstance(spec, rfl.TypeSpec) and dc.is_dataclass(spec.erased_cls)
-
-    class Instance(InstanceSerdeGen.Instance):
-
-        def __init__(self, spec: rfl.Spec) -> None:
-            super().__init__(spec)
-
-            cls = spec.erased_cls
-            self._ser = dataclass_serializer(cls)
-            self._des = dataclass_deserializer(cls)
-
-        def serialize(self, obj: T) -> ta.Any:
-            return self._ser(obj)
-
-        def deserialize(self, ser: ta.Any) -> T:
-            return self._des(ser)
+    def __call__(self, spec: rfl.Spec) -> ta.Optional[Serde]:
+        if isinstance(spec, rfl.TypeSpec) and dc.is_dataclass(spec.erased_cls):
+            return gen_dataclass_serde(spec.erased_cls)
+        else:
+            return None
