@@ -12,14 +12,12 @@ import typing as ta
 import weakref
 
 from omnibus import check
-from omnibus import lang
 from omnibus import reflect as rfl
 
 from .types import DeserializationException
-from .types import Deserializer
+from .types import Serde
 from .types import SerdeGen
 from .types import Serialized
-from .types import Serializer
 
 
 T = ta.TypeVar('T')
@@ -63,8 +61,7 @@ class _SerdeState:
         self._priority_serde_gens: ta.MutableSequence[SerdeGen] = []
         self._serde_gens: ta.MutableSequence[SerdeGen] = []
 
-        self._serializers_by_spec: ta.MutableMapping[rfl.Spec, Serializer] = weakref.WeakKeyDictionary()
-        self._deserializers_by_spec: ta.MutableMapping[rfl.Spec, Deserializer] = weakref.WeakKeyDictionary()
+        self._serdes_by_spec: ta.MutableMapping[rfl.Spec, Serde] = weakref.WeakKeyDictionary()
 
         # self._in_request = False
         # self._proxies_by_spec: ta.MutableMapping[rfl.Spec, _ProxySerdeGen] = {}
@@ -89,52 +86,34 @@ class _SerdeState:
         else:
             self._serde_gens.append(serde_gen)
 
-    def get_serde_gen(self, spec: ta.Any) -> ta.Optional[SerdeGen]:
+    def _get_serde(self, spec: ta.Any) -> ta.Optional[Serde]:
         spec = rfl.spec(spec)
+
         for g in self._priority_serde_gens:
-            if g.match(spec):
-                return g
-        matches = [g for g in self._serde_gens if g.match(spec)]
+            s = g(spec)
+            if s:
+                return s
+
+        matches = [s for g in self._serde_gens for s in [g(spec)] if s is not None]
         if matches:
             return check.single(matches)
         else:
             return None
 
-    def serializer(self, spec: ta.Optional[ta.Any]) -> Serializer:
+    def serde(self, spec: ta.Optional[ta.Any]) -> Serde:
         spec = rfl.spec(spec)
 
         try:
-            return self._serializers_by_spec[spec]
+            return self._serdes_by_spec[spec]
         except KeyError:
             pass
 
-        gen = self.get_serde_gen(spec)
-        if gen is None:
-            raise TypeError(spec)
-
-        ser = gen.serializer(spec)
-        self._serializers_by_spec[spec] = ser
-        return ser
+        sd = self._get_serde(spec)
+        self._serdes_by_spec[spec] = sd
+        return sd
 
     def serialize(self, obj: T, spec: ta.Optional[ta.Any] = None) -> Serialized:
-        return self.serializer(spec if spec is not None else type(obj))(obj)
-
-    def deserializer(self, spec: ta.Any) -> Deserializer:
-        spec = rfl.spec(spec)
-
-        try:
-            return self._deserializers_by_spec[spec]
-        except KeyError:
-            pass
-
-        gen = self.get_serde_gen(spec)
-        if gen is None:
-            raise TypeError(spec)
-
-        des = gen.deserializer(spec)
-
-        self._deserializers_by_spec[spec] = des
-        return des
+        return self.serde(spec if spec is not None else type(obj)).serialize(obj)
 
     _NO_RERAISE = False
     # _NO_RERAISE = True
@@ -142,10 +121,10 @@ class _SerdeState:
     def deserialize(self, ser: Serialized, spec: ta.Any, no_reraise: bool = False) -> T:
         spec = rfl.spec(spec)
         if no_reraise or self._NO_RERAISE:
-            return self.deserializer(spec)(ser)
+            return self.serde(spec).deserialize(ser)
         else:
             try:
-                return self.deserializer(spec)(ser)
+                return self.serde(spec).deserialize(ser)
             except Exception as e:
                 raise DeserializationException(spec=spec, ser=ser) from e
 
@@ -164,16 +143,6 @@ def serde_gen(*, priority: bool = False):
     return inner
 
 
-class AutoSerdeGen(SerdeGen, lang.Abstract):
-
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__()
-        check.state(cls.__bases__ == (AutoSerdeGen,))
-        serde_gen()(cls)
-
-
-get_serde_gen = _STATE.get_serde_gen
-serializer = _STATE.serializer
+serde = _STATE.serde
 serialize = _STATE.serialize
-deserializer = _STATE.deserializer
 deserialize = _STATE.deserialize

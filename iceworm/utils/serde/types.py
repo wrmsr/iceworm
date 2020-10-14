@@ -61,19 +61,27 @@ class Serde(lang.Abstract, ta.Generic[T]):
         raise NotImplementedError
 
 
-class SerdeGen(lang.Abstract):
+SerdeGen = ta.Callable[[rfl.Spec], ta.Optional[Serde]]
+
+
+class InstanceSerdeGen(lang.Abstract):
 
     @abc.abstractmethod
     def match(self, spec: rfl.Spec) -> bool:
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def serializer(self, spec: rfl.Spec) -> Serializer:
-        raise NotImplementedError
+    class Instance(Serde[T], lang.Abstract):
 
-    @abc.abstractmethod
-    def deserializer(self, spec: rfl.Spec) -> Deserializer:
-        raise NotImplementedError
+        def __init__(self, spec: rfl.Spec) -> None:
+            super().__init__()
+
+            self._spec = spec
+
+    def __call__(self, spec: rfl.Spec) -> ta.Optional[Instance]:
+        if self.match(spec):
+            return self.Instance(spec)
+        else:
+            return None
 
 
 class DeserializationException(Exception):
