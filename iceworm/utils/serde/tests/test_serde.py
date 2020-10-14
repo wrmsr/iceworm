@@ -100,3 +100,19 @@ def test_code_serde():
     assert s == {'lam': {'src': src}}
     d = serde.deserialize(s, Thing1)
     assert d.lam.fn(426) == 428
+
+
+class A(dc.Pure):
+    a: ta.Optional['A'] = None
+
+
+def test_rec():
+    s_ = serde.serializer(A)
+    d_ = serde.deserializer(A)
+
+    a = A(A())
+
+    s = s_(a)
+    d = d_(s)
+
+    assert d == a
