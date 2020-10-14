@@ -7,13 +7,13 @@ from omnibus import lang
 from omnibus import reflect as rfl
 
 from .serde import deserializer
-from .serde import Deserializer
-from .serde import get_serde
 from .serde import serde_gen
-from .serde import SerdeGen
-from .serde import Serialized
 from .serde import serializer
-from .serde import Serializer
+from .simple import get_serde
+from .types import Deserializer
+from .types import SerdeGen
+from .types import Serialized
+from .types import Serializer
 
 
 T = ta.TypeVar('T')
@@ -74,8 +74,10 @@ class _DataclassSerdeState:
             self,
             cls: type,
             *,
-            name_formatter: ta.Callable[[type], str] = format_subclass_name,
+            name_formatter: ta.Optional[ta.Callable[[type], str]] = None,
     ) -> SubclassMap:
+        if name_formatter is None:
+            name_formatter = self.format_subclass_name
         dct = {}
         todo = {cls}
         seen = set()

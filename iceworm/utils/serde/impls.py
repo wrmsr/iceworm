@@ -9,9 +9,9 @@ from omnibus import check
 from omnibus import cron
 from omnibus import lang
 
-from .serde import AutoSerde
-from .serde import Serde
-from .serde import serde_for
+from .simple import AutoSerde
+from .simple import serde_for
+from .types import Serde
 
 
 T = ta.TypeVar('T')

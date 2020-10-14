@@ -4,13 +4,12 @@ import enum
 from omnibus import check
 from omnibus import reflect as rfl
 
-from .serde import deserializer
-from .serde import Deserializer
-from .serde import get_serde
-from .serde import serializer
-from .serde import Serializer
-from .serde import PRIMITIVE_TYPES_TUPLE
 from .serde import AutoSerdeGen
+from .serde import deserializer
+from .serde import serializer
+from .types import Deserializer
+from .types import PRIMITIVE_TYPES_TUPLE
+from .types import Serializer
 
 
 class OptionalSerdeGen(AutoSerdeGen):
@@ -47,20 +46,6 @@ class AnySerdeGen(AutoSerdeGen):
             else:
                 raise TypeError(ser)
         return des
-
-
-class CustomSerdeGen(AutoSerdeGen):
-
-    def match(self, spec: rfl.Spec) -> bool:
-        return isinstance(spec, rfl.TypeSpec) and get_serde(spec.erased_cls) is not None
-
-    def serializer(self, spec: rfl.Spec) -> Serializer:
-        serde = get_serde(spec.erased_cls)
-        return lambda obj: serde.serialize(obj)
-
-    def deserializer(self, spec: rfl.Spec) -> Deserializer:
-        serde = get_serde(spec.erased_cls)
-        return lambda ser: serde.deserialize(ser)
 
 
 class MappingSerdeGen(AutoSerdeGen):
