@@ -7,15 +7,15 @@ azure-core==1.8.2
 azure-storage-blob==12.5.0
 backcall==0.2.0
 bleach==3.2.1
-boto3==1.15.16
-boto3-stubs==1.15.16.0
-botocore==1.18.16
+boto3==1.15.17
+boto3-stubs==1.15.17.0
+botocore==1.18.17
 certifi==2020.6.20
 cffi==1.14.3
 chardet==3.0.4
 cli-helpers==2.1.0
 click==7.1.2
-colorama==0.4.3
+colorama==0.4.4
 configobj==5.0.6
 cryptography==2.9.2
 Cython==0.29.21
@@ -30,7 +30,7 @@ gprof2dot==2019.11.30
 humanize==3.0.1
 idna==2.9
 importlib-metadata==2.0.0
-iniconfig==1.0.1
+iniconfig==1.1.1
 ipdb==0.13.4
 ipython==7.18.1
 ipython-genutils==0.2.0
@@ -51,7 +51,7 @@ nose==1.3.7
 numba==0.51.2
 numpy==1.19.2
 oauthlib==3.1.0
-omnibus @ git+https://github.com/wrmsr/omnibus@7efb2a9ee3a66cc2ca15dfdeb86969e1cb5ef509
+omnibus @ git+https://github.com/wrmsr/omnibus@64b7ffb889ecd06eb4022a521aee6d82cdf142f2
 oscrypto==1.2.1
 packaging==20.4
 pandas==1.1.3
@@ -65,7 +65,7 @@ pipdeptree==1.0.0
 pkginfo==1.5.0.1
 pluggy==0.13.1
 ply==3.11
-prompt-toolkit==3.0.7
+prompt-toolkit==3.0.8
 protobuf==3.13.0
 psycopg2==2.8.6
 ptyprocess==0.6.0
@@ -99,7 +99,7 @@ python-snappy==0.5.4
 pytz==2020.1
 PyUtilib==6.0.0
 PyYAML==5.3.1
-readme-renderer==26.0
+readme-renderer==27.0
 requests==2.23.0
 requests-oauthlib==1.3.0
 requests-toolbelt==0.9.1
@@ -119,8 +119,8 @@ terminaltables==3.1.0
 thrift==0.13.0
 thrift-sasl==0.4.2
 toml==0.10.1
-tqdm==4.50.0
-traitlets==5.0.4
+tqdm==4.50.2
+traitlets==5.0.5
 twine==3.2.0
 typed-ast==1.4.1
 typing-extensions==3.7.4.3
@@ -129,4 +129,4 @@ wcwidth==0.2.5
 webencodings==0.5.1
 websocket-client==0.57.0
 z3-solver==4.8.9.0
-zipp==3.3.0
+zipp==3.3.1
