@@ -150,6 +150,18 @@ def test_inject(harness: ptinj.Harness):
         print(list(pg_conn.execute('select * from nums')))
 
 
+def test_inject1(harness: ptinj.Harness):
+    pth = os.path.abspath(os.path.join(os.path.dirname(__file__), 'site1.yml'))
+
+    helper = Helper(harness, [sites.Site(pth)])
+
+    helper.verify_elements_serde()
+    helper.execute()
+
+    with harness[DbManager].pg_engine.connect() as pg_conn:
+        print(list(pg_conn.execute('select * from a')))
+
+
 def test_inject2(harness: ptinj.Harness):
     pth = os.path.abspath(os.path.join(os.path.dirname(__file__), 'site2.yml'))
 

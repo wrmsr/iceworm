@@ -143,7 +143,7 @@ class SiteProcessor(els.ElementProcessor):
                         lst.append(
                             rls.TableAsSelect(
                                 [sn, tn],
-                                src.strip(' \r\n;'),
+                                sel,
                                 anns={SourceLocation: SourceLocation(s.path, 1)},
                                 meta={els.Origin: els.Origin(ls)},
                             )
@@ -156,9 +156,15 @@ class SiteProcessor(els.ElementProcessor):
                     stmts = par.parse_stmts(src)
                     for stmt in stmts:
                         ctas = check.isinstance(stmt, no.CreateTable)
-                        sel = check.isinstance(ctas.select, no.Select)  # noqa
 
-                        breakpoint()
+                        lst.append(
+                            rls.TableAsSelect(
+                                ctas.name.name,
+                                check.isinstance(ctas.select, no.Select),
+                                anns={SourceLocation: SourceLocation(s.path, 1)},
+                                meta={els.Origin: els.Origin(ls)},
+                            )
+                        )
 
             else:
                 raise TypeError(fmt)

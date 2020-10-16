@@ -5,14 +5,15 @@ from omnibus import dataclasses as dc
 from .. import elements as els
 from .. import targets as tars
 from ... import metadata as md_
+from ...trees.types import Query
 from ...types import QualifiedName
-from .base import RuleProcessor
 from .base import Rule
+from .base import RuleProcessor
 
 
 class TableAsSelect(Rule):
     table: QualifiedName = dc.field(coerce=QualifiedName.of)
-    query: str = dc.field(check_type=str)
+    query: Query = dc.field(coerce=Query.of)
 
     md: ta.Optional[md_.Table] = dc.field(None, check_type=(md_.Table, None), kwonly=True)
 
@@ -32,7 +33,7 @@ class TableAsSelectProcessor(RuleProcessor[TableAsSelect]):
 
 class InsertedRows(Rule):
     table: QualifiedName = dc.field(coerce=QualifiedName.of)
-    query: str = dc.field(check_type=str)
+    query: Query = dc.field(coerce=Query.of)
 
 
 class InsertedRowsProcessor(RuleProcessor[InsertedRows]):
