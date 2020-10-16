@@ -4,3 +4,6 @@
     id: pg
     adapter: {postgres: {}}
     url_secret: pg_url
+
+- site:
+    path: site2/s.u.sql

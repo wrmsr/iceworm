@@ -134,10 +134,10 @@ class Helper:
                     oed.execute(matr.op)
 
 
-def test_inject(harness: ptinj.Harness, exit_stack):
-    exit_stack.enter_context(oos.tmp_chdir(os.path.dirname(__file__)))
+def test_inject(harness: ptinj.Harness):
+    pth = os.path.abspath(os.path.join(os.path.dirname(__file__), 'site0.yml'))
 
-    helper = Helper(harness, [sites.Site('site0.yml')])
+    helper = Helper(harness, [sites.Site(pth)])
 
     helper.verify_elements_serde()
     helper.execute()
@@ -150,11 +150,10 @@ def test_inject(harness: ptinj.Harness, exit_stack):
         print(list(pg_conn.execute('select * from nums')))
 
 
-@pytest.mark.skip()
-def test_inject2(harness: ptinj.Harness, exit_stack):
-    exit_stack.enter_context(oos.tmp_chdir(os.path.dirname(__file__)))
+def test_inject2(harness: ptinj.Harness):
+    pth = os.path.abspath(os.path.join(os.path.dirname(__file__), 'site2.yml'))
 
-    helper = Helper(harness, [sites.Site('site2.yml')])
+    helper = Helper(harness, [sites.Site(pth)])
 
     helper.verify_elements_serde()
     helper.execute()

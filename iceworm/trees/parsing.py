@@ -516,6 +516,30 @@ def parse_expr(buf: str, **kwargs) -> no.Expr:
     return check.isinstance(node, no.Expr)
 
 
+class _DelimitingLexer(antlr.DelimitingLexer, IceSqlLexer):
+    pass
+
+
+def split_stmts(buf: str) -> ta.Sequence[str]:
+    lexer = _DelimitingLexer(
+        antlr4.InputStream(buf),
+        delimiter_token=IceSqlParser.DELIMITER,
+        delimiters=[';'],
+    )
+    lexer.removeErrorListeners()
+    lexer.addErrorListener(antlr.SilentRaisingErrorListener())
+
+    lst, part = lexer.split()
+    if part:
+        raise ValueError(part)
+
+    return [s for s, _ in lst]
+
+
+def parse_stmts(buf: str, **kwargs) -> ta.Sequence[no.Stmt]:
+    return [parse_stmt(sb, **kwargs) for sb in split_stmts(buf)]
+
+
 def parse_type_spec(buf: str, **kwargs) -> no.TypeSpec:
     parser = create_parser(buf, **kwargs)
     node = _ParseVisitor().visit(parser.typeSpec())

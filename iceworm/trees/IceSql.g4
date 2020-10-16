@@ -29,8 +29,13 @@ def config(self, config):
 }
 
 
+tokens {
+    DELIMITER
+}
+
+
 singleStatement
-    : statement ';'? EOF
+    : statement EOF
     ;
 
 statement
@@ -527,5 +532,5 @@ JINJA_COMMENT
     ;
 
 WS
-    : [ \t\n\r]+ -> skip
+    : [ \t\n\r]+ -> channel(HIDDEN)
     ;

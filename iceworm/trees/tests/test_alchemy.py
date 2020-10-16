@@ -21,6 +21,6 @@ def test_alchemy():
         'select * from a join b where a.b and 2 > 3',
     ]:
         print(query)
-        stmt = alch.transmute(par.parse_stmt(query + ';'))
+        stmt = alch.transmute(par.parse_stmt(query))
         print(stmt)
         print()

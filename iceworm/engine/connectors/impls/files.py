@@ -17,14 +17,16 @@ from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import properties
 
+from ... import elements as els
+from ... import sites
 from .... import metadata as md
 from ....types import QualifiedName
 from ...utils import parse_simple_select_table
 from ..base import Connection as _Connection
 from ..base import Connector as _Connector
+from ..base import Rows
 from ..base import RowSink
 from ..base import RowSource
-from ..base import Rows
 
 
 class SchemaPolicy(dc.Enum):
@@ -130,3 +132,40 @@ class CsvFileRowSource(RowSource):
             for vals in rows:
                 row = dict(zip(cols, vals))
                 yield row
+
+
+class MountPathProcessor(els.InstanceElementProcessor):
+
+    class Instance(els.InstanceElementProcessor.Instance['MountPathProcessor']):
+
+        @properties.cached
+        def matches(self) -> ta.Iterable[els.Element]:
+            return [
+                e
+                for e in self.input
+                if isinstance(e, FileConnector.Config)
+                and any(not os.path.isabs(m.path) for m in e.mounts)
+            ]
+
+        def make_abs(self, cfg: FileConnector.Config) -> FileConnector.Config:
+            sos = [sb for sb in els.iter_origins(cfg) if isinstance(sb, sites.Site) and sites.SiteLoaded in sb.anns]
+            if sos:
+                base_path = os.path.dirname(sos[0].anns[sites.SiteLoaded].abs_path)
+            else:
+                base_path = os.getcwd()
+
+            return dc.replace(
+                cfg,
+                mounts=[
+                    dc.replace(
+                        m,
+                        path=os.path.abspath(os.path.join(base_path, m.path)),
+                    )
+                    for m in cfg.mounts
+                ],
+                meta={els.Origin: els.Origin(cfg)},
+            )
+
+        @properties.cached
+        def output(self) -> ta.Iterable[els.Element]:
+            return [self.make_abs(c) if c in self.matches else c for c in self.input]

@@ -30,6 +30,8 @@ def _install_elements(binder: inj.Binder) -> inj.Binder:
     bind_connector_impl(binder, impls.sql.SqlConnector)
     bind_connector_impl(binder, impls.system.SystemConnector)
 
+    els.inject.bind_element_processor(binder, impls.files.MountPathProcessor, els.Phases.CONNECTORS)
+
     def provide_connector_set(
             es: els.ElementSet,
             fac: ta.Callable[..., Connector],

@@ -141,3 +141,14 @@ class Origin(dc.Pure):
 
 class Frozen(lang.Marker):
     pass
+
+
+def iter_origins(el: Element) -> ta.Iterator[Element]:
+    cur = el
+    while True:
+        try:
+            o = cur.meta[Origin]
+        except KeyError:
+            break
+        cur = o.element
+        yield cur

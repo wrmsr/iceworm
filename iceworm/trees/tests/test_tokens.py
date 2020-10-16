@@ -36,7 +36,7 @@ def test_comments():
         rendered = rendering.render(root)
         print(rendered)
 
-        reparsed = parsing.parse_stmt(rendered + ';')
+        reparsed = parsing.parse_stmt(rendered)
         assert reparsed == root
 
         tok_ana = toks.TokenAnalysis(root)

@@ -62,8 +62,11 @@ class _NodalMeta(dc.Meta):
             ann_cls = check.issubclass(nos.cls_args[1], ans.Annotation)
             namespace['_ann_cls'] = ann_cls
 
-            class Annotations(ans.Annotations[ann_cls]):
-                pass
+            Annotations = lang.new_type(  # noqa
+                f'Annotations${name}',
+                (ans.Annotations[ann_cls],),
+                {},
+            )
 
             namespace['_anns_cls'] = Annotations
 

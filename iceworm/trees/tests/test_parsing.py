@@ -43,7 +43,7 @@ def _assert_query(query: str, *, config: ta.Optional[IceSqlParserConfig] = None)
 
     print(query)
 
-    node = parsing.parse_stmt(query + ';', config=config)
+    node = parsing.parse_stmt(query, config=config)
     print(node)
 
     hash(node)
@@ -56,7 +56,7 @@ def _assert_query(query: str, *, config: ta.Optional[IceSqlParserConfig] = None)
     rendered = rendering.render(node)
     print(rendered)
 
-    reparsed = parsing.parse_stmt(rendered + ';', config=config)
+    reparsed = parsing.parse_stmt(rendered, config=config)
     try:
         assert reparsed == node
     except Exception:
@@ -143,3 +143,30 @@ def test_dot():
     root = parsing.parse_stmt('select * from a left outer join b on a.id = b.id where foo >= 10')
     print(root)
     do_dot(root)
+
+
+def test_split():
+    from omnibus import antlr
+    from omnibus._vendor import antlr4
+    from omnibus.antlr.delimit import DelimitingLexer
+
+    from .._antlr.IceSqlLexer import IceSqlLexer
+    from .._antlr.IceSqlParser import IceSqlParser
+
+    class DelimLex(DelimitingLexer, IceSqlLexer):
+        pass
+
+    buf = 'select 1; select 2; select 3;'
+
+    lexer = DelimLex(
+        antlr4.InputStream(buf),
+        delimiter_token=IceSqlParser.DELIMITER,
+        delimiters=[';'],
+    )
+    lexer.removeErrorListeners()
+    lexer.addErrorListener(antlr.SilentRaisingErrorListener())
+
+    lst, part = lexer.split()
+
+    print(lst)
+    print(part)

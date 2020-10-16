@@ -1,5 +1,6 @@
 """
 TODO:
+ - siteanalysis.. anns not meta
  - cfgable qualifiedname mangling of queries
  - ** parsing of sql files, de-jinjaficatiton happens here **
   - track pre/post jinja src locs
@@ -22,6 +23,7 @@ TODO:
  - git aware sites - tag history, annotation, branches, etc, link to gh/pr/jira
  - site rule for loading dirs of csvs + create_table_as'ing them
 """
+import os.path
 import typing as ta
 
 from omnibus import check
@@ -31,6 +33,7 @@ from omnibus import lang
 from omnibus.serde.objects import yaml as oyaml
 
 from .. import elements as els
+from ...trees import parsing as par  # noqa
 from ...utils import serde
 
 
@@ -53,11 +56,26 @@ FORMATS_BY_EXTENSION: ta.Mapping[str, Format] = col.unique_dict((e, f) for f in 
 
 
 class Site(els.Element):
-
     dc.metadata({els.PhaseFrozen: els.PhaseFrozen(els.Phases.SITES)})
 
     path: str = dc.field(check=lambda s: isinstance(s, str) and s)
     format: ta.Optional[str] = None
+
+
+class SiteLoaded(els.Annotation):
+    abs_path: str
+
+
+def get_site(el: els.Element) -> ta.Optional[Site]:
+    cur = el
+    while True:
+        try:
+            o = cur.meta[els.Origin]
+        except KeyError:
+            return None
+        cur = o.element
+        if isinstance(cur, Site) and SiteLoaded in cur.anns:
+            return cur
 
 
 class SiteProcessor(els.ElementProcessor):
@@ -67,17 +85,32 @@ class SiteProcessor(els.ElementProcessor):
         return [els.Phases.SITES]
 
     def match(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
-        return elements.get_type_set(Site)
+        return [s for s in elements.get_type_set(Site) if SiteLoaded not in s.anns]
 
     def process(self, elements: els.ElementSet) -> ta.Iterable[els.Element]:
         def load(s: Site) -> ta.Iterable[els.Element]:
-            with open(s.path, 'r') as f:
-                src = f.read()
+            sos = [sb for sb in els.iter_origins(s) if isinstance(sb, Site) and SiteLoaded in sb.anns]
+            if sos:
+                base_path = os.path.dirname(sos[0].anns[SiteLoaded].abs_path)
+            else:
+                base_path = os.getcwd()
+
+            abs_path = os.path.abspath(os.path.join(base_path, s.path))
+
+            ls = dc.replace(
+                s,
+                anns={**s.anns, SiteLoaded: SiteLoaded(abs_path)},
+                meta={els.Origin: els.Origin(s)},
+            )
+
+            lst = [ls]
 
             fmt = FORMATS_BY_EXTENSION[(s.format if s.format else s.path.split('.')[-1]).lower()]
 
             if fmt is Formats.YAML:
-                lst = []
+                with open(abs_path, 'r') as f:
+                    src = f.read()
+
                 with lang.disposing(oyaml.WrappedLoaders.base(src)) as loader:
                     while loader.check_data():
                         node = loader.get_data()
@@ -88,16 +121,24 @@ class SiteProcessor(els.ElementProcessor):
                             el = dc.replace(
                                 el,
                                 anns={**el.anns, SourceLocation: sloc},
-                                meta={els.Origin: els.Origin(s)},
+                                meta={els.Origin: els.Origin(ls)},
                             )
                             lst.append(el)
-                return lst
 
             elif fmt is Formats.SQL:
-                # from ..trees import parsing as par
+                with open(abs_path, 'r') as f:
+                    src = f.read()
+
+                par.parse_stmts(src)
                 raise NotImplementedError
 
             else:
                 raise TypeError(fmt)
 
-        return [r for e in elements for r in (load(e) if isinstance(e, Site) else [e])]
+            return lst
+
+        return [
+            r
+            for e in elements
+            for r in (load(e) if isinstance(e, Site) and SiteLoaded not in e.anns else [e])
+        ]

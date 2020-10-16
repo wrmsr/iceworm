@@ -1,4 +1,5 @@
 # flake8: noqa
+# type: ignore
 # Generated from IceSql.g4 by ANTLR 4.8
 from omnibus._vendor.antlr4 import *
 if __name__ is not None and "." in __name__:
