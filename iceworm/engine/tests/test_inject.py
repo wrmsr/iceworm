@@ -157,3 +157,6 @@ def test_inject2(harness: ptinj.Harness):
 
     helper.verify_elements_serde()
     helper.execute()
+
+    with harness[DbManager].pg_engine.connect() as pg_conn:
+        print(list(pg_conn.execute('select * from a')))

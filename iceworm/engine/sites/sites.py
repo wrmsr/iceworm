@@ -33,6 +33,7 @@ from omnibus import lang
 from omnibus.serde.objects import yaml as oyaml
 
 from .. import elements as els
+from ...trees import nodes as no
 from ...trees import parsing as par  # noqa
 from ...utils import serde
 
@@ -126,11 +127,38 @@ class SiteProcessor(els.ElementProcessor):
                             lst.append(el)
 
             elif fmt is Formats.SQL:
-                with open(abs_path, 'r') as f:
-                    src = f.read()
+                from .. import rules as rls
 
-                par.parse_stmts(src)
-                raise NotImplementedError
+                if os.path.isdir(abs_path):
+                    for fn in os.listdir(abs_path):
+                        if not fn.endswith('.sql'):
+                            continue
+
+                        with open(os.path.join(abs_path, fn), 'r') as f:
+                            src = f.read()
+
+                        sn, tn, _ = fn.split('.')
+                        sel = check.isinstance(check.single(par.parse_stmts(src)), no.Select)  # noqa
+
+                        lst.append(
+                            rls.TableAsSelect(
+                                [sn, tn],
+                                src.strip(' \r\n;'),
+                                anns={SourceLocation: SourceLocation(s.path, 1)},
+                                meta={els.Origin: els.Origin(ls)},
+                            )
+                        )
+
+                else:
+                    with open(abs_path, 'r') as f:
+                        src = f.read()
+
+                    stmts = par.parse_stmts(src)
+                    for stmt in stmts:
+                        ctas = check.isinstance(stmt, no.CreateTable)
+                        sel = check.isinstance(ctas.select, no.Select)  # noqa
+
+                        breakpoint()
 
             else:
                 raise TypeError(fmt)

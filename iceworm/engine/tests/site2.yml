@@ -5,5 +5,19 @@
     adapter: {postgres: {}}
     url_secret: pg_url
 
+- file_connector:
+    id: csv
+    mounts:
+      - path: csv
+        schema:
+          provided:
+            columns:
+              - {name: id, type: integer, primary_key: true}
+              - {name: a, type: integer}
+              - {name: b, type: integer}
+        globs:
+          - '*.csv'
+
 - site:
-    path: site2/s.u.sql
+    path: site2
+    format: sql

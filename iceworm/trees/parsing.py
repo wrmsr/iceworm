@@ -530,7 +530,7 @@ def split_stmts(buf: str) -> ta.Sequence[str]:
     lexer.addErrorListener(antlr.SilentRaisingErrorListener())
 
     lst, part = lexer.split()
-    if part:
+    if part.strip():
         raise ValueError(part)
 
     return [s for s, _ in lst]
