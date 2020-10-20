@@ -1,6 +1,6 @@
 from omnibus import lang
 from omnibus.dev.pytest import skip_if_cant_import
-from omnibus.serde.objects import yaml as oyaml
+from omnibus.serde.formats import yaml as oyaml
 
 
 @skip_if_cant_import('_yaml')

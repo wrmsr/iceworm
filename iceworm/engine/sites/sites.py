@@ -30,7 +30,7 @@ from omnibus import check
 from omnibus import collections as col
 from omnibus import dataclasses as dc
 from omnibus import lang
-from omnibus.serde.objects import yaml as oyaml
+from omnibus.serde.formats import yaml as oyaml
 
 from .. import elements as els
 from ...trees import nodes as no

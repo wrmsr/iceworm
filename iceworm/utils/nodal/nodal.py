@@ -225,7 +225,10 @@ class Nodal(
         for fld in dc.fields(self):
             yield from self.yield_field_children(fld)
 
-    def build_field_map_kwargs(self, fn: ta.Callable[[NodalT], NodalT], fld: ta.Union[dc.Field, str]) -> ta.Mapping[str, ta.Any]:  # noqa
+    def build_field_map_kwargs(
+            self,
+            fn: ta.Callable[[NodalT], NodalT], fld: ta.Union[dc.Field, str],
+    ) -> ta.Mapping[str, ta.Any]:
         if isinstance(fld, dc.Field):
             val = getattr(self, fld.name)
         elif isinstance(fld, str):

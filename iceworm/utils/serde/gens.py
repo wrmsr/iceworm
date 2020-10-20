@@ -3,6 +3,7 @@ import enum
 import typing as ta
 
 from omnibus import check
+from omnibus import lang
 from omnibus import reflect as rfl
 
 from .core import serde
@@ -25,6 +26,7 @@ class OptionalSerdeGen(InstanceSerdeGen):
         def __init__(self, spec: rfl.Spec) -> None:
             super().__init__(spec)
 
+            spec = check.isinstance(spec, rfl.UnionSpec)
             self._child = serde(spec.optional_arg)
 
         def serialize(self, obj: T) -> ta.Any:
@@ -66,6 +68,7 @@ class MappingSerdeGen(InstanceSerdeGen):
         def __init__(self, spec: rfl.Spec) -> None:
             super().__init__(spec)
 
+            spec = check.isinstance(spec, rfl.GenericTypeSpec)
             kspec, vspec = spec.args
             self._kchild = serde(kspec)
             self._vchild = serde(vspec)
@@ -108,6 +111,7 @@ class SequenceSerdeGen(InstanceSerdeGen):
         def __init__(self, spec: rfl.Spec) -> None:
             super().__init__(spec)
 
+            spec = check.isinstance(spec, rfl.GenericTypeSpec)
             [espec] = spec.args
             self._child = serde(espec)
 
@@ -131,6 +135,7 @@ class SetSerdeGen(InstanceSerdeGen):
         def __init__(self, spec: rfl.Spec) -> None:
             super().__init__(spec)
 
+            spec = check.isinstance(spec, rfl.GenericTypeSpec)
             [espec] = spec.args
             self._child = serde(espec)
 
@@ -152,6 +157,7 @@ class TupleSerdeGen(InstanceSerdeGen):
         def __init__(self, spec: rfl.Spec) -> None:
             super().__init__(spec)
 
+            spec = check.isinstance(spec, rfl.TupleTypeSpec)
             self._children = [serde(e) for e in spec.args]
 
         def serialize(self, obj: T) -> ta.Any:
@@ -176,7 +182,8 @@ class EnumSerdeGen(InstanceSerdeGen):
         def __init__(self, spec: rfl.Spec) -> None:
             super().__init__(spec)
 
-            self._cls = spec.erased_cls
+            spec = check.isinstance(spec, rfl.TypeSpec)
+            self._cls = check.isinstance(spec.erased_cls, enum.EnumMeta)
 
         def serialize(self, obj: T) -> ta.Any:
             return obj.name
@@ -196,7 +203,10 @@ class PrimitiveSerdeGen(InstanceSerdeGen):
         def __init__(self, spec: rfl.Spec) -> None:
             super().__init__(spec)
 
+            spec = check.isinstance(spec, rfl.NonGenericTypeSpec)
             self._cls = spec.erased_cls
+
+            self.serialize = lang.identity
 
         def serialize(self, obj: T) -> ta.Any:
             return obj
