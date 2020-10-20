@@ -7,9 +7,9 @@ azure-core==1.8.2
 azure-storage-blob==12.5.0
 backcall==0.2.0
 bleach==3.2.1
-boto3==1.15.17
-boto3-stubs==1.15.17.0
-botocore==1.18.17
+boto3==1.16.1
+boto3-stubs==1.16.0.0
+botocore==1.16.1
 certifi==2020.6.20
 cffi==1.14.3
 chardet==3.0.4
@@ -27,7 +27,7 @@ fastparquet==0.4.1
 flake8==3.8.4
 future==0.18.2
 gprof2dot==2019.11.30
-humanize==3.0.1
+humanize==3.1.0
 idna==2.9
 importlib-metadata==2.0.0
 iniconfig==1.1.1
@@ -38,7 +38,7 @@ isodate==0.6.0
 jedi==0.17.2
 Jinja2==2.11.2
 jmespath==0.10.0
-JPype1==1.0.2
+JPype1==1.1.0
 keyring==21.4.0
 kiwisolver==1.2.0
 llvmlite==0.34.0
@@ -51,7 +51,7 @@ nose==1.3.7
 numba==0.51.2
 numpy==1.19.2
 oauthlib==3.1.0
-omnibus @ git+https://github.com/wrmsr/omnibus@eb2522500b39c9d84276d01d80bc97ae27f2d18f
+omnibus @ git+https://github.com/wrmsr/omnibus@9a2225516f838076828c32affd1aaf8f37a52dac
 oscrypto==1.2.1
 packaging==20.4
 pandas==1.1.3
@@ -62,7 +62,7 @@ pgcli==3.0.0
 pgspecial==1.11.10
 pickleshare==0.7.5
 pipdeptree==1.0.0
-pkginfo==1.5.0.1
+pkginfo==1.6.0
 pluggy==0.13.1
 ply==3.11
 prompt-toolkit==3.0.8
@@ -72,7 +72,7 @@ ptyprocess==0.6.0
 py==1.9.0
 py-cpuinfo==7.0.0
 py4j==0.10.9.1
-pyarrow==1.0.1
+pyarrow==2.0.0
 pycodestyle==2.6.0
 pycparser==2.20
 pycryptodomex==3.9.8
@@ -124,7 +124,7 @@ traitlets==5.0.5
 twine==3.2.0
 typed-ast==1.4.1
 typing-extensions==3.7.4.3
-urllib3==1.25.10
+urllib3==1.25.11
 wcwidth==0.2.5
 webencodings==0.5.1
 websocket-client==0.57.0
