@@ -7,9 +7,9 @@ azure-core==1.8.2
 azure-storage-blob==12.5.0
 backcall==0.2.0
 bleach==3.2.1
-boto3==1.16.4
-boto3-stubs==1.16.4.0
-botocore==1.19.4
+boto3==1.16.8
+boto3-stubs==1.16.8.0
+botocore==1.19.8
 certifi==2020.6.20
 cffi==1.14.3
 chardet==3.0.4
@@ -40,7 +40,7 @@ Jinja2==2.11.2
 jmespath==0.10.0
 JPype1==1.1.2
 keyring==21.4.0
-kiwisolver==1.2.0
+kiwisolver==1.3.0
 llvmlite==0.34.0
 MarkupSafe==1.1.1
 mccabe==0.6.1
@@ -49,9 +49,9 @@ mypy==0.790
 mypy-extensions==0.4.3
 nose==1.3.7
 numba==0.51.2
-numpy==1.19.2
+numpy==1.19.3
 oauthlib==3.1.0
-omnibus @ git+https://github.com/wrmsr/omnibus@7aa3ecc4d0d675e8db32758dc2c3c7b46a39573f
+omnibus @ git+https://github.com/wrmsr/omnibus@7e6a37f3bfc9bfde976bd9e09a128dc038d5a4ba
 oscrypto==1.2.1
 packaging==20.4
 pandas==1.1.3
@@ -62,7 +62,7 @@ pgcli==3.0.0
 pgspecial==1.11.10
 pickleshare==0.7.5
 pipdeptree==1.0.0
-pkginfo==1.6.0
+pkginfo==1.6.1
 pluggy==0.13.1
 ply==3.11
 prompt-toolkit==3.0.8
@@ -86,7 +86,7 @@ pyOpenSSL==19.1.0
 pyparsing==2.4.7
 pyspark==3.0.1
 pyspark-stubs==3.0.0.post1
-pytest==6.1.1
+pytest==6.1.2
 pytest-asyncio==0.14.0
 pytest-benchmark==3.2.3
 pytest-clarity==0.3.0a0
@@ -109,7 +109,7 @@ sasl==0.2.1
 scramp==1.2.0
 setproctitle==1.1.10
 six==1.15.0
-snowflake-connector-python==2.3.3
+snowflake-connector-python==2.3.4
 snowflake-sqlalchemy==1.2.4
 SQLAlchemy==1.3.20
 sqlparse==0.4.1
