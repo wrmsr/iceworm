@@ -1,6 +1,5 @@
 from omnibus import argparse as oap
-
-from ..bootstrap import Bootstrap
+from omnibus.bootstrap import Bootstrap
 
 
 class Main(oap.Cli):
