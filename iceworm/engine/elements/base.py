@@ -68,9 +68,9 @@ import typing as ta
 from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
+from omnibus import nodal
 
 from ...utils import build_dc_repr
-from ...utils import nodal
 
 
 Id = str

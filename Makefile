@@ -129,7 +129,7 @@ define do-deps
 	\
 	OMNIBUS_LOCAL=$$($(1)/bin/pip freeze | egrep '^omnibus ' | cut -d@ -f3) ; \
 	OMNIBUS_REMOTE=$$(git ls-remote https://github.com/wrmsr/omnibus wrmsr_working | awk '{print $$1}') ; \
-	echo "omnibus local@$$OMNIBUS_LOCAL remote@$$OMNIBUS_REMOTE" ; \
+	echo "omnibus local:$$OMNIBUS_LOCAL remote:$$OMNIBUS_REMOTE" ; \
 	if [ "$$OMNIBUS_LOCAL" != "$$OMNIBUS_REMOTE" ] ; then \
 		A="" ; \
 		$(1)/bin/pip uninstall -y omnibus ; \

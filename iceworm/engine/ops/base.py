@@ -4,9 +4,9 @@ import typing as ta
 from omnibus import dataclasses as dc
 from omnibus import collections as col
 from omnibus import lang
+from omnibus import nodal
 
 from ...utils import build_dc_repr
-from ...utils import nodal
 
 
 OpT = ta.TypeVar('OpT', bound='Op')

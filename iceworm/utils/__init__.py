@@ -1,5 +1,4 @@
 from . import inject  # noqa
-from . import nodal  # noqa
 from . import secrets  # noqa
 from .utils import ReprFn  # noqa
 from .utils import build_dc_repr  # noqa

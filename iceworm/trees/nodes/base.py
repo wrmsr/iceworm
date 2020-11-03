@@ -15,12 +15,12 @@ import typing as ta
 from omnibus import check
 from omnibus import collections as col
 from omnibus import dataclasses as dc
+from omnibus import nodal
 from omnibus import properties
 
 from ...types import QualifiedName
 from ...utils import build_dc_repr
 from ...utils import build_enum_value_map
-from ...utils import nodal
 
 
 T = ta.TypeVar('T')
