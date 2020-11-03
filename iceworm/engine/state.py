@@ -30,9 +30,8 @@ import typing as ta
 from omnibus import check
 from omnibus import collections as col
 from omnibus import lang
+from omnibus.serde import mapping as sm
 import sqlalchemy as sa
-
-from ..utils import serde
 
 
 StrMap = ta.Mapping[str, ta.Any]
@@ -137,12 +136,12 @@ class HeapObjStore(ObjStore):
 
     def get(self, cls: ObjCls, key: Key) -> Obj:
         kt = self._mappers[cls].key_to_key_tup(key)
-        return check.isinstance(serde.deserialize(self._objs_by_key_tup_by_cls[cls][kt], cls), cls)
+        return check.isinstance(sm.deserialize(self._objs_by_key_tup_by_cls[cls][kt], cls), cls)
 
     def put(self, obj: ObjCls) -> None:
         cls = type(obj)
         kt = self._mappers[cls].obj_to_key_tup(obj)
-        self._objs_by_key_tup_by_cls.setdefault(cls, {})[kt] = serde.serialize(obj)
+        self._objs_by_key_tup_by_cls.setdefault(cls, {})[kt] = sm.serialize(obj)
 
     def delete(self, cls: ObjCls, key: Key) -> None:
         kt = self._mappers[cls].key_to_key_tup(key)

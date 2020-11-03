@@ -4,8 +4,7 @@ import typing as ta
 from omnibus import check
 from omnibus import collections as col
 from omnibus import dataclasses as dc
-
-from . import serde
+from omnibus.serde import mapping as sm
 
 
 class SecretKey(dc.Pure):
@@ -28,7 +27,7 @@ class SecretKey(dc.Pure):
             return cls.of(obj)
 
 
-class SecretKeySerde(serde.AutoSerde[SecretKey]):
+class SecretKeySerde(sm.AutoSerde[SecretKey]):
 
     def serialize(self, obj: SecretKey) -> ta.Any:
         return obj.key

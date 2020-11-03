@@ -1,8 +1,9 @@
 import pytest
 
+from omnibus.serde import mapping as sm
+
 from .. import elements as els
 from .. import targets as tars
-from ...utils import serde
 
 
 def test_refs():
@@ -15,9 +16,9 @@ def test_refs():
     with pytest.raises(TypeError):
         r == 'hi'  # noqa
 
-    rs = serde.serialize(r)
+    rs = sm.serialize(r)
     assert rs == 'hi'
-    rd = serde.deserialize(rs, els.Ref[tars.Table])
+    rd = sm.deserialize(rs, els.Ref[tars.Table])
     assert rd == r
 
     rx = els.Ref[tars.Table]('x')

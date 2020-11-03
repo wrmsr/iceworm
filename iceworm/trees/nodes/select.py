@@ -4,9 +4,9 @@ import typing as ta
 
 from omnibus import collections as col
 from omnibus import dataclasses as dc
+from omnibus.serde import mapping as sm
 
 from ...utils import build_enum_value_map
-from ...utils import serde
 from .base import Expr
 from .base import Identifier
 from .base import Integer
@@ -103,7 +103,7 @@ class IdentifierAllSelectItem(SelectItem):
 
 class ExprSelectItem(SelectItem):
     value: Expr
-    label: ta.Optional[Identifier] = dc.field(None, metadata={serde.Ignore: operator.not_})
+    label: ta.Optional[Identifier] = dc.field(None, metadata={sm.Ignore: operator.not_})
 
 
 class Grouping(Node, abstract=True):
@@ -124,15 +124,15 @@ class SetsGrouping(Grouping):
 
 class Select(Selectable, Stmt):
     items: ta.Sequence[SelectItem] = dc.field(coerce=col.seq)
-    relations: ta.Sequence[Relation] = dc.field((), coerce=col.seq, metadata={serde.Ignore: operator.not_})
-    where: ta.Optional[Expr] = dc.field(None, metadata={serde.Ignore: operator.not_})
-    top_n: ta.Optional[Integer] = dc.field(None, metadata={serde.Ignore: operator.not_})
-    set_quantifier: ta.Optional[SetQuantifier] = dc.field(None, metadata={serde.Ignore: operator.not_})
-    group_by: ta.Optional[Grouping] = dc.field(None, metadata={serde.Ignore: operator.not_})
-    having: ta.Optional[Expr] = dc.field(None, metadata={serde.Ignore: operator.not_})
-    qualify: ta.Optional[Expr] = dc.field(None, metadata={serde.Ignore: operator.not_})
-    order_by: ta.Optional[ta.Sequence[SortItem]] = dc.field(None, coerce=col.seq_or_none, metadata={serde.Ignore: operator.not_})  # noqa
-    limit: ta.Optional[int] = dc.field(None, metadata={serde.Ignore: operator.not_})
+    relations: ta.Sequence[Relation] = dc.field((), coerce=col.seq, metadata={sm.Ignore: operator.not_})
+    where: ta.Optional[Expr] = dc.field(None, metadata={sm.Ignore: operator.not_})
+    top_n: ta.Optional[Integer] = dc.field(None, metadata={sm.Ignore: operator.not_})
+    set_quantifier: ta.Optional[SetQuantifier] = dc.field(None, metadata={sm.Ignore: operator.not_})
+    group_by: ta.Optional[Grouping] = dc.field(None, metadata={sm.Ignore: operator.not_})
+    having: ta.Optional[Expr] = dc.field(None, metadata={sm.Ignore: operator.not_})
+    qualify: ta.Optional[Expr] = dc.field(None, metadata={sm.Ignore: operator.not_})
+    order_by: ta.Optional[ta.Sequence[SortItem]] = dc.field(None, coerce=col.seq_or_none, metadata={sm.Ignore: operator.not_})  # noqa
+    limit: ta.Optional[int] = dc.field(None, metadata={sm.Ignore: operator.not_})
 
 
 class Cte(Node):

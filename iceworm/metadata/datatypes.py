@@ -14,8 +14,7 @@ from omnibus import check
 from omnibus import collections as col
 from omnibus import dataclasses as dc
 from omnibus import lang
-
-from ..utils import serde
+from omnibus.serde import mapping as sm
 
 
 class Datatype(dc.Enum):
@@ -242,28 +241,28 @@ class TableType(Datatype):
         coerce=col.seq, check=lambda l: all(isinstance(k, str) and isinstance(v, Datatype) for k, v in l))
 
 
-class DatatypeSerde(serde.AutoSerde[Datatype]):
+class DatatypeSerde(sm.AutoSerde[Datatype]):
 
     @property
     def handles_polymorphism(self) -> bool:
         return True
 
     def serialize(self, obj: Datatype) -> ta.Any:
-        return serde.gen_dataclass_serde(Datatype, no_custom=True).serialize(obj)
+        return sm.gen_dataclass_serde(Datatype, no_custom=True).serialize(obj)
 
     def deserialize(self, ser: ta.Any) -> Datatype:
         if isinstance(ser, str):
             cls = Datatype.CLS_MAP[ser]
             return cls()
-        return serde.gen_dataclass_serde(Datatype, no_custom=True).deserialize(ser)
+        return sm.gen_dataclass_serde(Datatype, no_custom=True).deserialize(ser)
 
 
-# class DatatypeSerdeGen(serde.InstanceSerdeGen):
+# class DatatypeSerdeGen(sm.InstanceSerdeGen):
 #
 #     def match(self, spec: rfl.Spec) -> bool:
 #         return isinstance(spec, rfl.TypeSpec) and spec.erased_cls is Datatype
 #
-#     class Instance(serde.InstanceSerdeGen.Instance):
+#     class Instance(sm.InstanceSerdeGen.Instance):
 #
 #         def __init__(self, spec: rfl.Spec) -> None:
 #             super().__init__(spec)
@@ -279,10 +278,10 @@ class DatatypeSerde(serde.AutoSerde[Datatype]):
 #             pass
 
 
-@serde.subclass_map_resolver_for(Datatype)
+@sm.subclass_map_resolver_for(Datatype)
 def _build_datatype_subclass_map(cls: type) -> ta.Mapping[ta.Union[str, type], ta.Union[str, type]]:
     check.state(cls is Datatype)
-    dct = dict(serde.build_subclass_map(Datatype))
+    dct = dict(sm.build_subclass_map(Datatype))
     for k, v in list(dct.items()):
         for a in getattr(v, 'ALIASES', []):
             check.not_in(a, dct)

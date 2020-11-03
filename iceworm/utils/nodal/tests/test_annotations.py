@@ -1,5 +1,6 @@
+from omnibus.serde import mapping as sm
+
 from .. import annotations as an
-from ... import serde
 
 
 class TestAnn(an.Annotation, abstract=True):
@@ -20,16 +21,16 @@ class B(TestAnn):
 
 def test_annotations():
     anns = TestAnns()
-    s = serde.serialize(anns)
+    s = sm.serialize(anns)
     assert s == {}
-    d = serde.deserialize(s, TestAnns)
+    d = sm.deserialize(s, TestAnns)
     assert anns == d
 
     anns = TestAnns([A(), B(1)])
     assert anns[B].v == 1
 
-    s = serde.serialize(anns)
-    d = serde.deserialize(s, TestAnns)
+    s = sm.serialize(anns)
+    d = sm.deserialize(s, TestAnns)
     assert anns == d
 
     anns = TestAnns({**{A: A(), B: B(1)}, B: B(2)})

@@ -1,8 +1,9 @@
 import pytest
 
+from omnibus.serde import mapping as sm
+
 from .. import datatypes as dt
 from .. import metadata as md
-from ...utils import serde
 
 
 def test_metadata():
@@ -15,6 +16,6 @@ def test_metadata():
 
 def test_serde():
     t = md.Table(['t'], [md.Column('a', dt.Integer()), md.Column('b', dt.String())])
-    s = serde.serialize(t, md.Object)
-    d = serde.deserialize(s, md.Object)
+    s = sm.serialize(t, md.Object)
+    d = sm.deserialize(s, md.Object)
     assert t == d

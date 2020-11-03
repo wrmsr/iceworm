@@ -40,11 +40,11 @@ from omnibus import configs as cfgs
 from omnibus import dataclasses as dc
 from omnibus import defs
 from omnibus import lang
+from omnibus.serde import mapping as sm
 
 from .. import elements as els
 from ... import metadata as md
 from ...types import QualifiedName
-from ...utils import serde
 
 
 ConnectorT = ta.TypeVar('ConnectorT', bound='Connector')
@@ -107,7 +107,7 @@ class Connector(ta.Generic[ConnectorT, ConnectorConfigT], cfgs.Configurable[Conn
 
         dc.metadata({
             els.PhaseFrozen: els.PhaseFrozen(els.Phases.CONNECTORS),
-            serde.Name: lambda cls: lang.decamelize(cfgs.get_impl(cls).__name__),
+            sm.Name: lambda cls: lang.decamelize(cfgs.get_impl(cls).__name__),
         })
 
         id: els.Id = dc.field(check=lambda s: isinstance(s, els.Id) and s)

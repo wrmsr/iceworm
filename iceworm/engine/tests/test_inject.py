@@ -11,6 +11,7 @@ from omnibus import lang  # noqa
 from omnibus import os as oos  # noqa
 from omnibus import properties
 from omnibus.inject.dev import pytest as ptinj
+from omnibus.serde import mapping as sm
 import pytest  # noqa
 import yaml  # noqa
 
@@ -27,7 +28,6 @@ from ...trees import nodes as no
 from ...trees import parsing as par
 from ...types import QualifiedName  # noqa
 from ...utils import secrets as sec  # noqa
-from ...utils import serde
 
 
 # def get_ele_dependencies(elements: ta.Iterable[els.Element]) -> ta.Mapping[els.Element, ta.AbstractSet[els.Element]]:  # noqa
@@ -112,8 +112,8 @@ class Helper:
         return self.elements_and_connectors[1]
 
     def verify_elements_serde(self) -> None:
-        selements = serde.serialize(list(self.elements), ta.Sequence[els.Element])
-        delements = els.ElementSet.of(serde.deserialize(selements, ta.Sequence[els.Element]))
+        selements = sm.serialize(list(self.elements), ta.Sequence[els.Element])
+        delements = els.ElementSet.of(sm.deserialize(selements, ta.Sequence[els.Element]))
         assert list(delements) == list(self.elements)
 
         print(yaml.dump(selements))

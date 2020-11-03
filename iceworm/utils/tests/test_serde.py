@@ -5,11 +5,10 @@ import uuid
 
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
+from omnibus.serde import mapping as sm
 import pytest
 
-from .. import core
-from .. import types
-from .... import types as ty
+from ... import types as ty
 
 
 class Pt(dc.Pure):
@@ -28,8 +27,8 @@ class Zbox(Box):
 
 def test_serde():
     def rt(o, t=None):
-        s = core.serialize(o, t)
-        d = core.deserialize(s, t or type(o))
+        s = sm.serialize(o, t)
+        d = sm.deserialize(s, t or type(o))
         assert d == o
 
     rt(2)
@@ -51,8 +50,8 @@ def test_serde():
 
     rt({1, 2}, ta.AbstractSet[int])
 
-    assert core.deserialize([[0, 1], [2, 3]], ta.Mapping[int, int]) == {0: 1, 2: 3}
-    assert core.deserialize({0: 1, 2: 3}, ta.Mapping[int, int]) == {0: 1, 2: 3}
+    assert sm.deserialize([[0, 1], [2, 3]], ta.Mapping[int, int]) == {0: 1, 2: 3}
+    assert sm.deserialize({0: 1, 2: 3}, ta.Mapping[int, int]) == {0: 1, 2: 3}
 
     rt(Pt(1, 2))
 
@@ -65,12 +64,12 @@ def test_serde():
     rt(datetime.datetime.now())
     rt(uuid.uuid4())
 
-    core.serialize(ocol.FrozenDict({1: 2, 3: 4}), ta.Mapping[int, int])
+    sm.serialize(ocol.FrozenDict({1: 2, 3: 4}), ta.Mapping[int, int])
 
 
 def test_reraise():
-    with pytest.raises(types.DeserializationException):
-        core.deserialize(None, int)
+    with pytest.raises(sm.DeserializationException):
+        sm.deserialize(None, int)
 
 
 def test_code_serde():
@@ -78,28 +77,28 @@ def test_code_serde():
     lam = ty.Lambda(src)
     assert lam.fn(420) == 422
 
-    assert core.deserialize('x: x + 10', ty.Lambda).fn(20) == 30
-    assert core.deserialize({'lambda': 'x: x + 10'}, ty.Code).fn(20) == 30
+    assert sm.deserialize('x: x + 10', ty.Lambda).fn(20) == 30
+    assert sm.deserialize({'lambda': 'x: x + 10'}, ty.Code).fn(20) == 30
 
-    s = core.serialize(lam, ty.Code)
+    s = sm.serialize(lam, ty.Code)
     assert s == {'lambda': {'src': src}}
-    d = core.deserialize(s, ty.Code)
+    d = sm.deserialize(s, ty.Code)
     assert d.fn(422) == 424
 
     class Thing0(dc.Pure):
         code: ty.Code
 
-    s = core.serialize(Thing0(lam))
+    s = sm.serialize(Thing0(lam))
     assert s == {'code': {'lambda': {'src': src}}}
-    d = core.deserialize(s, Thing0)
+    d = sm.deserialize(s, Thing0)
     assert d.code.fn(424) == 426
 
     class Thing1(dc.Pure):
         lam: ty.Lambda
 
-    s = core.serialize(Thing1(lam))
+    s = sm.serialize(Thing1(lam))
     assert s == {'lam': {'src': src}}
-    d = core.deserialize(s, Thing1)
+    d = sm.deserialize(s, Thing1)
     assert d.lam.fn(426) == 428
 
 
@@ -108,7 +107,7 @@ class A(dc.Pure):
 
 
 def test_rec():
-    sd = core.serde(A)
+    sd = sm.serde(A)
 
     a = A(A())
 

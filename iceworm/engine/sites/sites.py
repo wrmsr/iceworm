@@ -30,12 +30,12 @@ from omnibus import check
 from omnibus import collections as col
 from omnibus import dataclasses as dc
 from omnibus import lang
+from omnibus.serde import mapping as sm
 from omnibus.serde.formats import yaml as oyaml
 
 from .. import elements as els
 from ...trees import nodes as no
 from ...trees import parsing as par  # noqa
-from ...utils import serde
 
 
 class SourceLocation(els.Annotation, els.Inherited):
@@ -117,7 +117,7 @@ class SiteProcessor(els.ElementProcessor):
                         node = loader.get_data()
                         for child in check.isinstance(node.value, ta.Sequence):
                             uchild = oyaml.unwrap(child)
-                            el = serde.deserialize(uchild, els.Element)
+                            el = sm.deserialize(uchild, els.Element)
                             sloc = SourceLocation(s.path, child.node.start_mark.line + 1)
                             el = dc.replace(
                                 el,

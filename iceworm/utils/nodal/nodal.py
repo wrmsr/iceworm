@@ -14,9 +14,9 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import reflect as rfl
+from omnibus.serde import mapping as sm
 
 from . import annotations as ans
-from .. import serde
 
 
 Self = ta.TypeVar('Self')
@@ -77,7 +77,7 @@ class _NodalMeta(dc.Meta):
                 hash=False,
                 compare=False,
                 coerce=Annotations,
-                metadata={serde.Ignore: operator.not_},
+                metadata={sm.Ignore: operator.not_},
             )
 
             namespace.setdefault('__annotations__', {})['anns'] = Annotations
@@ -91,7 +91,7 @@ class _NodalMeta(dc.Meta):
                 coerce=lambda d: ocol.frozendict(
                     (k, v) for k, v in check.isinstance(d, ta.Mapping).items() if v is not None),
                 check=lambda d: not any(isinstance(k, ann_cls) or v is None for k, v in d.items()),
-                metadata={serde.Ignore: True},
+                metadata={sm.Ignore: True},
             )
 
             namespace.setdefault('__annotations__', {})['meta'] = ta.Mapping[ta.Any, ta.Any]

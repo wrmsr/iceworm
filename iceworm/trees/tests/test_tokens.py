@@ -1,10 +1,11 @@
 import textwrap
 
+from omnibus.serde import mapping as sm
+
 from .. import nodes as no
 from .. import parsing
 from .. import rendering
 from .. import tokens as toks
-from ...utils import serde
 
 
 def test_comments():
@@ -29,8 +30,8 @@ def test_comments():
         root = parsing.parse_stmt(sql)
         print(root)
 
-        ser = serde.serialize(root, no.Node)  # noqa
-        des = serde.deserialize(ser, no.Node)  # noqa
+        ser = sm.serialize(root, no.Node)  # noqa
+        des = sm.deserialize(ser, no.Node)  # noqa
         # assert des == node
 
         rendered = rendering.render(root)

@@ -11,8 +11,7 @@ from omnibus import check
 from omnibus import collections as col
 from omnibus import dataclasses as dc
 from omnibus import properties
-
-from .utils import serde
+from omnibus.serde import mapping as sm
 
 
 class QualifiedName(dc.Pure, ta.Sequence[str]):
@@ -80,7 +79,7 @@ class QualifiedName(dc.Pure, ta.Sequence[str]):
             return cls.of(obj)
 
 
-class QualifiedNameSerde(serde.AutoSerde[QualifiedName]):
+class QualifiedNameSerde(sm.AutoSerde[QualifiedName]):
 
     def serialize(self, obj: QualifiedName) -> ta.Any:
         return list(check.isinstance(obj, QualifiedName).parts)
@@ -107,12 +106,12 @@ class Lambda(Code, allow_setattr=True):
         return eval('lambda ' + self.src)
 
 
-class LambdaSerde(serde.AutoSerde[Lambda]):
+class LambdaSerde(sm.AutoSerde[Lambda]):
 
     def serialize(self, obj: Lambda) -> ta.Any:
-        return serde.serialize_dataclass_fields(obj)
+        return sm.serialize_dataclass_fields(obj)
 
     def deserialize(self, ser: ta.Any) -> Lambda:
         if isinstance(ser, str):
             return Lambda(ser)
-        return serde.deserialize_dataclass_fields(ser, Lambda)
+        return sm.deserialize_dataclass_fields(ser, Lambda)

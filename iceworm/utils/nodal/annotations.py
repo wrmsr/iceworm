@@ -8,8 +8,7 @@ from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus import lang
 from omnibus import reflect as rfl
-
-from .. import serde
+from omnibus.serde import mapping as sm
 
 
 AnnotationT = ta.TypeVar('AnnotationT', bound='Annotation')
@@ -93,8 +92,8 @@ class Annotations(
         (),
         coerce=_coerce_anns,
         metadata={
-            serde.GetType: lambda cls: ta.Sequence[cls._ann_cls],
-            serde.Ignore: operator.not_,
+            sm.GetType: lambda cls: ta.Sequence[cls._ann_cls],
+            sm.Ignore: operator.not_,
         },
     )
 

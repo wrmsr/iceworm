@@ -6,8 +6,8 @@ from omnibus import check
 from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import lang
+from omnibus.serde import mapping as sm
 
-from ...utils import serde
 from .base import Element
 from .base import Id
 from .base import id_check
@@ -64,7 +64,7 @@ class Ref(dc.Frozen, lang.Abstract, ta.Generic[ElementT], repr=False, eq=False, 
         check.not_in(rc, _REF_CLS_CACHE)
         _REF_CLS_CACHE[rc] = cls
 
-        class _RefSerde(serde.AutoSerde[cls]):  # noqa
+        class _RefSerde(sm.AutoSerde[cls]):  # noqa
             _bind = cls
 
             @property

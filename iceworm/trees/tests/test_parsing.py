@@ -8,12 +8,12 @@ from omnibus import check
 from omnibus import dataclasses as dc
 from omnibus.antlr import ParseException
 from omnibus.graphs.dot import dot
+from omnibus.serde import mapping as sm
 import pytest
 
 from .. import nodes as no
 from .. import parsing
 from .. import rendering
-from ...utils import serde
 from .._antlr.IceSqlParser import IceSqlParserConfig
 
 
@@ -48,9 +48,9 @@ def _assert_query(query: str, *, config: ta.Optional[IceSqlParserConfig] = None)
 
     hash(node)
 
-    ser = serde.serialize(node, no.Node)  # noqa
+    ser = sm.serialize(node, no.Node)  # noqa
     print(json.dumps(ser))
-    des = serde.deserialize(ser, no.Node)  # noqa
+    des = sm.deserialize(ser, no.Node)  # noqa
     # assert des == node
 
     rendered = rendering.render(node)
@@ -80,7 +80,7 @@ def _assert_query(query: str, *, config: ta.Optional[IceSqlParserConfig] = None)
     assert hash(reparsed) == hash(node)
 
     # parts = rendering.Renderer().render(node)
-    # parts_ser = serde.serialize(parts)
+    # parts_ser = sm.serialize(parts)
     # print(json.dumps(parts_ser, indent=4))
 
     print()

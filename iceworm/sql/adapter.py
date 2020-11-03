@@ -15,9 +15,8 @@ from omnibus import check
 from omnibus import configs as cfgs
 from omnibus import dataclasses as dc
 from omnibus import lang
+from omnibus.serde import mapping as sm
 import sqlalchemy as sa  # noqa
-
-from ..utils import serde
 
 
 AdapterT = ta.TypeVar('AdapterT', bound='Adapter')
@@ -28,7 +27,7 @@ class Adapter(cfgs.Configurable[AdapterConfigT], lang.Abstract):
 
     class Config(dc.Enum, cfgs.Config):
         dc.metadata({
-            serde.Name: lambda cls: lang.decamelize(cfgs.get_impl(cls).__name__[:-7]),
+            sm.Name: lambda cls: lang.decamelize(cfgs.get_impl(cls).__name__[:-7]),
         })
 
     def __init__(self, config: AdapterConfigT) -> None:
