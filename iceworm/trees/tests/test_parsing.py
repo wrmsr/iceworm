@@ -49,7 +49,7 @@ def _assert_query(query: str, *, config: ta.Optional[IceSqlParserConfig] = None)
     hash(node)
 
     ser = sm.serialize(node, no.Node)  # noqa
-    print(json.dumps(ser))
+    print(json.dumps(ser, indent=2))
     des = sm.deserialize(ser, no.Node)  # noqa
     # assert des == node
 
