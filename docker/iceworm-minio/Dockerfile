@@ -1,3 +1,3 @@
-FROM minio/minio:RELEASE.2020-09-02T18-19-50Z
+FROM minio/minio:RELEASE.2020-11-13T20-10-18Z
 COPY .dockertimestamp /
 CMD ["server", "/data"]

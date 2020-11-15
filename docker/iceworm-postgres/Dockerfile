@@ -1,4 +1,4 @@
-FROM postgres:12.3
+FROM postgres:12.5
 COPY .dockertimestamp /
 
 RUN ( \

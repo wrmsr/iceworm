@@ -1,23 +1,23 @@
 apipkg==1.5
 appnope==0.1.0
 asn1crypto==1.4.0
-attrs==20.2.0
-azure-common==1.1.25
-azure-core==1.8.2
-azure-storage-blob==12.5.0
+attrs==20.3.0
+azure-common==1.1.26
+azure-core==1.9.0
+azure-storage-blob==12.6.0
 backcall==0.2.0
 bleach==3.2.1
-boto3==1.16.10
-boto3-stubs==1.16.10.0
-botocore==1.19.10
-certifi==2020.6.20
+boto3==1.16.18
+boto3-stubs==1.16.18.0
+botocore==1.19.18
+certifi==2020.11.8
 cffi==1.14.3
 chardet==3.0.4
 cli-helpers==2.1.0
 click==7.1.2
 colorama==0.4.4
 configobj==5.0.6
-cryptography==2.9.2
+cryptography==3.2.1
 Cython==0.29.21
 decorator==4.4.2
 docker==4.3.1
@@ -39,7 +39,7 @@ jedi==0.17.2
 Jinja2==2.11.2
 jmespath==0.10.0
 JPype1==1.1.2
-keyring==21.4.0
+keyring==21.5.0
 kiwisolver==1.3.1
 llvmlite==0.34.0
 MarkupSafe==1.1.1
@@ -51,7 +51,7 @@ nose==1.3.7
 numba==0.51.2
 numpy==1.19.4
 oauthlib==3.1.0
-omnibus @ git+https://github.com/wrmsr/omnibus@5d47c800d248834275168015387c59738594d576
+omnibus @ git+https://github.com/wrmsr/omnibus@018fa56f60b3979726a101c8213acdf5252832f1
 oscrypto==1.2.1
 packaging==20.4
 pandas==1.1.4
@@ -66,7 +66,7 @@ pkginfo==1.6.1
 pluggy==0.13.1
 ply==3.11
 prompt-toolkit==3.0.8
-protobuf==3.13.0
+protobuf==3.14.0
 psycopg2==2.8.6
 ptyprocess==0.6.0
 py==1.9.0
@@ -75,7 +75,7 @@ py4j==0.10.9.1
 pyarrow==2.0.0
 pycodestyle==2.6.0
 pycparser==2.20
-pycryptodomex==3.9.8
+pycryptodomex==3.9.9
 pyflakes==2.2.0
 Pygments==2.7.2
 PyHive==0.6.3
@@ -96,7 +96,7 @@ pytest-timeout==1.4.2
 pytest-xdist==2.1.0
 python-dateutil==2.8.1
 python-snappy==0.5.4
-pytz==2020.1
+pytz==2020.4
 PyUtilib==6.0.0
 PyYAML==5.3.1
 readme-renderer==28.0
@@ -109,7 +109,7 @@ sasl==0.2.1
 scramp==1.2.0
 setproctitle==1.1.10
 six==1.15.0
-snowflake-connector-python==2.3.4
+snowflake-connector-python==2.3.5
 snowflake-sqlalchemy==1.2.4
 SQLAlchemy==1.3.20
 sqlparse==0.4.1
@@ -118,13 +118,13 @@ termcolor==1.1.0
 terminaltables==3.1.0
 thrift==0.13.0
 thrift-sasl==0.4.2
-toml==0.10.1
+toml==0.10.2
 tqdm==4.51.0
 traitlets==5.0.5
 twine==3.2.0
 typed-ast==1.4.1
 typing-extensions==3.7.4.3
-urllib3==1.25.11
+urllib3==1.26.2
 wcwidth==0.2.5
 webencodings==0.5.1
 websocket-client==0.57.0
