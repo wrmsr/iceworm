@@ -1,5 +1,5 @@
 apipkg==1.5
-appnope==0.1.0
+appnope==0.1.2
 asn1crypto==1.4.0
 attrs==20.3.0
 azure-common==1.1.26
@@ -7,9 +7,9 @@ azure-core==1.9.0
 azure-storage-blob==12.6.0
 backcall==0.2.0
 bleach==3.2.1
-boto3==1.16.25
+boto3==1.15.18
 boto3-stubs==1.16.25.0
-botocore==1.19.25
+botocore==1.18.18
 certifi==2020.11.8
 cffi==1.14.4
 chardet==3.0.4
@@ -51,7 +51,7 @@ nose==1.3.7
 numba==0.51.2
 numpy==1.19.4
 oauthlib==3.1.0
-omnibus @ git+https://github.com/wrmsr/omnibus@505b13a506370d3bd2b2f8dfa310ca0a8448a8c1
+omnibus @ git+https://github.com/wrmsr/omnibus@f25a986983a92ccac2b031343bfa128f781df628
 oscrypto==1.2.1
 packaging==20.7
 pandas==1.1.4
@@ -71,7 +71,7 @@ psycopg2==2.8.6
 ptyprocess==0.6.0
 py==1.9.0
 py-cpuinfo==7.0.0
-py4j==0.10.9.1
+py4j==0.10.9
 pyarrow==2.0.0
 pycodestyle==2.6.0
 pycparser==2.20
@@ -112,7 +112,7 @@ six==1.15.0
 snowflake-connector-python==2.3.6
 snowflake-sqlalchemy==1.2.4
 SQLAlchemy==1.3.20
-sqlparse==0.4.1
+sqlparse==0.3.1
 tabulate==0.8.7
 termcolor==1.1.0
 terminaltables==3.1.0
@@ -124,7 +124,7 @@ traitlets==5.0.5
 twine==3.2.0
 typed-ast==1.4.1
 typing-extensions==3.7.4.3
-urllib3==1.26.2
+urllib3==1.25.11
 wcwidth==0.2.5
 webencodings==0.5.1
 websocket-client==0.57.0
