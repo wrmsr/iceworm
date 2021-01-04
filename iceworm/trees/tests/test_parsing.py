@@ -21,10 +21,10 @@ def do_dot(root: no.Node) -> None:
     def rec(n: no.Node) -> None:
         title = f'{n.__class__.__name__}@{hex(id(n))[2:]}'
         if isinstance(n, no.Identifier):
-            body = [[title], [n.name]]
+            lbl = [[title], [n.name]]
         else:
-            body = title
-        stmts.append(dot.Node(str(id(n)), {'label': body}))
+            lbl = title
+        stmts.append(dot.Node(str(id(n)), {'label': lbl}))
         for c in n.children:
             rec(c)
             stmts.append(dot.Edge(str(id(n)), str(id(c))))
