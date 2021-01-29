@@ -15,11 +15,11 @@ pytest-asyncio==0.14.0
 pytest-benchmark==3.2.3
 pytest-clarity==0.3.0a0
 pytest-forked==1.3.0
-pytest-mock==3.4.0
+pytest-mock==3.5.1
 pytest-randomly==3.4.1
 pytest-timeout==1.4.2
 pytest-xdist==2.2.0
-pytest==6.2.1
+pytest==6.2.2
 
 
 ## experimental deps
@@ -33,16 +33,16 @@ pyspark-stubs==3.0.0.post1
 # parquet
 
 fastparquet==0.5.0
-numpy==1.19.4
-pandas==1.2.0
-pyarrow==2.0.0
-python-snappy==0.5.4
+numpy==1.19.5
+pandas==1.2.1
+pyarrow==3.0.0
+python-snappy==0.6.0
 
 # opto
 
 kiwisolver==1.3.1
 pyomo==5.7.2
-z3-solver==4.8.9.0
+z3-solver==4.8.10.0
 
 
 ## useful tools
@@ -51,9 +51,9 @@ flake8==3.8.4
 gprof2dot==2019.11.30
 ipdb==0.13.4
 ipython==7.19.0
-mypy==0.790
+mypy==0.800
 pgcli==3.1.0
 pipdeptree==2.0.0
 pyflakes==2.2.0
 sqlparse>=0.3.1
-typed-ast==1.4.1
+typed-ast==1.4.2

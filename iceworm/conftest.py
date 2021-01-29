@@ -18,7 +18,7 @@ from .tests import plugins  # noqa
 
 oplugins.ALL.extend(plugins.ALL)
 
-oplugins.switches.SWITCHES.extend([
+oplugins.switches.SWITCHES.update([
 
 ])
 

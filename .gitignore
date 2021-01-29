@@ -1,5 +1,5 @@
-**/.DS_Store
 **/.benchmarks/
+**/.DS_Store
 **/.idea/
 **/.revision
 **/node_modules/
@@ -14,6 +14,7 @@
 *.so
 *.sock
 *.swp
+/*.egg-info/
 /.cache/
 /.env
 /.mypy_cache/
@@ -21,13 +22,12 @@
 /.python-version
 /.tox/
 /.venv*/
-/MANIFEST
 /__pycache__/
 /build/
 /cython_debug/
 /dist/
 /gen/
-/iceworm.egg-info/
+/MANIFEST
 /profiles/
 /target/
 /temp/
