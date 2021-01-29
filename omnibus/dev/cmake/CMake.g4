@@ -1,6 +1,0 @@
-grammar CMake;
-
-
-body
-    : EOF
-    ;
