@@ -1,5 +1,6 @@
 import contextlib
 import itertools
+import logging  # noqa
 import os.path
 import typing as ta  # noqa
 
@@ -8,6 +9,7 @@ from omnibus import collections as ocol
 from omnibus import dataclasses as dc
 from omnibus import inject as inj
 from omnibus import lang  # noqa
+from omnibus import logs  # noqa
 from omnibus import os as oos  # noqa
 from omnibus import properties
 from omnibus.inject.dev import pytest as ptinj
@@ -36,6 +38,10 @@ from ...utils import secrets as sec  # noqa
 
 # def get_src_table_domain(query: str, src: QualifiedName, dom: doms.Domain) -> doms.Domain:  # noqa
 #     raise NotImplementedError
+
+
+# logs.configure_standard_logging()
+# els.driving.log.setLevel(logging.DEBUG)
 
 
 class UrlSecretsReplacer(els.ElementProcessor):
