@@ -125,7 +125,7 @@ class Element(nodal.Nodal['Element', Annotation]):
         check.state(nf.type in (Id, ta.Optional[Id]))
 
     @classmethod
-    def _build_nodal_fields(cls) -> nodal.FieldsInfo:
+    def _build_nodal_fields(cls) -> nodal.Fields:
         fi = super()._build_nodal_fields()
         for fn, f in fi.flds.items():
             if isinstance(f.spec.erased_cls, type) and issubclass(f.spec.erased_cls, Element):
