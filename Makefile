@@ -132,9 +132,9 @@ define do-deps
 	echo "omnibus local:$$OMNIBUS_LOCAL remote:$$OMNIBUS_REMOTE" ; \
 	if [ "$$OMNIBUS_LOCAL" != "$$OMNIBUS_REMOTE" ] ; then \
 		A="" ; \
-		$(1)/bin/pip uninstall -y omnibus ; \
+		$(1)/bin/pip freeze | grep omnibus | egrep -o '^[^ ]+' | xargs -n1 .venv/bin/pip uninstall -y ; \
 		if [ $(2) == "1" ] ; then \
-			export __OMNIBUS_DEV=1 ; \
+			export __OMNIBUS_DIST=all ; \
 			A="$$A --no-build-isolation" ; \
 		fi ; \
 		$(1)/bin/pip install $$A $(PIP_ARGS) git+https://github.com/wrmsr/omnibus@wrmsr_working ; \
@@ -303,7 +303,7 @@ with open('setup.py', 'r') as f: \n\
     lines = [l.rstrip() for l in f.readlines()] \n\
 [pos] = [i for i, l in enumerate(lines) if l.strip() == '# @omnibus-dep@'] \n\
 import subprocess \n\
-[dep] = [l for l in subprocess.check_output(['.venv/bin/pip', 'freeze']).decode('utf-8').splitlines() for l in [l.strip()] if l.startswith('omnibus ')] \n\
+[dep] = [l for l in subprocess.check_output(['.venv/bin/pip', 'freeze']).decode('utf-8').splitlines() for l in [l.strip()] if l.startswith('omnibus')] \n\
 print(dep) \n\
 lines[pos+1] = '    ' + chr(39) + dep + chr(39) + ',' \n\
 with open('setup.py', 'w') as f: \n\
