@@ -2,8 +2,8 @@ SHELL:=/bin/bash
 
 PROJECT:=iceworm
 
-PYTHON_VERSION:=3.7.9
-PYTHON_38_VERSION:=3.8.6
+PYTHON_VERSION:=3.7.12
+PYTHON_38_VERSION:=3.8.12
 
 PYENV_ROOT:=$(shell if [ -z "$${PYENV_ROOT}" ]; then echo "$${HOME}/.pyenv" ; else echo "$${PYENV_ROOT%/}" ; fi)
 PYENV_BIN:=$(shell if [ -f "$${HOME}/.pyenv/bin/pyenv" ] ; then echo "$${HOME}/.pyenv/bin/pyenv" ; else echo pyenv ; fi)
